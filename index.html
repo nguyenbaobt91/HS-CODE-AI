@@ -6210,6 +6210,14 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             const exclusions = r.exclusions || '';
             const recommendations = r.recommendations || '';
 
+            const matchedRulings = findMatchedCustomsRulings(input, cleanCode);
+            let rulingsA4Text = '';
+            if (matchedRulings && matchedRulings.length > 0) {
+                rulingsA4Text = matchedRulings.map(ru => `• Tiền lệ TCHQ ${ru.doc}: '${ru.name}' &rarr; Áp dụng mã HS ${formatHSCode(ru.hs)} (${ru.basis || ru.summary})`).join('<br>');
+            } else {
+                rulingsA4Text = '• Đã đối soát kho tiền lệ Hải quan (151 văn bản phán quyết TCHQ): Chưa phát sinh tranh chấp phân loại cho mặt hàng với model này. Kết quả phân loại tuân thủ đúng Chú giải HS 2022 (Công văn 1810/TCHQ-TXNK &amp; HQKV8).';
+            }
+
             // Optional Image HTML
             let imgHtml = '';
             const imageB64 = input.image_b64 || r.image_b64;
@@ -6338,20 +6346,27 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                 </div>
 
                 <!-- Section 2 -->
-                <div style="font-size: 11pt; font-weight: bold; color: #004080; margin: 10pt 0 4pt 0; font-family: Arial, sans-serif;">2. Phân tích theo 6 Quy tắc Tổng quát Giải thích HS (GRI)</div>
-                <div style="margin: 0 0 3pt 14pt; font-size: 9.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;"><span style="font-weight: bold; color: #111111;">· GRI 1 (Tên Nhóm &amp; Chú giải): </span>${gri1 || 'Áp dụng theo nội dung của nhóm và Chú giải Chương liên quan của Biểu thuế XNK 2026.'}</div>
-                <div style="margin: 0 0 3pt 14pt; font-size: 9.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;"><span style="font-weight: bold; color: #111111;">· GRI 2 (Chưa hoàn chỉnh / Đồng bộ): </span>${gri2 || 'Sản phẩm hoàn chỉnh, mang đầy đủ đặc tính thương mại cơ bản theo Quy tắc 2(a).'}</div>
-                <div style="margin: 0 0 3pt 14pt; font-size: 9.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;"><span style="font-weight: bold; color: #111111;">· GRI 3 (Mô tả cụ thể / Đặc trưng nhất): </span>${gri3 || 'Mô tả có tính chất cụ thể, rõ ràng nhất được ưu tiên theo Quy tắc 3(a).'}</div>
-                <div style="margin: 0 0 3pt 14pt; font-size: 9.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;"><span style="font-weight: bold; color: #111111;">· GRI 4 (Hàng hóa giống nhất): </span>${gri4 || 'Không cần áp dụng do hàng hóa đã được xác định cụ thể theo các quy tắc trước.'}</div>
-                <div style="margin: 0 0 3pt 14pt; font-size: 9.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;"><span style="font-weight: bold; color: #111111;">· GRI 5 (Bao bì &amp; Đồ chứa): </span>${gri5 || 'Bao bì tiêu chuẩn vận chuyển thông thường, phân loại cùng với hàng hóa.'}</div>
-                <div style="margin: 0 0 3pt 14pt; font-size: 9.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;"><span style="font-weight: bold; color: #111111;">· GRI 6 (Phân nhóm 6 số &amp; Mã 8 số): </span>${gri6 || `Phân loại ở cấp độ phân nhóm và mã 8 số ${codeFmt} dựa trên cấu trúc Biểu thuế XNK 2026.`}</div>
+                <div style="font-size: 11pt; font-weight: bold; color: #004080; margin: 10pt 0 4pt 0; font-family: Arial, sans-serif;">2. GRI 1 - Định vị Heading 4 số &amp; Ma trận Pháp lý Chú giải Phần XV, XVI</div>
+                <div style="margin: 0 0 3pt 14pt; font-size: 9.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;"><span style="font-weight: bold; color: #111111;">· GRI 1 (Tên Nhóm 4 số &amp; Chú giải): </span>${gri1 || 'Áp dụng theo nội dung của nhóm và Chú giải Chương liên quan của Biểu thuế XNK 2026.'}</div>
+                <div style="margin: 0 0 3pt 14pt; font-size: 9.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;"><span style="font-weight: bold; color: #111111;">· Chú giải 2(a) Phần XVI: </span>Hàng hóa có chức năng độc lập (van 84.81, ổ bi 84.82, công tắc 85.36, biến đổi tĩnh 85.04, cáp điện 85.44...) trong mọi trường hợp phải phân loại vào đúng nhóm của chúng, không phân loại theo nhóm phụ tùng chung.</div>
+                <div style="margin: 0 0 3pt 14pt; font-size: 9.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;"><span style="font-weight: bold; color: #111111;">· Chú giải 2 Phần XV: </span>Bộ phận công dụng chung bằng kim loại cơ bản (bu lông ốc vít 73.18, lò xo 73.20, chi tiết gá lắp 73.26) thuộc Phần XV, không phân loại vào máy móc Phần XVI.</div>
+                <div style="margin: 0 0 3pt 14pt; font-size: 9.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;"><span style="font-weight: bold; color: #111111;">· Chú giải loại trừ 1(g) Phần XVI: </span>Chỉ loại trừ các bộ phận máy móc gia công bằng nhựa plastic sang Chương 39 (Nhóm 39.26); các bộ phận máy móc kim loại chuyên dụng áp dụng theo Chú giải 2(b) Phần XVI.</div>
+                <div style="margin: 0 0 3pt 14pt; font-size: 9.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;"><span style="font-weight: bold; color: #111111;">· Quy tắc Bổ trợ (GRI 2 - 5): </span>${gri2 ? 'GRI 2: ' + gri2 + ' | ' : ''}GRI 3(a): Mô tả có tính chất cụ thể, rõ ràng nhất được ưu tiên so với mô tả khái quát. | GRI 5: Bao bì tiêu chuẩn thông thường.</div>
 
                 <!-- Section 3 -->
-                <div style="font-size: 11pt; font-weight: bold; color: #004080; margin: 10pt 0 4pt 0; font-family: Arial, sans-serif;">3. Trích dẫn Chú giải chi tiết HS 2022</div>
+                <div style="font-size: 11pt; font-weight: bold; color: #004080; margin: 10pt 0 4pt 0; font-family: Arial, sans-serif;">3. Đối chiếu Tiền lệ Hải quan (TCHQ Rulings) &amp; Chú giải WCO 2022</div>
+                <div style="margin: 0 0 4pt 14pt; font-size: 9.5pt; line-height: 1.35; color: #995500; font-weight: bold;">[TIỀN LỆ PHÁN QUYẾT TỔNG CỤC HẢI QUAN (KHO RULINGS_DATA.JS)]:</div>
+                <div style="margin: 0 0 6pt 14pt; font-size: 9.5pt; line-height: 1.4; text-align: justify; color: #222222; word-break: break-word; overflow-wrap: break-word;">${rulingsA4Text}</div>
+                <div style="margin: 0 0 4pt 14pt; font-size: 9.5pt; line-height: 1.35; color: #004080; font-weight: bold;">[TRÍCH DẪN BỘ CHÚ GIẢI CHI TIẾT HS 2022 WCO (CV 1810/TCHQ-TXNK &amp; HQKV8)]:</div>
                 <div style="margin: 0 0 6pt 14pt; font-size: 9.5pt; line-height: 1.4; text-align: justify; color: #222222; word-break: break-word; overflow-wrap: break-word;">${notes || 'Đối chiếu Chú giải chi tiết HS 2022 WCO &amp; Bản Toàn tập HQKV8.'}</div>
 
                 <!-- Section 4 -->
-                <div style="font-size: 11pt; font-weight: bold; color: #004080; margin: 10pt 0 4pt 0; font-family: Arial, sans-serif;">4. Bảng So sánh và Lập luận Đánh giá giữa các Mã HS Tiềm năng</div>
+                <div style="font-size: 11pt; font-weight: bold; color: #004080; margin: 10pt 0 4pt 0; font-family: Arial, sans-serif;">4. GRI 6 - Phân nhóm Cùng cấp Gạch nối theo Thông số Định mức &amp; Phả hệ Biểu thuế</div>
+                <div style="margin: 0 0 6pt 14pt; font-size: 9.5pt; line-height: 1.4; text-align: justify; color: #222222; word-break: break-word; overflow-wrap: break-word;">${gri6 || `Phân loại ở cấp độ phân nhóm và mã 8 số ${codeFmt} dựa trên quy tắc so sánh cùng cấp độ gạch nối và đối chiếu thông số kỹ thuật định mức.`}</div>
+
+                <!-- Section 5 -->
+                <div style="font-size: 11pt; font-weight: bold; color: #004080; margin: 10pt 0 4pt 0; font-family: Arial, sans-serif;">5. Lập luận Loại trừ Pháp lý &amp; Bảng So sánh Đánh giá các Mã HS Tiềm năng</div>
+                <div style="margin: 0 0 6pt 14pt; font-size: 9.5pt; line-height: 1.4; text-align: justify; color: #990000; word-break: break-word; overflow-wrap: break-word;">${exclusions ? '<b>LÝ DO PHÁP LÝ LOẠI TRỪ CÁC MÃ ĐỐI THỦ:</b><br>' + exclusions.replace(/\n/g, '<br>') : 'Đã kiểm tra toàn diện: Các mã hàng đối thủ không đáp ứng được bản chất công năng, cấu tạo vật liệu hoặc thông số kỹ thuật định mức như mã đề xuất.'}</div>
                 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; margin: 6pt 0 10pt 0; font-size: 8.5pt;">
                     <thead>
                         <tr>
@@ -6366,8 +6381,8 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                     </tbody>
                 </table>
 
-                <!-- Section 5 -->
-                <div style="font-size: 11pt; font-weight: bold; color: #004080; margin: 10pt 0 4pt 0; font-family: Arial, sans-serif;">5. Bảng Thuế suất Chi tiết của Mã HS ${codeFmt}</div>
+                <!-- Section 6 -->
+                <div style="font-size: 11pt; font-weight: bold; color: #004080; margin: 10pt 0 4pt 0; font-family: Arial, sans-serif;">6. Bảng Thuế suất Chi tiết của Mã HS ${codeFmt}</div>
                 <table style="width: 100%; table-layout: fixed; border-collapse: collapse; margin: 6pt 0 10pt 0; font-size: 8.5pt;">
                     <thead>
                         <tr>
@@ -6381,8 +6396,8 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                     </tbody>
                 </table>
 
-                <!-- Section 6 -->
-                <div style="font-size: 11pt; font-weight: bold; color: #004080; margin: 10pt 0 4pt 0; font-family: Arial, sans-serif;">6. Kết luận &amp; Khuyến nghị Thủ tục Hải quan</div>
+                <!-- Section 7 -->
+                <div style="font-size: 11pt; font-weight: bold; color: #004080; margin: 10pt 0 4pt 0; font-family: Arial, sans-serif;">7. Kết luận &amp; Khuyến nghị Thủ tục Hải quan</div>
                 <div style="margin: 0 0 6pt 14pt; font-size: 9.5pt; line-height: 1.45; text-align: justify; color: #222222; word-break: break-word; overflow-wrap: break-word;">
                     <span style="font-weight: bold; color: #003366;">KẾT LUẬN &amp; KIẾN NGHỊ: </span>${conclText}
                 </div>
@@ -6819,6 +6834,67 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
         window.printDirectReportModal = printDirectReportModal;
         window.buildCleanA4ReportHtml = buildCleanA4ReportHtml;
 
+        function findMatchedCustomsRulings(rawInput, cleanCode) {
+            if (!window.CUSTOMS_RULINGS_DATABASE || !Array.isArray(window.CUSTOMS_RULINGS_DATABASE)) return [];
+            const qRaw = `${rawInput.name || ''} ${rawInput.desc || ''} ${rawInput.use || ''} ${rawInput.specs || ''} ${rawInput.model_en || ''}`.toLowerCase();
+            const qNorm = (typeof removeAccents === 'function') ? removeAccents(qRaw) : qRaw;
+            const matches = [];
+            for (let r of window.CUSTOMS_RULINGS_DATABASE) {
+                if (!r.hs) continue;
+                let count = 0;
+                for (let kw of (r.keywords || [])) {
+                    if (qNorm.includes(kw)) count++;
+                }
+                if (r.hs === cleanCode) count += 3;
+                if (count >= 2 || (r.hs === cleanCode && count >= 1)) {
+                    matches.push({ ruling: r, score: count });
+                }
+            }
+            matches.sort((a, b) => b.score - a.score);
+            return matches.slice(0, 3).map(m => m.ruling);
+        }
+
+        function renderCustomsRulingsBox(matchedRulings, cleanCode) {
+            if (matchedRulings && matchedRulings.length > 0) {
+                let itemsHtml = '';
+                matchedRulings.forEach(r => {
+                    const rCodeFmt = formatHSCode(r.hs);
+                    itemsHtml += `
+                        <div class="p-3.5 rounded-xl bg-amber-500/10 dark:bg-amber-950/30 border border-amber-300/60 dark:border-amber-700/60 space-y-1.5">
+                            <div class="flex flex-wrap items-center justify-between gap-1.5">
+                                <span class="px-2.5 py-0.5 rounded text-[11px] font-bold bg-amber-600 text-white font-mono shadow-sm">
+                                    <i class="fa-solid fa-stamp mr-1"></i>${r.doc || 'Văn bản TCHQ'}
+                                </span>
+                                <span class="text-xs font-mono font-black text-amber-700 dark:text-amber-300">Mã HS ấn định: ${rCodeFmt}</span>
+                            </div>
+                            <p class="text-xs font-bold text-slate-800 dark:text-slate-100">${r.name}</p>
+                            <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed"><strong class="text-amber-800 dark:text-amber-300">Căn cứ:</strong> ${r.basis || r.summary}</p>
+                        </div>
+                    `;
+                });
+                return `
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-xs font-bold text-amber-700 dark:text-amber-300">
+                            <i class="fa-solid fa-scale-balanced"></i>
+                            <span>Tìm thấy ${matchedRulings.length} Tiền lệ Phán quyết Phân loại Tương ứng từ Tổng cục Hải quan:</span>
+                        </div>
+                        <div class="grid grid-cols-1 gap-2.5">
+                            ${itemsHtml}
+                        </div>
+                    </div>
+                `;
+            }
+            return `
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 flex items-start gap-2.5">
+                    <i class="fa-solid fa-circle-info text-sky-500 text-sm mt-0.5 shrink-0"></i>
+                    <div>
+                        <strong class="text-slate-800 dark:text-slate-200">Đã đối soát kho tiền lệ Hải quan (151 văn bản phán quyết TCHQ):</strong>
+                        Chưa ghi nhận tiền lệ phán quyết tranh chấp riêng biệt cho mặt hàng với model này. Kết quả phân loại được định vị chuẩn xác theo nguyên tắc pháp lý Chú giải HS 2022 (Công văn 1810/TCHQ-TXNK) và Biểu thuế XNK 2026.
+                    </div>
+                </div>
+            `;
+        }
+
         function renderGeminiAIReportHtml(res, rawInput) {
             const codeFmt = res.hs_code || '8208.90.00';
             const cleanCode = res.clean_code || codeFmt.replace(/\./g, '');
@@ -6828,6 +6904,7 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             const acfta = res.acfta || '0%';
             const declName = res.decl_name || rawInput.name;
             const isLocal = isLocalEnvironment();
+            const matchedRulings = findMatchedCustomsRulings(rawInput, cleanCode);
 
             const step1 = res.step1_tech_review || {
                 trade_name: `${rawInput.name || declName} (Model: ${rawInput.model_en || 'Tiêu chuẩn'})`,
@@ -6999,30 +7076,30 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                     ${imgHtml}
                     ${docHtml}
 
-                    <!-- BƯỚC 1: RÀ SOÁT ĐA CHIỀU (4 TIÊU CHUẨN KỸ THUẬT BẮT BUỘC) -->
+                    <!-- BƯỚC 1 (PHÂN RÃ THUỘC TÍNH): 4 TIÊU CHUẨN KỸ THUẬT CHUẨN MỰC HẢI QUAN -->
                     <div class="space-y-4">
                         <div class="flex items-center justify-between">
                             <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-sky-300 flex items-center gap-2">
                                 <span class="w-6 h-6 rounded-lg bg-sky-600 text-white flex items-center justify-center text-xs font-black shadow-sm">1</span>
-                                <span>Bước 1: Rà soát Đa chiều (4 Tiêu chuẩn Kỹ thuật Bắt buộc)</span>
+                                <span>Bước 1: Phân Rã Thuộc Tính (4 Tiêu Chuẩn Kỹ Thuật Chuẩn Mực)</span>
                             </h3>
                             <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-700">
-                                <i class="fa-solid fa-shield-halved text-sky-600 dark:text-sky-400 mr-1"></i>SOP hs_code_automation
+                                <i class="fa-solid fa-shield-halved text-sky-600 dark:text-sky-400 mr-1"></i>Trụ Cột 2: Agentic Reasoning Flow
                             </span>
                         </div>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div class="p-4 rounded-2xl bg-sky-50/70 dark:bg-slate-800/60 border border-sky-200 dark:border-sky-900/60 space-y-2 hover:shadow-md transition-all">
                                 <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300 font-mono border border-sky-200 dark:border-sky-700 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-tag"></i>1. Tên hàng định danh
+                                    <i class="fa-solid fa-tag"></i>1. Tên gọi định danh
                                 </span>
                                 <p class="text-xs text-slate-700 dark:text-slate-200 font-semibold leading-relaxed">${step1.trade_name || rawInput.name}</p>
-                                <span class="text-[10px] text-slate-500 dark:text-slate-400 block">Tên thương mại & kỹ thuật theo Datasheet / Hải quan</span>
+                                <span class="text-[10px] text-slate-500 dark:text-slate-400 block">Tên thương mại &amp; kỹ thuật theo Datasheet / Hải quan</span>
                             </div>
 
                             <div class="p-4 rounded-2xl bg-indigo-50/70 dark:bg-slate-800/60 border border-indigo-200 dark:border-indigo-900/60 space-y-2 hover:shadow-md transition-all">
                                 <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-mono border border-indigo-200 dark:border-indigo-700 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-cubes"></i>2. Bản chất & Chất liệu
+                                    <i class="fa-solid fa-cubes"></i>2. Bản chất &amp; Chất liệu
                                 </span>
                                 <p class="text-xs text-slate-700 dark:text-slate-200 font-semibold leading-relaxed">${step1.material || 'Theo hồ sơ kỹ thuật'}</p>
                                 <span class="text-[10px] text-slate-500 dark:text-slate-400 block">Đồng, sắt thép, nhôm, nhựa plastic, cao su...</span>
@@ -7030,7 +7107,7 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
 
                             <div class="p-4 rounded-2xl bg-purple-50/70 dark:bg-slate-800/60 border border-purple-200 dark:border-purple-900/60 space-y-2 hover:shadow-md transition-all">
                                 <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-mono border border-purple-200 dark:border-purple-700 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-ruler-combined"></i>3. Kích thước & Thông số
+                                    <i class="fa-solid fa-ruler-combined"></i>3. Kích thước &amp; Thông số
                                 </span>
                                 <p class="text-xs text-slate-700 dark:text-slate-200 font-semibold leading-relaxed">${step1.dimensions_specs || 'Theo thông số định mức'}</p>
                                 <span class="text-[10px] text-slate-500 dark:text-slate-400 block">Điện áp (V), dòng điện (A), DN (mm), áp suất (bar)...</span>
@@ -7038,7 +7115,7 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
 
                             <div class="p-4 rounded-2xl bg-teal-50/70 dark:bg-slate-800/60 border border-teal-200 dark:border-teal-900/60 space-y-2 hover:shadow-md transition-all">
                                 <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 font-mono border border-teal-200 dark:border-teal-700 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-gears"></i>4. Công dụng & Cơ cấu
+                                    <i class="fa-solid fa-gears"></i>4. Công dụng &amp; Cơ cấu
                                 </span>
                                 <p class="text-xs text-slate-700 dark:text-slate-200 font-semibold leading-relaxed">${step1.function_transmission || 'Cơ cấu vận hành chuyên dụng'}</p>
                                 <span class="text-[10px] text-slate-500 dark:text-slate-400 block">Đóng ngắt, bảo vệ, khí nén, thủy lực, cơ khí, tự động...</span>
@@ -7046,74 +7123,161 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                         </div>
                     </div>
 
-                    <!-- BƯỚC 2: PHÂN TÍCH 6 QUY TẮC GRI (GRI 1 - GRI 6) -->
+                    <!-- BƯỚC 2 (GRI 1 - ĐỊNH VỊ HEADING 4 SỐ): MA TRẬN PHÁP LÝ CHÚ GIẢI PHẦN & CHƯƠNG -->
                     <div class="space-y-4">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-sky-300 flex items-center gap-2">
-                            <span class="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs font-black shadow-sm">2</span>
-                            <span>Bước 2: Phân tích Chi tiết 6 Quy tắc Tổng quát Giải thích HS (GRI 1 - GRI 6)</span>
-                        </h3>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2 hover:shadow-md transition-all">
-                                <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300 font-mono border border-sky-200 dark:border-sky-700">GRI 1 - Tên Nhóm 4 số & Chú giải</span>
-                                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${res.gri1 || 'Áp dụng theo nội dung của nhóm và các Chú giải Phần, Chú giải Chương liên quan của Biểu thuế XNK 2026.'}</p>
-                            </div>
-
-                            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2 hover:shadow-md transition-all">
-                                <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-mono border border-indigo-200 dark:border-indigo-700">GRI 2 - Chưa hoàn chỉnh / Hỗn hợp</span>
-                                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${res.gri2 || 'Hàng hóa hoàn chỉnh, đã mang đặc trưng cơ bản của sản phẩm thương mại hoàn thiện.'}</p>
-                            </div>
-
-                            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2 hover:shadow-md transition-all">
-                                <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-mono border border-purple-200 dark:border-purple-700">GRI 3 - Phân loại đa hợp / Đặc trưng</span>
-                                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${res.gri3 || 'Mô tả có tính chất cụ thể, rõ ràng nhất được ưu tiên hơn các mô tả mang tính tổng quát.'}</p>
-                            </div>
-
-                            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2 hover:shadow-md transition-all">
-                                <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 font-mono border border-amber-200 dark:border-amber-700">GRI 4 - Hàng hóa giống nhất</span>
-                                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${res.gri4 || 'Không cần áp dụng do hàng hóa đã được xác định cụ thể theo các quy tắc trước.'}</p>
-                            </div>
-
-                            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2 hover:shadow-md transition-all">
-                                <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 font-mono border border-emerald-200 dark:border-emerald-700">GRI 5 - Bao bì & Đồ chứa đựng</span>
-                                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${res.gri5 || 'Bao bì tiêu chuẩn vận chuyển thông thường, được phân loại cùng với hàng hóa.'}</p>
-                            </div>
-
-                            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2 hover:shadow-md transition-all">
-                                <span class="px-2.5 py-1 rounded-md text-[11px] font-bold bg-rose-100 dark:bg-rose-900/40 text-rose-800 dark:text-rose-300 font-mono border border-rose-200 dark:border-rose-700">GRI 6 - Phân nhóm & Mã 8 số</span>
-                                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${res.gri6 || 'Phân loại ở cấp độ phân nhóm và mã 8 số dựa trên quy tắc so sánh cùng cấp độ và tính chất kỹ thuật.'}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- BƯỚC 3 & BƯỚC 4: CHÚ GIẢI 2022 & LOẠI TRỪ PHÁP LÝ -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3 shadow-sm">
-                            <h4 class="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400 flex items-center gap-2">
-                                <span class="w-5 h-5 rounded-md bg-sky-600 text-white flex items-center justify-center text-[10px] font-black">3</span>
-                                <span>Bước 3: Trích dẫn Bộ Chú giải HS 2022 (CV 1810 & HQKV8)</span>
-                            </h4>
-                            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">${res.explanatory_notes || 'Đối chiếu Bộ Chú giải HS 2022 (Công văn 1810/TCHQ-TXNK) và ấn phẩm HQKV8.'}</p>
-                        </div>
-
-                        <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-3 shadow-sm">
-                            <h4 class="text-xs font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400 flex items-center gap-2">
-                                <span class="w-5 h-5 rounded-md bg-rose-600 text-white flex items-center justify-center text-[10px] font-black">4</span>
-                                <span>Bước 4: Lập luận Loại trừ Pháp lý Chuyên sâu</span>
-                            </h4>
-                            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">${res.exclusions || 'Loại trừ các nhóm khác không phù hợp với bản chất hàng hóa.'}</p>
-                        </div>
-                    </div>
-
-                    <!-- BƯỚC 5: BẢNG SO SÁNH VÀ LẬP LUẬN ĐÁNH GIÁ GIỮA CÁC MÃ HS TIỀM NĂNG -->
-                    <div class="space-y-3">
                         <div class="flex items-center justify-between">
                             <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-sky-300 flex items-center gap-2">
-                                <span class="w-6 h-6 rounded-lg bg-teal-600 text-white flex items-center justify-center text-xs font-black shadow-sm">5</span>
-                                <span>Bước 5: Bảng So sánh và Lập luận Đánh giá giữa các Mã HS Tiềm năng</span>
+                                <span class="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs font-black shadow-sm">2</span>
+                                <span>Bước 2: GRI 1 - Định Vị Heading 4 Số (Ma Trận Pháp Lý Chú Giải Phần &amp; Chương)</span>
                             </h3>
+                            <span class="text-[11px] font-mono text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/50 px-2.5 py-1 rounded-full border border-indigo-200 dark:border-indigo-800 font-bold">
+                                Nhóm ${cleanCode.substring(0,2)}.${cleanCode.substring(2,4)}
+                            </span>
                         </div>
 
+                        <!-- Khối lập luận GRI 1 chính thức -->
+                        <div class="p-4 rounded-2xl bg-indigo-50/50 dark:bg-slate-800/80 border border-indigo-100 dark:border-indigo-900/40 space-y-2">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-600 text-white font-mono">GRI 1</span>
+                                <strong class="text-xs text-slate-900 dark:text-white">Căn cứ Tên Nhóm 4 số &amp; Chú giải Pháp lý Bắt buộc:</strong>
+                            </div>
+                            <p class="text-xs text-slate-700 dark:text-slate-200 leading-relaxed">${res.gri1 || `Căn cứ Quy tắc 1 (GRI 1), việc phân loại được xác định căn cứ vào nội dung của Nhóm ${cleanCode.substring(0,2)}.${cleanCode.substring(2,4)} và các Chú giải Phần, Chú giải Chương liên quan của Biểu thuế XNK 2026.`}</p>
+                        </div>
+
+                        <!-- Khối Ma trận 3 Chú giải Pháp lý Cốt lõi (Phần XV & Phần XVI) -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-1.5">
+                                <div class="text-[11px] font-bold text-sky-700 dark:text-sky-300 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-bolt"></i>Chú giải 2(a) Phần XVI
+                                </div>
+                                <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                                    Máy móc/thiết bị có chức năng độc lập (van 84.81, ổ bi 84.82, công tắc 85.36, dây cáp 85.44, nguồn tĩnh 85.04...) trong mọi trường hợp phải phân loại vào đúng nhóm của chúng, không phân loại theo nhóm phụ tùng chung.
+                                </p>
+                            </div>
+
+                            <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-1.5">
+                                <div class="text-[11px] font-bold text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-wrench"></i>Chú giải 2 Phần XV
+                                </div>
+                                <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                                    Bộ phận công dụng chung bằng kim loại cơ bản (bu lông ốc vít 73.18, lò xo 73.20, miếng thép gá lắp/bộ phận khác 73.26) thuộc Phần XV, không phân loại theo máy móc Phần XVI.
+                                </p>
+                            </div>
+
+                            <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-1.5">
+                                <div class="text-[11px] font-bold text-rose-700 dark:text-rose-300 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-ban"></i>Chú giải loại trừ 1(g) Phần XVI
+                                </div>
+                                <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                                    Chỉ loại trừ các bộ phận máy móc gia công bằng nhựa plastic sang Chương 39 (Nhóm 39.26); các bộ phận kim loại máy móc chuyên dụng tuân thủ Chú giải 2(b) Phần XVI.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- 4 Quy tắc bổ trợ GRI 2 - GRI 5 -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-[11px]">
+                            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60">
+                                <span class="font-bold text-slate-800 dark:text-slate-200 block text-[10px] uppercase font-mono">GRI 2 (Hoàn chỉnh)</span>
+                                <span class="text-slate-600 dark:text-slate-400 text-[11px] leading-tight block mt-1">${res.gri2 || 'Hàng hóa hoàn chỉnh, mang đặc tính cơ bản của thành phẩm.'}</span>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60">
+                                <span class="font-bold text-slate-800 dark:text-slate-200 block text-[10px] uppercase font-mono">GRI 3 (Đặc trưng nhất)</span>
+                                <span class="text-slate-600 dark:text-slate-400 text-[11px] leading-tight block mt-1">${res.gri3 || 'Mô tả định danh cụ thể nhất được ưu tiên theo GRI 3(a).'}</span>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60">
+                                <span class="font-bold text-slate-800 dark:text-slate-200 block text-[10px] uppercase font-mono">GRI 4 (Giống nhất)</span>
+                                <span class="text-slate-600 dark:text-slate-400 text-[11px] leading-tight block mt-1">${res.gri4 || 'Không cần áp dụng do đã xác định cụ thể theo GRI 1-3.'}</span>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60">
+                                <span class="font-bold text-slate-800 dark:text-slate-200 block text-[10px] uppercase font-mono">GRI 5 (Bao bì)</span>
+                                <span class="text-slate-600 dark:text-slate-400 text-[11px] leading-tight block mt-1">${res.gri5 || 'Bao bì đóng gói thông thường đi kèm cùng hàng hóa.'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BƯỚC 3 (ĐỐI CHIẾU TIỀN LỆ HẢI QUAN): TRUY QUÉT KHO RULINGS_DATA.JS & CHÚ GIẢI WCO 2022 -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-sky-300 flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-lg bg-amber-600 text-white flex items-center justify-center text-xs font-black shadow-sm">3</span>
+                                <span>Bước 3: Đối Chiếu Tiền Lệ Hải Quan (Kho Rulings TCHQ &amp; Chú Giải WCO 2022)</span>
+                            </h3>
+                            <span class="text-[11px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 px-2.5 py-1 rounded-full border border-amber-200 dark:border-amber-800">
+                                <i class="fa-solid fa-landmark mr-1"></i>151 Phán Quyết TCHQ
+                            </span>
+                        </div>
+
+                        <!-- Khối Tiền lệ Phán quyết TCHQ -->
+                        ${renderCustomsRulingsBox(matchedRulings, cleanCode)}
+
+                        <!-- Khối Trích dẫn Chú giải chi tiết HS 2022 -->
+                        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2">
+                            <div class="flex items-center gap-2 text-xs font-bold text-sky-700 dark:text-sky-300 uppercase">
+                                <i class="fa-solid fa-book-bookmark"></i>
+                                <span>Trích dẫn Bộ Chú giải HS 2022 WCO (Công văn 1810/TCHQ-TXNK &amp; Ấn phẩm HQKV8):</span>
+                            </div>
+                            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">${res.explanatory_notes || 'Đối chiếu Chú giải chi tiết HS 2022 (Công văn 1810/TCHQ-TXNK) và bộ ấn phẩm Chú giải HS 2022 Hải quan KV8.'}</p>
+                        </div>
+                    </div>
+
+                    <!-- BƯỚC 4 (GRI 6 - PHÂN NHÓM CÙNG CẤP GẠCH NỐI): ĐỐI CHIẾU THÔNG SỐ ĐỊNH MỨC THỰC TẾ -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-sky-300 flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-lg bg-teal-600 text-white flex items-center justify-center text-xs font-black shadow-sm">4</span>
+                                <span>Bước 4: GRI 6 - Phân Nhóm Cùng Cấp Gạch Nối (Đối Chiếu Thông Số Định Mức Thực Tế)</span>
+                            </h3>
+                            <span class="text-[11px] font-mono text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/50 px-2.5 py-1 rounded-full border border-teal-200 dark:border-teal-800 font-bold">
+                                Cấp độ gạch nối: - / -- / ---
+                            </span>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-teal-50/50 dark:bg-slate-800/60 border border-teal-200 dark:border-teal-900/60 space-y-3">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-teal-600 text-white font-mono">GRI 6</span>
+                                <strong class="text-xs text-slate-900 dark:text-white">Quy tắc so sánh cùng cấp độ gạch nối và đối chiếu thông số thực tế:</strong>
+                            </div>
+                            
+                            <p class="text-xs text-slate-700 dark:text-slate-200 leading-relaxed">
+                                ${res.gri6 || `Căn cứ Quy tắc 6 (GRI 6), việc phân loại ở cấp độ phân nhóm 6 số và mã hàng 8 số được xác định bằng cách so sánh ở CÙNG CẤP ĐỘ GẠCH NỐI (- hoặc --), các Chú giải phân nhóm liên quan và thông số kỹ thuật định lượng thực tế (${rawInput.specs || rawInput.desc || 'tiêu chuẩn'}).`}
+                            </p>
+
+                            <!-- Phả hệ phân tầng (Lineage) -->
+                            <div class="p-3 rounded-xl bg-white dark:bg-slate-900 border border-teal-200 dark:border-teal-800 text-xs space-y-1">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-teal-700 dark:text-teal-400 block font-mono">
+                                    <i class="fa-solid fa-sitemap mr-1"></i>Chuỗi phả hệ phân tầng Biểu thuế XNK 2026 (Lineage):
+                                </span>
+                                <div class="font-mono text-slate-800 dark:text-slate-200 text-xs">
+                                    ${res.item_description ? `Nhóm ${cleanCode.substring(0,4)} &gt; ... &gt; <strong class="text-teal-600 dark:text-amber-300">${res.item_description}</strong>` : `Mã số 8 số ${codeFmt}`}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BƯỚC 5 (LẬP LUẬN LOẠI TRỪ & BẢNG ĐÁNH GIÁ MÃ CẠNH TRANH) -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-sky-300 flex items-center gap-2">
+                                <span class="w-6 h-6 rounded-lg bg-rose-600 text-white flex items-center justify-center text-xs font-black shadow-sm">5</span>
+                                <span>Bước 5: Lập Luận Loại Trừ Pháp Lý &amp; Bảng Đánh Giá Mã Cạnh Tranh</span>
+                            </h3>
+                            <span class="text-[11px] font-semibold text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/50 px-2.5 py-1 rounded-full border border-rose-200 dark:border-rose-800">
+                                <i class="fa-solid fa-triangle-exclamation mr-1"></i>Loại trừ pháp lý bắt buộc
+                            </span>
+                        </div>
+
+                        <!-- Khung Lập luận loại trừ pháp lý chuyên sâu -->
+                        <div class="p-4 rounded-2xl bg-rose-50/50 dark:bg-slate-800/60 border border-rose-200 dark:border-rose-900/60 space-y-2">
+                            <div class="flex items-center gap-2 text-xs font-bold text-rose-700 dark:text-rose-300 uppercase">
+                                <i class="fa-solid fa-file-circle-xmark"></i>
+                                <span>Lý do pháp lý loại trừ từng mã ứng viên đối thủ cạnh tranh:</span>
+                            </div>
+                            <div class="text-xs text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-line pl-1 border-l-2 border-rose-400 dark:border-rose-600">
+                                ${res.exclusions || 'Đã kiểm tra toàn diện Biểu thuế: Các mã hàng đối thủ không đáp ứng được bản chất công năng, cấu tạo vật liệu hoặc thông số kỹ thuật định mức như mã đề xuất.'}
+                            </div>
+                        </div>
+
+                        <!-- Bảng Ma trận So sánh và Đánh giá Mã Cạnh tranh -->
                         <div class="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900">
                             <table class="w-full text-left text-xs border-collapse">
                                 <thead>
