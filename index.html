@@ -3111,6 +3111,47 @@
                         ]
                     }
                 ]
+            },
+            // 39. Tấm nhựa, Màng nhựa, Tấm che & Sản phẩm Plastic (Nhóm 39.20, 39.21 & 39.26)
+            {
+                id: 'plastic_plates_articles_39',
+                headings: ['3926', '3920', '3921'],
+                keywords: ['tam nhua', 'phien nhua', 'mang nhua', 'la nhua', 'dai nhua', 'thanh nhua', 'khuon nhua', 'tam mica', 'tam pvc', 'tam pe', 'tam pp', 'tam acrylic', 'tam polycarbonate', 'tam pc', 'plastic sheet', 'plastic plate', 'tam nhua chiu luc', 'tam nhua bao ve', 'nhua tam'],
+                category: 'Tấm nhựa, Màng nhựa & Sản phẩm Plastic (Nhóm 39.20, 39.21 & 39.26)',
+                essential_criteria: [
+                    {
+                        name: 'Bản chất gia công & Công năng (GRI 6)',
+                        check: (t, tn) => /gia cong|dinh hinh|phu tung|may moc|khong xop|co xop|3926|3920/i.test(tn),
+                        missing_label: 'Đã gia công làm phụ tùng máy móc (Nhóm 3926.90.99) hay Dạng tấm phẳng tiêu chuẩn (Nhóm 39.20/39.21)',
+                        chips: [
+                            'Đã gia công cơ khí làm phụ tùng/tấm che máy móc (Mã 3926.90.99)',
+                            'Tấm phẳng đặc không xốp, chưa gia công (Nhóm 39.20)',
+                            'Tấm nhựa xốp hoặc gia cố sợi (Nhóm 39.21)'
+                        ]
+                    }
+                ],
+                groups: [
+                    {
+                        label: '1. Bản chất gia công & Tiêu chí định thuế (Chương 39)',
+                        chips: [
+                            'Đã gia công cơ khí làm phụ tùng/tấm che máy móc (Mã 3926.90.99)',
+                            'Tấm phẳng đặc không xốp, chưa gia công (Nhóm 39.20)',
+                            'Nhựa PVC cứng (Nhóm 3920.49)',
+                            'Nhựa Acrylic / Mica PMMA (Nhóm 3920.51)',
+                            'Nhựa Polycarbonat PC (Nhóm 3920.61)',
+                            'Nhựa PE / PP (Nhóm 3920.10 / 3920.20)'
+                        ]
+                    },
+                    {
+                        label: '2. Quy cách kích thước (GRI 6)',
+                        chips: [
+                            'Độ dày dưới 1mm',
+                            'Độ dày từ 1mm đến 5mm',
+                            'Kích thước 550x5mm',
+                            'Độ dày trên 5mm'
+                        ]
+                    }
+                ]
             }
         ];
 
@@ -3139,9 +3180,24 @@
                 return;
             }
 
-            const matchedCategory = GRI6_PARAMETER_GATE_DATABASE.find(cat => 
-                cat.keywords.some(k => combinedText.includes(k) || combinedNorm.includes(removeAccents(k)))
-            );
+            // Universal Principle: Match against product name (Ô 1) FIRST to prevent host machine leakage!
+            const nameNorm = removeAccents(nameText);
+            let matchedCategory = null;
+            if (nameText && nameText.length >= 2) {
+                matchedCategory = GRI6_PARAMETER_GATE_DATABASE.find(cat => 
+                    cat.keywords.some(k => nameText.includes(k) || nameNorm.includes(removeAccents(k)))
+                );
+            }
+
+            // Only if Ô 1 is generic or does not match any category, search combinedText
+            if (!matchedCategory) {
+                const isGeneric = !nameText || /^(?:phu\s+tung|linh\s+kien|bo\s+phan|chi\s+tiet|phu\s+kien|thiet\s+bi|vat\s+tu|san\s+pham|part|parts)$/i.test(nameNorm);
+                if (isGeneric) {
+                    matchedCategory = GRI6_PARAMETER_GATE_DATABASE.find(cat => 
+                        cat.keywords.some(k => combinedText.includes(k) || combinedNorm.includes(removeAccents(k)))
+                    );
+                }
+            }
 
             if (!matchedCategory) {
                 container.classList.add('hidden');
@@ -4247,7 +4303,15 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                 forbidden_chapters: ['8544', '8535', '8536', '8537'],
                 bonus: 1350
             },
-            // 14c. Transmission / Conveyor Belts (4010, 3926, 5910) - Section XVI Note 1(a)
+            // 14c. Plastic Plates, Sheets, Film, Strips & Fabricated Articles (3920, 3921, 3926) - Note 1(g) Section XVI
+            {
+                name: 'plastic_plates_sheets_articles',
+                pattern: /\b(?:tam\s+nhua|phien\s+nhua|mang\s+nhua|la\s+nhua|dai\s+nhua|thanh\s+nhua|khuon\s+nhua|tam\s+mica|tam\s+pvc|tam\s+pe|tam\s+pp|tam\s+acrylic|tam\s+polycarbonate|tam\s+pc|plastic\s+sheet|plastic\s+plate|plastic\s+film|plastic\s+board|tam\s+nhua\s+chiu\s+luc|tam\s+nhua\s+bao\s+ve|nhua\s+tam)\b/i,
+                target_headings: ['3926', '3920', '3921'],
+                forbidden_chapters: ['84', '85', '87', '72', '73', '74', '76', '90'],
+                bonus: 2400
+            },
+            // 14d. Transmission / Conveyor Belts (4010, 3926, 5910) - Section XVI Note 1(a)
             {
                 name: 'transmission_conveyor_belts',
                 pattern: /\b(?:day\s+curoa|day\s+cu-roa|curoa|cu-roa|bang\s+tai|bang\s+chuyen|day\s+dai\s+truyen\s+dong|day\s+rang\s+dong\s+bo|timing\s+belt|transmission\s+belt|conveyor\s+belt|v-belt)\b/i,
@@ -4351,12 +4415,12 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                 forbidden_chapters: ['8477', '8479'],
                 bonus: 1150
             },
-            // 25. Parts of Machine Tools / Press Machines (8466) - Note 2(b) Section XVI
+            // 25. Parts of Machine Tools / Press Machines (8466) - Note 2(b) Section XVI (Excludes plastic & rubber per Note 1(a)(g) Section XVI)
             {
                 name: 'parts_of_machine_tools',
                 pattern: /\b(?:phu\s+tung\s+(?:thay\s+the\s+)?(?:may\s+)?(?:cat\s+dap|dap|ep\s+dap|phay|tien|mai|bao|khoan|cnc|cat\s+day)|bo\s+phan\s+may\s+(?:cat\s+dap|dap|ep\s+dap|phay|tien|mai|cnc)|ram\s+(?:metal\s+)?guide|die\s+set|punch\s+guide)\b/i,
                 target_headings: ['8466'],
-                forbidden_chapters: ['48', '39', '40', '72'],
+                forbidden_chapters: ['48', '72'],
                 bonus: 1200
             },
             // 26. Other Articles of Steel / Mounting plates / Brackets (7326)
@@ -4490,7 +4554,7 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             // 39. Footwear Articles (6401 - 6405) - Section XI Note 1(a), Ch 39 Note 1(e)
             {
                 name: 'footwear_articles',
-                pattern: /\b(?:giay|dep|ung|giay\s+the\s+thao|giay\s+da|giay\s+vai|dep\s+quai\s+hau|sandal|footwear|shoes?|boots?|slippers?)\b/i,
+                pattern: /\b(?:giay\s+(?:dep|da|the\s+thao|bao\s+ho|cao\s+got|tay|vai|chay\s+bo)|dep\s+(?:quai|le|tong|xong|cao\s+su)|ung\s+(?:cao\s+su|nhua|bao\s+ho|chong\s+nuoc|di\s+mua)|doi\s+giay|doi\s+dep|doi\s+ung|sandal|footwear|shoes?|boots?|slippers?)\b/i,
                 target_headings: ['6401', '6402', '6403', '6404', '6405'],
                 forbidden_chapters: ['39', '40', '61', '62', '63'],
                 bonus: 1400
@@ -4618,15 +4682,31 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
 
             // C2. Chú giải 1(g) Phần XVI (Sản phẩm plastic loại trừ khỏi Phần XVI)
             const matNames = (decomp.materials || []).map(m => m.name || m[0]);
-            const isPlastic = matNames.includes('plastic');
-            const isRubber = matNames.includes('rubber');
+            const subjLower = (decomp.subjectPart || '').toLowerCase();
+            const isPlastic = matNames.includes('plastic') || subjLower.includes('nhua') || subjLower.includes('plastic');
+            const isRubber = matNames.includes('rubber') || subjLower.includes('cao su');
             const isCopper = matNames.includes('copper');
             const isAluminum = matNames.includes('aluminum');
             const isSteel = matNames.includes('steel_iron');
             const isMetal = isSteel || isCopper || isAluminum;
 
-            if (isPlastic && (NOTE_2B_PARTS_HEADINGS.has(head) || ['8466', '8487'].includes(head) || (['84', '85'].includes(head.substring(0, 2)) && !NOTE_2A_HEADINGS.has(head)))) {
-                return { isDisqualified: true, penalty: -5000, reason: "Vi phạm Chú giải 1(g) Phần XVI: Sản phẩm cấu tạo từ plastic (nhựa) thuộc Chương 39 (Nhóm 39.26), loại trừ khỏi nhóm bộ phận máy móc Phần XVI" };
+            if (isPlastic) {
+                // Sản phẩm/tấm bằng nhựa tuyệt đối cấm phân loại vào Dây cáp điện (85.44), Động cơ (85.01), Máy biến áp (85.04)
+                if (['8544', '8501', '8504', '8535', '8536', '8537'].includes(head)) {
+                    return { 
+                        isDisqualified: true, 
+                        penalty: -7000, 
+                        reason: "Vi phạm Chú giải 1(g) Phần XVI & GRI 1: Sản phẩm hoặc tấm bằng nhựa (plastic) thuộc Chương 39 (Nhóm 39.26 hoặc 39.20), tuyệt đối không phân loại vào các nhóm thiết bị điện/dây dẫn điện Phần XVI (như Nhóm 85.44, 85.36)." 
+                    };
+                }
+                // Các bộ phận máy móc khác thuộc Phần XVI bị loại trừ theo Chú giải 1(g) (trừ van nhựa 8481 hoặc quạt nhựa 8414)
+                if (NOTE_2B_PARTS_HEADINGS.has(head) || ['8466', '8487'].includes(head) || (['84', '85'].includes(head.substring(0, 2)) && !['8481', '8414'].includes(head))) {
+                    return { 
+                        isDisqualified: true, 
+                        penalty: -6000, 
+                        reason: "Vi phạm Chú giải 1(g) Phần XVI: Sản phẩm cấu tạo từ plastic (nhựa) thuộc Chương 39 (Nhóm 39.26), loại trừ khỏi nhóm máy móc/bộ phận máy móc Phần XVI" 
+                    };
+                }
             }
 
             // C3. Cổng Kiểm Soát Pháp Lý Bản Chất Vật Liệu Phổ Quát (Universal Material-Chapter Boundary Gate - GRI 1)
@@ -4792,7 +4872,7 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             }
 
             // P. Giày dép (Chương 64)
-            const isFootwear = ['giay', 'dep', 'ung', 'giay the thao', 'giay da', 'giay vai', 'sandal', 'shoes', 'boots', 'footwear'].some(k => fullTextNorm.includes(k));
+            const isFootwear = /\b(?:giay\s+(?:dep|da|the\s+thao|bao\s+ho|cao\s+got|tay|vai|chay\s+bo)|dep\s+(?:quai|le|tong|xong|cao\s+su)|ung\s+(?:cao\s+su|nhua|bao\s+ho|chong\s+nuoc|di\s+mua)|doi\s+giay|doi\s+dep|doi\s+ung|sandal|shoes?|boots?|footwear)\b/i.test(fullTextNorm);
             if (isFootwear) {
                 if (['3926', '4016'].includes(head) || ['61', '62', '63'].includes(head.substring(0, 2))) {
                     return { isDisqualified: true, penalty: -5000, reason: "Vi phạm Chú giải 1(a) Phần XI & Chú giải 1(e) Chương 39: Giày, dép, ủng các loại BẮT BUỘC thuộc Chương 64, loại trừ khỏi các chương dệt may và đồ nhựa/cao su" };
@@ -5125,20 +5205,29 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                         cat.forbidden_chapters = ['84', '85', '87', '88', '40'];
                         cat.bonus = 1500;
                     }
+                } else if (cat.name === 'plastic_plates_sheets_articles') {
+                    const isMachinePartOrGuard = ['phu tung', 'thay the', 'bao ve', 'tam che', 'tam chan', 'may cat', 'may moc', 'gia cong', 'dinh hinh', 'chi tiet', 'bo phan', 'lap vao may', 'khoan', 'cat got', 'safety guard'].some(k => fullTextNorm.includes(k));
+                    if (isMachinePartOrGuard) {
+                        cat.target_headings = ['3926'];
+                        cat.forbidden_chapters = ['84', '85', '87', '72', '73', '74', '76', '90', '3920', '3921'];
+                        cat.bonus = 2800;
+                    } else {
+                        cat.target_headings = ['3926', '3920', '3921'];
+                        cat.forbidden_chapters = ['84', '85', '87', '72', '73', '74', '76', '90'];
+                        cat.bonus = 2200;
+                    }
                 }
 
                 const matchedInSubj = cat.pattern.test(subjNorm) || cat.pattern.test(subjectPart);
                 const matchedInFull = cat.pattern.test(fullTextNorm) || cat.pattern.test(fullText);
                 const matchedInHost = cat.pattern.test(hostNorm);
 
-                if (['insulated_cables', 'electric_motors', 'valves_fluid_controllers', 'pumps_for_liquids'].includes(cat.name)) {
-                    if (matchedInSubj || (matchedInFull && !matchedInHost)) {
-                        activeCategories.push(cat);
-                    }
-                } else {
-                    if (matchedInSubj || matchedInFull || matchedInHost) {
-                        activeCategories.push(cat);
-                    }
+                // Universal Principle (GRI 1): Product classification is determined strictly by the subject article in Ô 1!
+                // Host machine words (e.g. "máy xoắn dây điện", "máy ép nhựa") in Ô 2/3 must NEVER activate unrelated product categories!
+                const isGenericSubject = /^(?:phu\s+tung|linh\s+kien|bo\s+phan|chi\s+tiet|phu\s+kien|thiet\s+bi|vat\s+tu|san\s+pham|part|parts|spare\s+part|spare\s+parts|component|components)$/i.test(subjNorm.trim());
+
+                if (matchedInSubj || (isGenericSubject && matchedInFull && !matchedInHost)) {
+                    activeCategories.push(cat);
                 }
             }
 
@@ -5315,25 +5404,25 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                 }
 
                 // Stage 1 Universal Cross-Section Statutory Boundary Enforcements
-                if (/(?:ghe|ghe ngoi|ban lam viec|tu ho so|tu quan ao|giuong|chair|seat|table|cabinet)/i.test(fullTextNorm) && ['3926', '4421', '7326'].includes(head)) {
+                if (/\b(?:ghe\s+ngoi|ban\s+lam\s+viec|tu\s+ho\s+so|tu\s+quan\s+ao|giuong\s+ngu|chair|seat|table|cabinet)\b/i.test(fullTextNorm) && ['3926', '4421', '7326'].includes(head)) {
                     score -= 4000;
                 }
-                if (/(?:vali|tui xach|ba lo|balo|cap sach|suitcase|handbag|backpack)/i.test(fullTextNorm) && (['3926', '7326'].includes(head) || ['61', '62', '63'].includes(ch))) {
+                if (/\b(?:vali|va\s+li|tui\s+xach|ba\s+lo|balo|cap\s+sach|suitcase|handbag|backpack)\b/i.test(fullTextNorm) && (['3926', '7326'].includes(head) || ['61', '62', '63'].includes(ch))) {
                     score -= 4000;
                 }
-                if (/(?:giay|dep|ung|shoes|boots|footwear)/i.test(fullTextNorm) && (['3926', '4016'].includes(head) || ['61', '62', '63'].includes(ch))) {
+                if (/\b(?:giay\s+dep|doi\s+giay|doi\s+dep|giay\s+the\s+thao|giay\s+da|giay\s+vai|giay\s+bao\s+ho|sandal|dep\s+sandal|ung\s+cao\s+su|ung\s+nhua|ung\s+da|shoes|boots|footwear)\b/i.test(fullTextNorm) && (['3926', '4016'].includes(head) || ['61', '62', '63'].includes(ch))) {
                     score -= 4000;
                 }
-                if (/(?:do choi tre em|mo hinh do choi|bup be|dung cu the thao|toys|gym equipment)/i.test(fullTextNorm) && (['3926', '7326', '8479', '8543'].includes(head))) {
+                if (/\b(?:do\s+choi\s+tre\s+em|mo\s+hinh\s+do\s+choi|bup\s+be|dung\s+cu\s+the\s+thao|toys|gym\s+equipment)\b/i.test(fullTextNorm) && (['3926', '7326', '8479', '8543'].includes(head))) {
                     score -= 4000;
                 }
-                if (/(?:thuoc tru sau|thuoc diet con trung|thuoc diet co|pesticide|insecticide)/i.test(fullTextNorm) && ['28', '29', '30'].includes(ch)) {
+                if (/\b(?:thuoc\s+tru\s+sau|thuoc\s+diet\s+con\s+trung|thuoc\s+diet\s+co|pesticide|insecticide)\b/i.test(fullTextNorm) && ['28', '29', '30'].includes(ch)) {
                     score -= 4000;
                 }
-                if (/(?:det kim|knitted|crocheted|moc)/i.test(fullTextNorm) && ch === '62') {
+                if (/\b(?:det\s+kim|knitted|crocheted)\b/i.test(fullTextNorm) && ch === '62') {
                     score -= 3000;
                 }
-                if (/(?:det thoi|woven)/i.test(fullTextNorm) && ch === '61') {
+                if (/\b(?:det\s+thoi|woven)\b/i.test(fullTextNorm) && ch === '61') {
                     score -= 3000;
                 }
 
@@ -5427,8 +5516,8 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                         if (code === '39269099') itemScore += 900;
                         else if (code === '39269044' && !['cuu sinh', 'nga'].some(k => fullTextNorm.includes(k))) itemScore -= 2000;
                         else if (code === '39269010' && !['phao', 'danh ca'].some(k => fullTextNorm.includes(k))) itemScore -= 2000;
-                    } else if (['tam che', 'vo che', 'nap che', 'tam chan', 'safety guard', 'an toan lao dong', 'bao ve'].some(k => fullTextNorm.includes(k)) && code === '39269099') {
-                        itemScore += 700;
+                    } else if (['tam nhua', 'phien nhua', 'thanh nhua', 'nhua tam', 'plastic sheet', 'plastic plate', 'tam che', 'vo che', 'nap che', 'tam chan', 'safety guard', 'an toan lao dong', 'bao ve'].some(k => fullTextNorm.includes(k)) && code === '39269099') {
+                        itemScore += 1200;
                     }
                 } else if (head === '4016') {
                     if (['gioang', 'phot', 'vong dem', 'washer', 'dem kin', 'seal', 'o-ring', 'dem lot'].some(k => fullTextNorm.includes(k))) {
@@ -5698,7 +5787,7 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             let isCertain100 = false;
             if (bestCode === '73269099' && ['mieng thep', 'tam thep', 'ban ma', 'tam kim loai', 'gia do'].some(k => fullTextNorm.includes(k))) {
                 isCertain100 = true;
-            } else if (bestCode === '39269099' && ['tam che', 'vo che', 'nap che', 'tam chan', 'safety guard', 'bao ve'].some(k => fullTextNorm.includes(k))) {
+            } else if (bestCode === '39269099' && ['tam che', 'vo che', 'nap che', 'tam chan', 'safety guard', 'bao ve', 'tam nhua', 'nhua tam', 'phien nhua'].some(k => fullTextNorm.includes(k))) {
                 isCertain100 = true;
             } else if (bestCode.startsWith('7318') && ['bu long', 'oc vit', 'dinh vit'].some(k => fullTextNorm.includes(k))) {
                 isCertain100 = true;
