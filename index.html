@@ -4081,7 +4081,16 @@ BẮT BUỘC TUÂN THỦ NGUYÊN TẮC PHÁP LÝ HẢI QUAN THEO 6 QUY TẮC GRI
 8. QUY TẮC PHÂN LOẠI VÚ TRA MỠ / VÚ BƠM MỠ BÒ (GREASING NIPPLES / GREASE FITTINGS / ZERK FITTINGS):
    - Căn cứ Chú giải chi tiết WCO Nhóm 84.87 (HQKV8 Trang 214194) và Chú giải loại trừ Nhóm 84.81 (HQKV8 Trang 212255), vú tra mỡ / vú bơm mỡ bò không tự động là bộ phận cơ khí máy móc BẮT BUỘC phân loại vào Nhóm 84.87, mã số chi tiết 8487.90.00 (Thuế MFN: 0%, VAT: 8%).
    - TUYỆT ĐỐI KHÔNG phân loại vào Nhóm 73.18 (bu lông ốc vít), 73.07 (phụ kiện nối ống), 73.26 hay 84.81 (van).
-9. QUY TẮC RÀNG BUỘC MÃ TỪ BIỂU THUẾ VIỆT NAM 2026:
+9. QUY TẮC PHÂN LOẠI CÔNG TẮC ĐÓNG NGẮT MẠCH (NHÓM 85.36 - PHÂN NHÓM 8536.50):
+   - Căn cứ phân nhóm chi tiết 8 chữ số Biểu thuế XNK Việt Nam 2026:
+     + Công tắc điện thông thường (công tắc bấm, 1 phím/nhiều phím, nút nhấn, công tắc âm tường, chuyển mạch...):
+       * NẾU DÒNG ĐIỆN ĐỊNH MỨC DƯỚI 16 A (ví dụ 10A, 6A, 5A, 1A... hoặc có ghi "dưới 16A"): BẮT BUỘC phân loại vào mã 8536.50.96 ("- - - Loại khác, dòng điện dưới 16 A"). TUYỆT ĐỐI KHÔNG xếp vào mã 8536.50.99!
+       * NẾU DÒNG ĐIỆN ĐỊNH MỨC TỪ 16 A TRỞ LÊN (hoặc không nêu rõ): Mới phân loại vào mã 8536.50.99 ("- - - Loại khác").
+     + Công tắc điện tử (electronic switch): Dưới 16 A -> 8536.50.51; Từ 16 A trở lên -> 8536.50.59.
+     + Công tắc điện cơ bật nhanh (microswitch / snap-action): Dưới 16 A -> 8536.50.61; Từ 16 A trở lên -> 8536.50.69.
+     + Công tắc xoay / trượt: Dưới 16 A -> 8536.50.33; dùng cho quạt/sóng vô tuyến -> 8536.50.32; loại khác -> 8536.50.39.
+     + Công tắc đảo chiều (change-over switches) khởi động động cơ: 8536.50.95.
+10. QUY TẮC RÀNG BUỘC MÃ TỪ BIỂU THUẾ VIỆT NAM 2026:
    - BẮT BUỘC CHỌN 01 MÃ HS 8 CHỮ SỐ TRONG DANH SÁCH ỨNG VIÊN ĐÃ ĐƯỢC RÀ SOÁT TỪ BIỂU THUẾ VIỆT NAM 2026 TRÊN ĐÂY (trừ khi có căn cứ pháp lý chỉ ra mã khác chính xác hơn). TUYỆT ĐỐI KHÔNG TỰ BỊA MÃ 8 SỐ KHÔNG TỒN TẠI TRONG BIỂU THUẾ VIỆT NAM.
    - Trong mục "exclusions": Bắt buộc giải thích rõ lý do loại trừ từng mã ứng viên đối thủ còn lại.
 
@@ -7596,6 +7605,36 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                                 if (!gemRes.atiga) gemRes.atiga = dbItem.atiga || '0%';
                                 if (!gemRes.acfta) gemRes.acfta = dbItem.acfta || '0%';
                                 if (!gemRes.evfta) gemRes.evfta = dbItem.evfta || '0%';
+                            }
+
+                            // Post-Flight Statutory Legal Audit & Self-Healing Engine
+                            try {
+                                const fullTxtNorm = removeAccents(`${name} ${desc} ${use} ${specs} ${model_en}`);
+                                const decomp = decomposeQueryClientSide(name, desc, use, specs, model_en);
+                                const curCode = (gemRes.clean_code || gemRes.hs_code || '').replace(/\./g, '');
+                                const audit = auditStatutoryConstraintsClientSide(curCode, curCode.substring(0, 4), gemRes.item_description || dbItem?.vn || '', '', decomp, fullTxtNorm);
+                                
+                                if (audit && audit.isDisqualified) {
+                                    console.warn(`[Statutory Audit] Proposed code ${curCode} was disqualified: ${audit.reason}. Auto-reconciling...`);
+                                    const clientBest = classifyProductClientSide(name, desc, use, specs, model_en);
+                                    if (clientBest && clientBest.c) {
+                                        const corrCode = (clientBest.c || '').replace(/\./g, '');
+                                        const corrItem = (window.HS_DATABASE || []).find(it => (it.c || '').replace(/\./g, '') === corrCode) || clientBest;
+                                        gemRes.hs_code = formatHSCode(corrCode);
+                                        gemRes.clean_code = corrCode;
+                                        gemRes.item_description = corrItem.vn || clientBest.vn;
+                                        gemRes.mfn = corrItem.mfn || clientBest.mfn || '0%';
+                                        gemRes.vat = corrItem.vat || clientBest.vat || '8%';
+                                        gemRes.atiga = corrItem.atiga || clientBest.atiga || '0%';
+                                        gemRes.acfta = corrItem.acfta || clientBest.acfta || '0%';
+                                        gemRes.evfta = corrItem.evfta || clientBest.evfta || '0%';
+                                        if (gemRes.gri6) {
+                                            gemRes.gri6 = `Áp dụng Quy tắc 6 (GRI 6) và Danh mục Biểu thuế XNK Việt Nam 2026: Căn cứ thông số kỹ thuật định mức, phân loại chính xác vào phân nhánh ${gemRes.hs_code}: ${corrItem.vn}. ${gemRes.gri6}`;
+                                        }
+                                    }
+                                }
+                            } catch (auditErr) {
+                                console.warn("Lỗi kiểm toán pháp lý kết quả AI:", auditErr);
                             }
 
                             // Trigger background PDF export on local server ONLY if available
