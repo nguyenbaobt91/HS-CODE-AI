@@ -390,6 +390,7 @@
                             <span class="font-bold text-slate-700 dark:text-slate-300 flex items-center">
                                 <i class="fa-solid fa-bolt text-amber-500 mr-1.5"></i>Mẫu thử nhanh chuẩn WCO:
                             </span>
+                            <button type="button" onclick="fillProposeSample('op_nhua_o_to')" class="px-2.5 py-1 rounded-lg bg-pink-100 hover:bg-pink-200 dark:bg-pink-900/50 text-pink-800 dark:text-pink-300 border border-pink-300 dark:border-pink-600 transition-all font-bold cursor-pointer shadow-sm"><i class="fa-solid fa-car mr-1 text-pink-600"></i>Ốp nhựa trang trí ô tô (3926.30 / 8708.29)</button>
                             <button type="button" onclick="fillProposeSample('bu_long')" class="px-2.5 py-1 rounded-lg bg-sky-100 hover:bg-sky-200 dark:bg-sky-900/50 text-sky-800 dark:text-sky-300 border border-sky-300 dark:border-sky-600 transition-all font-bold cursor-pointer shadow-sm"><i class="fa-solid fa-screwdriver mr-1 text-sky-600"></i>Bu lông lục giác thép M12 (7318.15.10)</button>
                             <button type="button" onclick="fillProposeSample('cong_tac_10a')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-300 border border-slate-300 dark:border-slate-600 transition-all font-semibold cursor-pointer shadow-sm"><i class="fa-solid fa-toggle-on mr-1 text-sky-600"></i>Công tắc 220V 10A (< 16A)</button>
                             <button type="button" onclick="fillProposeSample('vu_mo')" class="px-2.5 py-1 rounded-lg bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-600 transition-all font-bold cursor-pointer shadow-sm"><i class="fa-solid fa-oil-can mr-1 text-emerald-600"></i>Vú bơm mỡ bò M6 (8487.90)</button>
@@ -1535,6 +1536,13 @@
 
         function fillProposeSample(sampleKey) {
             const samples = {
+                'op_nhua_o_to': {
+                    name: 'ốp nhựa',
+                    model: 'TRIM-CAR-PLASTIC',
+                    desc: 'Ốp trang trí đúc bằng chất dẻo (nhựa ABS/PP), có ngàm cài hoặc băng keo 2 mặt.',
+                    use: 'gắn trang trí trên xe ô tô',
+                    specs: 'Phụ kiện ốp trang trí nội ngoại thất gắn trên thân xe ô tô.'
+                },
                 'cong_tac': {
                     name: 'Công tắc chuyển mạch điện 220V 10A',
                     model: 'SWITCH-220V-10A',
@@ -5955,11 +5963,36 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             }
 
             if (!isCertain100) {
+                // Pass 1: Prioritize recognized cross-chapter dual rulings (e.g. 3926 vs 8708, 8466 vs 3926, 8482 vs 8483)
                 for (let cand of pool) {
                     const c = (cand.item.c || '').replace(/\./g, '');
                     if (c.length !== 8 || c === bestCode) continue;
                     const h4 = c.substring(0, 4);
                     const sub = c.substring(0, 6);
+
+                    let isRecognizedDual = false;
+                    if ((bestCode.startsWith('8466') && h4 === '3926') || (bestCode.startsWith('3926') && h4 === '8466')) isRecognizedDual = true;
+                    else if ((bestCode.startsWith('8482') && h4 === '8483') || (bestCode.startsWith('8483') && h4 === '8482')) isRecognizedDual = true;
+                    else if ((bestCode.startsWith('8537') && h4 === '8504') || (bestCode.startsWith('8504') && h4 === '8537')) isRecognizedDual = true;
+                    else if ((bestCode.startsWith('3926') && h4 === '8708') || (bestCode.startsWith('8708') && h4 === '3926')) isRecognizedDual = true;
+
+                    if (isRecognizedDual && !seenHeadings.has(h4)) {
+                        competingItems.push(cand.item);
+                        seenHeadings.add(h4);
+                        seenPrefixes.add(sub);
+                        break;
+                    }
+                }
+
+                // Pass 2: Fill secondary competing candidate from same or related heading if space remains
+                for (let cand of pool) {
+                    if (competingItems.length >= 2) break;
+                    const c = (cand.item.c || '').replace(/\./g, '');
+                    if (c.length !== 8 || c === bestCode) continue;
+                    const h4 = c.substring(0, 4);
+                    const sub = c.substring(0, 6);
+
+                    if (competingItems.some(it => (it.c || '').replace(/\./g, '') === c)) continue;
 
                     // Semantic negative filters
                     if (['mieng thep', 'tam thep', 'ban ma'].some(k => fullTextNorm.includes(k)) && (sub.startsWith('732620') || sub.startsWith('732611') || sub.startsWith('732619'))) {
@@ -5972,18 +6005,11 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                         continue;
                     }
 
-                    let isRecognizedDual = false;
-                    if ((bestCode.startsWith('8466') && h4 === '3926') || (bestCode.startsWith('3926') && h4 === '8466')) isRecognizedDual = true;
-                    else if ((bestCode.startsWith('8482') && h4 === '8483') || (bestCode.startsWith('8483') && h4 === '8482')) isRecognizedDual = true;
-                    else if ((bestCode.startsWith('8537') && h4 === '8504') || (bestCode.startsWith('8504') && h4 === '8537')) isRecognizedDual = true;
-                    else if ((bestCode.startsWith('3926') && h4 === '8708') || (bestCode.startsWith('8708') && h4 === '3926')) isRecognizedDual = true;
-
-                    if (isRecognizedDual || (cand.score >= bestScore * 0.70 && cand.score > 0)) {
-                        if (!seenHeadings.has(h4) || !seenPrefixes.has(sub)) {
+                    if (cand.score >= bestScore * 0.70 && cand.score > 0) {
+                        if (!seenPrefixes.has(sub)) {
                             competingItems.push(cand.item);
-                            seenHeadings.add(h4);
                             seenPrefixes.add(sub);
-                            if (competingItems.length >= 1) break;
+                            if (competingItems.length >= 2) break;
                         }
                     }
                 }
