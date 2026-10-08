@@ -5505,11 +5505,16 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                 const iTokens = getTokens(itemDescNorm);
                 const sTokens = getTokens(subDescNorm);
 
-                // Match bigrams & subject words
+                // Match bigrams & subject words across leaf item, subheading AND hierarchical lineage (lin / st)
+                const linDesc = item.lin || item.st || '';
+                const linDescNorm = removeAccents(linDesc);
+                const lTokens = linDesc ? getTokens(linDescNorm) : null;
+
                 for (let bg of bigrams) {
                     const bgRegex = new RegExp('\\b' + bg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
                     if (bgRegex.test(itemDescNorm)) itemScore += 120;
                     else if (bgRegex.test(subDescNorm)) itemScore += 60;
+                    else if (linDescNorm && bgRegex.test(linDescNorm)) itemScore += 50;
                 }
 
                 for (let sw of subjectWords) {
@@ -5518,6 +5523,26 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                     }
                     if (iTokens.has(sw)) itemScore += 40;
                     else if (sTokens.has(sw)) itemScore += 20;
+                    else if (lTokens && lTokens.has(sw)) itemScore += 15;
+                }
+
+                // Universal Quantitative Spec Threshold Engine (Auto-applies across Biểu thuế)
+                if (specsDict.v !== undefined) {
+                    const v = specsDict.v;
+                    if ((itemDescNorm.includes('khong qua 1000') || itemDescNorm.includes('khong qua 1.000') || linDescNorm.includes('khong qua 1000') || linDescNorm.includes('khong qua 1.000')) && v <= 1000) itemScore += 200;
+                    else if ((itemDescNorm.includes('tren 1000') || itemDescNorm.includes('tren 1.000') || linDescNorm.includes('tren 1000') || linDescNorm.includes('tren 1.000')) && v > 1000) itemScore += 200;
+                    if ((itemDescNorm.includes('khong qua 66 kv') || linDescNorm.includes('khong qua 66 kv')) && v <= 66000) itemScore += 200;
+                    else if ((itemDescNorm.includes('tren 66 kv') || linDescNorm.includes('tren 66 kv')) && v > 66000) itemScore += 200;
+                    if ((itemDescNorm.includes('khong qua 80 v') || linDescNorm.includes('khong qua 80 v')) && v <= 80) itemScore += 200;
+                    else if ((itemDescNorm.includes('tren 80 v') || linDescNorm.includes('tren 80 v')) && v > 80) itemScore += 200;
+                }
+
+                if (specsDict.mm !== undefined) {
+                    const mm = specsDict.mm;
+                    if ((itemDescNorm.includes('khong qua 16 mm') || linDescNorm.includes('khong qua 16 mm')) && mm <= 16) itemScore += 200;
+                    else if ((itemDescNorm.includes('tren 16 mm') || linDescNorm.includes('tren 16 mm')) && mm > 16) itemScore += 200;
+                    if ((itemDescNorm.includes('khong qua 6 mm') || linDescNorm.includes('khong qua 6 mm')) && mm <= 6) itemScore += 200;
+                    else if ((itemDescNorm.includes('tren 6 mm') || linDescNorm.includes('tren 6 mm')) && mm > 6) itemScore += 200;
                 }
 
                 // Specific Subtype & Parameter Rules
