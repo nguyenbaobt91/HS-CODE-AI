@@ -4164,7 +4164,7 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             // 1. Bearings (8482) - Note 2(a) Section XVI (vòng bi, bạc đạn, ổ bi, ổ lăn, thanh trượt có bi)
             {
                 name: 'ball_roller_bearings',
-                pattern: /\b(?:vong\s+bi|bac\s+dan|o\s+bi|o\s+dua|o\s+lan|ball\s+bearings?|roller\s+bearings?|(?:thanh\s+truot|thanh\s+ray|con\s+truot|co\s+che\s+truot|linear\s+(?:motion\s+)?guides?).*(?:o\s+bi|co\s+bi|vong\s+bi|ball\s+bearings?|bearings?)|(?:o\s+bi|co\s+bi|vong\s+bi|ball\s+bearings?|bearings?).*(?:thanh\s+truot|thanh\s+ray|con\s+truot|co\s+che\s+truot|linear\s+(?:motion\s+)?guides?))\b/i,
+                pattern: /\b(?:vong\s+bi|bac\s+dan|o\s+bi|o\s+dua|o\s+lan|ball\s+bearings?|roller\s+bearings?|thanh\s+truot\s+bi|con\s+truot\s+bi|thanh\s+truot\s+con\s+lan|con\s+truot\s+con\s+lan|(?:thanh\s+truot|thanh\s+ray|con\s+truot|co\s+che\s+truot|linear\s+(?:motion\s+)?guides?).*(?:bi\b|o\s+bi|co\s+bi|con\s+lan|vong\s+bi|ball\s+bearings?|bearings?)|(?:bi\b|o\s+bi|co\s+bi|con\s+lan|vong\s+bi|ball\s+bearings?|bearings?).*(?:thanh\s+truot|thanh\s+ray|con\s+truot|co\s+che\s+truot|linear\s+(?:motion\s+)?guides?))\b/i,
                 target_headings: ['8482'],
                 forbidden_chapters: ['72', '73', '8409', '8431', '8466', '8473', '8483', '8708', '8803'],
                 bonus: 1350
@@ -4964,31 +4964,26 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             const fullTextNorm = removeAccents(fullText);
 
             // 1. Separate Subject vs Host context
-            let subjectPart = text;
-            let hostPart = "";
-            if (desc || use || specs || model_en) {
-                subjectPart = `${text} ${model_en}`.trim();
-                hostPart = `${use} ${desc}`.trim();
+            const splitByHost = (str) => {
+                if (!str) return { s: '', h: '' };
                 for (let marker of HOST_MARKERS) {
-                    const m = text.match(marker);
+                    const m = str.match(marker);
                     if (m) {
-                        subjectPart = `${text.substring(0, m.index).replace(/^[\s,:;\-()]+|[\s,:;\-()]+$/g, '')} ${model_en}`.trim();
-                        hostPart = `${text.substring(m.index + m[0].length).replace(/^[\s,:;\-()]+|[\s,:;\-()]+$/g, '')} ${hostPart}`.trim();
-                        break;
+                        return {
+                            s: str.substring(0, m.index).replace(/^[\s,:;\-()]+|[\s,:;\-()]+$/g, ''),
+                            h: str.substring(m.index + m[0].length).replace(/^[\s,:;\-()]+|[\s,:;\-()]+$/g, '')
+                        };
                     }
                 }
-            } else {
-                subjectPart = text;
-                hostPart = "";
-                for (let marker of HOST_MARKERS) {
-                    const m = text.match(marker);
-                    if (m) {
-                        subjectPart = text.substring(0, m.index).replace(/^[\s,:;\-()]+|[\s,:;\-()]+$/g, '');
-                        hostPart = text.substring(m.index + m[0].length).replace(/^[\s,:;\-()]+|[\s,:;\-()]+$/g, '');
-                        break;
-                    }
-                }
-            }
+                return { s: str, h: '' };
+            };
+
+            const tSplit = splitByHost(text);
+            const dSplit = splitByHost(desc);
+
+            let subjectPart = `${tSplit.s} ${dSplit.s} ${model_en} ${specs}`.trim();
+            let hostPart = `${tSplit.h} ${dSplit.h} ${use}`.trim();
+
             const subjNorm = removeAccents(subjectPart);
             const hostNorm = removeAccents(hostPart);
 
