@@ -118,6 +118,7 @@
     <!-- Load Local Database -->
     <script src="hs_data.js"></script>
     <script src="wco_data.js"></script>
+    <script src="rulings_data.js"></script>
 
     <style id="print-styles">
         @media print {
@@ -4049,6 +4050,38 @@
                 console.warn("Lỗi trích xuất ngữ cảnh ứng viên:", e);
             }
 
+            // Extract relevant Customs Rulings Precedents from Database
+            let rulingsContext = "";
+            try {
+                if (window.CUSTOMS_RULINGS_DATABASE && Array.isArray(window.CUSTOMS_RULINGS_DATABASE)) {
+                    const qRaw = `${name} ${desc} ${use} ${specs} ${model_en || ''}`.toLowerCase();
+                    const qNorm = (typeof removeAccents === 'function') ? removeAccents(qRaw) : qRaw;
+                    const matchedRulings = [];
+                    for (let r of window.CUSTOMS_RULINGS_DATABASE) {
+                        if (!r.hs) continue;
+                        let matchCount = 0;
+                        for (let kw of (r.keywords || [])) {
+                            if (qNorm.includes(kw)) matchCount++;
+                        }
+                        if (matchCount >= 2 || (r.keywords && r.keywords.length === 1 && matchCount === 1)) {
+                            matchedRulings.push({ ruling: r, score: matchCount });
+                        }
+                    }
+                    matchedRulings.sort((a, b) => b.score - a.score);
+                    if (matchedRulings.length > 0) {
+                        const topR = matchedRulings.slice(0, 3);
+                        const rLines = topR.map((tr, idx) => {
+                            const r = tr.ruling;
+                            const rCode = r.hs.length === 8 ? `${r.hs.substring(0,4)}.${r.hs.substring(4,6)}.${r.hs.substring(6,8)}` : r.hs;
+                            return `${idx + 1}. [${r.doc}] Mã HS ${rCode}: ${r.name}\n   Căn cứ pháp lý: ${r.basis}\n   Tóm tắt: ${r.summary}`;
+                        });
+                        rulingsContext = `\nTIỀN LỆ PHÂN LOẠI & THÔNG BÁO KẾT QUẢ PHÂN LOẠI HẢI QUAN CHO MẶT HÀNG TƯƠNG TỰ:\n${rLines.join('\n')}\n`;
+                    }
+                }
+            } catch (err) {
+                console.warn("Lỗi trích xuất tiền lệ Hải quan:", err);
+            }
+
             const prompt = `Bạn là Chuyên gia Cao cấp Phân loại Biểu thuế & Mã số HS (Hải quan Việt Nam) theo Danh mục HS 2022 (Công văn 1810/TCHQ-TXNK & HQKV8) và Biểu thuế XNK 2026.
 BẮT BUỘC TUÂN THỦ QUY TRÌNH RÀ SOÁT & LẬP LUẬN 5 BƯỚC CHO MỌI MẶT HÀNG (CHƯƠNG 01 ĐẾN 97):
 TUYỆT ĐỐI KHÔNG CHỈ DỰA VÀO TÊN THƯƠNG MẠI MÀ PHẢI RÀ SOÁT ĐA CHIỀU 4 TIÊU CHUẨN KỸ THUẬT:
@@ -4058,6 +4091,7 @@ TUYỆT ĐỐI KHÔNG CHỈ DỰA VÀO TÊN THƯƠNG MẠI MÀ PHẢI RÀ SOÁT 
 4. Công dụng & Cơ cấu truyền động (Function & Transmission): ${use || 'Công nghiệp hoặc thương mại'}
 ${candidatesContext}
 ${wcoNotesContext}
+${rulingsContext}
 
 BẮT BUỘC TUÂN THỦ NGUYÊN TẮC PHÁP LÝ HẢI QUAN THEO 6 QUY TẮC GRI VÀ MA TRẬN PHÂN ĐỊNH 21 PHẦN / 97 CHƯƠNG:
 1. NGUYÊN TẮC VẬT LIỆU CHO BỘ PHẬN CÔNG DỤNG CHUNG (GRI 1 & Chú giải 2 Phần XV / Chú giải 1(g) Phần XVI):
@@ -5540,8 +5574,24 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                 }
             }
 
+            // Authoritative Customs Rulings Precedents Boost for Heading (from E:\AI\MOL\HS CODE)
+            if (window.CUSTOMS_RULINGS_DATABASE && Array.isArray(window.CUSTOMS_RULINGS_DATABASE)) {
+                for (let r of window.CUSTOMS_RULINGS_DATABASE) {
+                    if (!r.hs || r.hs.length < 4) continue;
+                    let kws = r.keywords || [];
+                    let matchCount = 0;
+                    for (let kw of kws) {
+                        if (fullTextNorm.includes(kw)) matchCount++;
+                    }
+                    if (matchCount >= 3 || (kws.length <= 2 && matchCount === kws.length && matchCount >= 1)) {
+                        const rHead = r.hs.substring(0, 4);
+                        headingScores[rHead] = (headingScores[rHead] || 0) + (matchCount * 120);
+                    }
+                }
+            }
+
             const rankedHeadings = Object.keys(headingScores).sort((a, b) => headingScores[b] - headingScores[a]);
-            let topHeadings = rankedHeadings.slice(0, 5);
+            let topHeadings = rankedHeadings.slice(0, 6);
             if (!topHeadings.length) {
                 topHeadings = ['8481', '7318', '8536', '3917'];
             }
@@ -5941,6 +5991,22 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                 } else if (head === '7326') {
                     if (['tam che', 'vo che', 'nap che', 'tam chan', 'safety guard', 'bao ve', 'mieng thep', 'tam thep', 'gia do', 'tai ga', 'dinh vi'].some(k => fullTextNorm.includes(k)) && code === '73269099') {
                         itemScore += 750;
+                    }
+                }
+
+                // Authoritative Customs Rulings Precedent Boost (from E:\AI\MOL\HS CODE)
+                if (window.CUSTOMS_RULINGS_DATABASE && Array.isArray(window.CUSTOMS_RULINGS_DATABASE)) {
+                    for (let r of window.CUSTOMS_RULINGS_DATABASE) {
+                        if (r.hs === code) {
+                            let kws = r.keywords || [];
+                            let matchCount = 0;
+                            for (let kw of kws) {
+                                if (fullTextNorm.includes(kw)) matchCount++;
+                            }
+                            if (matchCount >= 2 || (kws.length === 1 && matchCount === 1)) {
+                                itemScore += (matchCount * 250);
+                            }
+                        }
                     }
                 }
 
@@ -9119,6 +9185,135 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             }
         }
 
+        function runAutomatedRegressionGuard() {
+            const testCases = [
+                {
+                    id: 1,
+                    title: "Công tắc điện dưới 16A (220V 10A vỏ nhựa)",
+                    input: { name: "Công tắc chuyển mạch điện 220V 10A vỏ nhựa", desc: "Vỏ nhựa PC/ABS, tiếp điểm đồng", use: "Đóng ngắt mạch điện dân dụng", specs: "220V 10A", model_en: "SWITCH-10A" },
+                    expected: ["8536.50.96", "85365096"]
+                },
+                {
+                    id: 2,
+                    title: "Công tắc điện từ 16A trở lên (220V 20A)",
+                    input: { name: "Công tắc chuyển mạch điện 220V 20A", desc: "Vỏ nhựa, tiếp điểm hợp kim", use: "Đóng ngắt mạch điện công nghiệp", specs: "220V 20A", model_en: "SWITCH-20A" },
+                    expected: ["8536.50.99", "85365099"]
+                },
+                {
+                    id: 3,
+                    title: "Tấm che bảo vệ an toàn bằng nhựa cho máy dập",
+                    input: { name: "Tấm che bảo vệ an toàn bằng nhựa", desc: "Nhựa acrylic trong suốt, chống va đập", use: "Dùng che chắn bảo vệ an toàn cho máy dập kim loại", specs: "240x5x400mm", model_en: "GUARD-01" },
+                    expected: ["3926.90.99", "39269099"]
+                },
+                {
+                    id: 4,
+                    title: "Miếng thép gia công cố định cảm biến (45x75x5mm)",
+                    input: { name: "Miếng thép gia công cố định cảm biến", desc: "Thép carbon gia công cơ khí, bản mã thép", use: "Dùng gắn cố định cảm biến trên đài kiểm tra", specs: "45x75x5mm", model_en: "BRACKET-01" },
+                    expected: ["7326.90.99", "73269099"]
+                },
+                {
+                    id: 5,
+                    title: "Bu lông lục giác bằng thép M12x50 có ren",
+                    input: { name: "Bu lông lục giác bằng thép M12x50", desc: "Thép carbon cường độ cao 8.8 có ren", use: "Ghép nối các chi tiết cơ khí", specs: "M12x50mm", model_en: "BOLT-M12" },
+                    expected: ["7318.15.10", "73181510"]
+                },
+                {
+                    id: 6,
+                    title: "Thanh trượt có ổ bi dẫn hướng tịnh tiến (con trượt bi)",
+                    input: { name: "Thanh trượt bằng thép có ổ bi dẫn hướng tịnh tiến", desc: "Thép chịu lực có con trượt bi", use: "Dẫn hướng tịnh tiến bàn máy gia công cơ khí", specs: "Đường kính bi 5mm", model_en: "LINEAR-01" },
+                    expected: ["8482.10.00", "84821000"]
+                },
+                {
+                    id: 7,
+                    title: "Thân trượt dẫn hướng bằng gang không có ổ bi",
+                    input: { name: "Thân trượt dẫn hướng bằng gang không có ổ bi", desc: "Gang đúc dẫn hướng cơ khí không lắp ổ bi hay ổ đũa", use: "Dùng cho máy tiện công cụ", specs: "Không có ổ bi", model_en: "SLIDE-01" },
+                    expected: ["8483.30.90", "84833090"]
+                },
+                {
+                    id: 8,
+                    title: "Dây cáp đồng trục có gắn đầu nối",
+                    input: { name: "Dây cáp đồng trục có gắn đầu nối", desc: "Lõi đồng cáp đồng trục có gắn sẵn đầu nối rắc cắm", use: "Truyền tín hiệu tần số cao", specs: "Điện áp 220V", model_en: "COAX-01" },
+                    expected: ["8544.20.21", "85442021"]
+                },
+                {
+                    id: 9,
+                    title: "Dây cáp điện hạ thế có gắn đầu nối (PVC)",
+                    input: { name: "Dây cáp điện cách điện bằng nhựa PVC có gắn đầu nối", desc: "Ruột đồng cách điện PVC gắn đầu cắm", use: "Truyền dẫn điện hạ thế", specs: "Điện áp 220V, chiều dài 2m", model_en: "CABLE-01" },
+                    expected: ["8544.42.94", "85444294", "854442"]
+                },
+                {
+                    id: 10,
+                    title: "Vú tra mỡ bò bằng thép không tự động (grease nipple)",
+                    input: { name: "Vú tra mỡ bò bằng thép không tự động (grease nipple)", desc: "Thép ren M6 có lò xo và bi một chiều", use: "Bơm tra mỡ bôi trơn ổ trục cơ khí", specs: "Ren M6", model_en: "NIPPLE-M6" },
+                    expected: ["8487.90.00", "84879000"]
+                },
+                {
+                    id: 11,
+                    title: "Ổ lưu trữ thể rắn USB flash drive 32GB",
+                    input: { name: "Ổ lưu trữ thể rắn USB flash drive dung lượng 32GB", desc: "Bộ nhớ bán dẫn thể rắn flash USB chưa ghi dữ liệu", use: "Lưu trữ dữ liệu máy vi tính", specs: "32GB", model_en: "USB-32G" },
+                    expected: ["8523.51.11", "85235111"]
+                },
+                {
+                    id: 12,
+                    title: "Bộ chuyển đổi nguồn điện tĩnh AC sang DC (adapter)",
+                    input: { name: "Bộ chuyển đổi nguồn điện tĩnh AC sang DC", desc: "Bộ nguồn chuyển đổi tĩnh adapter switching biến đổi AC sang DC", use: "Cấp nguồn điện một chiều cho thiết bị", specs: "Input 220VAC, Output 12VDC 5A", model_en: "ADAPTER-12V" },
+                    expected: ["8504.40.90", "85044090"]
+                },
+                {
+                    id: 13,
+                    title: "Bộ điều nhiệt tự động thermostat",
+                    input: { name: "Bộ điều nhiệt tự động thermostat dùng cho tủ sấy", desc: "Rơ le nhiệt lưỡng kim tự động đóng ngắt theo nhiệt độ", use: "Khống chế nhiệt độ tự động tủ sấy công nghiệp", specs: "Nhiệt độ 50-250 độ C", model_en: "THERMO-01" },
+                    expected: ["9032.10.00", "90321000"]
+                },
+                {
+                    id: 14,
+                    title: "Nẹp nhựa cửa xe ô tô trang trí thân xe",
+                    input: { name: "Nẹp nhựa cửa xe ô tô dùng trang trí thân xe", desc: "Nhựa ABS mạ crôm lắp thân vỏ ô tô", use: "Phụ kiện trang trí lắp thân xe ô tô", specs: "Dài 80cm", model_en: "MOLDING-01" },
+                    expected: ["3926.30.00", "39263000", "8708.29.93", "87082993"]
+                },
+                {
+                    id: 15,
+                    title: "Quạt ly tâm hút khói công nghiệp bằng thép",
+                    input: { name: "Quạt ly tâm hút khói công nghiệp bằng thép", desc: "Thép tấm gắn động cơ cánh quạt hút ly tâm", use: "Hút khí khói bụi công nghiệp", specs: "Công suất 3kW, lưu lượng 2500 m3/h", model_en: "FAN-CENTRI" },
+                    expected: ["8414.60.91", "84146091", "8414.59", "841459"]
+                }
+            ];
+
+            const results = [];
+            let passCount = 0;
+
+            for (let tc of testCases) {
+                const res = classifyProductClientSide(tc.input.name, tc.input.desc, tc.input.use, tc.input.specs, tc.input.model_en);
+                const actual = (res && res.c ? res.c : '').replace(/\./g, '');
+                const passed = tc.expected.some(exp => exp.replace(/\./g, '') === actual);
+                if (passed) passCount++;
+                results.push({
+                    id: tc.id,
+                    title: tc.title,
+                    expected: tc.expected[0],
+                    actual: res && res.c ? res.c : 'N/A',
+                    actualClean: actual,
+                    passed: passed,
+                    vn: res && res.vn ? res.vn : ''
+                });
+            }
+
+            const summary = {
+                total: testCases.length,
+                passed: passCount,
+                failed: testCases.length - passCount,
+                pass_rate: `${Math.round((passCount / testCases.length) * 100)}%`,
+                all_passed: passCount === testCases.length,
+                cases: results
+            };
+
+            const pre = document.createElement('pre');
+            pre.id = 'guard-output';
+            pre.textContent = JSON.stringify(summary, null, 2);
+            document.body.appendChild(pre);
+            console.log("Automated Regression Guard Completed:", summary);
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             const isDark = document.documentElement.classList.contains('dark');
             updateThemeIcon();
@@ -9130,6 +9325,9 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                 switchTab(hashTab);
             }
             updateWCOComplianceMeter();
+            if (window.location.search.includes('run_guard=1')) {
+                setTimeout(runAutomatedRegressionGuard, 300);
+            }
         });
     </script>
 </body>
