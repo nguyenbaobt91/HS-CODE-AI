@@ -4844,6 +4844,8 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                 if (head !== '8487' || cRaw !== '84879000') {
                     return { isDisqualified: true, penalty: -6000, reason: "Vi phạm Chú giải WCO Nhóm 84.87 & Chú giải loại trừ Nhóm 84.81: Vú tra mỡ/vú bơm mỡ bò (greasing nipples) bắt buộc phân loại vào Nhóm 84.87 (mã số 8487.90.00), tuyệt đối không phân loại vào nhóm bu lông ốc vít (73.18), phụ kiện ống (73.07) hay van (84.81)." };
                 }
+            }
+
             // V. Thiết bị điều chỉnh tự động (9032) vs Khí cụ đóng ngắt rơ le (8536/8537)
             const isAutoReg = ['thermostat', 'bo dieu nhiet', 'bo on nhiet', 'manostat', 'bo dieu ap tu dong'].some(k => fullTextNorm.includes(k));
             if (isAutoReg && (['85', '84'].includes(head.substring(0, 2)) || head === '9031')) {
