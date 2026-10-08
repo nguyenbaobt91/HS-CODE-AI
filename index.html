@@ -1238,7 +1238,7 @@
         // =========================================================================
         // GLOBAL CONSTANTS & STATE VARIABLES
         // =========================================================================
-        const DEFAULT_GEMINI_API_KEY = "AQ.Ab8RN6LRlqBVkSuKF7vJdzLqj4rAMIwL0hnKrbYzbL5jUj8uRQ";
+        const DEFAULT_GEMINI_API_KEY = "";
 
         let headMap = null;
         let subheadMap = null;
@@ -1250,11 +1250,8 @@
 
         function getActiveApiKey() {
             const stored = localStorage.getItem('user_gemini_api_key');
-            if (stored && stored.trim().length > 15) return stored.trim();
-            if (DEFAULT_GEMINI_API_KEY) {
-                try { localStorage.setItem('user_gemini_api_key', DEFAULT_GEMINI_API_KEY); } catch(e){}
-            }
-            return DEFAULT_GEMINI_API_KEY.trim();
+            if (stored && stored.trim().startsWith('AIzaSy')) return stored.trim();
+            return '';
         }
 
         function updateGeminiStatusBadge() {
@@ -1263,19 +1260,19 @@
             const dot = document.getElementById('gemini-status-dot');
             const badge = document.getElementById('btn-gemini-settings');
 
-            if (key && key.length > 15) {
+            if (key && key.startsWith('AIzaSy')) {
                 if (label && label.innerText !== 'Gemini AI: Đã Kích Hoạt') label.innerText = 'Gemini AI: Đã Kích Hoạt';
                 if (dot && dot.className !== 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse') dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
                 if (badge && !badge.classList.contains('bg-purple-100')) {
                     badge.className = 'px-3 py-1.5 rounded-xl bg-purple-100 dark:bg-purple-900/40 border border-purple-300 dark:border-purple-500/50 text-purple-800 dark:text-purple-300 hover:border-purple-500 text-xs font-semibold transition-colors duration-150 flex items-center space-x-1.5 shadow-sm cursor-pointer shrink-0';
-                    badge.title = 'Google Gemini AI đang hoạt động và áp dụng cho mọi phân tích (Bấm để đổi Key)';
+                    badge.title = 'Google Gemini Cloud AI đang hoạt động cho phân tích chuyên sâu (Bấm để đổi Key)';
                 }
             } else {
-                if (label && label.innerText !== 'Nhập Gemini API Key') label.innerText = 'Nhập Gemini API Key';
-                if (dot && dot.className !== 'w-2 h-2 rounded-full bg-amber-400 animate-ping') dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping';
-                if (badge && !badge.classList.contains('bg-amber-100')) {
-                    badge.className = 'px-3 py-1.5 rounded-xl bg-amber-100 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-600/50 text-amber-800 dark:text-amber-300 hover:border-amber-500 text-xs font-semibold transition-colors duration-150 flex items-center space-x-1.5 shadow-sm cursor-pointer shrink-0';
-                    badge.title = 'Nhấp vào đây để nhập Google Gemini API Key giúp nâng cao độ chính xác 100%';
+                if (label && label.innerText !== 'Thuật Toán WCO 2026 (Sub-ms)') label.innerText = 'Thuật Toán WCO 2026 (Sub-ms)';
+                if (dot && dot.className !== 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse') dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+                if (badge) {
+                    badge.className = 'px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-600/50 text-emerald-800 dark:text-emerald-300 hover:border-emerald-500 text-xs font-semibold transition-colors duration-150 flex items-center space-x-1.5 shadow-sm cursor-pointer shrink-0';
+                    badge.title = 'Đang chạy thuật toán Cưỡng bức Biểu thuế Hải quan WCO 2026 tốc độ 5ms. Bấm vào đây nếu muốn gắn Google Gemini API Key.';
                 }
             }
         }
@@ -4005,9 +4002,9 @@
             if (!apiKey || apiKey.length < 15) throw new Error("Chưa cấu hình Google Gemini API Key hợp lệ");
 
             const candidateModels = [
-                'gemini-3.5-flash-lite',
-                'gemini-flash-lite-latest',
-                'gemini-3.5-flash'
+                'gemini-2.5-flash',
+                'gemini-2.0-flash',
+                'gemini-1.5-flash'
             ];
 
             // Pre-calculate candidate items from the 2026 tariff and extract official WCO notes
@@ -4640,6 +4637,22 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                 forbidden_chapters: ['84', '85', '73', '90'],
                 bonus: 1250
             },
+            // 46. Automotive Body Trims, Claddings, Moldings & Coachwork Fittings (8708 & 3926)
+            {
+                name: 'automotive_body_trims_fittings',
+                pattern: /\b(?:op\s+nhua|nep\s+nhua|tam\s+op|nep\s+trang\s+tri|op\s+trang\s+tri|vien\s+trang\s+tri|chan\s+bun|luoi\s+tan\s+nhiet|mat\s+ga\s+lang|calang|canh\s+luot\s+gio|spoiler|tay\s+nam\s+cua|nep\s+suon|op\s+bac\s+cua|op\s+guong|op\s+den|molding|moulding|garnish|body\s+trim|coachwork\s+fitting)\b/i,
+                target_headings: ['8708', '3926'],
+                forbidden_chapters: ['50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60', '61', '62', '63', '84', '85'],
+                bonus: 2600
+            },
+            // 47. Fabricated Articles of Plastics (3926) vs Primary Polymers (3901 - 3914)
+            {
+                name: 'fabricated_articles_of_plastics',
+                pattern: /\b(?:op\s+nhua|nep\s+nhua|tam\s+op\s+nhua|vo\s+nhua|nap\s+nhua|khung\s+nhua|chi\s+tiet\s+nhua|phu\s+kien\s+nhua|thanh\s+nhua|gia\s+nhua|kep\s+nhua|khay\s+nhua|hop\s+nhua|de\s+nhua|do\s+nhua|mat\s+nhua|tam\s+chan\s+nhua|moulded\s+plastic|plastic\s+cover|plastic\s+casing|plastic\s+frame|plastic\s+bracket|plastic\s+fitting)\b/i,
+                target_headings: ['3926'],
+                forbidden_chapters: ['3901', '3902', '3903', '3904', '3905', '3906', '3907', '3908', '3909', '3910', '3911', '3912', '3913', '3914', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60', '61', '62', '63', '72', '73'],
+                bonus: 2200
+            },
             // 38. Vú tra mỡ, vú bơm mỡ bò, núm tra mỡ (8487) - Chú giải WCO 84.87 & Loại trừ 84.81
             {
                 name: 'grease_nipples',
@@ -4724,6 +4737,31 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             const isMetal = isSteel || isCopper || isAluminum;
 
             if (isPlastic) {
+                // Cấm phân loại nhựa vào các Chương dệt may (50-63) theo Chú giải 1(ij) Chương 39 & Phần XI
+                const chNum = parseInt(head.substring(0, 2), 10);
+                if (chNum >= 50 && chNum <= 63) {
+                    return {
+                        isDisqualified: true,
+                        penalty: -8000,
+                        reason: "Vi phạm Chú giải 1(ij) Chương 39 & Phần XI: Sản phẩm chế tạo từ plastic (chất dẻo/nhựa) không phân loại vào các Chương dệt may (Chương 50 đến 63, ví dụ nhóm chỉ khâu 54.01)."
+                    };
+                }
+
+                // Cấm phân loại thành phẩm tạo hình/phụ kiện bằng nhựa vào Polyme nguyên sinh (39.01 - 39.14) theo Chú giải 6 Chương 39
+                const isPlasticFabricated = /\b(?:op|nep|tam|vo|nap|khung|chi\s+tiet|phu\s+kien|thanh|gia|kep|khay|hop|de|do|mat|boc|bao\s+ve|trang\s+tri|chan|bu\s+long|vit|chot|tan|dem|gioang|moulded|cover|casing|plate|sheet|frame|trim|fitting)\b/i.test(subjLower) ||
+                    /\b(?:op|nep|tam|vo|nap|khung|chi\s+tiet|phu\s+kien|thanh|gia|kep|khay|hop|de|do|mat|boc|bao\s+ve|trang\s+tri|chan|bu\s+long|vit|chot|tan|dem|gioang|moulded|cover|casing|plate|sheet|frame|trim|fitting)\b/i.test(fullTextNorm);
+                
+                if (isPlasticFabricated) {
+                    const headNum = parseInt(head, 10);
+                    if (headNum >= 3901 && headNum <= 3914) {
+                        return {
+                            isDisqualified: true,
+                            penalty: -7000,
+                            reason: "Vi phạm Chú giải 6 Chương 39: Các nhóm 39.01 đến 39.14 chỉ áp dụng cho dạng nguyên sinh (hạt, bột, nhão, lỏng, khối). Thành phẩm hoặc chi tiết tạo hình bằng nhựa (như ốp, tấm, vỏ, phụ kiện) bắt buộc thuộc các nhóm sản phẩm chế tạo (như Nhóm 39.26 hoặc phân nhóm chuyên dụng tương ứng)."
+                        };
+                    }
+                }
+
                 // Sản phẩm/tấm bằng nhựa tuyệt đối cấm phân loại vào Dây cáp điện (85.44), Động cơ (85.01), Máy biến áp (85.04)
                 if (['8544', '8501', '8504', '8535', '8536', '8537'].includes(head)) {
                     return { 
@@ -4733,11 +4771,11 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                     };
                 }
                 // Các bộ phận máy móc khác thuộc Phần XVI bị loại trừ theo Chú giải 1(g) (trừ van nhựa 8481 hoặc quạt nhựa 8414)
-                if (NOTE_2B_PARTS_HEADINGS.has(head) || ['8466', '8487'].includes(head) || (['84', '85'].includes(head.substring(0, 2)) && !['8481', '8414'].includes(head))) {
+                if (['84', '85'].includes(head.substring(0, 2)) && !['8481', '8414'].includes(head)) {
                     return { 
                         isDisqualified: true, 
                         penalty: -6000, 
-                        reason: "Vi phạm Chú giải 1(g) Phần XVI: Sản phẩm cấu tạo từ plastic (nhựa) thuộc Chương 39 (Nhóm 39.26), loại trừ khỏi nhóm máy móc/bộ phận máy móc Phần XVI" 
+                        reason: "Vi phạm Chú giải 1(g) Phần XVI: Sản phẩm cấu tạo từ plastic (nhựa) thuộc Chương 39 (Nhóm 39.26), loại trừ khỏi nhóm máy móc/bộ phận máy móc Phần XVI (Chương 84 và 85)" 
                     };
                 }
             }
@@ -5254,7 +5292,12 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                 // Host machine words (e.g. "máy xoắn dây điện", "máy ép nhựa") in Ô 2/3 must NEVER activate unrelated product categories!
                 const isGenericSubject = /^(?:phu\s+tung|linh\s+kien|bo\s+phan|chi\s+tiet|phu\s+kien|thiet\s+bi|vat\s+tu|san\s+pham|part|parts|spare\s+part|spare\s+parts|component|components)$/i.test(subjNorm.trim());
 
-                if (matchedInSubj || (isGenericSubject && matchedInFull && !matchedInHost)) {
+                // Specialized Vehicle Trim & Coachwork Fitting rule:
+                const isVehicleTrimAccessory = (cat.name === 'automotive_body_trims_fittings') &&
+                    /\b(?:op|nep|vien|trang\s+tri|chan\s+bun|luoi\s+tan\s+nhiet|mat\s+ga\s+lang|calang|canh\s+luot\s+gio|spoiler|tay\s+nam|molding|moulding|garnish|trim|coachwork|tam\s+op)\b/i.test(subjNorm) &&
+                    /\b(?:o\s+to|xe\s+o\s+to|xe\s+hoi|xe\s+con|xe\s+tai|xe\s+khach|than\s+xe|cabin|coachwork|motor\s+car|car|vehicle|automotive)\b/i.test(fullTextNorm);
+
+                if (matchedInSubj || (isGenericSubject && matchedInFull && !matchedInHost) || isVehicleTrimAccessory) {
                     activeCategories.push(cat);
                 }
             }
@@ -5405,8 +5448,17 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                 const isSteel = matNames.includes('steel_iron');
                 const isMetal = isSteel || isCopper || isAluminum;
 
-                if (isPlastic && (NOTE_2B_PARTS_HEADINGS.has(head) || ['8466', '8487'].includes(head) || (['84', '85'].includes(ch) && !NOTE_2A_HEADINGS.has(head)))) {
+                if (isPlastic && (['84', '85'].includes(ch) && !NOTE_2A_HEADINGS.has(head))) {
                     score -= 4000; // Chú giải 1(g) Phần XVI: Sản phẩm bằng plastic loại trừ khỏi Phần XVI máy móc
+                }
+                if (isPlastic && parseInt(ch, 10) >= 50 && parseInt(ch, 10) <= 63) {
+                    score -= 7000; // Chú giải 1(ij) Chương 39 & Phần XI: Loại trừ khỏi các Chương dệt may
+                }
+                const isArticleOrPart = /\b(?:op|nep|tam|vo|nap|khung|chi\s+tiet|phu\s+kien|thanh|gia|kep|khay|hop|de|do|mat|boc|bao\s+ve|trang\s+tri|chan|bu\s+long|vit|chot|tan|dem|gioang|moulded|cover|casing|plate|sheet|frame|trim|fitting)\b/i.test(subjNorm) ||
+                    /\b(?:op|nep|tam|vo|nap|khung|chi\s+tiet|phu\s+kien|thanh|gia|kep|khay|hop|de|do|mat|boc|bao\s+ve|trang\s+tri|chan|bu\s+long|vit|chot|tan|dem|gioang|moulded|cover|casing|plate|sheet|frame|trim|fitting)\b/i.test(fullTextNorm);
+
+                if (isPlastic && parseInt(head, 10) >= 3901 && parseInt(head, 10) <= 3914 && isArticleOrPart) {
+                    score -= 5000; // Chú giải 6 Chương 39: Loại trừ dạng polyme nguyên sinh cho chi tiết/thành phẩm tạo hình
                 }
 
                 // Stage 1 Universal Material Chapter Bounds
@@ -5571,6 +5623,15 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                         else if (code === '39269010' && !['phao', 'danh ca'].some(k => fullTextNorm.includes(k))) itemScore -= 2000;
                     } else if (['tam nhua', 'phien nhua', 'thanh nhua', 'nhua tam', 'plastic sheet', 'plastic plate', 'tam che', 'vo che', 'nap che', 'tam chan', 'safety guard', 'an toan lao dong', 'bao ve'].some(k => fullTextNorm.includes(k)) && code === '39269099') {
                         itemScore += 1200;
+                    } else if (['op', 'nep', 'vien', 'trang tri', 'chan bun', 'mat ga lang', 'calang', 'canh luot gio', 'spoiler', 'tay nam cua', 'coachwork', 'than xe', 'xe o to', 'o to', 'xe hoi'].some(k => fullTextNorm.includes(k))) {
+                        if (code === '39263000') itemScore += 1800;
+                        else if (code === '39269099') itemScore += 800;
+                    }
+                } else if (head === '8708') {
+                    if (['op', 'nep', 'vien', 'trang tri', 'chan bun', 'mat ga lang', 'calang', 'canh luot gio', 'spoiler', 'tay nam cua', 'body trim', 'garnish', 'molding'].some(k => fullTextNorm.includes(k))) {
+                        if (code === '87082993' || code === '87082996') itemScore += 1900;
+                        else if (code === '87082995' || code === '87082998') itemScore += 1700;
+                        else if (code === '87082916') itemScore += 1600;
                     }
                 } else if (head === '4016') {
                     if (['gioang', 'phot', 'vong dem', 'washer', 'dem kin', 'seal', 'o-ring', 'dem lot'].some(k => fullTextNorm.includes(k))) {
@@ -5681,19 +5742,23 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
 
                             if (hasConnector) {
                                 if (!isHighVoltage) {
-                                    if (isPlasticOrRubber && code === '85442011') itemScore += 850;
-                                    else if (!isPlasticOrRubber && code === '85442019') itemScore += 750;
+                                    if (isPlasticOrRubber && code === '85442021') itemScore += 1200;
+                                    else if (!isPlasticOrRubber && code === '85442029') itemScore += 1000;
+                                    else if (code.startsWith('8544201')) itemScore -= 1000;
                                 } else {
-                                    if (isPlasticOrRubber && code === '85442031') itemScore += 850;
-                                    else if (!isPlasticOrRubber && code === '85442039') itemScore += 750;
+                                    if (isPlasticOrRubber && code === '85442041') itemScore += 1200;
+                                    else if (!isPlasticOrRubber && code === '85442049') itemScore += 1000;
+                                    else if (code.startsWith('8544203')) itemScore -= 1000;
                                 }
                             } else {
                                 if (!isHighVoltage) {
-                                    if (isPlasticOrRubber && code === '85442021') itemScore += 850;
-                                    else if (!isPlasticOrRubber && code === '85442029') itemScore += 750;
+                                    if (isPlasticOrRubber && code === '85442011') itemScore += 1200;
+                                    else if (!isPlasticOrRubber && code === '85442019') itemScore += 1000;
+                                    else if (code.startsWith('8544202')) itemScore -= 1000;
                                 } else {
-                                    if (isPlasticOrRubber && code === '85442041') itemScore += 850;
-                                    else if (!isPlasticOrRubber && code === '85442049') itemScore += 750;
+                                    if (isPlasticOrRubber && code === '85442031') itemScore += 1200;
+                                    else if (!isPlasticOrRubber && code === '85442039') itemScore += 1000;
+                                    else if (code.startsWith('8544204')) itemScore -= 1000;
                                 }
                             }
                         } else {
@@ -5911,6 +5976,7 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                     if ((bestCode.startsWith('8466') && h4 === '3926') || (bestCode.startsWith('3926') && h4 === '8466')) isRecognizedDual = true;
                     else if ((bestCode.startsWith('8482') && h4 === '8483') || (bestCode.startsWith('8483') && h4 === '8482')) isRecognizedDual = true;
                     else if ((bestCode.startsWith('8537') && h4 === '8504') || (bestCode.startsWith('8504') && h4 === '8537')) isRecognizedDual = true;
+                    else if ((bestCode.startsWith('3926') && h4 === '8708') || (bestCode.startsWith('8708') && h4 === '3926')) isRecognizedDual = true;
 
                     if (isRecognizedDual || (cand.score >= bestScore * 0.70 && cand.score > 0)) {
                         if (!seenHeadings.has(h4) || !seenPrefixes.has(sub)) {
