@@ -7394,14 +7394,17 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                         const gemRes = await callGeminiAIClassification(name, desc, use, specs, model_en);
                         if (gemRes && (gemRes.hs_code || gemRes.clean_code)) {
                             const cCode = (gemRes.clean_code || gemRes.hs_code || '').replace(/\./g, '');
-                            const decomp = decomposeQueryClientSide(name, desc, use, specs, model_en);
-                            const fullTextNorm = removeAccents(`${name} ${desc} ${use} ${specs} ${model_en}`);
-                            const audit = auditStatutoryConstraintsClientSide(cCode, cCode.substring(0, 4), gemRes.item_description || '', '', decomp, fullTextNorm);
-                            if (audit.isDisqualified) {
-                                console.warn(`Gemini proposed code ${cCode} REJECTED by Statutory Audit: ${audit.reason}`);
-                                const fallbackHtml = generateClientSideAIReport(inputData);
-                                if (container) container.innerHTML = fallbackHtml;
-                                return;
+                            const dbItem = (window.HS_DATABASE || []).find(it => (it.c || '').replace(/\./g, '') === cCode) 
+                                        || (window.HS_DATABASE || []).find(it => (it.c || '').replace(/\./g, '').startsWith(cCode.substring(0, 6)));
+                            if (dbItem) {
+                                gemRes.hs_code = formatHSCode(dbItem.c || cCode);
+                                gemRes.clean_code = (dbItem.c || cCode).replace(/\./g, '');
+                                if (!gemRes.item_description || gemRes.item_description.length < 5) gemRes.item_description = dbItem.vn;
+                                if (!gemRes.mfn) gemRes.mfn = dbItem.mfn || '0%';
+                                if (!gemRes.vat) gemRes.vat = dbItem.vat || '8%';
+                                if (!gemRes.atiga) gemRes.atiga = dbItem.atiga || '0%';
+                                if (!gemRes.acfta) gemRes.acfta = dbItem.acfta || '0%';
+                                if (!gemRes.evfta) gemRes.evfta = dbItem.evfta || '0%';
                             }
 
                             // Trigger background PDF export on local server ONLY if available
