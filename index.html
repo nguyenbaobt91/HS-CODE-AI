@@ -4783,20 +4783,17 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                     }
                 }
 
-                // Sản phẩm/tấm bằng nhựa tuyệt đối cấm phân loại vào Dây cáp điện (85.44), Động cơ (85.01), Máy biến áp (85.04)
-                if (['8544', '8501', '8504', '8535', '8536', '8537'].includes(head)) {
-                    return { 
-                        isDisqualified: true, 
-                        penalty: -7000, 
-                        reason: "Vi phạm Chú giải 1(g) Phần XVI & GRI 1: Sản phẩm hoặc tấm bằng nhựa (plastic) thuộc Chương 39 (Nhóm 39.26 hoặc 39.20), tuyệt đối không phân loại vào các nhóm thiết bị điện/dây dẫn điện Phần XVI (như Nhóm 85.44, 85.36)." 
-                    };
-                }
-                // Các bộ phận máy móc khác thuộc Phần XVI bị loại trừ theo Chú giải 1(g) (trừ van nhựa 8481 hoặc quạt nhựa 8414)
-                if (['84', '85'].includes(head.substring(0, 2)) && !['8481', '8414'].includes(head)) {
+                // Chú giải 1(g) Phần XVI: Các sản phẩm/bộ phận bằng plastic (nhựa) thuộc Nhóm 39.26 (như tấm che máy, đệm nhựa, chi tiết gia công bằng nhựa)
+                // bị loại trừ khỏi các nhóm BỘ PHẬN máy móc Phần XVI (như 84.66, 84.73, 84.09, 84.31, 84.87, 85.03, 85.29, 85.38, 85.48).
+                // TUYỆT ĐỐI KHÔNG loại trừ các thiết bị, máy móc có chức năng độc lập (như công tắc 8536, dây cáp 8544, mô tơ 8501, biến áp 8504, van 8481) dù có vỏ hoặc cách điện bằng nhựa!
+                const isMachinePartHeading = NOTE_2B_PARTS_HEADINGS.has(head) || ['8487', '8548', '8409', '8431', '8466', '8473', '8503', '8529', '8538'].includes(head);
+                const isSubjectStructuralPlastic = /\b(?:tam\s+che|vo\s+che|nap\s+che|tam\s+chan|vach\s+chan|man\s+che|chan\s+bui|tam\s+(?:nhua|mica)?\s*bao\s+ve|vo\s+bao\s+ve|nap\s+bao\s+ve|mieng\s+nhua|tam\s+nhua|thanh\s+nhua|khung\s+nhua|de\s+ga|gia\s+do\s+nhua)\b/i.test(subjLower);
+
+                if (isSubjectStructuralPlastic && isMachinePartHeading) {
                     return { 
                         isDisqualified: true, 
                         penalty: -6000, 
-                        reason: "Vi phạm Chú giải 1(g) Phần XVI: Sản phẩm cấu tạo từ plastic (nhựa) thuộc Chương 39 (Nhóm 39.26), loại trừ khỏi nhóm máy móc/bộ phận máy móc Phần XVI (Chương 84 và 85)" 
+                        reason: "Vi phạm Chú giải 1(g) Phần XVI: Sản phẩm cấu tạo từ plastic (nhựa) thuộc Chương 39 (Nhóm 39.26), loại trừ khỏi các nhóm bộ phận máy móc Phần XVI (Chương 84 và 85)." 
                     };
                 }
             }
@@ -6014,7 +6011,7 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                     if (fullTextNorm.includes('thep') && ['7415', '7616', '3926'].includes(h4)) {
                         continue;
                     }
-                    if (fullTextNorm.includes('nhua') && ['7326', '7415', '8535', '8536', '8544'].includes(h4)) {
+                    if (fullTextNorm.includes('nhua') && ['7326', '7415'].includes(h4)) {
                         continue;
                     }
 
