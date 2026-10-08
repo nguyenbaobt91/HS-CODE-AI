@@ -4856,7 +4856,7 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             }
 
             // N. Đồ nội thất & Ghế (Chương 94: 9401, 9403)
-            const isFurniture = ['ghe', 'ghe ngoi', 'ghe xoay', 'ghe van phong', 'ban lam viec', 'ban an', 'tu ho so', 'tu quan ao', 'giuong', 'ke sach', 'ke de do', 'chair', 'seat', 'table', 'desk', 'cabinet', 'cupboard'].some(k => fullTextNorm.includes(k));
+            const isFurniture = /\b(?:ghe\s+ngoi|ghe\s+xoay|ghe\s+van\s+phong|ban\s+lam\s+viec|ban\s+an|tu\s+ho\s+so|tu\s+quan\s+ao|giuong\s+ngu|ke\s+sach|ke\s+de\s+do|chair|seat|table|desk|cabinet|cupboard)\b/i.test(fullTextNorm);
             if (isFurniture) {
                 if (['3926', '4421', '7326'].includes(head)) {
                     return { isDisqualified: true, penalty: -5000, reason: "Vi phạm Chú giải 1(e) Chương 39 / Chú giải 1(c) Chương 44 / Chú giải 1(k) Chương 73: Ghế và đồ nội thất dù làm bằng nhựa, gỗ hay kim loại đều BẮT BUỘC phân loại vào Chương 94 (Nhóm 94.01 hoặc 94.03), loại trừ khỏi các chương vật liệu thành phẩm" };
@@ -4864,7 +4864,7 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             }
 
             // O. Túi xách, Vali, Ba lô, Cặp (Nhóm 4202)
-            const isLuggage = ['vali', 'va li', 'tui xach', 'ba lo', 'balo', 'cap sach', 'vi tien', 'suitcase', 'handbag', 'backpack', 'briefcase', 'wallet'].some(k => fullTextNorm.includes(k));
+            const isLuggage = /\b(?:vali|va\s+li|tui\s+xach|ba\s+lo|balo|cap\s+sach|vi\s+tien|suitcase|handbag|backpack|briefcase|wallet)\b/i.test(fullTextNorm);
             if (isLuggage) {
                 if (['3926', '6117', '6217', '6307', '7326'].includes(head) || ['61', '62', '63'].includes(head.substring(0, 2))) {
                     return { isDisqualified: true, penalty: -5000, reason: "Vi phạm Chú giải 1(h) Phần XI & Chú giải 1(ij) Chương 39: Túi xách, vali, ba lô, cặp dù bề mặt bằng da, nhựa tấm hay vải dệt đều BẮT BUỘC thuộc Nhóm 42.02, loại trừ khỏi các chương dệt may hoặc nhựa" };
@@ -4880,7 +4880,7 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             }
 
             // Q. Đồ chơi & Dụng cụ thể thao (Chương 95)
-            const isToyOrSport = ['do choi tre em', 'mo hinh do choi', 'bup be', 'dung cu the thao', 'vot cau long', 'vot tennis', 'bong da', 'bong ro', 'may tap the duc', 'toys', 'gym equipment'].some(k => fullTextNorm.includes(k));
+            const isToyOrSport = /\b(?:do\s+choi\s+tre\s+em|mo\s+hinh\s+do\s+choi|bup\s+be|dung\s+cu\s+the\s+thao|vot\s+cau\s+long|vot\s+tennis|bong\s+da|bong\s+ro|may\s+tap\s+the\s+duc|toys|gym\s+equipment)\b/i.test(fullTextNorm);
             if (isToyOrSport) {
                 if (['3926', '4421', '7326', '8479', '8543'].includes(head)) {
                     return { isDisqualified: true, penalty: -5000, reason: "Vi phạm Chú giải 1(p) Phần XVI & Chú giải 1(o) Chương 39: Đồ chơi, mô hình giải trí và dụng cụ thể thao BẮT BUỘC thuộc Chương 95 (95.03 hoặc 95.06), loại trừ khỏi các chương nhựa, gỗ và máy móc" };
@@ -4888,7 +4888,7 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             }
 
             // R. Máy bơm (8413) & Máy nén khí/quạt (8414)
-            const isPumpOrFan = ['may bom', 'bom nuoc', 'bom dau', 'may nen khi', 'may nen lanh', 'quat thong gio', 'quat hut', 'water pump', 'air compressor', 'industrial fan'].some(k => fullTextNorm.includes(k));
+            const isPumpOrFan = /\b(?:may\s+bom|bom\s+nuoc|bom\s+dau|may\s+nen\s+khi|may\s+nen\s+lanh|quat\s+thong\s+gio|quat\s+hut|water\s+pump|air\s+compressor|industrial\s+fan)\b/i.test(fullTextNorm);
             if (isPumpOrFan) {
                 if (NOTE_2B_PARTS_HEADINGS.has(head) || ['8409', '8431', '8487'].includes(head)) {
                     return { isDisqualified: true, penalty: -5000, reason: "Vi phạm Chú giải 2(a) Phần XVI: Bơm chất lỏng (84.13), máy nén khí và quạt (84.14) có chức năng độc lập, bắt buộc phân loại vào nhóm định danh của chúng, không được xếp vào nhóm bộ phận máy" };
@@ -4896,7 +4896,7 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             }
 
             // S. Hóa chất bảo vệ thực vật & Chế phẩm tẩy rửa bán lẻ (3808, 3402)
-            if (['thuoc tru sau', 'thuoc diet con trung', 'thuoc diet co', 'thuoc sat trung', 'pesticide', 'insecticide'].some(k => fullTextNorm.includes(k))) {
+            if (/\b(?:thuoc\s+tru\s+sau|thuoc\s+diet\s+con\s+trung|thuoc\s+diet\s+co|thuoc\s+sat\s+trung|pesticide|insecticide)\b/i.test(fullTextNorm)) {
                 if (['28', '29', '30'].includes(head.substring(0, 2))) {
                     return { isDisqualified: true, penalty: -4000, reason: "Vi phạm Chú giải Chương 38: Thuốc trừ sâu, diệt côn trùng, sát trùng đã đóng gói bán lẻ BẮT BUỘC thuộc Nhóm 38.08, loại trừ khỏi hóa chất đơn chất Chương 28, 29" };
                 }
