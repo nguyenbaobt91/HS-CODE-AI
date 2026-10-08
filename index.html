@@ -75,6 +75,14 @@
             background: rgba(156, 163, 175, 0.4);
             border-radius: 4px;
         }
+        @keyframes gateShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .animate-shake {
+            animation: gateShake 0.4s ease-in-out;
+        }
     </style>
 
     <!-- Client-Side Document, PDF & Excel Engines for Netlify & Cloud Usage -->
@@ -122,6 +130,67 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen">
 
+    <!-- ========================================================================= -->
+    <!-- SECURITY ACCESS GATE MODAL (Bảo Vệ Truy Cập Nội Bộ)                       -->
+    <!-- ========================================================================= -->
+    <div id="security-gate-overlay" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-2xl flex items-center justify-center p-4 transition-all duration-300">
+        <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl p-6 sm:p-8 space-y-6 text-center relative overflow-hidden">
+            <!-- Top Gradient Bar -->
+            <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-sky-500 via-indigo-500 to-emerald-500"></div>
+
+            <!-- Shield Icon -->
+            <div class="w-16 h-16 mx-auto rounded-2xl bg-sky-100 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center text-3xl shadow-lg shadow-sky-500/20">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <!-- Title & Subtitle -->
+            <div class="space-y-1.5">
+                <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-sky-100 text-sky-800 dark:bg-sky-950/80 dark:text-sky-300 border border-sky-300 dark:border-sky-700">
+                    Cổng Truy Cập Nội Bộ • MOL-Logistics
+                </span>
+                <h2 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+                    HSCoder AI Security Gate
+                </h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-xs mx-auto">
+                    Hệ thống đề xuất HS Code tự động &amp; tra cứu Chú giải WCO 2022. Vui lòng nhập mật khẩu được cấp quyền để tiếp tục.
+                </p>
+            </div>
+
+            <!-- Form -->
+            <form onsubmit="handlePasscodeSubmit(event)" class="space-y-4 text-left">
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                        Mật khẩu truy cập (*)
+                    </label>
+                    <div class="relative">
+                        <input type="password" id="access-passcode-input" placeholder="Nhập mật khẩu..." 
+                               class="w-full px-4 py-3 pr-11 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm font-mono tracking-wider transition-all"
+                               autofocus autocomplete="current-password">
+                        <button type="button" onclick="togglePasscodeVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-sm p-1">
+                            <i id="passcode-eye-icon" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    <p id="passcode-error-msg" class="hidden text-xs text-rose-500 font-semibold flex items-center gap-1.5 mt-1">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>Mật khẩu không chính xác! Vui lòng liên hệ quản trị viên.</span>
+                    </p>
+                </div>
+
+                <button type="submit" id="btn-unlock-gate" 
+                        class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-black text-sm shadow-lg shadow-sky-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-lock-open text-xs"></i>
+                    <span>MỞ KHÓA TRUY CẬP</span>
+                </button>
+            </form>
+
+            <!-- Footer note -->
+            <div class="pt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] text-slate-400 dark:text-slate-500 flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-lock text-[10px]"></i>
+                <span>Chế độ bảo mật phiên làm việc • Tự động ghi nhớ</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Header / Navbar -->
     <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/90 dark:border-slate-800 shadow-sm">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
@@ -166,6 +235,10 @@
             <div class="flex items-center space-x-2 shrink-0">
                 <button onclick="toggleDarkMode()" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center transition-colors duration-150 cursor-pointer border border-slate-200 dark:border-slate-700" title="Chuyển chế độ Sáng / Tối">
                     <i id="theme-icon" class="fa-solid fa-moon text-sm"></i>
+                </button>
+
+                <button onclick="lockScreenSecurityGate()" class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-rose-100 hover:text-rose-600 dark:hover:bg-rose-950/50 dark:hover:text-rose-400 flex items-center justify-center transition-colors duration-150 cursor-pointer border border-slate-200 dark:border-slate-700" title="Khóa màn hình (Bảo mật truy cập)">
+                    <i class="fa-solid fa-lock text-sm"></i>
                 </button>
                 
                 <button id="btn-gemini-settings" onclick="openApiKeyModal()" class="px-3 py-1.5 rounded-xl bg-purple-100 dark:bg-purple-900/40 border border-purple-300 dark:border-purple-500/50 text-purple-800 dark:text-purple-300 hover:border-purple-500 text-xs font-semibold transition-colors duration-150 flex items-center space-x-1.5 shadow-sm cursor-pointer shrink-0" title="Google Gemini AI đang hoạt động và áp dụng cho mọi phân tích (Bấm để đổi Key)">
@@ -8774,7 +8847,86 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             });
         }
 
+        // =========================================================================
+        // SECURITY ACCESS GATE (Giải Pháp 1: Bảo Vệ Truy Cập Nội Bộ)
+        // =========================================================================
+        // Authorized SHA-256 hash for: "MOL@2026" (và "mol@2026")
+        const AUTHORIZED_HASHES = new Set([
+            'ac674f9966e5862388d20e5d38df87f5b9e9fdf5d32f28891d9126de27401377', // MOL@2026
+            '0d3aff0ccf80db1f4b646db93a32860a14642bae43aaf55377a344f193b07ea3'  // mol@2026
+        ]);
+
+        async function sha256Hex(text) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function checkSecurityGateStatus() {
+            const overlay = document.getElementById('security-gate-overlay');
+            const token = localStorage.getItem('hscoder_mol_auth');
+            if (token && AUTHORIZED_HASHES.has(token)) {
+                if (overlay) overlay.classList.add('hidden');
+            } else {
+                if (overlay) overlay.classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('access-passcode-input')?.focus();
+                }, 100);
+            }
+        }
+
+        async function handlePasscodeSubmit(e) {
+            if (e) e.preventDefault();
+            const input = document.getElementById('access-passcode-input');
+            const errMsg = document.getElementById('passcode-error-msg');
+            const val = (input?.value || '').trim();
+            if (!val) return;
+
+            const hash = await sha256Hex(val);
+            if (AUTHORIZED_HASHES.has(hash)) {
+                localStorage.setItem('hscoder_mol_auth', hash);
+                if (errMsg) errMsg.classList.add('hidden');
+                const overlay = document.getElementById('security-gate-overlay');
+                if (overlay) {
+                    overlay.classList.add('opacity-0', 'pointer-events-none');
+                    setTimeout(() => {
+                        overlay.classList.add('hidden');
+                        overlay.classList.remove('opacity-0', 'pointer-events-none');
+                    }, 300);
+                }
+            } else {
+                if (errMsg) errMsg.classList.remove('hidden');
+                if (input) {
+                    input.classList.add('border-rose-500', 'animate-shake');
+                    setTimeout(() => input.classList.remove('border-rose-500', 'animate-shake'), 600);
+                    input.value = '';
+                    input.focus();
+                }
+            }
+        }
+
+        function togglePasscodeVisibility() {
+            const input = document.getElementById('access-passcode-input');
+            const icon = document.getElementById('passcode-eye-icon');
+            if (!input || !icon) return;
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-solid fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-solid fa-eye';
+            }
+        }
+
+        function lockScreenSecurityGate() {
+            localStorage.removeItem('hscoder_mol_auth');
+            checkSecurityGateStatus();
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
+            checkSecurityGateStatus();
             const isDark = document.documentElement.classList.contains('dark');
             const themeIcon = document.getElementById('theme-icon');
             if (themeIcon) {
