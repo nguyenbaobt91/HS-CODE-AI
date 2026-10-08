@@ -5810,16 +5810,6 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
 
                             if (hasConnector) {
                                 if (!isHighVoltage) {
-                                    if (isPlasticOrRubber && code === '85442021') itemScore += 1200;
-                                    else if (!isPlasticOrRubber && code === '85442029') itemScore += 1000;
-                                    else if (code.startsWith('8544201')) itemScore -= 1000;
-                                } else {
-                                    if (isPlasticOrRubber && code === '85442041') itemScore += 1200;
-                                    else if (!isPlasticOrRubber && code === '85442049') itemScore += 1000;
-                                    else if (code.startsWith('8544203')) itemScore -= 1000;
-                                }
-                            } else {
-                                if (!isHighVoltage) {
                                     if (isPlasticOrRubber && code === '85442011') itemScore += 1200;
                                     else if (!isPlasticOrRubber && code === '85442019') itemScore += 1000;
                                     else if (code.startsWith('8544202')) itemScore -= 1000;
@@ -5827,6 +5817,16 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                                     if (isPlasticOrRubber && code === '85442031') itemScore += 1200;
                                     else if (!isPlasticOrRubber && code === '85442039') itemScore += 1000;
                                     else if (code.startsWith('8544204')) itemScore -= 1000;
+                                }
+                            } else {
+                                if (!isHighVoltage) {
+                                    if (isPlasticOrRubber && code === '85442021') itemScore += 1200;
+                                    else if (!isPlasticOrRubber && code === '85442029') itemScore += 1000;
+                                    else if (code.startsWith('8544201')) itemScore -= 1000;
+                                } else {
+                                    if (isPlasticOrRubber && code === '85442041') itemScore += 1200;
+                                    else if (!isPlasticOrRubber && code === '85442049') itemScore += 1000;
+                                    else if (code.startsWith('8544203')) itemScore -= 1000;
                                 }
                             }
                         } else {
@@ -9233,7 +9233,7 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                     id: 8,
                     title: "Dây cáp đồng trục có gắn đầu nối",
                     input: { name: "Dây cáp đồng trục có gắn đầu nối", desc: "Lõi đồng cáp đồng trục có gắn sẵn đầu nối rắc cắm", use: "Truyền tín hiệu tần số cao", specs: "Điện áp 220V", model_en: "COAX-01" },
-                    expected: ["8544.20.21", "85442021"]
+                    expected: ["8544.20.11", "85442011"]
                 },
                 {
                     id: 9,

@@ -176,9 +176,9 @@ statutory_benchmarks = [
     {
         'doc': 'Chú giải Nhóm 85.44 & Phân nhóm 8544.20 Biểu thuế 2026',
         'name': 'Dây cáp đồng trục có gắn đầu nối, vỏ bọc cách điện nhựa',
-        'hs': '85442021',
-        'basis': 'Áp dụng GRI 1 Nhóm 85.44. Áp dụng GRI 6: Phân nhóm 8544.20 (Cáp đồng trục) -> Có gắn đầu nối -> Điện áp không quá 66 kV -> Mã 8544.20.21.',
-        'summary': 'Cáp đồng trục có gắn đầu nối điện áp dưới 66kV bắt buộc phân loại 8544.20.21.',
+        'hs': '85442011',
+        'basis': 'Áp dụng GRI 1 Nhóm 85.44. Áp dụng GRI 6: Phân nhóm 8544.20 (Cáp đồng trục) -> Cáp cách điện ĐÃ GẮN VỚI ĐẦU NỐI, dùng cho điện áp không quá 66 kV -> Cách điện bằng cao su hoặc plastic -> Bắt buộc phân loại mã 8544.20.11 (loại trừ mã 8544.20.21 là loại CHƯA gắn đầu nối).',
+        'summary': 'Cáp đồng trục có gắn đầu nối điện áp dưới 66kV cách điện nhựa/cao su bắt buộc phân loại 8544.20.11.',
         'keywords': ['day', 'cap', 'dong', 'truc', 'dau', 'noi', 'coaxial', 'cable']
     },
     {

@@ -21,7 +21,7 @@ if not browser_exe:
     print("ERROR: Không tìm thấy trình duyệt msedge hoặc chrome trên hệ thống.")
     sys.exit(1)
 
-test_url = "http://127.0.0.1:8080/index.html?run_guard=1"
+test_url = sys.argv[1] if (len(sys.argv) > 1 and sys.argv[1].startswith("http")) else "http://127.0.0.1:8080/index.html?run_guard=1"
 print(f"================================================================================")
 print(f"   HỆ THỐNG KIỂM THỬ TỰ ĐỘNG BẢO VỆ CHỐNG TÁI PHÁT LỖI (REGRESSION GUARD)     ")
 print(f"================================================================================")
