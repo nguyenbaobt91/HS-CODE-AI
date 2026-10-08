@@ -1,0 +1,51 @@
+# Netlify Configuration for HSCoder AI
+[build]
+  publish = "."
+
+# 1. Security: Block direct HTTP access to server scripts and API keys
+[[redirects]]
+  from = "/gemini_key.txt"
+  to = "/index.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/*.py"
+  to = "/index.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/*.json"
+  to = "/index.html"
+  status = 404
+  force = true
+
+# 2. SPA Single Page Application Routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# 3. Security Headers for all responses
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Access-Control-Allow-Origin = "*"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# 4. Performance: Cache large static datasets (hs_data.js, wco_data.js) on Netlify Edge CDN
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, stale-while-revalidate=86400"
+    Access-Control-Allow-Origin = "*"
+
+# 5. PDF Documents Content-Type
+[[headers]]
+  for = "/pdf_docs/*"
+  [headers.values]
+    Content-Type = "application/pdf"
+    Access-Control-Allow-Origin = "*"

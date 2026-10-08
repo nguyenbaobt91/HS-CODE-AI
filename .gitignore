@@ -1,0 +1,14 @@
+# Security: Do NOT commit API keys
+gemini_key.txt
+*.key
+.env
+
+# Python cache & temp files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Operating system files
+Thumbs.db
+.DS_Store
