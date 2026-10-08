@@ -1959,8 +1959,8 @@
             {
                 id: 'cables_8544',
                 headings: ['8544'],
-                keywords: ['day dien', 'dây điện', 'cap dien', 'cáp điện', 'cap quang', 'cáp quang', 'cable', 'wire', 'day cap', 'dây cáp'],
-                category: 'Dây điện, Cáp điện có vỏ bọc & Cáp sợi quang (Nhóm 85.44)',
+                keywords: ['day dien', 'dây điện', 'cap dien', 'cáp điện', 'cap quang', 'cáp quang', 'cable', 'wire', 'day cap', 'dây cáp', 'cap dong truc', 'cáp đồng trục', 'dong truc', 'đồng trục', 'coaxial', 'coaxial cable'],
+                category: 'Dây điện, Cáp điện có vỏ bọc, Cáp đồng trục & Cáp quang (Nhóm 85.44)',
                 essential_criteria: [
                     {
                         name: 'Trang bị đầu nối',
@@ -1972,12 +1972,13 @@
                         ]
                     },
                     {
-                        name: 'Cấp điện áp cách điện',
-                        check: (t, tn) => /80v|1000v|cap quang|optical|dien ap cao the|ha the/i.test(tn),
-                        missing_label: 'Cấp điện áp cách điện (<= 80V / 80V - 1000V / > 1000V) hoặc Cáp quang',
+                        name: 'Loại cáp & Cấp điện áp cách điện',
+                        check: (t, tn) => /dong truc|coaxial|66 kv|80v|1000v|cap quang|optical|ha the/i.test(tn),
+                        missing_label: 'Loại cáp (Đồng trục 8544.20 / Thông thường / Quang 8544.70) & Cấp điện áp',
                         chips: [
-                            'Điện áp cách điện không quá 80V (Phân nhóm 8544.42/49)',
-                            'Điện áp cách điện từ trên 80V đến 1000V',
+                            'Cáp đồng trục đã gắn đầu nối, điện áp <= 66 kV (Mã 8544.20.11)',
+                            'Cáp đồng trục chưa gắn đầu nối, điện áp <= 66 kV (Mã 8544.20.21)',
+                            'Điện áp cách điện không quá 1000V (Phân nhóm 8544.42/49)',
                             'Điện áp cao thế vượt quá 1000V (Phân nhóm 8544.60)',
                             'Cáp sợi quang học truyền dữ liệu (Mã 8544.70.00)'
                         ]
@@ -1985,15 +1986,19 @@
                 ],
                 groups: [
                     {
-                        label: '1. Tình trạng trang bị đầu nối (GRI 6)',
+                        label: '1. Phân loại cấu tạo & Cáp đồng trục (GRI 6)',
                         chips: [
+                            'Cáp đồng trục đã gắn đầu nối, điện áp <= 66 kV (Mã 8544.20.11)',
+                            'Cáp đồng trục chưa gắn đầu nối, điện áp <= 66 kV (Mã 8544.20.21)',
+                            'Cách điện bằng cao su hoặc plastic',
                             'Đã gắn sẵn đầu nối (Fitted with connectors)',
                             'Chưa gắn đầu nối (Without connectors)'
                         ]
                     },
                     {
-                        label: '2. Cấp điện áp & Môi chất truyền dẫn',
+                        label: '2. Cấp điện áp cách điện & Môi chất truyền dẫn',
                         chips: [
+                            'Điện áp 220V (Dưới 1000V / Dưới 66 kV)',
                             'Điện áp cách điện không quá 80V (Phân nhóm 8544.42/49)',
                             'Điện áp cách điện từ trên 80V đến 1000V',
                             'Điện áp cao thế vượt quá 1000V (Phân nhóm 8544.60)',
@@ -4494,10 +4499,10 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             // 31. Insulated Electrical Cables & Conductors (8544) - Note 2(a) Section XVI
             {
                 name: 'insulated_electric_cables',
-                pattern: /\b(?:day\s+dien|cap\s+dien|day\s+cap\s+dien|day\s+dan\s+dien|cap\s+dong\s+truc|cap\s+mang|day\s+tin\s+hieu|cap\s+dieu\s+khien|electric\s+cable|power\s+cable|insulated\s+wire|coaxial\s+cable|lan\s+cable)\b/i,
+                pattern: /\b(?:day\s+dien|cap\s+dien|day\s+cap\s+dien|day\s+dan\s+dien|cap\s+dong\s+truc|day\s+cap\s+dong\s+truc|day\s+dong\s+truc|cap\s+mang|day\s+tin\s+hieu|cap\s+dieu\s+khien|electric\s+cable|power\s+cable|insulated\s+wire|coaxial\s+cable|co-axial\s+cable|lan\s+cable)\b/i,
                 target_headings: ['8544'],
-                forbidden_chapters: ['7408', '7605', '8536', '8538', '9001'],
-                bonus: 1300
+                forbidden_chapters: ['7408', '7605', '8536', '8538', '9001', '9028', '9030', '9031'],
+                bonus: 2400
             },
             // 32. Optical Fibre Cables (8544.70 vs 9001.10)
             {
@@ -5636,8 +5641,47 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                 } else if (head === '8544') {
                     if (['tam che', 'vo che', 'nap che', 'tam chan', 'bu long', 'mieng thep', 'gia do'].some(k => subjNorm.includes(k))) {
                         itemScore -= 3000;
-                    } else if (['ha the', 'duoi 1000v', '0.6/1kv', 'dien ap khong qua 1000'].some(k => fullTextNorm.includes(k))) {
-                        if (code.startsWith('854449') || code.startsWith('854442')) itemScore += 300;
+                    }
+
+                    const sub = code.substring(0, 6);
+
+                    // 1. Cáp đồng trục (8544.20)
+                    if (['dong truc', 'coaxial', 'dong-truc', 'co-axial'].some(k => fullTextNorm.includes(k))) {
+                        if (sub === '854420') {
+                            itemScore += 950;
+
+                            const hasConnector = ['da gan dau noi', 'co gan dau noi', 'gan dau noi', 'co dau noi', 'fitted with connector', 'with connector'].some(k => fullTextNorm.includes(k)) && !['chua gan dau noi', 'khong co dau noi', 'without connector', 'not fitted'].some(k => fullTextNorm.includes(k));
+                            const isHighVoltage = specsDict.v !== undefined ? specsDict.v > 66000 : ['tren 66 kv', 'tren 66kv', '> 66 kv', '>66kv', 'over 66 kv'].some(k => fullTextNorm.includes(k));
+                            const isPlasticOrRubber = ['plastic', 'nhua', 'cao su', 'rubber', 'pvc', 'pe', 'xlpe'].some(k => fullTextNorm.includes(k));
+
+                            if (hasConnector) {
+                                if (!isHighVoltage) {
+                                    if (isPlasticOrRubber && code === '85442011') itemScore += 850;
+                                    else if (!isPlasticOrRubber && code === '85442019') itemScore += 750;
+                                } else {
+                                    if (isPlasticOrRubber && code === '85442031') itemScore += 850;
+                                    else if (!isPlasticOrRubber && code === '85442039') itemScore += 750;
+                                }
+                            } else {
+                                if (!isHighVoltage) {
+                                    if (isPlasticOrRubber && code === '85442021') itemScore += 850;
+                                    else if (!isPlasticOrRubber && code === '85442029') itemScore += 750;
+                                } else {
+                                    if (isPlasticOrRubber && code === '85442041') itemScore += 850;
+                                    else if (!isPlasticOrRubber && code === '85442049') itemScore += 750;
+                                }
+                            }
+                        } else {
+                            itemScore -= 2000;
+                        }
+                    } else if (sub === '854420') {
+                        itemScore -= 1500;
+                    } else if (['ha the', 'duoi 1000v', '0.6/1kv', 'dien ap khong qua 1000', '220v', '110v', '380v'].some(k => fullTextNorm.includes(k)) || (specsDict.v !== undefined && specsDict.v <= 1000)) {
+                        if (['da gan dau noi', 'co gan dau noi', 'gan dau noi', 'co dau noi', 'fitted with connector'].some(k => fullTextNorm.includes(k))) {
+                            if (code.startsWith('854442')) itemScore += 450;
+                        } else {
+                            if (code.startsWith('854449')) itemScore += 450;
+                        }
                     }
                 } else if (head === '8537') {
                     if (['hop dieu khien', 'tu dieu khien', 'bo dieu khien', 'mach dieu khien', 'bang dieu khien', 'control box', 'motor controller', 'controller'].some(k => fullTextNorm.includes(k))) {
@@ -5815,6 +5859,8 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             } else if (bestCode.startsWith('7318') && ['bu long', 'oc vit', 'dinh vit'].some(k => fullTextNorm.includes(k))) {
                 isCertain100 = true;
             } else if (bestCode === '85235111' && ['chua ghi', 'unrecorded', 'trong'].some(k => fullTextNorm.includes(k))) {
+                isCertain100 = true;
+            } else if (bestCode.startsWith('854420') && ['dong truc', 'coaxial'].some(k => fullTextNorm.includes(k))) {
                 isCertain100 = true;
             }
 
