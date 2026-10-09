@@ -4020,37 +4020,6 @@
                 'gemini-2.5-flash-lite'
             ];
 
-            // Pre-calculate candidate items from the 2026 tariff and extract official WCO notes
-            let candidatesContext = "";
-            let wcoNotesContext = "";
-            try {
-                const preResult = classifyProductClientSide(name, desc, use, specs, model_en);
-                if (preResult) {
-                    const topCands = preResult._top_candidates || (preResult.c ? [preResult] : []);
-                    if (topCands.length > 0) {
-                        const candLines = topCands.slice(0, 10).map((c, idx) => {
-                            const codeClean = (c.c || '').replace(/\./g, '');
-                            const codeFmt = codeClean.length === 8 ? `${codeClean.substring(0,4)}.${codeClean.substring(4,6)}.${codeClean.substring(6,8)}` : (c.c || '');
-                            return `${idx + 1}. Mã ${codeFmt} (${codeClean}): ${c.vn || ''} (MFN: ${c.mfn || '0%'}, VAT: ${c.vat || '8%'})`;
-                        });
-                        candidatesContext = `\nDANH MỤC CÁC MÃ ỨNG VIÊN ĐÃ RÀ SOÁT TỪ BIỂU THUẾ XNK VIỆT NAM 2026 (THEO GRI 1 VÀ GRI 6):\n${candLines.join('\n')}\n`;
-                    }
-                    const topHeads = preResult._top_headings || [];
-                    if (topHeads.length > 0) {
-                        const wcoLines = [];
-                        for (let th of topHeads.slice(0, 4)) {
-                            const wText = getWCOExplanatoryNoteClientSide(th.substring(0, 2), th);
-                            if (wText) wcoLines.push(wText);
-                        }
-                        if (wcoLines.length > 0) {
-                            wcoNotesContext = `\nTRÍCH XUẤT CHÚ GIẢI CHI TIẾT HS 2022 WCO (CÔNG VĂN 1810/TCHQ-TXNK & HQKV8):\n${wcoLines.join('\n\n')}\n`;
-                        }
-                    }
-                }
-            } catch (e) {
-                console.warn("Lỗi trích xuất ngữ cảnh ứng viên:", e);
-            }
-
             // Extract relevant Customs Rulings Precedents from Database
             let rulingsContext = "";
             try {
@@ -4084,63 +4053,83 @@
             }
 
             const prompt = `Bạn là Chuyên gia Cao cấp Phân loại Biểu thuế & Mã số HS (Hải quan Việt Nam) theo Danh mục HS 2022 (Công văn 1810/TCHQ-TXNK & HQKV8) và Biểu thuế XNK 2026.
-BẮT BUỘC TUÂN THỦ QUY TRÌNH RÀ SOÁT & LẬP LUẬN 5 BƯỚC CHO MỌI MẶT HÀNG (CHƯƠNG 01 ĐẾN 97):
-TUYỆT ĐỐI KHÔNG CHỈ DỰA VÀO TÊN THƯƠNG MẠI MÀ PHẢI RÀ SOÁT ĐA CHIỀU 4 TIÊU CHUẨN KỸ THUẬT:
-1. Tên hàng định danh: ${name} (Model: ${model_en || name})
-2. Bản chất & Chất liệu (Material): ${desc || specs || name}
-3. Kích thước & Thông số (Dimensions & Specs): ${specs || desc || 'Điện áp / kích thước tiêu chuẩn'}
-4. Công dụng & Cơ cấu truyền động (Function & Transmission): ${use || 'Công nghiệp hoặc thương mại'}
-${candidatesContext}
-${wcoNotesContext}
+BẮT BUỘC TUÂN THỦ QUY TRÌNH RÀ SOÁT & LẬP LUẬN THEO ĐẦY ĐỦ 6 QUY TẮC TỔNG QUÁT (GRI 1 ĐẾN GRI 6):
+1. Tên hàng định danh: ${name} (Model: ${model_en || 'Tiêu chuẩn'})
+2. Bản chất & Chất liệu (Material): ${desc || specs || 'Chưa rõ'}
+3. Kích thước & Thông số kỹ thuật (Dimensions & Specs): ${specs || desc || 'Tiêu chuẩn'}
+4. Công dụng & Cơ cấu truyền động (Function & Transmission): ${use || 'Đa dụng / Chưa rõ'}
 ${rulingsContext}
 
-BẮT BUỘC TUÂN THỦ NGUYÊN TẮC PHÁP LÝ HẢI QUAN THEO 6 QUY TẮC GRI VÀ MA TRẬN PHÂN ĐỊNH 21 PHẦN / 97 CHƯƠNG:
-1. NGUYÊN TẮC VẬT LIỆU CHO BỘ PHẬN CÔNG DỤNG CHUNG (GRI 1 & Chú giải 2 Phần XV / Chú giải 1(g) Phần XVI):
-   - Các chi tiết bu lông, ốc vít, đai ốc, đinh tán, chốt hãm, chốt định vị, vòng đệm, gioăng, đệm lót, lò xo, ống dẫn, phụ kiện ống:
-     + NẾU BẰNG NHỰA / CHẤT DẺO (Plastic, PBT, POM, PA, nylon, PVC, PTFE...): BẮT BUỘC phân loại vào Chương 39 (Nhóm 39.26, đặc biệt mã 3926.90.99 cho bu lông/vòng đệm/chốt nhựa; hoặc Nhóm 39.17 cho ống/phụ kiện ống nhựa). TUYỆT ĐỐI KHÔNG xếp vào Chương kim loại 73, 74, 76!
-     + NẾU BẰNG CAO SU (Rubber, EPDM, NBR, silicone...): BẮT BUỘC phân loại vào Chương 40 (Nhóm 40.16, đặc biệt mã 4016.93 cho gioăng, đệm, vòng đệm cao su; hoặc Nhóm 40.09 cho ống cao su; 40.10 cho dây curoa/băng chuyền). TUYỆT ĐỐI KHÔNG xếp vào Chương 73 hay Chương 39!
-     + CHỈ KHI BẰNG KIM LOẠI CƠ BẢN mới áp dụng Chú giải 2 Phần XV: Sắt/thép/inox -> Chương 73 (73.18, 73.20, 73.07); Đồng -> Chương 74 (74.15, 74.12); Nhôm -> Chương 76 (76.16, 76.09).
-     + Trong mọi trường hợp, các bộ phận công dụng chung nêu trên TUYỆT ĐỐI KHÔNG phân loại theo máy móc mẹ hay phương tiện chủ (Chương 84, 85, 87, 88, 90).
-2. THIẾT BỊ CÓ CHỨC NĂNG ĐỘC LẬP ĐỊNH DANH (Chú giải 2(a) Phần XVI):
-   - Các mặt hàng đã được chi tiết hóa tại các nhóm riêng (van 8481, bơm 8413, động cơ điện 8501, máy nén khí/quạt 8414, biến áp 8504, công tắc 8536, tủ bảng điều khiển 8537, thiết bị đo kiểm 9031, thiết bị điều khiển tự động 9032...) thì DÙ VỎ BỌC LÀM BẰNG NHỰA HAY KIM LOẠI và DÙ LẮP VÀO MÁY NÀO vẫn BẮT BUỘC phân loại vào nhóm định danh của chúng theo Chú giải 2(a) Phần XVI, TUYỆT ĐỐI KHÔNG xếp vào nhóm bộ phận máy (8409, 8431, 8466, 8473, 8538, 8708).
-3. DÂY CÁP ĐIỆN VÀ CÁP SỢI QUANG (Nhóm 85.44 vs 90.01):
-   - Dây cáp điện có gắn đầu nối (connectors, phích cắm, đầu cos) -> Phân loại vào phân nhóm có gắn đầu nối (ví dụ 8544.42); không có đầu nối -> Phân nhóm 8544.49; Điện áp > 1.000V -> Phân nhóm 8544.60.
-   - Cáp sợi quang cấu tạo từ các sợi quang bọc từng sợi riêng biệt -> Phân nhóm 8544.70 (loại trừ khỏi Chương 90). Sợi quang chưa bọc từng sợi -> Nhóm 90.01.
-4. ĐỒ NỘI THẤT VÀ GHẾ (Nhóm 94.01, 94.03):
-   - Ghế ngồi (94.01) và đồ nội thất (94.03) dù làm bằng gỗ, kim loại hay nhựa đều BẮT BUỘC phân loại vào Chương 94 (theo Chú giải 1(e) Chương 39, Chú giải 1(c) Chương 44, Chú giải 1(k) Chương 73). Tuyệt đối không xếp vào 3926, 4421 hay 7326!
-5. TÚI XÁCH, VALI, BA LÔ, CẶP (Nhóm 42.02):
-   - Các loại túi xách, vali, bao đựng dù bề mặt bằng da, nhựa tấm hay vải dệt đều BẮT BUỘC thuộc Nhóm 42.02 theo Chú giải 1(h) Phần XI và Chú giải 1(ij) Chương 39. Tuyệt đối không xếp vào Chương 39, 61, 62 hay 63!
-6. QUẦN ÁO DỆT KIM (Chương 61) VS DỆT THOI (Chương 62) & GIÀY DÉP (Chương 64):
-   - Quần áo may từ vải dệt kim hoặc móc -> Chương 61; Quần áo may từ vải dệt thoi -> Chương 62.
-   - Giày dép các loại -> Bắt buộc Chương 64 (loại trừ khỏi dệt may và đồ nhựa).
-7. HÓA CHẤT ĐƠN CHẤT (Chương 28, 29) VS CHẾ PHẨM HỖN HỢP (Chương 34, 35, 38):
-   - Hóa chất hữu cơ/vô cơ đã xác định thành phần hóa học thuần túy -> Chương 28, 29.
-   - Chế phẩm tẩy rửa, làm sạch -> Nhóm 34.02; Dầu bôi trơn tổng hợp -> Nhóm 34.03; Chế phẩm hóa chất công nghiệp khác -> Nhóm 38.24/38.27; Thuốc trừ sâu, diệt cỏ, sát trùng bán lẻ -> Nhóm 38.08.
-8. QUY TẮC PHÂN LOẠI VÚ TRA MỠ / VÚ BƠM MỠ BÒ (GREASING NIPPLES / GREASE FITTINGS / ZERK FITTINGS):
-   - Căn cứ Chú giải chi tiết WCO Nhóm 84.87 (HQKV8 Trang 214194) và Chú giải loại trừ Nhóm 84.81 (HQKV8 Trang 212255), vú tra mỡ / vú bơm mỡ bò không tự động là bộ phận cơ khí máy móc BẮT BUỘC phân loại vào Nhóm 84.87, mã số chi tiết 8487.90.00 (Thuế MFN: 0%, VAT: 8%).
-   - TUYỆT ĐỐI KHÔNG phân loại vào Nhóm 73.18 (bu lông ốc vít), 73.07 (phụ kiện nối ống), 73.26 hay 84.81 (van).
-9. QUY TẮC PHÂN LOẠI CÔNG TẮC ĐÓNG NGẮT MẠCH (NHÓM 85.36 - PHÂN NHÓM 8536.50):
-   - Căn cứ phân nhóm chi tiết 8 chữ số Biểu thuế XNK Việt Nam 2026:
-     + Công tắc điện thông thường (công tắc bấm, 1 phím/nhiều phím, nút nhấn, công tắc âm tường, chuyển mạch...):
-       * NẾU DÒNG ĐIỆN ĐỊNH MỨC DƯỚI 16 A (ví dụ 10A, 6A, 5A, 1A... hoặc có ghi "dưới 16A"): BẮT BUỘC phân loại vào mã 8536.50.96 ("- - - Loại khác, dòng điện dưới 16 A"). TUYỆT ĐỐI KHÔNG xếp vào mã 8536.50.99!
-       * NẾU DÒNG ĐIỆN ĐỊNH MỨC TỪ 16 A TRỞ LÊN (hoặc không nêu rõ): Mới phân loại vào mã 8536.50.99 ("- - - Loại khác").
-     + Công tắc điện tử (electronic switch): Dưới 16 A -> 8536.50.51; Từ 16 A trở lên -> 8536.50.59.
-     + Công tắc điện cơ bật nhanh (microswitch / snap-action): Dưới 16 A -> 8536.50.61; Từ 16 A trở lên -> 8536.50.69.
-     + Công tắc xoay / trượt: Dưới 16 A -> 8536.50.33; dùng cho quạt/sóng vô tuyến -> 8536.50.32; loại khác -> 8536.50.39.
-     + Công tắc đảo chiều (change-over switches) khởi động động cơ: 8536.50.95.
-10. NGUYÊN TẮC ÁP DỤNG MÃ SỐ & ĐỐI CHIẾU DANH MỤC BIỂU THUẾ VIỆT NAM 2026:
-   - Hãy ưu tiên đối chiếu danh sách các mã ứng viên đã rà soát từ Biểu thuế 2026 ở trên.
-   - NẾU BẰNG NĂNG LỰC PHÂN LOẠI PHÁP LÝ CHUYÊN SÂU THEO 6 QUY TẮC GRI VÀ CHÚ GIẢI WCO 2022, bạn phát hiện có mã số HS 8 chữ số khác CHÍNH XÁC HƠN (thuộc Biểu thuế XNK Việt Nam 2026 nhưng bộ lọc từ khóa ban đầu chọn sót), BẠN ĐƯỢC TOÀN QUYỀN ĐỀ XUẤT MÃ ĐÚNG ĐÓ và giải thích rõ căn cứ pháp lý trong mục "exclusions" và "gri1"!
-   - TUYỆT ĐỐI KHÔNG TỰ BỊA MÃ 8 SỐ KHÔNG TỒN TẠI TRONG BIỂU THUẾ VIỆT NAM. Mã đề xuất phải là mã có thật trong Danh mục Biểu thuế XNK Việt Nam.
+MA TRẬN CHÚ GIẢI PHÁP LÝ BẮT BUỘC TOÀN DIỆN (21 PHẦN & 97 CHƯƠNG THEO CHÚ GIẢI WCO 2022):
 
-YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì ngoài JSON):
+0. NGUYÊN TẮC CỔNG THẨM ĐỊNH THÔNG TIN (INFORMATION GATE - TUYỆT ĐỐI KHÔNG ĐOÁN MÒ):
+   - NẾU thông tin hàng hóa quá sơ sài, mơ hồ (ví dụ chỉ ghi 'phụ tùng', 'linh kiện', 'chi tiết máy', 'thiết bị' hoặc không rõ chất liệu cấu tạo và không rõ công năng hoạt động cụ thể dẫn đến không đủ căn cứ pháp lý để xác định mã 8 số theo 6 Quy tắc GRI):
+     BẮT BUỘC trả về JSON với "is_insufficient_info": true, "missing_criteria": ["liệt kê 2-4 thông tin cốt tử cần bổ sung"] và TUYỆT ĐỐI KHÔNG ĐƯỢC TỰ Ý ĐOÁN MÒ MÃ 8 SỐ.
+
+1. NGUYÊN TẮC BỘ PHẬN CÔNG DỤNG CHUNG (GRI 1 & Chú giải 2 Phần XV / Chú giải 1(g) Phần XVI):
+   - Các chi tiết bu lông, ốc vít, đai ốc, đinh tán, chốt hãm, chốt định vị, vòng đệm, gioăng, đệm lót, lò xo, ống dẫn, khớp nối ống, phụ kiện nối ống:
+     + BẰNG ĐỒNG: BẮT BUỘC thuộc Chương 74 (Nhóm 74.12 cho phụ kiện/khớp nối ống đồng: 7412.10/20; Nhóm 74.15 cho bu lông, ốc vít đồng).
+     + BẰNG SẮT, THÉP, INOX: BẮT BUỘC thuộc Chương 73 (Nhóm 73.07 cho phụ kiện nối ống; Nhóm 73.18 cho bu lông, ốc vít; Nhóm 73.20 cho lò xo).
+     + BẰNG NHÔM: BẮT BUỘC thuộc Chương 76 (Nhóm 76.09 cho phụ kiện nối ống; Nhóm 76.16 cho bu lông, đinh tán nhôm).
+     + BẰNG NHỰA / CHẤT DẺO: BẮT BUỘC thuộc Chương 39 (Nhóm 39.17 cho ống và phụ kiện ống nhựa; Nhóm 39.26 cho bu lông, gioăng, chốt nhựa).
+     + BẰNG CAO SU: BẮT BUỘC thuộc Chương 40 (Nhóm 40.09 cho ống cao su; Nhóm 40.16, mã 4016.93 cho gioăng, vòng đệm cao su).
+     + TUYỆT ĐỐI KHÔNG phân loại các bộ phận công dụng chung nêu trên theo máy móc chủ hay phương tiện chủ (Chương 84, 85, 87, 88, 90).
+
+2. NGUYÊN TẮC THIẾT BỊ CÓ CHỨC NĂNG ĐỘC LẬP ĐỊNH DANH (Chú giải 2(a) Phần XVI):
+   - Các mặt hàng đã được chi tiết hóa tại các nhóm riêng biệt:
+     + Van các loại (8481), máy bơm chất lỏng (8413), quạt và máy nén khí (8414), động cơ điện (8501), máy biến áp (8504), công tắc/đầu nối điện (8535, 8536), tủ bảng điều khiển (8537), thiết bị đo kiểm (9031), thiết bị điều khiển tự động (9032)...
+     + DÙ VỎ LÀM BẰNG GÌ và DÙ LẮP VÀO MÁY NÀO (kể cả ô tô 87 hay máy bay 88) vẫn BẮT BUỘC phân loại vào nhóm định danh của chúng theo Chú giải 2(a) Phần XVI, TUYỆT ĐỐI KHÔNG xếp vào nhóm bộ phận máy (8409, 8431, 8466, 8473, 8538, 8708).
+
+3. NGUYÊN TẮC ĐẦU NỐI SỢI QUANG (NHÓM 85.36 VS 85.44 & CHƯƠNG 90):
+   - Căn cứ Chú giải 9 Chương 85 và Chú giải 1(h) Chương 90, các loại ĐẦU NỐI DÙNG CHO SỢI QUANG, BÓ SỢI QUANG HOẶC CÁP QUANG (connectors for optical fibres, optical fibre bundles or cables) BẮT BUỘC phân loại vào PHÂN NHÓM 8536.70:
+     + Bằng gốm: 8536.70.10
+     + Bằng đồng: 8536.70.20
+     + Bằng nhựa / vật liệu khác: 8536.70.90
+     TUYỆT ĐỐI KHÔNG phân loại sang nhóm cáp sợi quang học 8544.70 hay dây cáp điện có gắn đầu nối 8544.42!
+
+4. NGUYÊN TẮC MÁY MÓC CƠ KHÍ GIA CÔNG CÔNG CỤ (CHƯƠNG 84 VS 8544):
+   - Máy dập, máy ép, máy uốn, máy đột kim loại, máy dập/tán đầu cos, đầu nối dây điện (crimping machine, stamping press, punch press) BẮT BUỘC thuộc Nhóm 84.62 (hoặc 84.79), TUYỆT ĐỐI KHÔNG nhầm sang dây cáp điện 8544!
+
+5. NGUYÊN TẮC ĐỒ GỐM SỨ ĐẤT NUNG (CHƯƠNG 69 VS 39, 84):
+   - Chậu trồng cây, bình gốm, đồ sành sứ đất nung BẮT BUỘC thuộc Chương 69 (Nhóm 69.14: 6914.10.00 cho đồ sứ hoặc 6914.90.00 cho gốm khác; hoặc 69.13 cho đồ trang trí), TUYỆT ĐỐI KHÔNG xếp sang Chương 84 hay Chương 39!
+
+6. NGUYÊN TẮC DỤNG CỤ CẦM TAY & DAO CẮT GỌT (CHƯƠNG 82 - Chú giải 1(k) Phần XVI):
+   - Các loại dụng cụ công cụ tháo lắp, dao phay ngón, mũi khoan, mũi khoét, lưỡi cưa, đá mài gắn hạt kim cương/carbide BẮT BUỘC thuộc Nhóm 82.07 (hoặc 82.08), loại trừ hoàn toàn khỏi bộ phận máy công cụ Nhóm 84.66.
+
+7. NGUYÊN TẮC TÚI XÁCH, VALI, BA LÔ, CẶP (NHÓM 42.02):
+   - Các loại vali, túi xách, ba lô, cặp dù mặt ngoài bằng da, nhựa tấm hay vải dệt đều BẮT BUỘC thuộc Nhóm 42.02 theo Chú giải 1(h) Phần XI và Chú giải 1(ij) Chương 39. Tuyệt đối không xếp vào Chương 39 hay 63!
+
+8. NGUYÊN TẮC ĐỒ NỘI THẤT VÀ GHẾ NGỒI (CHƯƠNG 94):
+   - Ghế ngồi (94.01) và đồ nội thất (94.03) dù làm bằng gỗ, kim loại, nhựa hay nệm bọc đều BẮT BUỘC thuộc Chương 94 (theo Chú giải 1(e) Chương 39, Chú giải 1(c) Chương 44, Chú giải 1(k) Chương 73). Tuyệt đối không xếp vào 3926, 4421 hay 7326!
+
+9. NGUYÊN TẮC QUẦN ÁO & GIÀY DÉP (CHƯƠNG 61, 62, 64):
+   - Quần áo may từ vải dệt kim hoặc móc -> Chương 61; Quần áo may từ vải dệt thoi -> Chương 62. Giày dép các loại -> Bắt buộc Chương 64.
+
+10. NGUYÊN TẮC HÓA CHẤT (CHƯƠNG 28, 29, 34, 38):
+   - Hóa chất đơn chất hữu cơ/vô cơ đã xác định công thức -> Chương 28, 29.
+   - Chế phẩm tẩy rửa, làm sạch -> Nhóm 34.02; Dầu bôi trơn tổng hợp -> Nhóm 34.03; Chế phẩm hóa chất công nghiệp khác -> Nhóm 38.24/38.27.
+
+11. NGUYÊN TẮC CÔNG TẮC ĐÓNG NGẮT MẠCH (NHÓM 85.36 - PHÂN NHÓM 8536.50):
+   - Phân biệt theo định mức dòng điện: Dưới 16 A -> 8536.50.96; Từ 16 A trở lên -> 8536.50.99.
+
+12. NGUYÊN TẮC VÚ TRA MỠ / VÚ BƠM MỠ BÒ (GREASING NIPPLES / ZERK FITTINGS):
+   - Căn cứ Chú giải WCO Nhóm 84.87 (HQKV8 Trang 214194) và Chú giải loại trừ 84.81 (HQKV8 Trang 212255), vú tra mỡ bò cơ khí BẮT BUỘC thuộc Nhóm 84.87 (mã 8487.90.00).
+
+YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON (không kèm văn bản nào ngoài JSON):
+Trường hợp thiếu thông tin:
 {
-  "step1_tech_review": {
-    "trade_name": "${name} (Model: ${model_en || 'Tiêu chuẩn'})",
-    "material": "${desc || 'Theo hồ sơ kỹ thuật'}",
-    "dimensions_specs": "${specs || 'Thông số kỹ thuật tiêu chuẩn'}",
-    "function_transmission": "${use || 'Vận hành công nghiệp / thương mại'}"
-  },
+  "is_insufficient_info": true,
+  "warning_title": "Cần bổ sung thông tin định danh hàng hóa",
+  "warning_message": "Mô tả hàng hóa chưa đủ các tiêu chí kỹ thuật cốt tử theo 6 Quy tắc GRI để xác định mã HS 8 số chính xác.",
+  "missing_criteria": [
+    "Chất liệu cấu tạo chính (ví dụ: bằng thép, bằng đồng, bằng nhựa...)",
+    "Nguyên lý vận hành hoặc công năng cụ thể..."
+  ]
+}
+
+Trường hợp đủ thông tin:
+{
+  "is_insufficient_info": false,
   "hs_code": "mã 8 số dạng xxxx.xx.xx",
   "clean_code": "8 chữ số liền nhau",
   "decl_name": "Tên hàng khai báo hải quan chuẩn hóa kèm quy cách chất liệu và mới 100%",
@@ -4150,13 +4139,19 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
   "atiga": "0%",
   "acfta": "0%",
   "evfta": "0%",
-  "gri1": "Lập luận GRI 1...",
+  "step1_tech_review": {
+    "trade_name": "${name} (Model: ${model_en || 'Tiêu chuẩn'})",
+    "material": "${desc || 'Theo hồ sơ kỹ thuật'}",
+    "dimensions_specs": "${specs || 'Thông số kỹ thuật tiêu chuẩn'}",
+    "function_transmission": "${use || 'Vận hành công nghiệp / thương mại'}"
+  },
+  "gri1": "Lập luận GRI 1 căn cứ tên nhóm 4 số và Chú giải Phần/Chương...",
   "gri2": "Lập luận GRI 2...",
   "gri3": "Lập luận GRI 3...",
   "gri4": "Lập luận GRI 4...",
   "gri5": "Lập luận GRI 5...",
-  "gri6": "Lập luận GRI 6...",
-  "explanatory_notes": "Trích dẫn Chú giải HS 2022 (CV 1810 & HQKV8)...",
+  "gri6": "Lập luận GRI 6 so sánh cùng cấp độ gạch nối...",
+  "explanatory_notes": "Trích dẫn Chú giải HS 2022 WCO (CV 1810/TCHQ-TXNK & HQKV8)...",
   "exclusions": "Lập luận loại trừ chi tiết các nhóm ứng viên cạnh tranh...",
   "recommendations": "Khuyến nghị thủ tục hải quan..."
 }`;
@@ -4185,7 +4180,41 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                         const jsonMatch = text.match(/\{[\s\S]*\}/);
                         if (jsonMatch) {
                             const parsed = JSON.parse(jsonMatch[0]);
-                            if (parsed && (parsed.hs_code || parsed.clean_code)) {
+                            if (parsed && (parsed.hs_code || parsed.clean_code || parsed.is_insufficient_info)) {
+                                return parsed;
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.warn(`Model ${model} attempt failed:`, err);
+                }
+            }`;
+
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }]
+            };
+
+            for (let model of candidateModels) {
+                try {
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        signal: controller.signal,
+                        body: JSON.stringify(payload)
+                    });
+                    clearTimeout(timeoutId);
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                        const jsonMatch = text.match(/\{[\s\S]*\}/);
+                        if (jsonMatch) {
+                            const parsed = JSON.parse(jsonMatch[0]);
+                            if (parsed && (parsed.hs_code || parsed.clean_code || parsed.is_insufficient_info)) {
                                 return parsed;
                             }
                         }
@@ -6990,6 +7019,92 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                     </div>
                 </div>
             `;
+        function renderApiKeyRequiredAlertHtml(errMsg) {
+            return `
+                <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border-2 border-amber-400/60 dark:border-amber-500/40 shadow-xl space-y-6 text-slate-800 dark:text-slate-100">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl shrink-0 shadow-sm border border-amber-200 dark:border-amber-700/50">
+                            <i class="fa-solid fa-key"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 text-xs font-bold uppercase tracking-wider">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                <span>Yêu Cầu Kích Hoạt AI Agent (Phương Án 1)</span>
+                            </div>
+                            <h3 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white">
+                                Chưa cấu hình Google Gemini API Key hợp lệ
+                            </h3>
+                            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                Để đảm bảo 100% kết quả phân loại mã HS đạt chuẩn pháp lý theo 6 Quy tắc GRI và Chú giải HS 2022 (CV 1810/TCHQ) và <strong>tuyệt đối không bị đoán mò sai lệch</strong>, hệ thống yêu cầu kết nối trực tiếp với não bộ Google Gemini AI.
+                            </p>
+                            ${errMsg ? `<p class="text-xs font-mono text-rose-500 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 p-2 rounded-lg border border-rose-200 dark:border-rose-900">Chi tiết lỗi: ${errMsg}</p>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="p-5 rounded-2xl bg-amber-50/70 dark:bg-slate-800/60 border border-amber-200 dark:border-amber-900/60 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="space-y-1 text-center sm:text-left">
+                            <h4 class="text-sm font-bold text-slate-900 dark:text-white">Bạn đã có Gemini API Key chưa?</h4>
+                            <p class="text-xs text-slate-600 dark:text-slate-400">Khóa API được lưu trữ cục bộ bảo mật trên trình duyệt của bạn (hoàn toàn miễn phí từ Google AI Studio).</p>
+                        </div>
+                        <button type="button" onclick="openApiKeyModal()" 
+                                class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs transition-all shadow-md hover:shadow-lg flex items-center gap-2 cursor-pointer whitespace-nowrap transform hover:-translate-y-0.5">
+                            <i class="fa-solid fa-key"></i>
+                            <span>Nhập Gemini API Key Ngay</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderInsufficientInfoAlertHtml(res, rawInput) {
+            const missing = res.missing_criteria || [
+                "Chất liệu cấu tạo chi tiết (ví dụ: bằng thép, bằng đồng, bằng nhựa...)",
+                "Nguyên lý vận hành hoặc công năng sử dụng trong máy móc/hệ thống nào"
+            ];
+            return `
+                <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border-2 border-amber-400/60 dark:border-amber-500/40 shadow-xl space-y-6 text-slate-800 dark:text-slate-100">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl shrink-0 shadow-sm border border-amber-200 dark:border-amber-700/50">
+                            <i class="fa-solid fa-clipboard-question"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 text-xs font-bold uppercase tracking-wider">
+                                <i class="fa-solid fa-shield-halved"></i>
+                                <span>Cổng Thẩm Định Thông Tin (Information Gate)</span>
+                            </div>
+                            <h3 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white">
+                                ${res.warning_title || 'Cần bổ sung thông tin định danh hàng hóa'}
+                            </h3>
+                            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                ${res.warning_message || 'Mô tả hiện tại chưa đủ các tiêu chí kỹ thuật cốt tử theo 6 Quy tắc GRI để phân loại chính xác mã HS 8 số.'}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="p-5 rounded-2xl bg-amber-50/70 dark:bg-slate-800/60 border border-amber-200 dark:border-amber-900/60 space-y-3">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300 flex items-center gap-2">
+                            <i class="fa-solid fa-list-check"></i>
+                            <span>Các tiêu chí kỹ thuật còn thiếu cần bổ sung để chốt mã:</span>
+                        </h4>
+                        <ul class="space-y-2 text-xs text-slate-700 dark:text-slate-200">
+                            ${missing.map(m => `
+                                <li class="flex items-start gap-2">
+                                    <i class="fa-solid fa-circle-dot text-amber-500 mt-1 shrink-0 text-[10px]"></i>
+                                    <span class="font-medium">${m}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button type="button" onclick="document.getElementById('input-desc')?.focus() || document.getElementById('input-name')?.focus()" 
+                                class="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs transition-all shadow-md flex items-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            <span>Bổ Sung Thông Tin Vào Biểu Mẫu</span>
+                        </button>
+                    </div>
+                </div>
+            `;
         }
 
         function renderGeminiAIReportHtml(res, rawInput) {
@@ -7958,10 +8073,19 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                     }
                 }
 
-                // Tier 2: Direct Google Gemini AI Call from Browser (using configured API Key)
+                // Tier 2: Direct Google Gemini AI Call from Browser (Pure AI Agent - Option 1)
                 if (activeKey && activeKey.length > 15) {
                     try {
                         const gemRes = await callGeminiAIClassification(name, desc, use, specs, model_en);
+                        
+                        // 1. Cổng Thẩm Định Thông Tin (Information Gate)
+                        if (gemRes && gemRes.is_insufficient_info) {
+                            const html = renderInsufficientInfoAlertHtml(gemRes, inputData);
+                            if (container) container.innerHTML = html;
+                            return;
+                        }
+
+                        // 2. Kết quả phân loại chính thức từ Gemini AI
                         if (gemRes && (gemRes.hs_code || gemRes.clean_code)) {
                             const cCode = (gemRes.clean_code || gemRes.hs_code || '').replace(/\./g, '');
                             const dbItem = (window.HS_DATABASE || []).find(it => (it.c || '').replace(/\./g, '') === cCode) 
@@ -7975,36 +8099,6 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                                 if (!gemRes.atiga) gemRes.atiga = dbItem.atiga || '0%';
                                 if (!gemRes.acfta) gemRes.acfta = dbItem.acfta || '0%';
                                 if (!gemRes.evfta) gemRes.evfta = dbItem.evfta || '0%';
-                            }
-
-                            // Post-Flight Statutory Legal Audit & Self-Healing Engine
-                            try {
-                                const fullTxtNorm = removeAccents(`${name} ${desc} ${use} ${specs} ${model_en}`);
-                                const decomp = decomposeQueryClientSide(name, desc, use, specs, model_en);
-                                const curCode = (gemRes.clean_code || gemRes.hs_code || '').replace(/\./g, '');
-                                const audit = auditStatutoryConstraintsClientSide(curCode, curCode.substring(0, 4), gemRes.item_description || dbItem?.vn || '', '', decomp, fullTxtNorm);
-                                
-                                if (audit && audit.isDisqualified) {
-                                    console.warn(`[Statutory Audit] Proposed code ${curCode} was disqualified: ${audit.reason}. Auto-reconciling...`);
-                                    const clientBest = classifyProductClientSide(name, desc, use, specs, model_en);
-                                    if (clientBest && clientBest.c) {
-                                        const corrCode = (clientBest.c || '').replace(/\./g, '');
-                                        const corrItem = (window.HS_DATABASE || []).find(it => (it.c || '').replace(/\./g, '') === corrCode) || clientBest;
-                                        gemRes.hs_code = formatHSCode(corrCode);
-                                        gemRes.clean_code = corrCode;
-                                        gemRes.item_description = corrItem.vn || clientBest.vn;
-                                        gemRes.mfn = corrItem.mfn || clientBest.mfn || '0%';
-                                        gemRes.vat = corrItem.vat || clientBest.vat || '8%';
-                                        gemRes.atiga = corrItem.atiga || clientBest.atiga || '0%';
-                                        gemRes.acfta = corrItem.acfta || clientBest.acfta || '0%';
-                                        gemRes.evfta = corrItem.evfta || clientBest.evfta || '0%';
-                                        if (gemRes.gri6) {
-                                            gemRes.gri6 = `Áp dụng Quy tắc 6 (GRI 6) và Danh mục Biểu thuế XNK Việt Nam 2026: Căn cứ thông số kỹ thuật định mức, phân loại chính xác vào phân nhánh ${gemRes.hs_code}: ${corrItem.vn}. ${gemRes.gri6}`;
-                                        }
-                                    }
-                                }
-                            } catch (auditErr) {
-                                console.warn("Lỗi kiểm toán pháp lý kết quả AI:", auditErr);
                             }
 
                             // Trigger background PDF export on local server ONLY if available
@@ -8031,18 +8125,21 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                             return;
                         }
                     } catch (gemErr) {
-                        console.warn("Direct Gemini call attempt fallback:", gemErr);
+                        console.warn("Lỗi gọi Gemini AI:", gemErr);
+                        const html = renderApiKeyRequiredAlertHtml(gemErr.message || "Lỗi kết nối tới máy chủ Google Gemini AI");
+                        if (container) container.innerHTML = html;
+                        return;
                     }
+                } else {
+                    // Chưa cấu hình API Key: Hiện bảng yêu cầu nhập Key, TUYỆT ĐỐI KHÔNG ĐOÁN MÒ (Phương Án 1)
+                    const html = renderApiKeyRequiredAlertHtml("Chưa cấu hình Google Gemini API Key. Vui lòng bấm nút 'Nhập Gemini API Key' trên góc phải màn hình để kích hoạt AI Agent.");
+                    if (container) container.innerHTML = html;
+                    return;
                 }
-
-                // Tier 3: Instant Dynamic Client-Side Semantic & Legal Reasoner (100% reliable)
-                const html = generateClientSideAIReport(inputData);
-                if (container) container.innerHTML = html;
-
             } catch (fatalErr) {
                 console.error("Classification fatal error:", fatalErr);
                 if (container) {
-                    container.innerHTML = generateClientSideAIReport(inputData);
+                    container.innerHTML = renderApiKeyRequiredAlertHtml(fatalErr?.message || "Đã xảy ra lỗi trong quá trình xử lý");
                 }
             } finally {
                 if (btn) {
