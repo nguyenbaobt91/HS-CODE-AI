@@ -1167,6 +1167,35 @@
 
     </main>
 
+    <!-- Global Footer: Legal Disclaimer & Internal Use Notice -->
+    <footer class="mt-16 border-t border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 backdrop-blur-sm py-8 px-4 sm:px-6">
+        <div class="max-w-7xl mx-auto space-y-4">
+            <div class="p-4 sm:p-5 rounded-2xl bg-amber-500/5 dark:bg-amber-400/5 border border-amber-500/20 dark:border-amber-400/20">
+                <div class="flex items-center gap-2 text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider mb-2">
+                    <i class="fa-solid fa-shield-halved text-sm"></i>
+                    <span>Lưu ý Pháp lý &amp; Quy định Lưu hành Nội bộ</span>
+                </div>
+                <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-1.5 leading-relaxed">
+                    <li class="flex items-start gap-2">
+                        <span class="text-amber-600 dark:text-amber-400 font-bold">•</span>
+                        <span><strong>Phạm vi sử dụng:</strong> Nền tảng và toàn bộ tài liệu, dữ liệu phân tích đính kèm được bảo mật và chỉ lưu hành phục vụ công tác nghiệp vụ nội bộ công ty.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-amber-600 dark:text-amber-400 font-bold">•</span>
+                        <span><strong>Giá trị tham khảo:</strong> Mã số HS, thuế suất và lập luận pháp lý được đề xuất chỉ mang tính chất tham khảo chuyên môn hỗ trợ ra quyết định. Kết quả phân loại chính thức cuối cùng căn cứ theo thực tế hàng hóa thông quan và phán quyết của Cơ quan Hải quan có thẩm quyền.</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 text-[11px] text-slate-500 dark:text-slate-400">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>HSCoder AI Engine &bull; Hệ thống Phân loại &amp; Tra cứu Mã HS Chuyên sâu</span>
+                </div>
+                <span>Tài liệu nghiệp vụ lưu hành nội bộ</span>
+            </div>
+        </div>
+    </footer>
+
     
     <!-- Modal: Gemini API Key Setting -->
     <div id="api-key-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
@@ -6492,6 +6521,19 @@ Trường hợp đủ thông tin:
                 <div style="margin: 0 0 6pt 14pt; font-size: 9.5pt; line-height: 1.45; text-align: justify; color: #222222; word-break: break-word; overflow-wrap: break-word;">
                     <span style="font-weight: bold; color: #003366;">KẾT LUẬN &amp; KIẾN NGHỊ: </span>${conclText}
                 </div>
+
+                <!-- Internal Use & Legal Disclaimer Box -->
+                <div style="margin-top: 10pt; padding: 8pt 10pt; border-radius: 6pt; background-color: #f8fafc; border: 1px solid #cbd5e1; font-size: 8.5pt; color: #475569; line-height: 1.4;">
+                    <div style="font-weight: bold; color: #b45309; margin-bottom: 3pt; text-transform: uppercase; font-size: 8.5pt;">
+                        &#128737; Lưu ý Pháp lý &amp; Quy định Lưu hành Nội bộ:
+                    </div>
+                    <div style="margin-bottom: 2pt;">
+                        <strong>&bull; Phạm vi sử dụng:</strong> Báo cáo này và toàn bộ tài liệu đính kèm được bảo mật và chỉ lưu hành phục vụ công tác nghiệp vụ nội bộ công ty.
+                    </div>
+                    <div>
+                        <strong>&bull; Giá trị tham khảo:</strong> Mã số HS, thuế suất và lập luận pháp lý được đề xuất chỉ mang tính chất tham khảo chuyên môn hỗ trợ ra quyết định. Kết quả phân loại chính thức cuối cùng căn cứ theo thực tế hàng hóa thông quan và phán quyết của Cơ quan Hải quan có thẩm quyền.
+                    </div>
+                </div>
             </div>`;
         }
 
@@ -7484,6 +7526,20 @@ Trường hợp đủ thông tin:
                             Mặt hàng <strong class="text-slate-900 dark:text-white">'${rawInput.name}'</strong> được phân loại chính xác vào mã HS <strong class="text-sky-700 dark:text-amber-300 font-mono">${codeFmt}</strong> (${declName}). 
                             Mức thuế MFN: <strong class="text-slate-900 dark:text-white">${mfn}</strong>, VAT: <strong class="text-sky-700 dark:text-sky-300">${vat}</strong>. 
                             ${res.recommendations || 'Doanh nghiệp chuẩn bị đầy đủ hồ sơ kỹ thuật, datasheet và C/O ưu đãi để được áp dụng thuế suất ưu đãi đặc biệt 0%.'}
+                        </p>
+                    </div>
+
+                    <!-- Lưu ý Pháp lý & Quy định Lưu hành Nội bộ -->
+                    <div class="p-4 rounded-2xl bg-amber-500/5 dark:bg-amber-400/5 border border-amber-500/20 dark:border-amber-400/20 text-xs text-slate-600 dark:text-slate-400 space-y-1.5 shadow-sm">
+                        <div class="flex items-center gap-2 font-bold text-amber-700 dark:text-amber-400 text-xs uppercase tracking-wider">
+                            <i class="fa-solid fa-shield-halved text-sm"></i>
+                            <span>Lưu ý Pháp lý &amp; Quy định Lưu hành Nội bộ:</span>
+                        </div>
+                        <p class="leading-relaxed">
+                            <strong>• Phạm vi sử dụng:</strong> Nền tảng và toàn bộ tài liệu, dữ liệu phân tích đính kèm được bảo mật và chỉ lưu hành phục vụ công tác nghiệp vụ nội bộ công ty.
+                        </p>
+                        <p class="leading-relaxed">
+                            <strong>• Giá trị tham khảo:</strong> Mã số HS, thuế suất và lập luận pháp lý được đề xuất chỉ mang tính chất tham khảo chuyên môn hỗ trợ ra quyết định. Kết quả phân loại chính thức cuối cùng căn cứ theo thực tế hàng hóa thông quan và phán quyết của Cơ quan Hải quan có thẩm quyền.
                         </p>
                     </div>
 
