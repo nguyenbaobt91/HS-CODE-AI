@@ -4153,42 +4153,7 @@ Trường hợp đủ thông tin:
   "gri6": "Lập luận GRI 6 so sánh cùng cấp độ gạch nối...",
   "explanatory_notes": "Trích dẫn Chú giải HS 2022 WCO (CV 1810/TCHQ-TXNK & HQKV8)...",
   "exclusions": "Lập luận loại trừ chi tiết các nhóm ứng viên cạnh tranh...",
-  "recommendations": "Khuyến nghị thủ tục hải quan..."
 }`;
-
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }]
-            };
-
-            for (let model of candidateModels) {
-                try {
-                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 12000);
-
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        signal: controller.signal,
-                        body: JSON.stringify(payload)
-                    });
-                    clearTimeout(timeoutId);
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                        const jsonMatch = text.match(/\{[\s\S]*\}/);
-                        if (jsonMatch) {
-                            const parsed = JSON.parse(jsonMatch[0]);
-                            if (parsed && (parsed.hs_code || parsed.clean_code || parsed.is_insufficient_info)) {
-                                return parsed;
-                            }
-                        }
-                    }
-                } catch (err) {
-                    console.warn(`Model ${model} attempt failed:`, err);
-                }
-            }`;
 
             const payload = {
                 contents: [{ parts: [{ text: prompt }] }]
@@ -7019,6 +6984,8 @@ Trường hợp đủ thông tin:
                     </div>
                 </div>
             `;
+        }
+
         function renderApiKeyRequiredAlertHtml(errMsg) {
             return `
                 <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border-2 border-amber-400/60 dark:border-amber-500/40 shadow-xl space-y-6 text-slate-800 dark:text-slate-100">
