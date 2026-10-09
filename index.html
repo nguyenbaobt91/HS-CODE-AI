@@ -1240,7 +1240,7 @@
         // =========================================================================
         // GLOBAL CONSTANTS & STATE VARIABLES
         // =========================================================================
-        const DEFAULT_GEMINI_API_KEY = "AQ.Ab8RN6LRlqBVkSuKF7vJdzLqj4rAMIwL0hnKrbYzbL5jUj8uRQ";
+        const DEFAULT_GEMINI_API_KEY = "";
 
         let headMap = null;
         let subheadMap = null;
@@ -1253,10 +1253,11 @@
         function getActiveApiKey() {
             const stored = localStorage.getItem('user_gemini_api_key');
             if (stored && stored.trim().length > 15) return stored.trim();
-            if (DEFAULT_GEMINI_API_KEY) {
-                try { localStorage.setItem('user_gemini_api_key', DEFAULT_GEMINI_API_KEY); } catch(e){}
+            if (DEFAULT_GEMINI_API_KEY && DEFAULT_GEMINI_API_KEY.trim().length > 15) {
+                try { localStorage.setItem('user_gemini_api_key', DEFAULT_GEMINI_API_KEY.trim()); } catch(e){}
+                return DEFAULT_GEMINI_API_KEY.trim();
             }
-            return DEFAULT_GEMINI_API_KEY.trim();
+            return "";
         }
 
         function updateGeminiStatusBadge() {
