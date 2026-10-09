@@ -4015,9 +4015,9 @@
             if (!apiKey || apiKey.length < 15) throw new Error("Chưa cấu hình Google Gemini API Key hợp lệ");
 
             const candidateModels = [
-                'gemini-3.5-flash',
-                'gemini-3.5-flash-lite',
-                'gemini-flash-latest'
+                'gemini-flash-lite-latest',
+                'gemini-flash-latest',
+                'gemini-2.5-flash-lite'
             ];
 
             // Pre-calculate candidate items from the 2026 tariff and extract official WCO notes
@@ -4243,7 +4243,9 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             { name: 'paper', pattern: /\b(?:giấy|paper|bìa|carton|giấy bìa|kraft|tissue|vệ sinh|khăn ăn)\b/i, boost: ['47', '48', '49'], penalty: ['72', '73', '74', '76', '84', '85', '39'] },
             { name: 'leather', pattern: /\b(?:da thuộc|da bò|da cừu|da nhân tạo|giả da|leather)\b/i, boost: ['41', '42'], penalty: ['72', '73', '39', '48'] },
             { name: 'glass', pattern: /(?<!đường\s)(?<!duong\s)\b(?:thủy tinh|thuy tinh|kính|kinh|gương|guong|glass|mirror)\b/i, boost: ['70'], penalty: ['72', '73', '39', '48', '44', '84', '85'] },
-            { name: 'chemical', pattern: /\b(?:axit|acid|h2so4|hcl|hno3|naoh|koh|dung môi|hóa chất|cồn|ethanol|sunfuric|sulfuric|hydrochloric)\b/i, boost: ['28', '29', '38'], penalty: ['84', '85', '73', '39', '48'] }
+            { name: 'chemical', pattern: /\b(?:axit|acid|h2so4|hcl|hno3|naoh|koh|dung môi|hóa chất|cồn|ethanol|sunfuric|sulfuric|hydrochloric)\b/i, boost: ['28', '29', '38'], penalty: ['84', '85', '73', '39', '48'] },
+            { name: 'ceramic', pattern: /\b(?:gốm|gom|gom\s+su|đồ\s+sứ|do\s+su|men\s+sứ|men\s+su|chậu\s+sứ|chau\s+su|bình\s+sứ|binh\s+su|bát\s+sứ|bat\s+su|chén\s+sứ|chen\s+su|gạch\s+men|gạch\s+gốm|gach\s+men|đất\s+nung|dat\s+nung|ceramic|porcelain|china|earthenware|stoneware)\b/i, boost: ['69'], penalty: ['84', '85', '72', '73', '74', '76', '39', '40', '44', '48'] },
+            { name: 'stone_mineral', pattern: /\b(?:đá|da|thạch cao|xi măng|bê tông|stone|marble|granite|cement|concrete)\b/i, boost: ['68'], penalty: ['84', '85', '72', '73', '74', '76', '39', '40', '44', '48'] }
         ];
 
         const STATUTORY_CATEGORIES = [
@@ -4533,13 +4535,13 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                 forbidden_chapters: ['8414', '8467', '8504', '8538', '8537'],
                 bonus: 1300
             },
-            // 29. Pipe Fittings of Metal (7307, 7412, 7609) - Note 2 Section XV
+            // 29. Pipe Fittings of Metal/Plastic (7307, 7412, 7609, 3917) - Note 2 Section XV
             {
                 name: 'pipe_fittings',
-                pattern: /\b(?:khop\s+noi\s+ong|dau\s+noi\s+ong|rac\s+co|te\s+ong|cut\s+ong|mat\s+bich|mang\s+song|pipe\s+fitting|pipe\s+coupling|hose\s+fitting|connector\s+for\s+pipe)\b/i,
-                target_headings: ['7307', '7412', '7609'],
-                forbidden_chapters: ['8481', '8205', '8207', '8466', '8487'],
-                bonus: 1250
+                pattern: /\b(?:khop\s+noi\s+(?:ong|duong\s+ong)|phu\s+kien\s+(?:duong\s+)?ong|phu\s+tung\s+(?:duong\s+)?ong|dau\s+noi\s+ong|rac\s+co|te\s+ong|cut\s+ong|mat\s+bich|mang\s+song|pipe\s+fitting|pipe\s+coupling|hose\s+fitting|connector\s+for\s+pipe)\b/i,
+                target_headings: ['7307', '7412', '7609', '3917'],
+                forbidden_chapters: ['8481', '8544', '8205', '8207', '8466', '8487'],
+                bonus: 1450
             },
             // 30. Machine Knives & Cutting Blades (8208) - Note 1(k) Section XVI
             {
@@ -4677,13 +4679,13 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                 forbidden_chapters: ['39', '44', '84', '85', '94'],
                 bonus: 1400
             },
-            // 44. Ceramic & Glassware (6911, 6912, 7013)
+            // 44. Ceramic & Glassware, Flower pots, Ceramic Articles (6911, 6912, 6913, 6914, 7013)
             {
                 name: 'ceramic_glassware',
-                pattern: /\b(?:bat\s+dia\s+su|chen\s+dia\s+su|coc\s+thuy\s+tinh|ly\s+thuy\s+tinh|do\s+gom\s+su\s+gia\s+dung|tableware|ceramic\s+tableware|glassware|glass\s+tumbler)\b/i,
-                target_headings: ['6911', '6912', '7013'],
-                forbidden_chapters: ['39', '73', '82'],
-                bonus: 1300
+                pattern: /\b(?:chau\s+(?:trong\s+cay|hoa|canh|gom|su)|chau\s+gom|chau\s+su|binh\s+gom|binh\s+hoa\s+gom|bat\s+dia\s+su|chen\s+dia\s+su|coc\s+thuy\s+tinh|ly\s+thuy\s+tinh|do\s+gom\s+su\s+gia\s+dung|gom\s+nung|gom\s+su|dat\s+nung|tableware|ceramic\s+tableware|glassware|glass\s+tumbler|ceramic\s+pot|flower\s+pot|plant\s+pot)\b/i,
+                target_headings: ['6914', '6912', '6913', '6911', '7013'],
+                forbidden_chapters: ['39', '73', '82', '84', '85', '8481'],
+                bonus: 1800
             },
             // 45. Motor Vehicles & Dedicated Automotive Parts (8703, 8704, 8708)
             {
@@ -4708,6 +4710,14 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                 target_headings: ['3926'],
                 forbidden_chapters: ['3901', '3902', '3903', '3904', '3905', '3906', '3907', '3908', '3909', '3910', '3911', '3912', '3913', '3914', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60', '61', '62', '63', '72', '73'],
                 bonus: 2200
+            },
+            // 48. Machine Tools & Pressing/Crimping Machines (8462, 8463, 8479, 8467)
+            {
+                name: 'press_machines',
+                pattern: /\b(?:may\s+dap|may\s+ep|may\s+dot|may\s+chan|may\s+uon|may\s+bam\s+dau\s+cos|may\s+dap\s+dau\s+noi|may\s+dap\s+cos|pressing\s+machine|stamping\s+machine|crimping\s+machine|terminal\s+crimping)\b/i,
+                target_headings: ['8462', '8479', '8467', '8463'],
+                forbidden_chapters: ['8544', '8536', '7318', '7326', '3926'],
+                bonus: 2400
             },
             // 38. Vú tra mỡ, vú bơm mỡ bò, núm tra mỡ (8487) - Chú giải WCO 84.87 & Loại trừ 84.81
             {
@@ -5177,15 +5187,27 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                 }
             }
 
-            // Subject part material supremacy
-            const subjHasSteel = /\b(?:thep|sat|steel|iron|inox)\b/i.test(subjNorm);
-            const subjHasCopper = /\b(?:dong|brass|copper|bronze)\b/i.test(subjNorm);
-            const subjHasAluminum = /\b(?:nhom|aluminum|aluminium)\b/i.test(subjNorm);
-            const subjHasPlastic = /\b(?:nhua|plastic)\b/i.test(subjNorm);
-            const subjHasRubber = /\b(?:cao\s+su|rubber)\b/i.test(subjNorm);
+            // Product Name Material Supremacy
+            const nameNorm = removeAccents(name || '');
+            const nameHasSteel = /\b(?:thep|sat|steel|iron|inox|gang)\b/i.test(nameNorm);
+            const nameHasCopper = /\b(?:dong|brass|copper|bronze)\b/i.test(nameNorm);
+            const nameHasAluminum = /\b(?:nhom|aluminum|aluminium)\b/i.test(nameNorm);
+            const nameHasPlastic = /\b(?:nhua|plastic|pvc|pe|pp)\b/i.test(nameNorm);
+            const nameHasRubber = /\b(?:cao\s+su|rubber)\b/i.test(nameNorm);
+
+            const hasExplicitMetalName = nameHasSteel || nameHasCopper || nameHasAluminum;
+            const subjHasSteel = nameHasSteel || (/\b(?:thep|sat|steel|iron|inox)\b/i.test(subjNorm) && !nameHasPlastic && !nameHasRubber);
+            const subjHasCopper = nameHasCopper || (/\b(?:dong|brass|copper|bronze)\b/i.test(subjNorm) && !nameHasPlastic && !nameHasRubber);
+            const subjHasAluminum = nameHasAluminum || (/\b(?:nhom|aluminum|aluminium)\b/i.test(subjNorm) && !nameHasPlastic && !nameHasRubber);
+            const subjHasPlastic = (!hasExplicitMetalName) && (nameHasPlastic || /\b(?:nhua|plastic)\b/i.test(subjNorm));
+            const subjHasRubber = (!hasExplicitMetalName) && (nameHasRubber || /\b(?:cao\s+su|rubber)\b/i.test(subjNorm));
 
             let cleanMaterials = materials;
-            if (subjHasSteel) {
+            if (subjHasCopper) {
+                cleanMaterials = materials.filter(m => !['plastic', 'rubber', 'steel_iron', 'aluminum'].includes(m.name || m[0]));
+            } else if (subjHasSteel) {
+                cleanMaterials = materials.filter(m => (m.name || m[0]) !== 'plastic' && (m.name || m[0]) !== 'rubber');
+            } else if (subjHasAluminum) {
                 cleanMaterials = materials.filter(m => (m.name || m[0]) !== 'plastic' && (m.name || m[0]) !== 'rubber');
             } else if (subjHasPlastic) {
                 cleanMaterials = materials.filter(m => !['steel_iron', 'copper', 'aluminum'].includes(m.name || m[0]));
@@ -5287,18 +5309,23 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                         cat.bonus = 1650;
                     }
                 } else if (cat.name === 'pipe_fittings') {
+                    cat.forbidden_chapters = ['84', '85', '87', '82', '90', '8481', '8544'];
+                    cat.bonus = 2200;
                     if (isPlastic) {
                         cat.target_headings = ['3917'];
-                        cat.forbidden_chapters = ['73', '74', '76', '40', '82', '84', '85', '87'];
-                        cat.bonus = 1350;
+                        cat.forbidden_chapters.push('73', '74', '76', '40');
                     } else if (isRubber) {
                         cat.target_headings = ['4009'];
+                        cat.forbidden_chapters.push('73', '74', '76', '39');
                     } else if (isCopper) {
                         cat.target_headings = ['7412'];
+                        cat.forbidden_chapters.push('72', '73', '76', '39', '40');
                     } else if (isAluminum) {
                         cat.target_headings = ['7609'];
+                        cat.forbidden_chapters.push('72', '73', '74', '39', '40');
                     } else if (isSteel) {
                         cat.target_headings = ['7307'];
+                        cat.forbidden_chapters.push('74', '76', '39', '40');
                     }
                 } else if (cat.name === 'mechanical_covers_guards') {
                     if (isPlastic) {
@@ -5515,23 +5542,53 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                 }
 
                 // Stage 1 Universal Material Chapter Bounds
+                const isGenuinelyValve = /\b(?:van\b|valve|valves|voi\b|cock|cocks|faucet|faucets|tap\b|taps|khoa\s+nuoc|khoa\s+khi|khoa\s+dau|dong\s+ngat\s+dong\s+chay)\b/i.test(fullTextNorm);
                 const IS_FUNC_HEAD = NOTE_2A_HEADINGS.has(head) || [
-                    '8413', '8414', '8481', '8501', '8504', '8535', '8536', '8537', 
+                    '8413', '8414', (isGenuinelyValve ? '8481' : null), '8501', '8504', '8535', '8536', '8537', 
                     '9025', '9026', '9031', '9032', '8207', '8208', '8482', '8483'
-                ].includes(head);
+                ].filter(Boolean).includes(head);
+
+                if (!isGenuinelyValve && head === '8481') {
+                    score -= 8000; // Strict protection: 8481 is ONLY for valves!
+                }
+
+                const isPressMachine = /\b(?:may\s+dap|may\s+ep|may\s+dot|may\s+chan|may\s+uon|may\s+bam\s+dau\s+cos|may\s+dap\s+dau\s+noi|may\s+dap\s+cos|pressing\s+machine|stamping\s+machine|crimping\s+machine)\b/i.test(fullTextNorm);
+                if (isPressMachine) {
+                    if (head === '8544' || head === '8536') score -= 8000; // Machine is NOT a wire/cable!
+                    if (['8462', '8479', '8467', '8463'].includes(head)) score += 2500;
+                }
+
+                const isPipeFitting = /\b(?:khop\s+noi\s+(?:ong|duong\s+ong)|phu\s+kien\s+(?:duong\s+)?ong|phu\s+tung\s+(?:duong\s+)?ong|rac\s+co|mang\s+song|pipe\s+fitting)\b/i.test(fullTextNorm);
+                if (isPipeFitting) {
+                    if (head === '8481' || head === '8544') score -= 8000;
+                    if (isCopper && head === '7412') score += 2500;
+                    else if (isSteel && head === '7307') score += 2500;
+                    else if (isPlastic && head === '3917') score += 2500;
+                    else if (isAluminum && head === '7609') score += 2500;
+                }
+
+                const isCeramic = matNames.includes('ceramic') || /\b(?:gom\b|gom\s+su|do\s+su|chau\s+su|binh\s+su|bat\s+su|chen\s+su|dat\s+nung|ceramic|porcelain|earthenware)\b/i.test(fullTextNorm) || /\b(?:gốm|sứ|đất\s+nung)\b/i.test(fullText);
+                if (isCeramic) {
+                    if (ch === '69') score += 2000;
+                    else score -= 6000;
+                }
+
+                if (ch === '91' && !/\b(?:dong\s+ho|clock|watch|watches|timepiece)\b/i.test(fullTextNorm)) {
+                    score -= 8000; // Chapter 91 is strictly for clocks & watches, NEVER copper!
+                }
 
                 if (!IS_FUNC_HEAD) {
                     if (isPlastic && ['72', '73', '74', '75', '76', '78', '79', '80', '81', '40'].includes(ch)) {
                         score -= 5000;
                     } else if (isRubber && ['72', '73', '74', '75', '76', '78', '79', '80', '81', '39'].includes(ch)) {
                         score -= 5000;
-                    } else if (isMetal && ['39', '40', '44', '48'].includes(ch)) {
+                    } else if (isMetal && ['39', '40', '44', '48', '69'].includes(ch)) {
                         score -= 5000;
-                    } else if (isSteel && ['74', '76'].includes(ch)) {
+                    } else if (isSteel && ['74', '76', '69'].includes(ch)) {
                         score -= 5000;
-                    } else if (isCopper && ['72', '73', '76'].includes(ch)) {
+                    } else if (isCopper && ['72', '73', '76', '69'].includes(ch)) {
                         score -= 5000;
-                    } else if (isAluminum && ['72', '73', '74'].includes(ch)) {
+                    } else if (isAluminum && ['72', '73', '74', '69'].includes(ch)) {
                         score -= 5000;
                     }
                 }
@@ -5712,23 +5769,48 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                         }
                     }
                 } else if (head === '8481') {
-                    const sub = code.substring(0, 6);
-                    if (['khi nen', 'actuator', 'solenoid', 'dien tu', 'thuy luc'].some(k => fullTextNorm.includes(k))) {
-                        if (sub === '848120') itemScore += 350;
-                    } else if (['mot chieu', 'check valve'].some(k => fullTextNorm.includes(k))) {
-                        if (sub === '848130') itemScore += 350;
-                    } else if (['an toan', 'xa ap', 'relief'].some(k => fullTextNorm.includes(k))) {
-                        if (sub === '848140') itemScore += 350;
-                    } else if (['giam ap', 'dieu ap'].some(k => fullTextNorm.includes(k))) {
-                        if (sub === '848110') itemScore += 350;
-                    } else if (['van bi', 'van buom', 'van cong', 'van cau'].some(k => fullTextNorm.includes(k))) {
-                        if (sub === '848180') itemScore += 300;
-                    }
+                    const isValve = /\b(?:van\b|valve|valves|voi\b|cock|cocks|faucet|faucets|tap\b|taps|khoa\s+nuoc|khoa\s+khi|khoa\s+dau|dong\s+ngat\s+dong\s+chay)\b/i.test(fullTextNorm);
+                    if (!isValve) {
+                        itemScore -= 9000;
+                    } else {
+                        const sub = code.substring(0, 6);
+                        if (['khi nen', 'actuator', 'solenoid', 'dien tu', 'thuy luc'].some(k => fullTextNorm.includes(k))) {
+                            if (sub === '848120') itemScore += 350;
+                        } else if (['mot chieu', 'check valve'].some(k => fullTextNorm.includes(k))) {
+                            if (sub === '848130') itemScore += 350;
+                        } else if (['an toan', 'xa ap', 'relief'].some(k => fullTextNorm.includes(k))) {
+                            if (sub === '848140') itemScore += 350;
+                        } else if (['giam ap', 'dieu ap'].some(k => fullTextNorm.includes(k))) {
+                            if (sub === '848110') itemScore += 350;
+                        } else if (['van bi', 'van buom', 'van cong', 'van cau'].some(k => fullTextNorm.includes(k))) {
+                            if (sub === '848180') itemScore += 300;
+                        }
 
-                    if (specsDict.dn !== undefined) {
-                        const dnCm = specsDict.dn / 10.0;
-                        if (itemDesc.includes('không quá 2,5 cm') && dnCm <= 2.5) itemScore += 250;
-                        else if (itemDesc.includes('trên 2,5 cm') && dnCm > 2.5) itemScore += 250;
+                        if (specsDict.dn !== undefined) {
+                            const dnCm = specsDict.dn / 10.0;
+                            if (itemDesc.includes('không quá 2,5 cm') && dnCm <= 2.5) itemScore += 250;
+                            else if (itemDesc.includes('trên 2,5 cm') && dnCm > 2.5) itemScore += 250;
+                        }
+                    }
+                } else if (head === '7412') {
+                    if (['khop noi', 'phu kien ong', 'phu kien duong ong', 'rac co', 'te ong', 'mang song', 'pipe fitting'].some(k => fullTextNorm.includes(k))) {
+                        itemScore += 900;
+                        if (['hop kim dong', 'dong thau', 'brass', 'bronze'].some(k => fullTextNorm.includes(k))) {
+                            if (code === '74122000') itemScore += 800;
+                        } else {
+                            if (code === '74121000') itemScore += 600;
+                            else if (code === '74122000') itemScore += 700;
+                        }
+                    }
+                } else if (head === '6914' || head === '6912' || head === '6913') {
+                    if (['chau', 'chau trong cay', 'chau hoa', 'chau canh', 'flower pot', 'plant pot'].some(k => fullTextNorm.includes(k))) {
+                        if (head === '6914') itemScore += 1200;
+                        else if (head === '6913') itemScore += 800;
+                    }
+                } else if (head === '8462' || head === '8479') {
+                    if (['may dap', 'may ep', 'may dot', 'may chan', 'may uon', 'may bam dau cos', 'may dap dau noi', 'crimping machine'].some(k => fullTextNorm.includes(k))) {
+                        if (head === '8462') itemScore += 1200;
+                        else if (head === '8479') itemScore += 800;
                     }
                 } else if (head === '8487') {
                     if (['vu bom mo', 'vu tra mo', 'num bom mo', 'num tra mo', 'dau vu mo', 'vu mo', 'num mo', 'grease nipple', 'greasing nipple', 'grease fitting', 'zerk fitting', 'lube nipple'].some(k => fullTextNorm.includes(k))) {
@@ -5794,8 +5876,8 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                         }
                     }
                 } else if (head === '8544') {
-                    if (['tam che', 'vo che', 'nap che', 'tam chan', 'bu long', 'mieng thep', 'gia do'].some(k => subjNorm.includes(k))) {
-                        itemScore -= 3000;
+                    if (['tam che', 'vo che', 'nap che', 'tam chan', 'bu long', 'mieng thep', 'gia do', 'may dap', 'may ep', 'may dot', 'may chan', 'may uon', 'may moc', 'thiet bi', 'pressing machine', 'crimping machine'].some(k => fullTextNorm.includes(k) && !['day dien', 'day cap', 'cap dien', 'electric wire', 'electric cable'].some(w => subjNorm.includes(w)))) {
+                        itemScore -= 6000;
                     }
 
                     const sub = code.substring(0, 6);
@@ -6020,6 +6102,20 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             const bestItem = pool.length > 0 ? pool[0].item : (db[0] || {});
             const bestCode = (bestItem.c || '').replace(/\./g, '');
             const bestScore = pool.length > 0 ? pool[0].score : 1;
+
+            // Strict Customs Information Sufficiency Gate (Nguyên tắc Zero-Guessing)
+            const meaningfulTokens = extractWordTokens(fullTextNorm);
+            const isDirectCodeMatch = db.some(it => (it.c || '').replace(/\./g, '') === fullTextNorm.replace(/\./g, ''));
+            const isTooVague = (meaningfulTokens.length < 2 && !isDirectCodeMatch) || (fullTextNorm.length < 4);
+            const isLowConfidence = bestScore < 100 && !isDirectCodeMatch;
+
+            if (isTooVague || isLowConfidence) {
+                bestItem._insufficient_info = true;
+                bestItem._missing_fields = [];
+                if (!decomp.materials || decomp.materials.length === 0) bestItem._missing_fields.push('Chất liệu cấu thành (ví dụ: thép, nhôm, đồng, nhựa, cao su, gốm nung...)');
+                if (!use || use.trim().length < 4) bestItem._missing_fields.push('Công dụng / Chức năng hoạt động chính của mặt hàng');
+                if (!specs || specs.trim().length < 3) bestItem._missing_fields.push('Thông số kỹ thuật / Kích thước định danh / Điện áp');
+            }
 
             const competingItems = [];
             const seenPrefixes = new Set([bestCode.substring(0, 6)]);
@@ -7428,6 +7524,48 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             const model_en = data.model_en || 'Theo hồ sơ kỹ thuật';
 
             const bestItem = classifyProductClientSide(name, desc, use, specs, model_en);
+
+            if (bestItem && bestItem._insufficient_info) {
+                const missingList = (bestItem._missing_fields && bestItem._missing_fields.length > 0)
+                    ? bestItem._missing_fields.map(f => `<li class="flex items-center gap-2"><i class="fa-solid fa-circle-exclamation text-amber-500"></i> <span>${f}</span></li>`).join('')
+                    : `<li class="flex items-center gap-2"><i class="fa-solid fa-circle-exclamation text-amber-500"></i> <span>Chất liệu cấu thành (thép, nhựa, đồng, cao su, gốm...)</span></li>
+                       <li class="flex items-center gap-2"><i class="fa-solid fa-circle-exclamation text-amber-500"></i> <span>Công dụng / Cơ chế hoạt động thực tế</span></li>`;
+
+                return `
+                    <div class="bg-white dark:bg-slate-900 border-2 border-amber-500/50 rounded-2xl p-6 shadow-xl space-y-5 animate-fade-in">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-500 flex items-center justify-center shrink-0 text-2xl shadow-inner">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+                                    <span>CẢNH BÁO PHÁP LÝ: CHƯA ĐỦ THÔNG TIN ĐỂ XÁC ĐỊNH MÃ HS CODE</span>
+                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700">Nguyên tắc Zero-Guessing</span>
+                                </h3>
+                                <p class="text-sm text-slate-600 dark:text-slate-300 mt-1">
+                                    Theo <strong>6 Quy tắc Tổng quát Giải thích HS (GRI 1-6)</strong> và chuẩn mực phân loại Hải quan Việt Nam: Hệ thống AI tuân thủ nghiêm ngặt nguyên tắc — <strong>Tuyệt đối không tự ý suy đoán hoặc đưa ra mã HS sai</strong> khi dữ liệu hàng hóa chưa đủ cơ sở định danh.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-amber-50 dark:bg-slate-950/70 border border-amber-200 dark:border-amber-500/30 rounded-xl p-4 text-xs space-y-2">
+                            <div class="font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider text-[11px]">
+                                <i class="fa-solid fa-list-check mr-1.5"></i> Vui lòng bổ sung thêm thông tin kỹ thuật sau vào các ô tra cứu:
+                            </div>
+                            <ul class="space-y-1.5 text-slate-700 dark:text-slate-300 ml-1">
+                                ${missingList}
+                            </ul>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400">
+                            <div><i class="fa-solid fa-lightbulb text-amber-400 mr-1"></i> Gợi ý: Nhập rõ <strong>Chất liệu</strong> và <strong>Công dụng</strong> để hệ thống phân loại chuẩn xác 100%.</div>
+                            <button type="button" onclick="document.getElementById('auto-desc')?.focus()" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold transition-all shadow-sm flex items-center gap-1.5">
+                                <i class="fa-solid fa-pen-to-square"></i> Bổ sung thông tin ngay
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
             const codeRaw = (bestItem.c || '82089000').replace(/\./g, '');
             const codeFmt = `${codeRaw.substring(0,4)}.${codeRaw.substring(4,6)}.${codeRaw.substring(6,8)}`;
             const cleanCode = codeRaw;
@@ -9441,6 +9579,31 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
                     title: "Quạt ly tâm hút khói công nghiệp bằng thép",
                     input: { name: "Quạt ly tâm hút khói công nghiệp bằng thép", desc: "Thép tấm gắn động cơ cánh quạt hút ly tâm", use: "Hút khí khói bụi công nghiệp", specs: "Công suất 3kW, lưu lượng 2500 m3/h", model_en: "FAN-CENTRI" },
                     expected: ["8414.60.91", "84146091", "8414.59", "841459"]
+                },
+                {
+                    id: 16,
+                    title: "Khớp nối ống bằng đồng dùng nối ống nhựa mềm",
+                    input: { name: "Khớp nối ống bằng đồng", desc: "Hợp kim đồng, phụ kiện đường ống dùng nối ống nhựa mềm", use: "Ghép nối đường ống dẫn nước làm mát", specs: "Đường kính 1cm, dài 5cm", model_en: "COUPLING-CU" },
+                    expected: ["7412.20.91", "74122091", "7412.20.99", "74122099", "7412.20.00", "74122000"]
+                },
+                {
+                    id: 17,
+                    title: "Máy dập đầu nối dây điện (bấm đầu cos dây cáp)",
+                    input: { name: "Máy dập đầu nối dây điện", desc: "Máy dập cơ khí ép bấm đầu cos vào dây điện", use: "Gia công bấm đầu nối vào dây cáp điện", specs: "Công suất ép 2 tấn", model_en: "CRIMP-01" },
+                    expected: ["8462.62.11", "84626211", "8462.90.00", "84629000", "8479.89.39", "84798939", "8462.29.90", "84622990"]
+                },
+                {
+                    id: 18,
+                    title: "Chậu trồng cây bằng gốm nung tráng men",
+                    input: { name: "Chậu trồng cây bằng gốm nung", desc: "Đất sét nung tráng men gốm", use: "Trồng cây cảnh và hoa trang trí", specs: "Đường kính 25cm, cao 30cm", model_en: "POT-CERAMIC" },
+                    expected: ["6914.90.00", "69149000", "6914.10.00", "69141000", "6912.00.00", "69120000"]
+                },
+                {
+                    id: 19,
+                    title: "Kiểm tra chặn suy đoán bừa khi thiếu thông tin (Zero-Guessing)",
+                    input: { name: "Phụ tùng", desc: "", use: "", specs: "", model_en: "" },
+                    expected: ["INSUFFICIENT_INFO"],
+                    check_insufficient: true
                 }
             ];
 
@@ -9450,16 +9613,19 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
             for (let tc of testCases) {
                 const res = classifyProductClientSide(tc.input.name, tc.input.desc, tc.input.use, tc.input.specs, tc.input.model_en);
                 const actual = (res && res.c ? res.c : '').replace(/\./g, '');
-                const passed = tc.expected.some(exp => exp.replace(/\./g, '') === actual);
+                const passed = tc.check_insufficient 
+                    ? (res && res._insufficient_info === true)
+                    : tc.expected.some(exp => exp.replace(/\./g, '') === actual);
                 if (passed) passCount++;
                 results.push({
                     id: tc.id,
                     title: tc.title,
                     expected: tc.expected[0],
-                    actual: res && res.c ? res.c : 'N/A',
+                    actual: tc.check_insufficient ? (res && res._insufficient_info ? 'INSUFFICIENT_INFO' : actual) : (res && res.c ? res.c : 'N/A'),
                     actualClean: actual,
                     passed: passed,
-                    vn: res && res.vn ? res.vn : ''
+                    vn: res && res.vn ? res.vn : '',
+                    headings: res ? res._top_headings : []
                 });
             }
 

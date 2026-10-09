@@ -3,12 +3,12 @@ import os, sys, re, json, time, subprocess
 sys.stdout.reconfigure(encoding='utf-8')
 
 CHROME_CANDIDATE_PATHS = [
-    r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe',
-    r'C:\Program Files\Microsoft\Edge\Application\msedge.exe',
     r'C:\Program Files\Google\Chrome\Application\chrome.exe',
     r'C:\Program Files (x86)\Google\Chrome\Application\chrome.exe',
-    os.path.expandvars(r'%LOCALAPPDATA%\Microsoft\Edge\Application\msedge.exe'),
     os.path.expandvars(r'%LOCALAPPDATA%\Google\Chrome\Application\chrome.exe'),
+    r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe',
+    r'C:\Program Files\Microsoft\Edge\Application\msedge.exe',
+    os.path.expandvars(r'%LOCALAPPDATA%\Microsoft\Edge\Application\msedge.exe'),
 ]
 
 browser_exe = None
@@ -28,14 +28,13 @@ print(f"========================================================================
 print(f"Trình duyệt: {browser_exe}")
 print(f"Địa chỉ test: {test_url}\n")
 
-# Run headless browser with dump-dom and virtual time budget to allow execution
+# Run headless browser with dump-dom and 2s virtual time for DOM ready
 cmd = [
     browser_exe,
     '--headless=new',
     '--disable-gpu',
     '--no-sandbox',
-    '--run-all-compositor-stages-before-draw',
-    '--virtual-time-budget=8000',
+    '--virtual-time-budget=2000',
     '--dump-dom',
     test_url
 ]
@@ -81,6 +80,9 @@ for tc in data.get('cases', []):
     exp = tc.get('expected', '')
     act = tc.get('actual', '')
     print(f"{tc.get('id'):<4} | {title_short:<50} | {exp:<12} | {act:<12} | {status_str}")
+    if not tc.get('passed'):
+        print(f"   -> ACTUAL VN: {tc.get('vn')}")
+        print(f"   -> HEADINGS: {tc.get('headings')}")
 
 print("-" * 95)
 print(f"TỔNG KẾT: {passed}/{total} ca đạt chuẩn ({rate})")
