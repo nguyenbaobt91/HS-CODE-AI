@@ -3776,7 +3776,7 @@
                 if (!/^\d{4}$/.test(key)) return false;
                 const item = wcoData[key];
                 if (!item) return false;
-                if (chapFilter && !key.startsWith(chapFilter)) return false;
+                if (chapFilter && chapFilter !== 'all' && !key.startsWith(chapFilter)) return false;
                 if (!searchInputRaw) return true;
                 if (targetCodes.some(tc => key.startsWith(tc))) return true;
                 const matchCode = key.includes(searchInput) || key.includes(searchInputRaw);
