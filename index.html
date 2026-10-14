@@ -1128,15 +1128,19 @@
                     </p>
 
                     <!-- Search & Filter Controls Bar -->
-                    <div class="pt-2 flex flex-col sm:flex-row items-center gap-3">
+                    <div class="pt-2 flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
                         <div class="relative flex-1 w-full">
                             <input type="text" id="wco-search-input" onkeyup="handleWcoSearchInput()" placeholder="Nhập số Nhóm (VD: 8481, 84.81, 3917), từ khóa hoặc tên hàng hóa..." 
                                    class="w-full pl-11 pr-4 py-3 rounded-2xl bg-white/15 border border-white/25 text-white placeholder-amber-100 focus:outline-none focus:ring-2 focus:ring-white text-sm backdrop-blur-md transition-all">
                             <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-white/70 text-lg"></i>
                         </div>
-                        <select id="wco-chapter-filter" onchange="filterWCONotes()" class="w-full sm:w-64 px-4 py-3 rounded-2xl bg-white/20 border border-white/30 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white [&>option]:text-slate-900 [&>option]:bg-white cursor-pointer">
+                        <select id="wco-chapter-filter" onchange="filterWCONotes()" class="w-full lg:w-56 px-4 py-3 rounded-2xl bg-white/20 border border-white/30 text-white text-sm focus:outline-none focus:ring-2 focus:ring-white [&>option]:text-slate-900 [&>option]:bg-white cursor-pointer">
                             <option value="all">Tất cả 98 Chương</option>
                         </select>
+                        <a href="pdf_docs/hqkv8.pdf" target="_blank" class="px-5 py-3 rounded-2xl bg-white hover:bg-amber-50 text-amber-800 font-extrabold text-sm shadow-xl flex items-center justify-center gap-2 transition-all cursor-pointer whitespace-nowrap">
+                            <i class="fa-solid fa-book-open text-rose-600 text-base"></i>
+                            <span>Mở Toàn Bộ Chú Giải 2022 (2.409 Trang)</span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -3883,11 +3887,12 @@
             if (rightContainer) {
                 rightContainer.innerHTML = `
                     <div class="space-y-4 animate-fade-in">
-                        <!-- Top Header & Action Controls -->
-                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-sky-500/30 shadow-sm">
-                            <div class="space-y-1.5 min-w-0">
+                        <!-- Top Header & Action Controls (Full Width, No Squashing) -->
+                        <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-sky-500/30 shadow-sm space-y-4">
+                            <!-- Row 1: Badges & Heading Info (Full Width) -->
+                            <div class="space-y-2">
                                 <div class="flex flex-wrap items-center gap-2">
-                                    <span class="px-3 py-1 rounded-xl bg-sky-600 text-white font-mono font-extrabold text-sm shadow-sm shadow-sky-600/30">
+                                    <span class="px-3 py-1 rounded-xl bg-sky-600 text-white font-mono font-extrabold text-sm shadow-sm">
                                         Nhóm ${formattedHead}
                                     </span>
                                     <span class="px-2.5 py-1 rounded-xl bg-sky-100 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 font-mono text-xs font-semibold border border-sky-200 dark:border-sky-500/30">
@@ -3900,12 +3905,12 @@
                                         <i class="fa-solid fa-bolt mr-1 text-emerald-600"></i>Chương ${chapterNum} (Trang nội bộ: ${relChapterPage})
                                     </span>
                                 </div>
-                                <h3 class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white leading-snug">
+                                <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white leading-snug">
                                     ${item.title || 'Chú giải HS 2022 Nhóm ' + formattedHead}
                                 </h3>
                                 ${item.section_id ? `
-                                <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                                    <span class="px-2.5 py-0.5 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 font-medium border border-purple-200 dark:border-purple-800/40 truncate max-w-md">
+                                <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400 pt-1">
+                                    <span class="px-2.5 py-0.5 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 font-medium border border-purple-200 dark:border-purple-800/40">
                                         <i class="fa-solid fa-layer-group mr-1"></i>Phần ${item.section_id}: ${item.section_title || ''}
                                     </span>
                                     <span class="px-2.5 py-0.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 font-medium border border-emerald-200 dark:border-emerald-800/40">
@@ -3914,23 +3919,24 @@
                                 </div>
                                 ` : ''}
                             </div>
-                            <div class="flex flex-wrap items-center gap-2 flex-shrink-0">
-                                <a href="${chapterOpenUrl}" target="_blank" 
+
+                            <!-- Row 2: Action Buttons Bar (Full Width, Clean Wrap) -->
+                            <div class="flex flex-wrap items-center gap-2.5 pt-3 border-t border-slate-200 dark:border-slate-800">
+                                <a href="pdf_docs/hqkv8.pdf#page=${pageNumHQKV8}" target="_blank" 
                                    class="py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition-all cursor-pointer">
-                                    <i class="fa-solid fa-bolt text-yellow-200"></i>
-                                    <span>Mở PDF Chương ${chapterNum} (Trang ${pageNumHQKV8}) - Tải Tức Thì</span>
+                                    <i class="fa-solid fa-book-open text-base"></i>
+                                    <span>Mở Toàn Bộ Chú Giải 2022 (Đến Đúng Trang ${pageNumHQKV8})</span>
                                 </a>
-                                <a href="${fullPdfUrl}" target="_blank" 
-                                   class="py-2.5 px-3 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
-                                   title="Mở toàn bộ 2.409 trang để cuộn liên chương">
-                                    <i class="fa-solid fa-book-open text-sky-500"></i>
-                                    <span>Toàn tập (2.409 trang)</span>
+                                <a href="${chapterOpenUrl}" target="_blank" 
+                                   class="py-2.5 px-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-sky-600/20 transition-all cursor-pointer">
+                                    <i class="fa-solid fa-bolt text-yellow-200"></i>
+                                    <span>Mở Riêng Chương ${chapterNum} (Tải Tức Thì)</span>
                                 </a>
                                 <button onclick="copyWCOCitation('${key}')" 
                                         class="py-2.5 px-3 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer" 
                                         title="Sao chép trích dẫn căn cứ pháp lý">
                                     <i class="fa-solid fa-copy"></i>
-                                    <span class="hidden sm:inline">Sao chép trích dẫn</span>
+                                    <span>Sao chép trích dẫn</span>
                                 </button>
                             </div>
                         </div>
