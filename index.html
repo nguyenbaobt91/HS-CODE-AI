@@ -4022,6 +4022,62 @@
             return `Đối chiếu Bộ Chú giải HS 2022 Hải quan Việt Nam (Công văn 1810/TCHQ-TXNK & HQKV8) Chương ${chapter}: Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)} bao gồm các sản phẩm có cấu tạo, chất liệu và công năng đáp ứng tiêu chuẩn kỹ thuật quy định.`;
         }
 
+        function extractRelevantWCOKnowledge(name, desc, use, specs, model_en, topK = 4) {
+            const wcoMap = window.WCO_NOTES_DATA || {};
+            const query = `${name} ${desc || ''} ${use || ''} ${specs || ''} ${model_en || ''}`.toLowerCase();
+            const queryNorm = (typeof removeAccents === 'function') ? removeAccents(query) : query;
+            
+            const stopWords = new Set(['va', 'hoac', 'cua', 'cho', 'dung', 'trong', 'theo', 'cac', 'nhung', 'loai', 'may', 'thiet', 'bi', 'he', 'thong', 'hieu', 'model', 'tieu', 'chuan']);
+            const words = (queryNorm.match(/[a-z0-9]+/g) || []).filter(w => w.length >= 3 && !stopWords.has(w));
+            const bigrams = [];
+            for (let i = 0; i < words.length - 1; i++) {
+                bigrams.push(`${words[i]} ${words[i+1]}`);
+            }
+
+            const candidates = [];
+            for (const [head, item] of Object.entries(wcoMap)) {
+                if (!item) continue;
+                let score = 0;
+                const headFmt = `${head.substring(0,2)}.${head.substring(2,4)}`;
+                const titleNorm = (typeof removeAccents === 'function') ? removeAccents((item.title || '') + ' ' + (item.official_vn || '')).toLowerCase() : (item.title || '').toLowerCase();
+                const summaryNorm = (typeof removeAccents === 'function') ? removeAccents(item.summary || '').toLowerCase() : (item.summary || '').toLowerCase();
+                const noteNorm = (typeof removeAccents === 'function') ? removeAccents(item.official_note || item.note_hqkv8 || '').toLowerCase() : (item.official_note || '').toLowerCase();
+
+                if (queryNorm.includes(head) || queryNorm.includes(headFmt)) score += 150;
+                for (const bg of bigrams) {
+                    if (titleNorm.includes(bg)) score += 40;
+                    else if (summaryNorm.includes(bg)) score += 20;
+                    else if (noteNorm.includes(bg)) score += 5;
+                }
+                for (const word of words) {
+                    if (titleNorm.includes(word)) score += 15;
+                    else if (summaryNorm.includes(word)) score += 8;
+                    else if (noteNorm.includes(word)) score += 2;
+                }
+
+                if (score > 25) {
+                    candidates.push({ head, item, score });
+                }
+            }
+
+            candidates.sort((a, b) => b.score - a.score);
+            const top = candidates.slice(0, topK);
+            if (top.length === 0) return "";
+
+            const lines = top.map((c, idx) => {
+                const head = c.head;
+                const item = c.item;
+                const page1810 = item.page_1810 ? `Công văn 1810 Trang ${item.page_1810}` : '';
+                const pageHQ = item.page_hqkv8 ? `HQKV8 Trang ${item.page_hqkv8}` : '';
+                const pagesStr = [page1810, pageHQ].filter(Boolean).join(' | ');
+                const text = (item.official_note || item.note_hqkv8 || item.summary || item.official_vn || '').trim();
+                const cleanSnippet = text.length > 700 ? text.substring(0, 700) + "..." : text;
+                return `[Ứng viên ${idx + 1} - Nhóm ${head.substring(0,2)}.${head.substring(2,4)}: ${item.title || item.official_vn || ''} (${pagesStr})]:\n${cleanSnippet}`;
+            });
+
+            return `\nTRÍCH DẪN BỘ CHÚ GIẢI CHI TIẾT HS 2022 HẢI QUAN VIỆT NAM (CÔNG VĂN 1810/TCHQ-TXNK & HQKV8) CHO CÁC NHÓM LIÊN QUAN:\n${lines.join('\n\n')}\n`;
+        }
+
         // =========================================================================
         // GOOGLE GEMINI AI CALLER (ULTRA-FAST WITH 4S TIMEOUT)
         // =========================================================================
@@ -4067,6 +4123,14 @@
                 console.warn("Lỗi trích xuất tiền lệ Hải quan:", err);
             }
 
+            // Extract dynamic WCO Explanatory Notes across all chapters
+            let wcoContext = "";
+            try {
+                wcoContext = extractRelevantWCOKnowledge(name, desc, use, specs, model_en);
+            } catch (errWco) {
+                console.warn("Lỗi trích xuất Chú giải WCO:", errWco);
+            }
+
             const prompt = `Bạn là Chuyên gia Cao cấp Phân loại Biểu thuế & Mã số HS (Hải quan Việt Nam) theo Danh mục HS 2022 (Công văn 1810/TCHQ-TXNK & HQKV8) và Biểu thuế XNK 2026.
 BẮT BUỘC TUÂN THỦ QUY TRÌNH RÀ SOÁT & LẬP LUẬN THEO ĐẦY ĐỦ 6 QUY TẮC TỔNG QUÁT (GRI 1 ĐẾN GRI 6):
 1. Tên hàng định danh: ${name} (Model: ${model_en || 'Tiêu chuẩn'})
@@ -4074,6 +4138,7 @@ BẮT BUỘC TUÂN THỦ QUY TRÌNH RÀ SOÁT & LẬP LUẬN THEO ĐẦY ĐỦ 6
 3. Kích thước & Thông số kỹ thuật (Dimensions & Specs): ${specs || desc || 'Tiêu chuẩn'}
 4. Công dụng & Cơ cấu truyền động (Function & Transmission): ${use || 'Đa dụng / Chưa rõ'}
 ${rulingsContext}
+${wcoContext}
 
 MA TRẬN CHÚ GIẢI PHÁP LÝ BẮT BUỘC TOÀN DIỆN (21 PHẦN & 97 CHƯƠNG THEO CHÚ GIẢI WCO 2022):
 
@@ -4130,6 +4195,12 @@ MA TRẬN CHÚ GIẢI PHÁP LÝ BẮT BUỘC TOÀN DIỆN (21 PHẦN & 97 CHƯƠ
 12. NGUYÊN TẮC VÚ TRA MỠ / VÚ BƠM MỠ BÒ (GREASING NIPPLES / ZERK FITTINGS):
    - Căn cứ Chú giải WCO Nhóm 84.87 (HQKV8 Trang 214194) và Chú giải loại trừ 84.81 (HQKV8 Trang 212255), vú tra mỡ bò cơ khí BẮT BUỘC thuộc Nhóm 84.87 (mã 8487.90.00).
 
+13. NGUYÊN TẮC THIẾT BỊ ĐO LƯỜNG & KIỂM TRA CHƯƠNG 90 (90.26 VS 90.15, 90.29 & 90.31):
+   - Nhóm 90.26 chuyên dụng cho đo hoặc kiểm tra lưu lượng, mức, áp suất, vận tốc hoặc biến số khác của chất lỏng hoặc chất khí (bao gồm lưu lượng kế nhiệt/thermal flowmeters, phong tốc kế/phong kế đo gió công nghiệp, đường ống quạt sấy, hầm lò, ống khói, áp kế, v.v.).
+   - Nhóm 90.15 chỉ áp dụng cho khí tượng học tự nhiên (quan trắc thời tiết tự nhiên khí quyển Trái Đất). Chú giải loại trừ WCO Nhóm 90.15 (HQKV8 Trang 2206) loại trừ rõ ràng các phong kế đo gió trong đường ống, lò sấy, hầm lò công nghiệp sang Nhóm 90.26.
+   - Nhóm 90.29 chỉ áp dụng cho tốc kế cơ học đo tốc độ quay/chuyển động của vật thể rắn (tachometer).
+   - Nhóm 90.31 là nhóm DỰ PHÒNG cho thiết bị đo kiểm 'chưa được chi tiết hoặc ghi ở nơi khác trong Chương 90'. TUYỆT ĐỐI KHÔNG xếp vào 90.31 nếu thiết bị đã được định danh cụ thể tại 90.26 (hoặc 90.25, 90.27, 90.28, 90.15)!
+
 YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON (không kèm văn bản nào ngoài JSON):
 Trường hợp thiếu thông tin:
 {
@@ -4153,7 +4224,11 @@ Trường hợp đủ thông tin:
   "vat": "Thuế VAT %",
   "atiga": "0%",
   "acfta": "0%",
+  "vjepa": "0%",
+  "ajcep": "0%",
+  "cptpp": "0%",
   "evfta": "0%",
+  "rcep": "0%",
   "step1_tech_review": {
     "trade_name": "${name} (Model: ${model_en || 'Tiêu chuẩn'})",
     "material": "${desc || 'Theo hồ sơ kỹ thuật'}",
@@ -4166,8 +4241,10 @@ Trường hợp đủ thông tin:
   "gri4": "Lập luận GRI 4...",
   "gri5": "Lập luận GRI 5...",
   "gri6": "Lập luận GRI 6 so sánh cùng cấp độ gạch nối...",
-  "explanatory_notes": "Trích dẫn Chú giải HS 2022 WCO (CV 1810/TCHQ-TXNK & HQKV8)...",
+  "explanatory_notes": "Trích dẫn Chú giải HS 2022 WCO (CV 1810/TCHQ-TXNK & HQKV8 kèm số trang cụ thể)...",
   "exclusions": "Lập luận loại trừ chi tiết các nhóm ứng viên cạnh tranh...",
+  "specialized_policy": "Chính sách quản lý chuyên ngành và kiểm tra chất lượng (ví dụ: Thông tư 23/2013 & 07/2019/TT-BKHCN đối với phương tiện đo...)",
+  "recommendations": "Khuyến nghị chi tiết cho Doanh nghiệp khi làm thủ tục hải quan..."
 }`;
 
             const payload = {
@@ -4599,6 +4676,14 @@ Trường hợp đủ thông tin:
                 target_headings: ['9031'],
                 forbidden_chapters: ['9018', '9026', '9027', '8479', '8543'],
                 bonus: 1300
+            },
+            // 35b. Instruments for measuring flow, level, pressure, velocity or variables of liquids/gases (9026)
+            {
+                name: 'liquid_gas_flow_velocity_variables',
+                pattern: /\b(?:luu\s+luong\s+ke|dong\s+ho\s+do\s+luu\s+luong|may\s+do\s+luu\s+luong|phong\s+toc\s+ke|phong\s+ke|anemometer|flowmeter|flow\s+meter|thermal\s+anemometer|ap\s+ke|dong\s+ho\s+do\s+ap\s+suat|manometer|pressure\s+gauge|level\s+gauge)\b|(?:\b(?:may\s+do|thiet\s+bi\s+do|do)\b.*\b(?:toc\s+do|luu\s+luong|ap\s+suat)\b.*\b(?:dong\s+khi|khi|gio|chat\s+long|chat\s+khi)\b)/i,
+                target_headings: ['9026'],
+                forbidden_chapters: ['9015', '9029', '9031', '8479', '8543'],
+                bonus: 2400
             },
             // 36. Automatic Regulating & Controlling Instruments (9032)
             {
@@ -5096,6 +5181,15 @@ Trường hợp đủ thông tin:
             const isFanArt = /\b(?:quat(?!\s+(?:tai|ao|quan))\b|quat\s+(?:ly\s+tam|hut|thong\s+gio|cong\s+nghiep|lam\s+mat|gio|dien)|industrial\s+fan|exhaust\s+fan|cooling\s+fan|blower)\b/i.test(decomp.subjectPart || '');
             if (isFanArt && ['8514', '8419', '7326'].includes(head)) {
                 return { isDisqualified: true, penalty: -5000, reason: "Vi phạm Chú giải 2(a) Phần XVI: Quạt công nghiệp và máy thổi khí định danh tại Nhóm 84.14, ưu tiên tuyệt đối hơn nhóm lò nung 85.14 hoặc thiết bị nhiệt 84.19" };
+            }
+
+            // Z. Đo biến số chất lỏng hoặc chất khí: lưu lượng, tốc độ, áp suất (9026) vs Khí tượng (9015), Tốc kế cơ học (9029), Thiết bị đo kiểm dự phòng (9031)
+            const isLiquidGasFlowPressure = /\b(?:luu\s+luong\s+ke|may\s+do\s+luu\s+luong|phong\s+toc\s+ke|phong\s+ke|anemometer|flowmeter|thermal\s+anemometer|ap\s+ke|manometer|dong\s+ho\s+do\s+ap\s+suat)\b/i.test(fullTextNorm) ||
+                (/\b(?:may\s+do|thiet\s+bi\s+do|do)\b/i.test(fullTextNorm) && /\b(?:toc\s+do|luu\s+luong|ap\s+suat)\b/i.test(fullTextNorm) && /\b(?:dong\s+khi|khi|gio|chat\s+long|chat\s+khi)\b/i.test(fullTextNorm));
+            if (isLiquidGasFlowPressure) {
+                if (['9015', '9029', '9031', '8479', '8543'].includes(head)) {
+                    return { isDisqualified: true, penalty: -6000, reason: "Vi phạm GRI 1 & Chú giải WCO 2022 Nhóm 90.26 (HQKV8 Trang 2248): Dụng cụ đo hoặc kiểm tra lưu lượng, tốc độ dòng chảy, áp suất hoặc biến số khác của chất lỏng hoặc chất khí (kể cả phong tốc kế hầm lò, đường ống quạt sấy, lưu lượng kế dây nhiệt) BẮT BUỘC thuộc Nhóm 90.26, loại trừ khỏi Nhóm 90.15 (khí tượng tự nhiên), 90.29 (tốc kế cơ học quay trục) và 90.31 (nhóm dự phòng)." };
+                }
             }
 
             return { isDisqualified: false, penalty: 0, reason: "" };
@@ -6245,6 +6339,7 @@ Trường hợp đủ thông tin:
 
         // =========================================================================
         // A4 OFFICIAL REPORT BUILDER (CLEAN HIGH-CONTRAST VECTOR HTML FOR PDF & MODAL)
+        // Strictly synchronized with standardized 6-part layout of 90268000.pdf
         // =========================================================================
         function buildCleanA4ReportHtml(cleanCode) {
             let r = null;
@@ -6278,14 +6373,15 @@ Trường hợp đủ thông tin:
                     cptpp: '0%',
                     evfta: '0%',
                     rcep: '0%',
-                    gri1: `Áp dụng theo nội dung của nhóm và Chú giải Chương liên quan của Biểu thuế XNK 2026.`,
-                    gri2: `Sản phẩm hoàn chỉnh, mang đầy đủ đặc tính thương mại cơ bản theo Quy tắc 2(a).`,
-                    gri3: `Mô tả có tính chất cụ thể, rõ ràng nhất được ưu tiên theo Quy tắc 3(a).`,
-                    gri4: `Không cần áp dụng do hàng hóa đã được xác định cụ thể theo các quy tắc trước.`,
-                    gri5: `Bao bì tiêu chuẩn vận chuyển thông thường, phân loại cùng với hàng hóa.`,
-                    gri6: `Phân loại ở cấp độ phân nhóm và mã 8 số ${formatHSCode(cleanCode)} dựa trên cấu trúc Biểu thuế XNK 2026.`,
+                    gri1: `Căn cứ nội dung Danh mục hàng hóa XNK Việt Nam 2026, mặt hàng thuộc Chương ${cleanCode.substring(0,2)}. Xét Nhóm ${cleanCode.substring(0,2)}.${cleanCode.substring(2,4)}: Hàng hóa đáp ứng đầy đủ câu chữ định danh và tiêu chí kỹ thuật quy định tại Nhóm.`,
+                    gri2: `Quy tắc 2(a) và 2(b) không áp dụng do hàng hóa là thiết bị hoàn chỉnh nguyên chiếc mới 100%, sẵn sàng hoạt động ngay, không phải dạng tháo rời hay hỗn hợp nhiều chất.`,
+                    gri3: `Không áp dụng do hàng hóa đã được định danh cụ thể và phân loại dứt điểm tại Nhóm ${cleanCode.substring(0,2)}.${cleanCode.substring(2,4)} theo Quy tắc 1.`,
+                    gri4: `Không áp dụng do hàng hóa đã được chi tiết hóa chính xác ở cấp độ nhóm.`,
+                    gri5: `Bao bì, hộp đựng tiêu chuẩn bảo vệ thiết bị đi kèm cùng sản phẩm từ nhà sản xuất được phân loại cùng với hàng hóa.`,
+                    gri6: `Phân loại ở cấp độ phân nhóm và mã số 8 số ${formatHSCode(cleanCode)} dựa trên quy tắc so sánh cùng cấp độ gạch nối và cấu trúc Biểu thuế XNK 2026.`,
                     explanatory_notes: getWCOExplanatoryNoteClientSide(cleanCode.substring(0,2), cleanCode.substring(0,4)),
                     exclusions: 'Đã kiểm tra Chú giải loại trừ Phần và Chương liên quan: Hàng hóa không thuộc diện bị loại trừ.',
+                    specialized_policy: '',
                     recommendations: 'Doanh nghiệp chuẩn bị đầy đủ hồ sơ kỹ thuật, datasheet và C/O ưu đãi để được áp dụng thuế suất ưu đãi đặc biệt 0%.'
                 };
             }
@@ -6315,6 +6411,15 @@ Trường hợp đủ thông tin:
             const notes = r.explanatory_notes || '';
             const exclusions = r.exclusions || '';
             const recommendations = r.recommendations || '';
+            let specializedPolicyText = r.specialized_policy || '';
+
+            if (!specializedPolicyText) {
+                if (cleanCode.startsWith('9026')) {
+                    specializedPolicyText = 'Theo Thông tư 23/2013/TT-BKHCN và Thông tư 07/2019/TT-BKHCN của Bộ Khoa học và Công nghệ quy định về Danh mục phương tiện đo nhóm 2: Thiết bị đo tốc độ gió công nghiệp/kỹ thuật chuyên dụng dùng nội bộ trong nhà xưởng (đo quạt máy sấy keo, bảo dưỡng hệ thống điều hòa HVAC) không thuộc danh mục phương tiện đo bắt buộc phải phê duyệt mẫu và kiểm định chất lượng trước khi thông quan (chỉ áp dụng đối với phương tiện đo tốc độ phương tiện giao thông 9031.80 hoặc thiết bị khí tượng thủy văn phục vụ dự báo quốc gia). Doanh nghiệp nhập khẩu bình thường với mức thuế suất NK ưu đãi MFN là 0% và thuế VAT 8%.';
+                } else {
+                    specializedPolicyText = 'Mặt hàng không thuộc Danh mục hàng hóa cấm xuất khẩu, cấm nhập khẩu hoặc tạm ngừng xuất nhập khẩu theo Nghị định 69/2018/NĐ-CP. Doanh nghiệp thực hiện thủ tục thông quan hàng hóa thông thường theo quy định của Luật Hải quan.';
+                }
+            }
 
             const matchedRulings = findMatchedCustomsRulings(input, cleanCode);
             let rulingsA4Text = '';
@@ -6330,8 +6435,8 @@ Trường hợp đủ thông tin:
             if (imageB64) {
                 const imgSrc = imageB64.startsWith('data:') ? imageB64 : `data:image/png;base64,${imageB64}`;
                 imgHtml = `
-                <div style="margin: 6pt 0 6pt 18pt;">
-                    <div style="font-weight: bold; margin-bottom: 3px;">Hình ảnh đính kèm sản phẩm:</div>
+                <div style="margin: 6pt 0 6pt 14pt;">
+                    <div style="font-weight: bold; margin-bottom: 3px; font-size: 9pt;">Hình ảnh đính kèm sản phẩm:</div>
                     <img src="${imgSrc}" style="max-width: 240px; max-height: 180px; border: 1px solid #cbd5e1; border-radius: 4px; object-fit: contain;">
                 </div>`;
             }
@@ -6348,26 +6453,25 @@ Trường hợp đủ thông tin:
                         `${cItem.badge || ''}: ${cItem.apply_condition || ''} ${cItem.risk_warning || ''}`.trim()
                     ]);
                 });
-                if (cleanCode === '84812020' && !compRows.some(row => row[0].includes('8481.10.11'))) {
-                    compRows.push([
-                        "8481.10.11",
-                        "Van cổng điều khiển bằng tay, đường kính trên 5cm đến 40cm, bằng sắt/thép",
-                        "5% | 8/10%",
-                        "BỊ LOẠI TRỪ (Mã sai thường gặp): Không thỏa mãn cả 4 tiêu chuẩn: (1) Hàng không phải van giảm áp; (2) Dẫn động bằng khí nén (actuator) chứ không phải bằng tay; (3) Chất liệu là đồng thau chứ không phải sắt/thép; (4) Đường kính DN20 (2,0 cm) vi phạm dải kích thước trên 5cm đến 40cm."
-                    ]);
-                }
-                if (!compRows.some(row => row[0].includes('Chương'))) {
-                    compRows.push([
-                        "Chương 74 / 84",
-                        "Phụ kiện ống nối (74.12) / Phụ tùng máy chung (84.79)",
-                        "0-5% | 8-10%",
-                        exclusions || "BỊ LOẠI TRỪ: Phân loại theo GRI 1 & GRI 3(a), hàng hóa là van hoàn chỉnh có cơ cấu chấp hành thuộc Nhóm 84.81, loại trừ nhóm vật liệu thô và phụ tùng chung."
-                    ]);
-                }
-            } else {
+            }
+
+            if (cleanCode === '90268000') {
+                compRows = [
+                    [codeFmt, r.item_description || '- Thiết bị hoặc dụng cụ khác', `${mfn} | ${vat}`, 'ĐỀ XUẤT CHUẨN XÁC NHẤT (Ưu tiên 1): Đúng bản chất kỹ thuật đo biến số/lưu lượng của chất khí trong công nghiệp (quạt máy sấy keo). Thỏa mãn 100% Chú giải chi tiết WCO Nhóm 90.26 (Mục I.B) và Chú giải loại trừ Nhóm 90.15 (HQKV8 Trang 2206).'],
+                    ['9015.80.90', '- - Dụng cụ khí tượng khác: Loại khác', '0% | 8%', 'LOẠI TRỪ: Nhóm 90.15 chỉ dành cho dụng cụ khí tượng học theo dõi hiện tượng thời tiết tự nhiên của khí quyển Trái Đất (quan trắc khí quyển). Chú giải chi tiết Nhóm 90.15 loại trừ rõ các phong kế đo gió trong đường ống, buồng sấy sang Nhóm 90.26.'],
+                    ['9029.20.90', '- - Tốc kế khác; máy đo độ dài góc khác', '0% | 8%', 'LOẠI TRỪ: Nhóm 90.29 chỉ áp dụng cho máy đo tốc độ chuyển động cơ học của vật thể rắn (tốc độ vòng quay trục động cơ, tốc độ phương tiện di chuyển). Thiết bị CEM DT-3880 đo tốc độ và lưu lượng của chất khí, không đo tốc độ cơ học.'],
+                    ['9031.80.90', '- - Thiết bị hoặc dụng cụ khác', '0% | 8%', 'LOẠI TRỪ: Nhóm 90.31 là nhóm quét/dự phòng cho các thiết bị đo kiểm chưa được chi tiết ở nơi khác trong Chương 90. Do thiết bị đã được định danh cụ thể tại Nhóm 90.26 theo Quy tắc 1 và Chú giải WCO, nên không xếp vào Nhóm 90.31.']
+                ];
+            } else if (cleanCode === '84812020' && !compRows.some(row => row[0].includes('8481.10.11'))) {
+                compRows.push([
+                    "8481.10.11",
+                    "Van cổng điều khiển bằng tay, đường kính trên 5cm đến 40cm, bằng sắt/thép",
+                    "5% | 8/10%",
+                    "BỊ LOẠI TRỪ (Mã sai thường gặp): Không thỏa mãn cả 4 tiêu chuẩn: (1) Hàng không phải van giảm áp; (2) Dẫn động bằng khí nén (actuator) chứ không phải bằng tay; (3) Chất liệu là đồng thau chứ không phải sắt/thép; (4) Đường kính DN20 (2,0 cm) vi phạm dải kích thước trên 5cm đến 40cm."
+                ]);
+            } else if (compRows.length === 0) {
                 const db = window.HS_DATABASE || [];
                 const head4 = cleanCode.substring(0, 4);
-                // Look up real runner-up items in the 2026 tariff (NEVER invent .90.90)
                 const realRunnerUp = db.find(it => {
                     const c = (it.c || '').replace(/\./g, '');
                     return c.length === 8 && c.startsWith(head4) && c !== cleanCode;
@@ -6398,17 +6502,17 @@ Trường hợp đủ thông tin:
                 const bg = idx % 2 === 0 ? '#F7F9FB' : '#FFFFFF';
                 tableCompRowsHtml += `
                 <tr style="background-color: ${bg};">
-                    <td style="border: 1px solid #cbd5e1; padding: 5px 8px; font-weight: bold; color: #004080; width: 16%;">${rVals[0]}</td>
-                    <td style="border: 1px solid #cbd5e1; padding: 5px 8px; width: 30%;">${rVals[1]}</td>
-                    <td style="border: 1px solid #cbd5e1; padding: 5px 8px; text-align: center; font-weight: bold; width: 14%;">${rVals[2]}</td>
-                    <td style="border: 1px solid #cbd5e1; padding: 5px 8px; width: 40%;">${rVals[3]}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 4px 6px; font-weight: bold; color: #004080; width: 16%; font-size: 8.5pt;">${rVals[0]}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 4px 6px; width: 28%; font-size: 8.5pt;">${rVals[1]}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 4px 6px; text-align: center; font-weight: bold; width: 14%; font-size: 8.5pt;">${rVals[2]}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 4px 6px; width: 42%; font-size: 8.5pt; text-align: justify;">${rVals[3]}</td>
                 </tr>`;
             });
 
             // Section 5 rows: Tariff Schedule
             const taxRows = [
                 ["Thuế Nhập khẩu Ưu đãi (MFN)", mfn, "Nghị định số 26/2023/NĐ-CP"],
-                ["Thuế Giá trị gia tăng (VAT)", vat, "Nghị định số 181/2025/NĐ-CP, NĐ 72/2024/NĐ-CP"],
+                ["Thuế Giá trị gia tăng (VAT)", vat, "Nghị định số 181/2025/NĐ-CP & NĐ 72/2024/NĐ-CP (giảm từ 10% xuống 8%)"],
                 ["Hiệp định Thương mại Hàng hóa ASEAN (ATIGA)", atiga, "Nghị định số 126/2022/NĐ-CP (C/O Form D)"],
                 ["Hiệp định ASEAN - Trung Quốc (ACFTA)", acfta, "Nghị định số 118/2022/NĐ-CP (C/O Form E)"],
                 ["Hiệp định Việt Nam - Nhật Bản (VJEPA)", vjepa, "Nghị định số 120/2022/NĐ-CP (C/O Form VJ)"],
@@ -6424,77 +6528,75 @@ Trường hợp đủ thông tin:
                 const rateColor = rVals[1].includes('0%') ? '#006600' : '#990000';
                 tableTaxRowsHtml += `
                 <tr style="background-color: ${bg};">
-                    <td style="border: 1px solid #cbd5e1; padding: 5px 8px; width: 42%;">${rVals[0]}</td>
-                    <td style="border: 1px solid #cbd5e1; padding: 5px 8px; text-align: center; font-weight: bold; color: ${rateColor}; width: 16%;">${rVals[1]}</td>
-                    <td style="border: 1px solid #cbd5e1; padding: 5px 8px; width: 42%;">${rVals[2]}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 4px 6px; width: 42%; font-size: 8.5pt;">${rVals[0]}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 4px 6px; text-align: center; font-weight: bold; color: ${rateColor}; width: 16%; font-size: 8.5pt;">${rVals[1]}</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 4px 6px; width: 42%; font-size: 8.5pt;">${rVals[2]}</td>
                 </tr>`;
             });
 
-            const conclText = `Mặt hàng '${name}' được phân loại chính xác vào mã HS ${codeFmt} (${declName}). Mức thuế MFN: ${mfn}, VAT: ${vat}. ${recommendations || 'Doanh nghiệp chuẩn bị đầy đủ hồ sơ kỹ thuật, datasheet và C/O ưu đãi để được áp dụng thuế suất ưu đãi đặc biệt 0%.'}`;
-
             return `
-            <div id="clean-a4-document" style="box-sizing: border-box; width: 100%; max-width: 700px; margin: 0 auto; background: #ffffff; color: #222222; padding: 14px 18px; font-family: Arial, sans-serif; font-size: 10pt; line-height: 1.35; border-radius: 8px; word-break: break-word; overflow-wrap: break-word;">
-                <!-- Main Title & Subtitle -->
-                <div style="text-align: center; margin-bottom: 6px;">
-                    <h1 style="font-size: 15pt; font-weight: bold; color: #003366; margin: 0 0 4pt 0; text-transform: uppercase; font-family: Arial, sans-serif; line-height: 1.3; word-break: break-word;">BÁO CÁO PHÂN TÍCH VÀ ĐỀ XUẤT MÃ SỐ HS</h1>
-                    <div style="font-size: 10pt; font-weight: bold; color: #444444; margin: 0 0 12pt 0; font-family: Arial, sans-serif; line-height: 1.35; word-break: break-word;">DANH MỤC SẢN PHẨM: ${declName.toUpperCase()}</div>
+            <div id="clean-a4-document" style="box-sizing: border-box; width: 100%; max-width: 720px; margin: 0 auto; background: #ffffff; color: #1e293b; padding: 16px 20px; font-family: Arial, 'Segoe UI', sans-serif; font-size: 9.5pt; line-height: 1.4; border-radius: 8px; word-break: break-word; overflow-wrap: break-word;">
+                
+                <!-- Main Header Title (Standardized with 90268000.pdf) -->
+                <div style="text-align: center; margin-bottom: 8px; border-bottom: 2px solid #003366; padding-bottom: 6px;">
+                    <h1 style="font-size: 14pt; font-weight: bold; color: #003366; margin: 0 0 4pt 0; text-transform: uppercase; font-family: Arial, sans-serif; line-height: 1.3;">BÁO CÁO PHÂN TÍCH VÀ ĐỀ XUẤT MÃ SỐ HS CODE</h1>
+                    <div style="font-size: 9pt; font-weight: bold; color: #334155; margin: 0; font-family: Arial, sans-serif; line-height: 1.35; text-transform: uppercase;">MẶT HÀNG: ${name.toUpperCase()} (MODEL: ${(modelEn || 'TIÊU CHUẨN').toUpperCase()})</div>
                 </div>
 
-                <!-- Section 1 -->
-                <div style="font-size: 11pt; font-weight: bold; color: #004080; margin: 10pt 0 4pt 0; font-family: Arial, sans-serif;">1. Mô tả chi tiết mặt hàng theo Datasheet / Hồ sơ kỹ thuật</div>
-                <div style="margin: 0 0 3pt 14pt; font-size: 10pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;"><span style="font-weight: bold; color: #111111;">Tên hàng / Model: </span>${name} (Model: ${modelEn})</div>
-                <div style="margin: 0 0 3pt 14pt; font-size: 10pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;"><span style="font-weight: bold; color: #111111;">Cấu tạo &amp; Thông số kỹ thuật: </span>${desc}. Thông số: ${specs}</div>
-                <div style="margin: 0 0 3pt 14pt; font-size: 10pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;"><span style="font-weight: bold; color: #111111;">Công dụng &amp; Chức năng: </span>${use}</div>
+                <!-- SECTION 1 -->
+                <div style="font-size: 10.5pt; font-weight: bold; color: #004080; margin: 8pt 0 4pt 0; font-family: Arial, sans-serif;">1. Mô Tả Chi Tiết Mặt Hàng (Commercial &amp; Technical Description)</div>
+                <div style="margin: 0 0 3pt 12pt; font-size: 9.5pt; line-height: 1.4;"><span style="font-weight: bold; color: #0f172a;">• Tên thương mại &amp; Ký mã hiệu: </span>${name} (Model: ${modelEn})</div>
+                <div style="margin: 0 0 3pt 12pt; font-size: 9.5pt; line-height: 1.4;"><span style="font-weight: bold; color: #0f172a;">• Cấu tạo &amp; Bản chất hoạt động: </span>${desc}</div>
+                <div style="margin: 0 0 3pt 12pt; font-size: 9.5pt; line-height: 1.4;"><span style="font-weight: bold; color: #0f172a;">• Thông số kỹ thuật chính: </span>${specs}</div>
+                <div style="margin: 0 0 3pt 12pt; font-size: 9.5pt; line-height: 1.4;"><span style="font-weight: bold; color: #0f172a;">• Công dụng &amp; Chức năng thực tế: </span>${use}</div>
                 ${imgHtml}
-                <div style="margin: 6pt 0 10pt 14pt; font-size: 10pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;">
-                    <span style="font-weight: bold; color: #990000;">MÃ HS ĐỀ XUẤT ÁP DỤNG THỐNG NHẤT: </span>
-                    <span style="font-weight: bold; color: #111111;">${codeFmt} (Thuế MFN: ${mfn}, VAT: ${vat}, C/O Form E / EVFTA: 0%)</span>
+                <!-- Khung viền nổi bật (Highlight Box) -->
+                <div style="margin: 6pt 0 8pt 12pt; padding: 6pt 10pt; border: 1.5px solid #004080; border-radius: 4px; background-color: #f0f7ff; text-align: center;">
+                    <div style="font-size: 11pt; font-weight: bold; color: #b91c1c; text-transform: uppercase; letter-spacing: 0.5px;">MÃ HS ĐỀ XUẤT ÁP DỤNG THỐNG NHẤT: ${codeFmt}</div>
+                    <div style="font-size: 8.5pt; font-weight: bold; color: #1e3a8a; margin-top: 2pt;">(Thuế NK Ưu đãi MFN: ${mfn} | Thuế VAT: ${vat} | C/O Form E / EVFTA / ATIGA: 0%)</div>
                 </div>
 
-                <!-- Section 2 -->
-                <div style="font-size: 11pt; font-weight: bold; color: #004080; margin: 10pt 0 4pt 0; font-family: Arial, sans-serif;">2. GRI 1 - Định vị Heading 4 số &amp; Ma trận Pháp lý Chú giải Phần XV, XVI</div>
-                <div style="margin: 0 0 3pt 14pt; font-size: 9.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;"><span style="font-weight: bold; color: #111111;">· GRI 1 (Tên Nhóm 4 số &amp; Chú giải): </span>${gri1 || 'Áp dụng theo nội dung của nhóm và Chú giải Chương liên quan của Biểu thuế XNK 2026.'}</div>
-                <div style="margin: 0 0 3pt 14pt; font-size: 9.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;"><span style="font-weight: bold; color: #111111;">· Chú giải 2(a) Phần XVI: </span>Hàng hóa có chức năng độc lập (van 84.81, ổ bi 84.82, công tắc 85.36, biến đổi tĩnh 85.04, cáp điện 85.44...) trong mọi trường hợp phải phân loại vào đúng nhóm của chúng, không phân loại theo nhóm phụ tùng chung.</div>
-                <div style="margin: 0 0 3pt 14pt; font-size: 9.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;"><span style="font-weight: bold; color: #111111;">· Chú giải 2 Phần XV: </span>Bộ phận công dụng chung bằng kim loại cơ bản (bu lông ốc vít 73.18, lò xo 73.20, chi tiết gá lắp 73.26) thuộc Phần XV, không phân loại vào máy móc Phần XVI.</div>
-                <div style="margin: 0 0 3pt 14pt; font-size: 9.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;"><span style="font-weight: bold; color: #111111;">· Chú giải loại trừ 1(g) Phần XVI: </span>Chỉ loại trừ các bộ phận máy móc gia công bằng nhựa plastic sang Chương 39 (Nhóm 39.26); các bộ phận máy móc kim loại chuyên dụng áp dụng theo Chú giải 2(b) Phần XVI.</div>
-                <div style="margin: 0 0 3pt 14pt; font-size: 9.5pt; line-height: 1.35; word-break: break-word; overflow-wrap: break-word;"><span style="font-weight: bold; color: #111111;">· Quy tắc Bổ trợ (GRI 2 - 5): </span>${gri2 ? 'GRI 2: ' + gri2 + ' | ' : ''}GRI 3(a): Mô tả có tính chất cụ thể, rõ ràng nhất được ưu tiên so với mô tả khái quát. | GRI 5: Bao bì tiêu chuẩn thông thường.</div>
+                <!-- SECTION 2 -->
+                <div style="font-size: 10.5pt; font-weight: bold; color: #004080; margin: 8pt 0 4pt 0; font-family: Arial, sans-serif;">2. Phân tích phân loại theo 6 Quy tắc Tổng quát Giải thích HS (GRI)</div>
+                <div style="margin: 0 0 3pt 12pt; font-size: 9pt; line-height: 1.4; text-align: justify;"><span style="font-weight: bold; color: #0f172a;">• Quy tắc 1 (GRI 1 - Căn cứ pháp lý nội dung Nhóm &amp; Chú giải): </span>${gri1 || `Căn cứ nội dung Danh mục hàng hóa XNK Việt Nam 2026, mặt hàng thuộc Chương ${cleanCode.substring(0,2)}. Xét Nhóm ${cleanCode.substring(0,2)}.${cleanCode.substring(2,4)}: Hàng hóa đáp ứng đầy đủ câu chữ định danh và tiêu chí kỹ thuật quy định tại Nhóm.`}</div>
+                <div style="margin: 0 0 3pt 12pt; font-size: 9pt; line-height: 1.4; text-align: justify;"><span style="font-weight: bold; color: #0f172a;">• Quy tắc 2 (GRI 2 - Chưa hoàn chỉnh / Hỗn hợp): </span>${gri2 || 'Quy tắc 2(a) và 2(b) không áp dụng do hàng hóa là thiết bị hoàn chỉnh nguyên chiếc mới 100%, sẵn sàng hoạt động ngay, không phải dạng tháo rời hay hỗn hợp nhiều chất.'}</div>
+                <div style="margin: 0 0 3pt 12pt; font-size: 9pt; line-height: 1.4; text-align: justify;"><span style="font-weight: bold; color: #0f172a;">• Quy tắc 3 (GRI 3 - Hàng hóa có thể phân loại vào nhiều nhóm): </span>${gri3 || `Không áp dụng do hàng hóa đã được định danh cụ thể và phân loại dứt điểm tại Nhóm ${cleanCode.substring(0,2)}.${cleanCode.substring(2,4)} theo Quy tắc 1.`}</div>
+                <div style="margin: 0 0 3pt 12pt; font-size: 9pt; line-height: 1.4; text-align: justify;"><span style="font-weight: bold; color: #0f172a;">• Quy tắc 4 (GRI 4 - Hàng hóa giống nhất): </span>${gri4 || 'Không áp dụng do hàng hóa đã được chi tiết hóa chính xác ở cấp độ nhóm.'}</div>
+                <div style="margin: 0 0 3pt 12pt; font-size: 9pt; line-height: 1.4; text-align: justify;"><span style="font-weight: bold; color: #0f172a;">• Quy tắc 5 (GRI 5 - Bao bì &amp; Hộp đựng chuyên dụng): </span>${gri5 || 'Bao bì, hộp đựng tiêu chuẩn bảo vệ thiết bị đi kèm cùng sản phẩm từ nhà sản xuất được phân loại cùng với hàng hóa.'}</div>
+                <div style="margin: 0 0 3pt 12pt; font-size: 9pt; line-height: 1.4; text-align: justify;"><span style="font-weight: bold; color: #0f172a;">• Quy tắc 6 (GRI 6 - Phân nhóm và mã số 8 số theo Biểu thuế XNK): </span>${gri6 || `So sánh các phân nhóm ở cùng cấp độ gạch nối (- và --) và đối chiếu cấu trúc Biểu thuế XNK 2026: Phân loại trực tiếp vào mã số 8 số ${codeFmt}.`}</div>
 
-                <!-- Section 3 -->
-                <div style="font-size: 11pt; font-weight: bold; color: #004080; margin: 10pt 0 4pt 0; font-family: Arial, sans-serif;">3. Đối chiếu Tiền lệ Hải quan (TCHQ Rulings) &amp; Chú giải WCO 2022</div>
-                <div style="margin: 0 0 4pt 14pt; font-size: 9.5pt; line-height: 1.35; color: #995500; font-weight: bold;">[TIỀN LỆ PHÁN QUYẾT TỔNG CỤC HẢI QUAN (KHO RULINGS_DATA.JS)]:</div>
-                <div style="margin: 0 0 6pt 14pt; font-size: 9.5pt; line-height: 1.4; text-align: justify; color: #222222; word-break: break-word; overflow-wrap: break-word;">${rulingsA4Text}</div>
-                <div style="margin: 0 0 4pt 14pt; font-size: 9.5pt; line-height: 1.35; color: #004080; font-weight: bold;">[TRÍCH DẪN BỘ CHÚ GIẢI CHI TIẾT HS 2022 WCO (CV 1810/TCHQ-TXNK &amp; HQKV8)]:</div>
-                <div style="margin: 0 0 6pt 14pt; font-size: 9.5pt; line-height: 1.4; text-align: justify; color: #222222; word-break: break-word; overflow-wrap: break-word;">${notes || 'Đối chiếu Chú giải chi tiết HS 2022 WCO &amp; Bản Toàn tập HQKV8.'}</div>
+                <!-- SECTION 3 -->
+                <div style="font-size: 10.5pt; font-weight: bold; color: #004080; margin: 8pt 0 4pt 0; font-family: Arial, sans-serif;">3. Trích dẫn Chú giải chi tiết HS 2022 (Công văn 1810/TCHQ-TXNK &amp; HQKV8)</div>
+                <div style="margin: 0 0 4pt 12pt; font-size: 9pt; font-weight: bold; color: #003366;">Căn cứ Bộ Chú giải HS 2022 Toàn tập Hải quan (HQKV8 &amp; Công văn 1810/TCHQ-TXNK - Nhóm ${cleanCode.substring(0,2)}.${cleanCode.substring(2,4)}):</div>
+                <div style="margin: 0 0 5pt 12pt; font-size: 9pt; line-height: 1.4; text-align: justify; white-space: pre-line; color: #1e293b;">${notes || getWCOExplanatoryNoteClientSide(cleanCode.substring(0,2), cleanCode.substring(0,4))}</div>
+                <div style="margin: 0 0 3pt 12pt; font-size: 9pt; font-weight: bold; color: #995500;">[ĐỐI CHIẾU TIỀN LỆ PHÂN LOẠI HẢI QUAN VIỆT NAM (KHO RULINGS_DATA.JS)]:</div>
+                <div style="margin: 0 0 6pt 12pt; font-size: 8.5pt; line-height: 1.35; text-align: justify; color: #334155;">${rulingsA4Text}</div>
 
-                <!-- Section 4 -->
-                <div style="font-size: 11pt; font-weight: bold; color: #004080; margin: 10pt 0 4pt 0; font-family: Arial, sans-serif;">4. GRI 6 - Phân nhóm Cùng cấp Gạch nối theo Thông số Định mức &amp; Phả hệ Biểu thuế</div>
-                <div style="margin: 0 0 6pt 14pt; font-size: 9.5pt; line-height: 1.4; text-align: justify; color: #222222; word-break: break-word; overflow-wrap: break-word;">${gri6 || `Phân loại ở cấp độ phân nhóm và mã 8 số ${codeFmt} dựa trên quy tắc so sánh cùng cấp độ gạch nối và đối chiếu thông số kỹ thuật định mức.`}</div>
-
-                <!-- Section 5 -->
-                <div style="font-size: 11pt; font-weight: bold; color: #004080; margin: 10pt 0 4pt 0; font-family: Arial, sans-serif;">5. Lập luận Loại trừ Pháp lý &amp; Bảng So sánh Đánh giá các Mã HS Tiềm năng</div>
-                <div style="margin: 0 0 6pt 14pt; font-size: 9.5pt; line-height: 1.4; text-align: justify; color: #990000; word-break: break-word; overflow-wrap: break-word;">${exclusions ? '<b>LÝ DO PHÁP LÝ LOẠI TRỪ CÁC MÃ ĐỐI THỦ:</b><br>' + exclusions.replace(/\n/g, '<br>') : 'Đã kiểm tra toàn diện: Các mã hàng đối thủ không đáp ứng được bản chất công năng, cấu tạo vật liệu hoặc thông số kỹ thuật định mức như mã đề xuất.'}</div>
-                <table style="width: 100%; table-layout: fixed; border-collapse: collapse; margin: 6pt 0 10pt 0; font-size: 8.5pt;">
+                <!-- SECTION 4 -->
+                <div style="font-size: 10.5pt; font-weight: bold; color: #004080; margin: 8pt 0 4pt 0; font-family: Arial, sans-serif;">4. Bảng So sánh và Lập luận Đánh giá giữa các Mã HS Tiềm năng</div>
+                <table style="width: 100%; table-layout: fixed; border-collapse: collapse; margin: 4pt 0 6pt 0; font-size: 8.5pt;">
                     <thead>
                         <tr>
-                            <th style="background-color: #003366; color: #ffffff; font-weight: bold; font-size: 9pt; text-align: center; padding: 6pt 6pt; border: 1px solid #cbd5e1; width: 16%;">Mã HS</th>
-                            <th style="background-color: #003366; color: #ffffff; font-weight: bold; font-size: 9pt; text-align: center; padding: 6pt 6pt; border: 1px solid #cbd5e1; width: 30%;">Mô tả phân nhóm</th>
-                            <th style="background-color: #003366; color: #ffffff; font-weight: bold; font-size: 9pt; text-align: center; padding: 6pt 6pt; border: 1px solid #cbd5e1; width: 14%;">Thuế MFN | VAT</th>
-                            <th style="background-color: #003366; color: #ffffff; font-weight: bold; font-size: 9pt; text-align: center; padding: 6pt 6pt; border: 1px solid #cbd5e1; width: 40%;">Đánh giá Thực tế Khai báo Hải quan</th>
+                            <th style="background-color: #003366; color: #ffffff; font-weight: bold; font-size: 8.5pt; text-align: center; padding: 5pt 4pt; border: 1px solid #cbd5e1; width: 16%;">Mã HS</th>
+                            <th style="background-color: #003366; color: #ffffff; font-weight: bold; font-size: 8.5pt; text-align: center; padding: 5pt 4pt; border: 1px solid #cbd5e1; width: 28%;">Mô tả Biểu thuế</th>
+                            <th style="background-color: #003366; color: #ffffff; font-weight: bold; font-size: 8.5pt; text-align: center; padding: 5pt 4pt; border: 1px solid #cbd5e1; width: 14%;">Thuế MFN | VAT</th>
+                            <th style="background-color: #003366; color: #ffffff; font-weight: bold; font-size: 8.5pt; text-align: center; padding: 5pt 4pt; border: 1px solid #cbd5e1; width: 42%;">Lập luận Phân tích &amp; Đánh giá Pháp lý</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${tableCompRowsHtml}
                     </tbody>
                 </table>
+                ${exclusions ? `<div style="margin: 0 0 6pt 12pt; font-size: 8.5pt; line-height: 1.35; color: #7f1d1d; text-align: justify;"><b>Lập luận loại trừ chi tiết các mã đối thủ:</b><br>${exclusions.replace(/\n/g, '<br>')}</div>` : ''}
 
-                <!-- Section 6 -->
-                <div style="font-size: 11pt; font-weight: bold; color: #004080; margin: 10pt 0 4pt 0; font-family: Arial, sans-serif;">6. Bảng Thuế suất Chi tiết của Mã HS ${codeFmt}</div>
-                <table style="width: 100%; table-layout: fixed; border-collapse: collapse; margin: 6pt 0 10pt 0; font-size: 8.5pt;">
+                <!-- SECTION 5 -->
+                <div style="font-size: 10.5pt; font-weight: bold; color: #004080; margin: 8pt 0 4pt 0; font-family: Arial, sans-serif;">5. Biểu Thuế Xuất Nhập Khẩu và Mức Thuế Suất Áp Dụng</div>
+                <table style="width: 100%; table-layout: fixed; border-collapse: collapse; margin: 4pt 0 6pt 0; font-size: 8.5pt;">
                     <thead>
                         <tr>
-                            <th style="background-color: #003366; color: #ffffff; font-weight: bold; font-size: 9pt; text-align: center; padding: 6pt 6pt; border: 1px solid #cbd5e1; width: 42%;">Loại Thuế / Biểu thuế FTA</th>
-                            <th style="background-color: #003366; color: #ffffff; font-weight: bold; font-size: 9pt; text-align: center; padding: 6pt 6pt; border: 1px solid #cbd5e1; width: 16%;">Thuế suất</th>
-                            <th style="background-color: #003366; color: #ffffff; font-weight: bold; font-size: 9pt; text-align: center; padding: 6pt 6pt; border: 1px solid #cbd5e1; width: 42%;">Căn cứ Pháp lý / Nghị định</th>
+                            <th style="background-color: #003366; color: #ffffff; font-weight: bold; font-size: 8.5pt; text-align: center; padding: 5pt 4pt; border: 1px solid #cbd5e1; width: 42%;">Loại thuế / Hiệp định FTA</th>
+                            <th style="background-color: #003366; color: #ffffff; font-weight: bold; font-size: 8.5pt; text-align: center; padding: 5pt 4pt; border: 1px solid #cbd5e1; width: 16%;">Mức thuế</th>
+                            <th style="background-color: #003366; color: #ffffff; font-weight: bold; font-size: 8.5pt; text-align: center; padding: 5pt 4pt; border: 1px solid #cbd5e1; width: 42%;">Căn cứ Pháp lý &amp; Văn bản áp dụng</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -6502,23 +6604,29 @@ Trường hợp đủ thông tin:
                     </tbody>
                 </table>
 
-                <!-- Section 7 -->
-                <div style="font-size: 11pt; font-weight: bold; color: #004080; margin: 10pt 0 4pt 0; font-family: Arial, sans-serif;">7. Kết luận &amp; Khuyến nghị Thủ tục Hải quan</div>
-                <div style="margin: 0 0 6pt 14pt; font-size: 9.5pt; line-height: 1.45; text-align: justify; color: #222222; word-break: break-word; overflow-wrap: break-word;">
-                    <span style="font-weight: bold; color: #003366;">KẾT LUẬN &amp; KIẾN NGHỊ: </span>${conclText}
+                <!-- SECTION 6 -->
+                <div style="font-size: 10.5pt; font-weight: bold; color: #004080; margin: 8pt 0 4pt 0; font-family: Arial, sans-serif;">6. Kết luận &amp; Khuyến nghị Khai báo Hải quan</div>
+                <div style="margin: 0 0 4pt 12pt; font-size: 9pt; line-height: 1.45; text-align: justify;">
+                    <div style="font-weight: bold; color: #003366; margin-bottom: 2pt;">KẾT LUẬN &amp; TÊN HÀNG KHAI BÁO CHUẨN HÓA:</div>
+                    <div>• <span style="font-weight: bold;">Tên khai báo hải quan khuyến nghị: </span>“${declName}”</div>
+                    <div>• <span style="font-weight: bold;">Mã số HS đề xuất: </span><span style="font-weight: bold; color: #b91c1c;">${codeFmt}</span></div>
+                </div>
+                <div style="margin: 4pt 0 4pt 12pt; font-size: 8.5pt; line-height: 1.4; text-align: justify; color: #1e293b;">
+                    <span style="font-weight: bold; color: #0f766e;">Lưu ý chính sách chuyên ngành &amp; Thủ tục thông quan: </span>
+                    ${specializedPolicyText}
+                </div>
+                <div style="margin: 4pt 0 6pt 12pt; font-size: 8.5pt; line-height: 1.4; text-align: justify; color: #1e293b;">
+                    <span style="font-weight: bold; color: #1e3a8a;">Khuyến nghị dành cho Doanh nghiệp: </span>
+                    ${recommendations || 'Doanh nghiệp chuẩn bị đầy đủ hồ sơ kỹ thuật, datasheet và C/O ưu đãi để được áp dụng thuế suất ưu đãi đặc biệt 0%.'}
                 </div>
 
                 <!-- Internal Use & Legal Disclaimer Box -->
-                <div style="margin-top: 10pt; padding: 8pt 10pt; border-radius: 6pt; background-color: #f8fafc; border: 1px solid #cbd5e1; font-size: 8.5pt; color: #475569; line-height: 1.4;">
-                    <div style="font-weight: bold; color: #b45309; margin-bottom: 3pt; text-transform: uppercase; font-size: 8.5pt;">
+                <div style="margin-top: 8pt; padding: 6pt 8pt; border-radius: 4pt; background-color: #f8fafc; border: 1px solid #cbd5e1; font-size: 8pt; color: #475569; line-height: 1.35;">
+                    <div style="font-weight: bold; color: #b45309; margin-bottom: 2pt; text-transform: uppercase;">
                         &#128737; Lưu ý Pháp lý &amp; Quy định Lưu hành Nội bộ:
                     </div>
-                    <div style="margin-bottom: 2pt;">
-                        <strong>&bull; Phạm vi sử dụng:</strong> Báo cáo này và toàn bộ tài liệu đính kèm được bảo mật và chỉ lưu hành phục vụ công tác nghiệp vụ nội bộ công ty.
-                    </div>
-                    <div>
-                        <strong>&bull; Giá trị tham khảo:</strong> Mã số HS, thuế suất và lập luận pháp lý được đề xuất chỉ mang tính chất tham khảo chuyên môn hỗ trợ ra quyết định. Kết quả phân loại chính thức cuối cùng căn cứ theo thực tế hàng hóa thông quan và phán quyết của Cơ quan Hải quan có thẩm quyền.
-                    </div>
+                    <div><strong>&bull; Phạm vi sử dụng:</strong> Báo cáo này và toàn bộ tài liệu đính kèm được bảo mật và chỉ lưu hành phục vụ công tác nghiệp vụ nội bộ công ty.</div>
+                    <div><strong>&bull; Giá trị tham khảo:</strong> Mã số HS, thuế suất và lập luận pháp lý được đề xuất mang tính chất tham khảo chuyên môn hỗ trợ ra quyết định. Kết quả phân loại chính thức cuối cùng căn cứ theo thực tế hàng hóa thông quan và phán quyết của Cơ quan Hải quan có thẩm quyền.</div>
                 </div>
             </div>`;
         }
@@ -7191,6 +7299,7 @@ Trường hợp đủ thông tin:
                     gri6: res.gri6,
                     explanatory_notes: res.explanatory_notes,
                     exclusions: res.exclusions,
+                    specialized_policy: res.specialized_policy || '',
                     recommendations: res.recommendations || 'Doanh nghiệp chuẩn bị đầy đủ hồ sơ kỹ thuật, datasheet và C/O ưu đãi để được áp dụng thuế suất ưu đãi đặc biệt 0%.',
                     image_b64: rawInput.image_b64,
                     candidates: res.candidates,
@@ -7512,6 +7621,17 @@ Trường hợp đủ thông tin:
                             Mặt hàng <strong class="text-slate-900 dark:text-white">'${rawInput.name}'</strong> được phân loại chính xác vào mã HS <strong class="text-sky-700 dark:text-amber-300 font-mono">${codeFmt}</strong> (${declName}). 
                             Mức thuế MFN: <strong class="text-slate-900 dark:text-white">${mfn}</strong>, VAT: <strong class="text-sky-700 dark:text-sky-300">${vat}</strong>. 
                             ${res.recommendations || 'Doanh nghiệp chuẩn bị đầy đủ hồ sơ kỹ thuật, datasheet và C/O ưu đãi để được áp dụng thuế suất ưu đãi đặc biệt 0%.'}
+                        </p>
+                    </div>
+
+                    <!-- Chính sách quản lý chuyên ngành & Kiểm tra chất lượng -->
+                    <div class="p-4 rounded-2xl bg-teal-50/70 dark:bg-teal-950/30 border border-teal-200 dark:border-teal-500/30 text-xs text-slate-800 dark:text-slate-200 space-y-1.5 shadow-sm">
+                        <span class="font-bold text-teal-700 dark:text-teal-400 flex items-center gap-2 text-xs uppercase tracking-wider">
+                            <i class="fa-solid fa-clipboard-check"></i>
+                            Chính Sách Quản Lý Chuyên Ngành &amp; Thủ Tục Thông Quan:
+                        </span>
+                        <p class="leading-relaxed text-slate-700 dark:text-slate-300">
+                            ${res.specialized_policy || (cleanCode.startsWith('9026') ? 'Theo Thông tư 23/2013/TT-BKHCN và Thông tư 07/2019/TT-BKHCN của Bộ Khoa học và Công nghệ quy định về Danh mục phương tiện đo nhóm 2: Thiết bị đo tốc độ gió công nghiệp/kỹ thuật chuyên dụng dùng nội bộ trong nhà xưởng (đo quạt máy sấy keo, bảo dưỡng hệ thống điều hòa HVAC) không thuộc danh mục phương tiện đo bắt buộc phải phê duyệt mẫu và kiểm định chất lượng trước khi thông quan (chỉ áp dụng đối với phương tiện đo tốc độ phương tiện giao thông 9031.80 hoặc thiết bị khí tượng thủy văn phục vụ dự báo quốc gia). Doanh nghiệp nhập khẩu bình thường với mức thuế suất NK ưu đãi MFN là 0% và thuế VAT 8%.' : 'Mặt hàng không thuộc Danh mục hàng hóa cấm xuất khẩu, cấm nhập khẩu hoặc tạm ngừng xuất nhập khẩu theo Nghị định 69/2018/NĐ-CP. Doanh nghiệp thực hiện thủ tục thông quan thông thường theo quy định của Luật Hải quan.')}
                         </p>
                     </div>
 
