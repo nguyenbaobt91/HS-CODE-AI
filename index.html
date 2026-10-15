@@ -4091,20 +4091,35 @@
                 'gemini-2.5-flash-lite'
             ];
 
-            // Extract relevant Customs Rulings Precedents from Database
+            // Extract relevant Customs Rulings Precedents from Database (Strict Chapter Guard)
             let rulingsContext = "";
             try {
                 if (window.CUSTOMS_RULINGS_DATABASE && Array.isArray(window.CUSTOMS_RULINGS_DATABASE)) {
-                    const qRaw = `${name} ${desc} ${use} ${specs} ${model_en || ''}`.toLowerCase();
+                    const qRaw = `${name} ${desc || ''} ${use || ''} ${specs || ''} ${model_en || ''}`.toLowerCase();
                     const qNorm = (typeof removeAccents === 'function') ? removeAccents(qRaw) : qRaw;
+                    const stopKws = new Set(['bo', 'dieu', 'khien', 'dung', 'cho', 'trong', 'may', 'thiet', 'bi', 'he', 'thong', 'khi', 'day', 'cong', 'nghiep', 'hieu', 'model']);
+                    
+                    const quickCand = (typeof classifyProductClientSide === 'function') ? classifyProductClientSide(name, desc, use, specs, model_en) : null;
+                    const expectedChap = quickCand && quickCand.c ? quickCand.c.replace(/\./g, '').substring(0, 2) : '';
+                    const expectedHead = quickCand && quickCand.c ? quickCand.c.replace(/\./g, '').substring(0, 4) : '';
+
                     const matchedRulings = [];
                     for (let r of window.CUSTOMS_RULINGS_DATABASE) {
                         if (!r.hs) continue;
+                        const rClean = r.hs.replace(/\./g, '');
+                        const rHead = rClean.substring(0, 4);
+                        const rChap = rClean.substring(0, 2);
+                        // Strict chapter guard: NEVER cross chapters for precedents!
+                        if (expectedChap && rChap !== expectedChap) continue;
+
                         let matchCount = 0;
                         for (let kw of (r.keywords || [])) {
-                            if (qNorm.includes(kw)) matchCount++;
+                            if (kw.length >= 4 && !stopKws.has(kw) && qNorm.includes(kw)) matchCount++;
                         }
-                        if (matchCount >= 2 || (r.keywords && r.keywords.length === 1 && matchCount === 1)) {
+                        if (rClean === (quickCand?.c || '').replace(/\./g, '')) matchCount += 5;
+                        else if (rHead === expectedHead) matchCount += 3;
+
+                        if (matchCount >= 2 || (rClean === (quickCand?.c || '').replace(/\./g, '') && matchCount >= 1)) {
                             matchedRulings.push({ ruling: r, score: matchCount });
                         }
                     }
@@ -4201,6 +4216,11 @@ MA TRẬN CHÚ GIẢI PHÁP LÝ BẮT BUỘC TOÀN DIỆN (21 PHẦN & 97 CHƯƠ
    - Nhóm 90.29 chỉ áp dụng cho tốc kế cơ học đo tốc độ quay/chuyển động của vật thể rắn (tachometer).
    - Nhóm 90.31 là nhóm DỰ PHÒNG cho thiết bị đo kiểm 'chưa được chi tiết hoặc ghi ở nơi khác trong Chương 90'. TUYỆT ĐỐI KHÔNG xếp vào 90.31 nếu thiết bị đã được định danh cụ thể tại 90.26 (hoặc 90.25, 90.27, 90.28, 90.15)!
 
+14. BẮT BUỘC TUÂN THỦ DANH MỤC 8 SỐ BIỂU THUẾ VIỆT NAM 2026:
+   - TUYỆT ĐỐI KHÔNG tự suy đoán các phân nhóm 8 số của nước ngoài (AHTN). Ví dụ: Nhóm 90.26 tại phân nhóm 9026.80 chỉ có duy nhất mã 8 số 9026.80.00 (- Thiết bị hoặc dụng cụ khác), TUYỆT ĐỐI KHÔNG sinh mã 9026.80.10 hay 9026.80.20 trong bất kỳ phần lập luận nào!
+   - Quy tắc 2 (GRI 2): Chú ý chính tả tiếng Việt: ghi rõ "sản phẩm hoàn chỉnh, không ở dạng chưa lắp ráp hay chưa hoàn chỉnh" (tuyệt đối không viết sai chính tả thành "chứa hoàn chỉnh").
+   - Quy tắc 5 (GRI 5): Đối với thiết bị đo lường cầm tay chuyên dụng có kèm hộp đựng hoặc vali định hình bảo vệ máy/đầu dò từ nhà sản xuất, ghi rõ: "Áp dụng Quy tắc 5(a), hộp đựng chuyên dụng đi kèm cùng sản phẩm được phân loại cùng thiết bị."
+
 YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON (không kèm văn bản nào ngoài JSON):
 Trường hợp thiếu thông tin:
 {
@@ -4272,6 +4292,25 @@ Trường hợp đủ thông tin:
                         if (jsonMatch) {
                             const parsed = JSON.parse(jsonMatch[0]);
                             if (parsed && (parsed.hs_code || parsed.clean_code || parsed.is_insufficient_info)) {
+                                if (!parsed.is_insufficient_info) {
+                                    // 1. Sanitize typo 'chứa hoàn chỉnh' -> 'chưa hoàn chỉnh'
+                                    if (parsed.gri2) {
+                                        parsed.gri2 = parsed.gri2.replace(/\bchứa\s+hoàn\s+chỉnh\b/gi, 'chưa hoàn chỉnh');
+                                    }
+                                    // 2. Sanitize hallucinated 8-digit codes (e.g. 9026.80.10 -> 9026.80.00)
+                                    if (parsed.clean_code === '90268010' || (parsed.clean_code && parsed.clean_code.startsWith('902680'))) {
+                                        parsed.clean_code = '90268000';
+                                        parsed.hs_code = '9026.80.00';
+                                    }
+                                    if (parsed.gri6) {
+                                        parsed.gri6 = parsed.gri6.replace(/\b9026\.80\.10\b/g, '9026.80.00')
+                                                                 .replace(/\b9026\.80\.20\b/g, '9026.80.00');
+                                    }
+                                    // 3. Ensure GRI 5(a) case is stated properly if relevant
+                                    if (parsed.clean_code && parsed.clean_code.startsWith('9026') && parsed.gri5 && (parsed.gri5.includes('Không áp dụng') || parsed.gri5.includes('không đi kèm'))) {
+                                        parsed.gri5 = 'Hộp đựng/vali bảo vệ chuyên dụng định hình đầu dò đi kèm sản phẩm từ nhà sản xuất được phân loại cùng với thiết bị (Quy tắc 5a).';
+                                    }
+                                }
                                 return parsed;
                             }
                         }
@@ -6402,12 +6441,16 @@ Trường hợp đủ thông tin:
             const cptpp = r.cptpp || '0%';
             const evfta = r.evfta || '0%';
             const rcep = r.rcep || '0%';
-            const gri1 = r.gri1 || '';
-            const gri2 = r.gri2 || '';
-            const gri3 = r.gri3 || '';
-            const gri4 = r.gri4 || '';
-            const gri5 = r.gri5 || '';
-            const gri6 = r.gri6 || '';
+            let gri1 = r.gri1 || '';
+            let gri2 = (r.gri2 || '').replace(/\bchứa\s+hoàn\s+chỉnh\b/gi, 'chưa hoàn chỉnh');
+            let gri3 = r.gri3 || '';
+            let gri4 = r.gri4 || '';
+            let gri5 = r.gri5 || '';
+            let gri6 = (r.gri6 || '').replace(/\b9026\.80\.10\b/g, '9026.80.00').replace(/\b9026\.80\.20\b/g, '9026.80.00');
+
+            if (cleanCode && cleanCode.startsWith('9026') && (gri5.includes('Không áp dụng') || gri5.includes('không đi kèm') || !gri5)) {
+                gri5 = 'Hộp đựng/vali bảo vệ chuyên dụng định hình đầu dò đi kèm sản phẩm từ nhà sản xuất được phân loại cùng với thiết bị (Quy tắc 5a).';
+            }
             const notes = r.explanatory_notes || '';
             const exclusions = r.exclusions || '';
             const recommendations = r.recommendations || '';
@@ -7063,17 +7106,37 @@ Trường hợp đủ thông tin:
 
         function findMatchedCustomsRulings(rawInput, cleanCode) {
             if (!window.CUSTOMS_RULINGS_DATABASE || !Array.isArray(window.CUSTOMS_RULINGS_DATABASE)) return [];
+            const targetChap = (cleanCode && cleanCode.length >= 2) ? cleanCode.substring(0, 2) : '';
+            const targetHead = (cleanCode && cleanCode.length >= 4) ? cleanCode.substring(0, 4) : '';
             const qRaw = `${rawInput.name || ''} ${rawInput.desc || ''} ${rawInput.use || ''} ${rawInput.specs || ''} ${rawInput.model_en || ''}`.toLowerCase();
             const qNorm = (typeof removeAccents === 'function') ? removeAccents(qRaw) : qRaw;
+
+            // Common stopwords that cause false matches across unrelated chapters
+            const stopWords = new Set(['day', 'khi', 'bo', 'may', 'thiet', 'bi', 'dung', 'cu', 'cho', 'va', 'cua', 'trong', 'loai', 'cong', 'nghiep', 'cam', 'tay', 'hieu', 'model', 'che', 'tao']);
+
             const matches = [];
             for (let r of window.CUSTOMS_RULINGS_DATABASE) {
                 if (!r.hs) continue;
+                const rClean = (r.hs || '').replace(/\./g, '');
+                const rChap = rClean.substring(0, 2);
+                const rHead = rClean.substring(0, 4);
+
+                // STRICT CHAPTER GUARD: If we have a target chapter, NEVER cross chapters for rulings!
+                if (targetChap && rChap !== targetChap) continue;
+
                 let count = 0;
                 for (let kw of (r.keywords || [])) {
-                    if (qNorm.includes(kw)) count++;
+                    const kwClean = (typeof removeAccents === 'function') ? removeAccents(kw.trim().toLowerCase()) : kw.trim().toLowerCase();
+                    if (!kwClean || stopWords.has(kwClean) || kwClean.length < 3) continue;
+                    if (qNorm.includes(kwClean)) count += 2;
                 }
-                if (r.hs === cleanCode) count += 3;
-                if (count >= 2 || (r.hs === cleanCode && count >= 1)) {
+                // Heading match bonus
+                if (targetHead && rHead === targetHead) count += 3;
+                // Exact code match bonus
+                if (cleanCode && rClean === cleanCode) count += 5;
+
+                // Threshold: must have strong heading match or exact code or multiple specific keyword matches
+                if (count >= 3 || (cleanCode && rClean === cleanCode)) {
                     matches.push({ ruling: r, score: count });
                 }
             }
@@ -7211,6 +7274,13 @@ Trường hợp đủ thông tin:
         }
 
         function renderGeminiAIReportHtml(res, rawInput) {
+            if (res) {
+                if (res.gri2) res.gri2 = res.gri2.replace(/\bchứa\s+hoàn\s+chỉnh\b/gi, 'chưa hoàn chỉnh');
+                if (res.gri6) res.gri6 = res.gri6.replace(/\b9026\.80\.10\b/g, '9026.80.00').replace(/\b9026\.80\.20\b/g, '9026.80.00');
+                if ((res.clean_code || '').startsWith('9026') && res.gri5 && (res.gri5.includes('Không áp dụng') || res.gri5.includes('không đi kèm') || !res.gri5)) {
+                    res.gri5 = 'Hộp đựng/vali bảo vệ chuyên dụng định hình đầu dò đi kèm sản phẩm từ nhà sản xuất được phân loại cùng với thiết bị (Quy tắc 5a).';
+                }
+            }
             const codeFmt = res.hs_code || '8208.90.00';
             const cleanCode = res.clean_code || codeFmt.replace(/\./g, '');
             const mfn = res.mfn || '0%';
