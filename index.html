@@ -320,8 +320,8 @@
                     </div>
 
                     <!-- FORM TAB 1: General Product Information (Tối ưu 3 Tiêu chí Siêu Tinh gọn) -->
-                    <div id="form-tab-info" class="space-y-4">
-                        <div class="space-y-1.5">
+                    <div id="form-tab-info" class="space-y-3">
+                        <div class="space-y-1">
                             <div class="flex items-center justify-between">
                                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                                     <span class="w-5 h-5 rounded-md bg-sky-100 text-sky-700 dark:bg-sky-900/60 dark:text-sky-300 font-extrabold flex items-center justify-center text-[10px]">Ô 1</span>
@@ -330,13 +330,13 @@
                                 <span class="text-[11px] text-sky-600 dark:text-sky-400 font-semibold hidden sm:inline">[Tên danh từ vật phẩm] + [Chất liệu cấu tạo] (Không đưa tên máy chủ vào đây)</span>
                             </div>
                             <input type="text" id="auto-name" oninput="updateSmartClarificationHints(); updateWCOComplianceMeter();" placeholder="Ví dụ: Bu lông lục giác bằng thép, hoặc Ống mềm dẫn dầu bằng cao su, Van một chiều bằng đồng thau, Công tắc điện xoay chiều..." 
-                                   class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm transition-all shadow-inner">
+                                   class="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 text-base transition-all shadow-inner">
                             <!-- Dynamic Category Clarification Hints -->
-                            <div id="smart-clarification-container" class="hidden mt-2 p-3.5 rounded-2xl bg-sky-50 dark:bg-slate-950 border border-sky-200 dark:border-sky-500/40 space-y-2.5 transition-all shadow-md"></div>
+                            <div id="smart-clarification-container" class="hidden mt-2 p-3 rounded-2xl bg-sky-50 dark:bg-slate-950 border border-sky-200 dark:border-sky-500/40 space-y-2 transition-all shadow-md"></div>
                         </div>
 
                         <!-- 2. Cấu tạo, Quy cách & Thông số kỹ thuật cốt tử (GRI 6) -->
-                        <div class="space-y-1.5">
+                        <div class="space-y-1">
                             <div class="flex items-center justify-between">
                                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                                     <span class="w-5 h-5 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 font-extrabold flex items-center justify-center text-[10px]">Ô 2</span>
@@ -344,12 +344,12 @@
                                 </label>
                                 <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold hidden sm:inline">Kích thước & tiêu chí định thuế (M12, phi mm, DN, Vôn, Ampe, Watt, có/chưa đầu nối...)</span>
                             </div>
-                            <textarea id="auto-desc" rows="3" oninput="updateSmartClarificationHints(); updateWCOComplianceMeter()" placeholder="Ví dụ: Đường kính ren M12, chiều dài 50mm, bước ren 1.75mm; hoặc: Thân thép chịu lực, dài 300mm, có rãnh lăn ổ bi; Điện áp 220V, dòng tải 10A..." 
-                                      class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm transition-all shadow-inner"></textarea>
+                            <textarea id="auto-desc" rows="2" oninput="updateSmartClarificationHints(); updateWCOComplianceMeter()" placeholder="Ví dụ: Đường kính ren M12, chiều dài 50mm, bước ren 1.75mm; hoặc: Thân thép chịu lực, dài 300mm, có rãnh lăn ổ bi; Điện áp 220V, dòng tải 10A..." 
+                                      class="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 text-base transition-all shadow-inner"></textarea>
                         </div>
 
                         <!-- 3. Công năng & Thiết bị máy móc liên quan -->
-                        <div class="space-y-1.5">
+                        <div class="space-y-1">
                             <div class="flex items-center justify-between">
                                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                                     <span class="w-5 h-5 rounded-md bg-purple-100 text-purple-700 dark:bg-purple-900/60 dark:text-purple-300 font-extrabold flex items-center justify-center text-[10px]">Ô 3</span>
@@ -358,7 +358,7 @@
                                 <span class="text-[11px] text-purple-600 dark:text-purple-400 font-semibold hidden sm:inline">[Dùng để làm gì - hành động công năng] + cho [Máy móc / Dây chuyền nào]</span>
                             </div>
                             <textarea id="auto-use" rows="2" oninput="updateSmartClarificationHints(); updateWCOComplianceMeter()" placeholder="Ví dụ: Dùng để liên kết các kết cấu cơ khí chịu lực trong máy ép nhựa (hoặc: Dẫn hướng tịnh tiến cho cụm đầu cắt máy dập kim loại)..." 
-                                      class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm transition-all shadow-inner"></textarea>
+                                      class="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 text-base transition-all shadow-inner"></textarea>
                         </div>
 
                         <!-- Hidden fields to ensure 100% backward compatibility -->
