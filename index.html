@@ -222,129 +222,105 @@
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         <!-- TAB: AI Propose Form (Skill /hs_code_automation workflow) -->
-        <div id="tab-propose" class="space-y-6">
-            <!-- Executive Hero Banner (Compact & High Impact) -->
-            <div class="relative overflow-hidden rounded-2xl p-5 bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-700 text-white shadow-lg shadow-blue-500/10">
+        <div id="tab-propose" class="space-y-4">
+            <!-- Executive Slim Hero Banner (Compact & High Impact) -->
+            <div class="relative overflow-hidden rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-700 text-white shadow-md shadow-blue-500/10">
                 <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3">
-                    <div class="space-y-1 max-w-3xl">
-                        <div class="inline-flex items-center space-x-2 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-white/15 border border-white/25 text-white backdrop-blur-md">
+                <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="w-9 h-9 rounded-xl bg-white/20 text-white flex items-center justify-center font-bold text-base backdrop-blur-sm shrink-0 shadow-sm">
                             <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
-                            <span>Quy Trình Chuẩn SOP Phân Loại Hải Quan &amp; Thông Tư 31/2022/TT-BTC</span>
+                        </span>
+                        <div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <h1 class="text-base sm:text-lg font-black tracking-tight leading-snug">
+                                    Đề Xuất Mã HS Code &amp; Lập Luận Chuyên Sâu Tự Động
+                                </h1>
+                                <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/15 border border-white/20 text-white">
+                                    SOP 6 Quy Tắc GRI
+                                </span>
+                            </div>
+                            <p class="text-sky-100 text-xs mt-0.5 line-clamp-1">
+                                Tự động đối chiếu 6 Quy tắc GRI, tra cứu 1.269 Chú giải WCO 2022 và kết xuất báo cáo pháp lý chuẩn xác.
+                            </p>
                         </div>
-                        <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white">
-                            Đề Xuất Mã HS Code &amp; Lập Luận Chuyên Sâu Tự Động
-                        </h1>
-                        <p class="text-sky-100 text-xs sm:text-sm leading-relaxed">
-                            Nhập 3 tiêu chí kỹ thuật cốt lõi hoặc nạp file Word mẫu. Hệ thống AI tự động đối chiếu 6 Quy tắc GRI, tra cứu 1.269 Chú giải WCO 2022 và kết xuất báo cáo pháp lý chuẩn xác.
-                        </p>
                     </div>
 
-                    <!-- Quick Action: Upload Word Button -->
-                    <div class="flex items-center gap-2 self-start md:self-auto shrink-0">
+                    <!-- Actions: Upload Word & Reset on Banner -->
+                    <div class="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+                        <input type="file" id="docx-file-input" accept=".docx" class="hidden" onchange="uploadAndParseDocx(event)">
+                        
+                        <!-- Badge when file is loaded -->
+                        <div id="selected-doc-badge" class="hidden items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-500/30 text-white border border-emerald-300/50 text-xs font-bold backdrop-blur-md">
+                            <i class="fa-solid fa-check-circle text-emerald-300"></i>
+                            <span id="selected-doc-name" class="truncate max-w-[130px]">File.docx</span>
+                        </div>
+
                         <button type="button" onclick="document.getElementById('docx-file-input').click()" 
-                                class="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white font-bold text-xs flex items-center gap-2 transition-all cursor-pointer backdrop-blur-md shadow-sm transform hover:-translate-y-0.5">
+                                class="px-3.5 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer backdrop-blur-md shadow-sm">
                             <i class="fa-solid fa-file-word text-amber-300 text-sm"></i>
                             <span>Nạp File Word (.docx)</span>
+                        </button>
+
+                        <button type="button" onclick="clearAllInputCriteria()" 
+                                class="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-300/40 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-md" 
+                                title="Xóa toàn bộ nội dung đã nhập để nhập lại mặt hàng mới">
+                            <i class="fa-solid fa-rotate-left"></i>
+                            <span class="hidden sm:inline">Nhập Mới</span>
                         </button>
                     </div>
                 </div>
             </div>
 
             <!-- Standalone Executive Workspace Card -->
-            <div class="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-7 border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none space-y-5">
-                <!-- Compact Word Upload Strip -->
-                <div class="p-3 sm:p-3.5 rounded-xl bg-sky-50/70 dark:bg-slate-800/60 border border-dashed border-sky-300 dark:border-sky-600 hover:border-sky-500 flex flex-col sm:flex-row items-center justify-between gap-3 cursor-pointer transition-all hover:bg-sky-50" onclick="document.getElementById('docx-file-input').click()">
-                    <input type="file" id="docx-file-input" accept=".docx" class="hidden" onchange="uploadAndParseDocx(event)">
-                    <div class="flex items-center gap-3 w-full sm:w-auto">
-                        <div class="w-9 h-9 rounded-lg bg-sky-500/15 text-sky-600 dark:text-sky-400 flex items-center justify-center text-lg shrink-0">
-                            <i class="fa-solid fa-file-word"></i>
-                        </div>
-                        <div class="text-left">
-                            <span class="text-xs sm:text-sm font-bold text-sky-900 dark:text-sky-200">Kéo thả file Word mẫu (<code class="px-1 py-0.2 rounded bg-sky-100 dark:bg-slate-700 text-sky-700 dark:text-sky-300 font-mono text-[11px]">HS CODE.docx</code>) vào đây hoặc bấm để chọn</span>
-                            <p class="text-[11px] text-slate-500 dark:text-slate-400">Tự động đọc &amp; trích xuất: Tên hàng, Cấu tạo, Kích thước, Công năng</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2 self-end sm:self-auto shrink-0">
-                        <div id="selected-doc-badge" class="hidden items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/30 text-xs font-bold">
-                            <i class="fa-solid fa-check-circle"></i>
-                            <span id="selected-doc-name">File.docx</span>
-                        </div>
-                        <span class="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shadow-sm transition-all">Chọn File</span>
-                    </div>
-                </div>
-
-                <!-- 3-Tab Form Container -->
+            <div class="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none space-y-4">
+                
+                <!-- 3-Tab Form Container with Inline WCO Compliance Meter -->
                 <div class="space-y-4">
-                    <!-- Tab Navigation Header: Sleek Segmented Control -->
-                    <div class="flex flex-wrap items-center justify-between border-b border-slate-200 dark:border-slate-800 gap-2 pb-2">
+                    <!-- Tab Navigation Header & Slim WCO Meter in ONE Single Row -->
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
+                        <!-- Left: Form Tabs -->
                         <div class="flex items-center bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
-                            <button type="button" onclick="switchFormTab('info')" id="form-tab-btn-info" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-sm">
+                            <button type="button" onclick="switchFormTab('info')" id="form-tab-btn-info" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center space-x-1.5 bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 shadow-sm">
                                 <i class="fa-solid fa-list-check"></i>
                                 <span>1. Thông Tin Mô Tả Chung</span>
                             </button>
-                            <button type="button" onclick="switchFormTab('image')" id="form-tab-btn-image" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center space-x-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                            <button type="button" onclick="switchFormTab('image')" id="form-tab-btn-image" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center space-x-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
                                 <i class="fa-solid fa-image"></i>
                                 <span>2. Hình Ảnh Đính Kèm</span>
                                 <span id="badge-img-count" class="hidden px-1.5 py-0.2 rounded-full text-[10px] bg-purple-600 text-white font-extrabold">1</span>
                             </button>
-                            <button type="button" onclick="switchFormTab('doc')" id="form-tab-btn-doc" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center space-x-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                            <button type="button" onclick="switchFormTab('doc')" id="form-tab-btn-doc" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center space-x-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
                                 <i class="fa-solid fa-file-pdf"></i>
                                 <span>3. Tài Liệu Kỹ Thuật</span>
                                 <span id="badge-doc-count" class="hidden px-1.5 py-0.2 rounded-full text-[10px] bg-indigo-600 text-white font-extrabold">1</span>
                             </button>
                         </div>
-                        <button type="button" onclick="clearAllInputCriteria()" class="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm" title="Xóa toàn bộ nội dung đã nhập để nhập lại mặt hàng mới">
-                            <i class="fa-solid fa-rotate-left text-rose-500"></i>
-                            <span>Xóa Toàn Bộ (Nhập Mới)</span>
-                        </button>
+
+                        <!-- Right: Slim WCO 2022 Compliance Meter (Inline Row) -->
+                        <div id="wco-compliance-box" class="flex flex-wrap items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/70 text-xs">
+                            <span class="text-slate-600 dark:text-slate-300 font-bold text-[11px] flex items-center gap-1.5">
+                                <i class="fa-solid fa-scale-balanced text-sky-500"></i>
+                                <span>Tiêu chí WCO:</span>
+                            </span>
+                            <div class="w-24 sm:w-28 bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden flex">
+                                <div id="wco-compliance-bar" class="h-full bg-gradient-to-r from-amber-500 via-sky-500 to-emerald-500 rounded-full transition-all duration-500" style="width: 5%;"></div>
+                            </div>
+                            <span id="wco-compliance-badge" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                                <i class="fa-solid fa-clock text-amber-500"></i>
+                                <span id="wco-compliance-percent">0%</span>
+                            </span>
+                            
+                            <!-- Hidden elements for JS compatibility -->
+                            <p id="wco-compliance-subtext" class="hidden"></p>
+                            <div id="pill-crit-1" class="hidden"><i id="icon-crit-1"></i></div>
+                            <div id="pill-crit-2" class="hidden"><i id="icon-crit-2"></i></div>
+                            <div id="pill-crit-3" class="hidden"><i id="icon-crit-3"></i></div>
+                        </div>
                     </div>
 
                     <!-- FORM TAB 1: General Product Information (Tối ưu 3 Tiêu chí Siêu Tinh gọn) -->
                     <div id="form-tab-info" class="space-y-4">
-                        <!-- WCO 2022 Statutory Compliance Meter -->
-                        <div id="wco-compliance-box" class="p-3.5 rounded-2xl bg-gradient-to-r from-slate-50 via-sky-50/50 to-indigo-50/40 dark:from-slate-900/90 dark:via-slate-900/70 dark:to-slate-950 border border-slate-200 dark:border-slate-800 transition-all shadow-sm">
-                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
-                                <div class="flex items-center space-x-2">
-                                    <span class="w-7 h-7 rounded-lg bg-sky-600 text-white flex items-center justify-center text-xs shadow-sm">
-                                        <i class="fa-solid fa-scale-balanced"></i>
-                                    </span>
-                                    <div>
-                                        <span class="text-xs font-black text-slate-800 dark:text-slate-100 uppercase tracking-wide">
-                                            Độ Hoàn Thiện Tiêu Chí Pháp Lý (Chú Giải WCO 2022)
-                                        </span>
-                                        <p class="text-[11px] text-slate-500 dark:text-slate-400" id="wco-compliance-subtext">Cung cấp đủ 3 trụ cột thông tin để AI khóa chính xác mã 8 số và áp dụng các Chú giải loại trừ.</p>
-                                    </div>
-                                </div>
-                                <span id="wco-compliance-badge" class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700 self-start sm:self-auto flex items-center gap-1.5">
-                                    <i class="fa-solid fa-clock text-amber-500"></i>
-                                    <span id="wco-compliance-percent">0%</span>
-                                </span>
-                            </div>
-                            
-                            <!-- Progress Bar -->
-                            <div class="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden flex">
-                                <div id="wco-compliance-bar" class="h-full bg-gradient-to-r from-amber-500 via-sky-500 to-emerald-500 rounded-full transition-all duration-500" style="width: 5%;"></div>
-                            </div>
-                            
-                            <!-- 3 WCO Criteria Pills -->
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2 pt-2 border-t border-slate-200/70 dark:border-slate-800 text-[11px]">
-                                <div id="pill-crit-1" class="flex items-center gap-1.5 text-slate-400 dark:text-slate-500 transition-colors">
-                                    <i class="fa-solid fa-circle-dot text-[10px]" id="icon-crit-1"></i>
-                                    <span>Ô 1: Danh từ vật phẩm + Chất liệu</span>
-                                </div>
-                                <div id="pill-crit-2" class="flex items-center gap-1.5 text-slate-400 dark:text-slate-500 transition-colors">
-                                    <i class="fa-solid fa-circle-dot text-[10px]" id="icon-crit-2"></i>
-                                    <span>Ô 2: Cấu tạo & Thông số cốt tử (GRI 6)</span>
-                                </div>
-                                <div id="pill-crit-3" class="flex items-center gap-1.5 text-slate-400 dark:text-slate-500 transition-colors">
-                                    <i class="fa-solid fa-circle-dot text-[10px]" id="icon-crit-3"></i>
-                                    <span>Ô 3: Công năng & Thiết bị máy chủ</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 1. Tên hàng hóa & Vật liệu cấu tạo chính -->
                         <div class="space-y-1.5">
                             <div class="flex items-center justify-between">
                                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
