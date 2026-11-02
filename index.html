@@ -339,12 +339,12 @@
                             <div id="smart-clarification-container" class="hidden mt-2 p-3 rounded-2xl bg-sky-50 dark:bg-slate-950 border border-sky-200 dark:border-sky-500/40 space-y-2 transition-all shadow-md"></div>
                         </div>
 
-                        <!-- 2. Cấu tạo, Quy cách & Thông số kỹ thuật cốt tử (GRI 6) -->
+                        <!-- 2. Cấu tạo, Quy cách & Thông số kỹ thuật (GRI 6) -->
                         <div class="space-y-1">
                             <div class="flex items-center justify-between gap-2">
                                 <label class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5 shrink-0">
                                     <span class="px-1.5 h-5 min-w-[26px] rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 font-extrabold flex items-center justify-center text-[10px] shrink-0 whitespace-nowrap [word-spacing:normal]">Ô 2</span>
-                                    <span>CẤU TẠO, QUY CÁCH & THÔNG SỐ KỸ THUẬT CỐT TỬ (GRI 6)</span> <span class="text-rose-500 font-bold">(*)</span>
+                                    <span>CẤU TẠO, QUY CÁCH & THÔNG SỐ KỸ THUẬT (GRI 6)</span> <span class="text-rose-500 font-bold">(*)</span>
                                 </label>
                                 <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold hidden sm:inline text-right truncate">Kích thước & tiêu chí định thuế (M12, phi mm, DN, Vôn, Ampe...)</span>
                             </div>
@@ -3519,7 +3519,7 @@
             // 1. Tiêu chí 1: Ô 1 - Tên danh từ vật phẩm & Chất liệu chế tạo (34%)
             const crit1 = name.length >= 3;
 
-            // 2. Tiêu chí 2: Ô 2 - Cấu tạo, Quy cách & Thông số cốt tử GRI 6 (33%)
+            // 2. Tiêu chí 2: Ô 2 - Cấu tạo, Quy cách & Thông số kỹ thuật (GRI 6) (33%)
             const matKeywords = ['thep', 'sat', 'inox', 'dong', 'nhom', 'nhua', 'plastic', 'cao su', 'rubber', 'go', 'timber', 'wood', 'vai', 'textile', 'hop kim', 'thuy tinh', 'gom', 'da'];
             const specKeywords = [/\b\d+\s*v\b/i, /\b\d+\s*a\b/i, /\b\d+\s*w\b/i, /\bdn\s*\d+\b/i, /\b\d+\s*mm\b/i, /\b\d+\s*cm\b/i, /\bm\d+\b/i, /\bphi\s*\d+\b/i, /\b\d+\s*bar\b/i, /\b\d+\s*mpa\b/i, /\b\d+\s*kg\b/i, /\b\d+\s*g\b/i, /\bduoi\s+16a\b/i, /\btren\s+16a\b/i, /\bco\s+o\s+bi\b/i, /\bkhong\s+lap\s+o\s+bi\b/i, /\b\d+\s*kw\b/i];
             
