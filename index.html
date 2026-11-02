@@ -3465,7 +3465,7 @@
                             </div>
                             <span class="px-3 py-1 rounded-full text-[11px] font-extrabold bg-amber-200 dark:bg-amber-900/70 text-amber-900 dark:text-amber-200 border border-amber-400 self-start sm:self-auto flex items-center gap-1 shadow-sm">
                                 <i class="fa-solid fa-circle-exclamation text-amber-600 dark:text-amber-400"></i>
-                                <span>Phát Hiện Thiếu Tiêu Chí Phân Nhánh Cốt Tử</span>
+                                <span>Phát Hiện Thiếu Tiêu Chí Phân Nhánh Kỹ Thuật</span>
                             </span>
                         </div>
 
@@ -3495,7 +3495,7 @@
                             <i class="fa-solid fa-circle-check"></i>
                         </span>
                         <div class="text-xs">
-                            <span class="font-bold text-emerald-800 dark:text-emerald-300 block">CỔNG KIỂM SOÁT THÔNG SỐ GRI 6: ĐÃ XÁC LẬP ĐẦY ĐỦ TIÊU CHÍ KỸ THUẬT CỐT TỬ</span>
+                            <span class="font-bold text-emerald-800 dark:text-emerald-300 block">CỔNG KIỂM SOÁT THÔNG SỐ GRI 6: ĐÃ XÁC LẬP ĐẦY ĐỦ TIÊU CHÍ KỸ THUẬT</span>
                             <span class="text-[11px] text-slate-600 dark:text-slate-300">Đã kiểm soát tiêu chí: <strong class="text-emerald-700 dark:text-emerald-400">${confirmedCriteria.join(', ')}</strong>. Mã 8 số <strong class="font-mono text-sky-700 dark:text-amber-300">${codeFmt}</strong> được khóa tuyệt đối theo GRI 6 (100% Không đoán mò).</span>
                         </div>
                     </div>
@@ -4147,19 +4147,39 @@
             }
 
             const prompt = `Bạn là Chuyên gia Cao cấp Phân loại Biểu thuế & Mã số HS (Hải quan Việt Nam) theo Danh mục HS 2022 (Công văn 1810/TCHQ-TXNK & HQKV8) và Biểu thuế XNK 2026.
-BẮT BUỘC TUÂN THỦ QUY TRÌNH RÀ SOÁT & LẬP LUẬN THEO ĐẦY ĐỦ 6 QUY TẮC TỔNG QUÁT (GRI 1 ĐẾN GRI 6):
+BẮT BUỘC TUÂN THỦ QUY TRÌNH 2 GIAI ĐOẠN TUẦN TỰ (GRI 1 -> GRI 6) VÀ RÀ SOÁT TOÀN DIỆN CHÚ GIẢI HS 2022:
+THÔNG TIN ĐẦU VÀO CỦA MẶT HÀNG:
 1. Tên hàng định danh: ${name} (Model: ${model_en || 'Tiêu chuẩn'})
-2. Bản chất & Chất liệu (Material): ${desc || specs || 'Chưa rõ'}
+2. Cấu tạo & Bản chất chất liệu (Material): ${desc || specs || 'Chưa rõ'}
 3. Kích thước & Thông số kỹ thuật (Dimensions & Specs): ${specs || desc || 'Tiêu chuẩn'}
-4. Công dụng & Cơ cấu truyền động (Function & Transmission): ${use || 'Đa dụng / Chưa rõ'}
+4. Công dụng & Chức năng thực tế (Function & Transmission): ${use || 'Đa dụng / Chưa rõ'}
 ${rulingsContext}
 ${wcoContext}
 
-MA TRẬN CHÚ GIẢI PHÁP LÝ BẮT BUỘC TOÀN DIỆN (21 PHẦN & 97 CHƯƠNG THEO CHÚ GIẢI WCO 2022):
+QUY TRÌNH PHÂN LOẠI TUẦN TỰ BẮT BUỘC 2 GIAI ĐOẠN (TWO-STAGE MANDATORY HS WORKFLOW):
+- GIAI ĐOẠN 1: ÁP DỤNG QUY TẮC 1 (GRI 1) & RÀ SOÁT TOÀN BỘ NỘI DUNG CHÚ GIẢI HS 2022:
+  + Rà soát toàn bộ Chú giải HS 2022 (Công văn 1810/TCHQ-TXNK & HQKV8), Chú giải bắt buộc của Phần và Chương.
+  + Kiểm tra toàn diện các Chú giải loại trừ của các Chương liên quan (ví dụ Chú giải 2(a) Phần XVI, Chú giải 2 Phần XV, Chú giải loại trừ 1(g) Phần XVI, Chú giải loại trừ Nhóm 90.15, 84.81...).
+  + Xác định dứt điểm HEADING 4 SỐ và PHÂN NHÓM 6 SỐ QUỐC TẾ (WCO SUBHEADING).
 
-0. NGUYÊN TẮC CỔNG THẨM ĐỊNH THÔNG TIN (INFORMATION GATE - TUYỆT ĐỐI KHÔNG ĐOÁN MÒ):
-   - NẾU thông tin hàng hóa quá sơ sài, mơ hồ (ví dụ chỉ ghi 'phụ tùng', 'linh kiện', 'chi tiết máy', 'thiết bị' hoặc không rõ chất liệu cấu tạo và không rõ công năng hoạt động cụ thể dẫn đến không đủ căn cứ pháp lý để xác định mã 8 số theo 6 Quy tắc GRI):
-     BẮT BUỘC trả về JSON với "is_insufficient_info": true, "missing_criteria": ["liệt kê 2-4 thông tin cốt tử cần bổ sung"] và TUYỆT ĐỐI KHÔNG ĐƯỢC TỰ Ý ĐOÁN MÒ MÃ 8 SỐ.
+- GIAI ĐOẠN 2: ÁP DỤNG QUY TẮC 6 (GRI 6) & PHÂN LOẠI CÙNG CẤP ĐỘ GẠCH NỐI (- / --):
+  + So sánh tuần tự các phân nhóm ở CÙNG CẤP ĐỘ GẠCH NỐI (- so với -, -- so với --) và đối chiếu với thông số kỹ thuật thực tế để phân loại dứt điểm đến mã 8 số của Biểu thuế XNK Việt Nam 2026.
+
+3 NGUYÊN TẮC CỐT LÕI QUẢN TRỊ ĐỘ CHÍNH XÁC CAO NHẤT:
+1. NGUYÊN TẮC CỔNG THẨM ĐỊNH THÔNG TIN (INFORMATION GATE - KHÔNG TỰ SUY ĐOÁN KHI CHƯA ĐỦ THÔNG TIN):
+   - NẾU thông tin hàng hóa quá sơ sài, mơ hồ (ví dụ chỉ ghi 'phụ tùng', 'linh kiện', 'chi tiết máy', 'thiết bị' hoặc không rõ chất liệu cấu tạo và không rõ công năng hoạt động cụ thể dẫn đến không đủ căn cứ pháp lý để xác định mã theo 6 Quy tắc GRI):
+     BẮT BUỘC trả về JSON với "is_insufficient_info": true, "missing_criteria": ["liệt kê 2-4 thông tin kỹ thuật cần bổ sung"] và TUYỆT ĐỐI KHÔNG ĐƯỢC TỰ Ý ĐOÁN MÒ.
+   - Tuyệt đối không tự suy diễn hoặc bịa ra các thông số không có trong mô tả hàng hóa.
+
+2. NGUYÊN TẮC ĐỀ XUẤT MÃ HS 6 SỐ KHI CHƯA CHẮC CHẮN MÃ 8 SỐ:
+   - NẾU thông tin hàng hóa đã đủ để xác định chuẩn xác Heading 4 số và Phân nhóm 6 số WCO (ví dụ 8536.50, 9031.49, 8481.80...), NHƯNG THIẾU THÔNG SỐ ĐỊNH LƯỢNG cụ thể để phân tách giữa các dòng mã 8 số trong cùng phân nhóm (ví dụ: chưa rõ dòng điện danh định dưới 16A hay trên 16A, chưa rõ đường kính ren, chưa rõ công suất mô-tơ, chưa rõ vật liệu chi tiết):
+     + BẮT BUỘC ĐỀ XUẤT MÃ HS CODE 6 SỐ (dạng xxxx.xx, ví dụ 8536.50 hoặc 9031.49, clean_code: 6 chữ số liền nhau, is_six_digit_proposed: true).
+     + Đồng thời, trong danh sách 'candidates' và phần 'gri6', liệt kê đầy đủ các phương án rẽ nhánh mã 8 số tương ứng kèm điều kiện kỹ thuật cụ thể để Doanh nghiệp/Hải quan đối chiếu xác nhận.
+
+3. NGUYÊN TẮC ĐỀ XUẤT MÃ 8 SỐ KHI ĐÃ ĐẦY ĐỦ THÔNG SỐ ĐỊNH LƯỢNG:
+   - NẾU mô tả hàng hóa đã có đầy đủ thông số định lượng cụ thể thỏa mãn tiêu chí phân nhánh gạch nối của Biểu thuế Việt Nam 2026: Đề xuất mã 8 số chính xác tuyệt đối (dạng xxxx.xx.xx, clean_code: 8 chữ số liền nhau, is_six_digit_proposed: false).
+
+MA TRẬN CHÚ GIẢI PHÁP LÝ BẮT BUỘC TOÀN DIỆN (21 PHẦN & 97 CHƯƠNG THEO CHÚ GIẢI WCO 2022):
 
 1. NGUYÊN TẮC BỘ PHẬN CÔNG DỤNG CHUNG (GRI 1 & Chú giải 2 Phần XV / Chú giải 1(g) Phần XVI):
    - Các chi tiết bu lông, ốc vít, đai ốc, đinh tán, chốt hãm, chốt định vị, vòng đệm, gioăng, đệm lót, lò xo, ống dẫn, khớp nối ống, phụ kiện nối ống:
@@ -4236,8 +4256,9 @@ Trường hợp thiếu thông tin:
 Trường hợp đủ thông tin:
 {
   "is_insufficient_info": false,
-  "hs_code": "mã 8 số dạng xxxx.xx.xx",
-  "clean_code": "8 chữ số liền nhau",
+  "hs_code": "mã 8 số dạng xxxx.xx.xx (HOẶC mã 6 số dạng xxxx.xx nếu thiếu thông số chia tách cấp 8 số)",
+  "clean_code": "8 chữ số hoặc 6 chữ số liền nhau",
+  "is_six_digit_proposed": false,
   "decl_name": "Tên hàng khai báo hải quan chuẩn hóa kèm quy cách chất liệu và mới 100%",
   "item_description": "Mô tả phân nhóm theo biểu thuế 2026",
   "mfn": "Thuế MFN %",
@@ -4293,6 +4314,16 @@ Trường hợp đủ thông tin:
                             const parsed = JSON.parse(jsonMatch[0]);
                             if (parsed && (parsed.hs_code || parsed.clean_code || parsed.is_insufficient_info)) {
                                 if (!parsed.is_insufficient_info) {
+                                    const rawClean = (parsed.clean_code || parsed.hs_code || '').replace(/\./g, '');
+                                    if (rawClean.length === 6) {
+                                        parsed.clean_code = rawClean;
+                                        parsed.hs_code = formatHSCode(rawClean);
+                                        parsed.is_six_digit_proposed = true;
+                                    } else if (rawClean.length === 8) {
+                                        parsed.clean_code = rawClean;
+                                        parsed.hs_code = formatHSCode(rawClean);
+                                        parsed.is_six_digit_proposed = false;
+                                    }
                                     // 1. Sanitize typo 'chứa hoàn chỉnh' -> 'chưa hoàn chỉnh'
                                     if (parsed.gri2) {
                                         parsed.gri2 = parsed.gri2.replace(/\bchứa\s+hoàn\s+chỉnh\b/gi, 'chưa hoàn chỉnh');
@@ -7298,6 +7329,30 @@ Trường hợp đủ thông tin:
                 function_transmission: rawInput.use || 'Vận hành đóng cắt, kiểm soát hoặc truyền động'
             };
 
+            // If 6-digit HS code is proposed, populate sub-candidates with 8-digit split branches
+            if (cleanCode.length === 6) {
+                const sub8Items = (window.HS_DATABASE || []).filter(it => {
+                    const c = (it.c || '').replace(/\./g, '');
+                    return c.startsWith(cleanCode) && c.length === 8;
+                });
+                if (sub8Items.length > 0) {
+                    res.candidates = sub8Items.slice(0, 4).map((it, idx) => {
+                        const itClean = (it.c || '').replace(/\./g, '');
+                        return {
+                            hs_code: formatHSCode(itClean),
+                            clean_code: itClean,
+                            badge: `Phương án Rẽ nhánh ${idx + 1}`,
+                            name: `${rawInput.name} (${formatHSCode(itClean)})`,
+                            desc: it.vn || '',
+                            mfn: it.mfn ? (it.mfn.includes('%') ? it.mfn : it.mfn + '%') : mfn,
+                            vat: it.vat ? (it.vat.includes('%') ? it.vat : it.vat + '%') : vat,
+                            apply_condition: `Áp dụng mã ${formatHSCode(itClean)} nếu thông số thực tế thỏa mãn: ${it.vn || ''}.`,
+                            is_primary: idx === 0
+                        };
+                    });
+                }
+            }
+
             // Ensure candidates array contains real, statutory candidate lines from the 2026 tariff (NEVER mock fake codes)
             if (!res.candidates || !Array.isArray(res.candidates) || res.candidates.length === 0) {
                 const clientBest = classifyProductClientSide(rawInput.name, rawInput.desc, rawInput.use, rawInput.specs, rawInput.model_en);
@@ -8287,11 +8342,19 @@ Trường hợp đủ thông tin:
                         // 2. Kết quả phân loại chính thức từ Gemini AI
                         if (gemRes && (gemRes.hs_code || gemRes.clean_code)) {
                             const cCode = (gemRes.clean_code || gemRes.hs_code || '').replace(/\./g, '');
+                            const is6Digit = cCode.length === 6;
                             const dbItem = (window.HS_DATABASE || []).find(it => (it.c || '').replace(/\./g, '') === cCode) 
                                         || (window.HS_DATABASE || []).find(it => (it.c || '').replace(/\./g, '').startsWith(cCode.substring(0, 6)));
                             if (dbItem) {
-                                gemRes.hs_code = formatHSCode(dbItem.c || cCode);
-                                gemRes.clean_code = (dbItem.c || cCode).replace(/\./g, '');
+                                if (is6Digit) {
+                                    gemRes.hs_code = formatHSCode(cCode);
+                                    gemRes.clean_code = cCode;
+                                    gemRes.is_six_digit_proposed = true;
+                                } else {
+                                    gemRes.hs_code = formatHSCode(dbItem.c || cCode);
+                                    gemRes.clean_code = (dbItem.c || cCode).replace(/\./g, '');
+                                    gemRes.is_six_digit_proposed = false;
+                                }
                                 if (!gemRes.item_description || gemRes.item_description.length < 5) gemRes.item_description = dbItem.vn;
                                 if (!gemRes.mfn) gemRes.mfn = dbItem.mfn || '0%';
                                 if (!gemRes.vat) gemRes.vat = dbItem.vat || '8%';
