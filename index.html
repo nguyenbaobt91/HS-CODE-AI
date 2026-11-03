@@ -165,68 +165,72 @@
 
     <!-- Header / Navbar -->
     <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/90 dark:border-slate-800 shadow-sm">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
-            <!-- Left Area: Brand Logo & Chemical Portal Quick-Tab -->
-            <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
-                <!-- Brand Logo -->
-                <div class="flex items-center space-x-2 cursor-pointer" onclick="switchTab('propose')">
-                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-500/25">
-                        <i class="fa-solid fa-robot text-lg sm:text-xl"></i>
-                    </div>
-                    <div class="hidden xl:block">
-                        <div class="flex items-center gap-1.5">
-                            <span class="text-lg sm:text-xl font-black bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">HSCoder AI</span>
-                            <span class="text-[10px] px-1.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-400 dark:border-emerald-700 uppercase tracking-wider">v2.6</span>
-                        </div>
-                    </div>
-                    <div class="hidden sm:block xl:hidden">
-                        <span class="text-base font-black bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">HSCoder</span>
+        <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 h-16 flex items-center justify-between gap-1.5 sm:gap-2">
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-2 cursor-pointer shrink-0" onclick="switchTab('propose')">
+                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-500/25">
+                    <i class="fa-solid fa-robot text-base sm:text-lg"></i>
+                </div>
+                <div class="hidden sm:block">
+                    <div class="flex items-center gap-1">
+                        <span class="text-base sm:text-lg font-black bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">HSCoder AI</span>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-400 dark:border-emerald-700 uppercase tracking-wider">v2.6</span>
                     </div>
                 </div>
-
-                <!-- Tab Hóa Chất (Đưa về góc trái để tránh che khuất API Key) -->
-                <a href="./hoa-chat/" class="px-2.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 hover:text-white dark:hover:text-white bg-rose-50/90 dark:bg-rose-950/60 hover:bg-gradient-to-r hover:from-rose-600 hover:to-orange-500 dark:hover:from-rose-600 dark:hover:to-orange-500 border border-rose-300/80 dark:border-rose-700/60 transition-all duration-200 flex items-center gap-1.5 shadow-sm shrink-0" title="Mở Cổng Nghiệp Vụ Hóa Chất 2026 & Quét Phân Tích MSDS Tự Động">
-                    <i class="fa-solid fa-flask-vial text-rose-500 text-sm"></i>
-                    <span class="hidden md:inline font-extrabold tracking-tight">Cổng Hóa Chất &amp; Quét MSDS</span>
-                    <span class="md:hidden font-extrabold tracking-tight">Hóa Chất &amp; MSDS</span>
-                    <span class="inline-flex items-center px-1.5 py-0.5 text-[8.5px] font-black uppercase rounded-full bg-rose-600 text-white animate-pulse">MỚI</span>
-                </a>
             </div>
 
-            <!-- Segmented Navigation Bar (Compact, Modern, No Wrapping) -->
-            <nav class="flex items-center bg-slate-100/90 dark:bg-slate-800/80 p-1 rounded-2xl border border-slate-200/70 dark:border-slate-700/60 overflow-x-auto custom-scrollbar shrink-0">
-                <button onclick="switchTab('propose')" id="tab-btn-propose" class="tab-btn active px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors duration-150 flex items-center gap-1.5 bg-sky-600 text-white shadow-sm whitespace-nowrap cursor-pointer">
+            <!-- Segmented Navigation Bar (Compact, Modern) -->
+            <nav class="flex items-center bg-slate-100/90 dark:bg-slate-800/80 p-1 rounded-2xl border border-slate-200/70 dark:border-slate-700/60 overflow-x-auto custom-scrollbar min-w-0">
+                <!-- 1. Tab Hóa Chất (Góc Trái Của Dãy Tab) -->
+                <a href="./hoa-chat/" class="tab-btn px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold text-amber-950 dark:text-amber-100 hover:text-white dark:hover:text-white bg-gradient-to-r from-amber-400 to-yellow-300 hover:from-amber-500 hover:to-orange-500 dark:from-amber-600 dark:to-yellow-500 dark:hover:from-amber-500 dark:hover:to-orange-500 border border-amber-400/90 dark:border-amber-600 transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-sm shrink-0" title="Mở Cổng Nghiệp Vụ Hóa Chất 2026 & Quét Phân Tích MSDS Tự Động">
+                    <i class="fa-solid fa-flask-vial text-rose-600 dark:text-rose-200"></i>
+                    <span>Cổng Hóa Chất &amp; Quét MSDS</span>
+                    <span class="inline-flex items-center px-1.5 py-0.2 text-[8px] font-black uppercase rounded-full bg-rose-600 text-white animate-pulse">MỚI</span>
+                </a>
+
+                <div class="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-1 hidden sm:block shrink-0"></div>
+
+                <!-- 2. AI Đề Xuất HS -->
+                <button onclick="switchTab('propose')" id="tab-btn-propose" class="tab-btn active px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors duration-150 flex items-center gap-1.5 bg-sky-600 text-white shadow-sm whitespace-nowrap cursor-pointer shrink-0">
                     <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
                     <span>AI Đề Xuất HS</span>
                 </button>
-                <button onclick="switchTab('batch')" id="tab-btn-batch" class="tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-white/60 dark:hover:bg-slate-700/60 transition-colors duration-150 flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
+
+                <!-- 3. Excel Hàng Loạt -->
+                <button onclick="switchTab('batch')" id="tab-btn-batch" class="tab-btn px-2 sm:px-2.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-white/60 dark:hover:bg-slate-700/60 transition-colors duration-150 flex items-center gap-1.5 whitespace-nowrap cursor-pointer shrink-0">
                     <i class="fa-solid fa-file-excel text-emerald-500"></i>
                     <span>Excel Hàng Loạt</span>
                 </button>
-                <button onclick="switchTab('tree')" id="tab-btn-tree" class="tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-white/60 dark:hover:bg-slate-700/60 transition-colors duration-150 flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
+
+                <!-- 4. Biểu Thuế 98 Chương -->
+                <button onclick="switchTab('tree')" id="tab-btn-tree" class="tab-btn px-2 sm:px-2.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-white/60 dark:hover:bg-slate-700/60 transition-colors duration-150 flex items-center gap-1.5 whitespace-nowrap cursor-pointer shrink-0">
                     <i class="fa-solid fa-sitemap text-sky-500"></i>
                     <span>Biểu Thuế 98 Chương</span>
                 </button>
-                <button onclick="switchTab('rules')" id="tab-btn-rules" class="tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white/60 dark:hover:bg-slate-700/60 transition-colors duration-150 flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
+
+                <!-- 5. 6 Quy Tắc GRI -->
+                <button onclick="switchTab('rules')" id="tab-btn-rules" class="tab-btn px-2 sm:px-2.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white/60 dark:hover:bg-slate-700/60 transition-colors duration-150 flex items-center gap-1.5 whitespace-nowrap cursor-pointer shrink-0">
                     <i class="fa-solid fa-scale-balanced text-indigo-500"></i>
                     <span>6 Quy Tắc GRI</span>
                 </button>
-                <button onclick="switchTab('notes')" id="tab-btn-notes" class="tab-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-white/60 dark:hover:bg-slate-700/60 transition-colors duration-150 flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
+
+                <!-- 6. Chú Giải WCO 2022 -->
+                <button onclick="switchTab('notes')" id="tab-btn-notes" class="tab-btn px-2 sm:px-2.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-white/60 dark:hover:bg-slate-700/60 transition-colors duration-150 flex items-center gap-1.5 whitespace-nowrap cursor-pointer shrink-0">
                     <i class="fa-solid fa-book-open text-amber-500"></i>
                     <span>Chú Giải WCO 2022</span>
                 </button>
             </nav>
 
-            <!-- Actions: Multi-Theme Switcher & AI Key Modal -->
-            <div class="flex items-center space-x-2 shrink-0">
+            <!-- Actions: Multi-Theme Switcher & AI Key Modal (Always visible, Never hidden) -->
+            <div class="flex items-center space-x-1.5 sm:space-x-2 shrink-0 ml-auto sm:ml-0">
                 <!-- Light / Dark Mode Toggle Button -->
                 <button type="button" id="btn-theme-toggle" onclick="toggleDarkMode()" 
-                        class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-amber-300 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center transition-all cursor-pointer border border-slate-200 dark:border-slate-700 shadow-sm" 
+                        class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-amber-300 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center transition-all cursor-pointer border border-slate-200 dark:border-slate-700 shadow-sm shrink-0" 
                         title="Chuyển chế độ Sáng / Tối">
                     <i id="theme-icon" class="fa-solid fa-moon text-sm"></i>
                 </button>
                 
-                <button id="btn-gemini-settings" onclick="openApiKeyModal()" class="px-3 py-1.5 rounded-xl bg-purple-100 dark:bg-purple-900/40 border border-purple-300 dark:border-purple-500/50 text-purple-800 dark:text-purple-300 hover:border-purple-500 text-xs font-semibold transition-colors duration-150 flex items-center space-x-1.5 shadow-sm cursor-pointer shrink-0" title="Google Gemini AI đang hoạt động và áp dụng cho mọi phân tích (Bấm để đổi Key)">
+                <button id="btn-gemini-settings" onclick="openApiKeyModal()" class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-purple-100 dark:bg-purple-900/40 border border-purple-300 dark:border-purple-500/50 text-purple-800 dark:text-purple-300 hover:border-purple-500 text-xs font-semibold transition-colors duration-150 flex items-center space-x-1.5 shadow-sm cursor-pointer shrink-0" title="Google Gemini AI đang hoạt động và áp dụng cho mọi phân tích (Bấm để đổi Key)">
                     <span id="gemini-status-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                     <i class="fa-solid fa-brain text-purple-600 dark:text-purple-300"></i>
                     <span id="gemini-status-label" class="hidden sm:inline">Gemini AI: Đã Kích Hoạt</span>
