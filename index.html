@@ -166,17 +166,31 @@
     <!-- Header / Navbar -->
     <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/90 dark:border-slate-800 shadow-sm">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
-            <!-- Brand Logo -->
-            <div class="flex items-center space-x-2.5 cursor-pointer shrink-0" onclick="switchTab('propose')">
-                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-500/25">
-                    <i class="fa-solid fa-robot text-lg sm:text-xl"></i>
-                </div>
-                <div class="hidden sm:block">
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-lg sm:text-xl font-black bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">HSCoder AI</span>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-400 dark:border-emerald-700 uppercase tracking-wider">v2.6 Cập nhật Mới Nhất</span>
+            <!-- Left Area: Brand Logo & Chemical Portal Quick-Tab -->
+            <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
+                <!-- Brand Logo -->
+                <div class="flex items-center space-x-2 cursor-pointer" onclick="switchTab('propose')">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-500/25">
+                        <i class="fa-solid fa-robot text-lg sm:text-xl"></i>
+                    </div>
+                    <div class="hidden xl:block">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-lg sm:text-xl font-black bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">HSCoder AI</span>
+                            <span class="text-[10px] px-1.5 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-400 dark:border-emerald-700 uppercase tracking-wider">v2.6</span>
+                        </div>
+                    </div>
+                    <div class="hidden sm:block xl:hidden">
+                        <span class="text-base font-black bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">HSCoder</span>
                     </div>
                 </div>
+
+                <!-- Tab Hóa Chất (Đưa về góc trái để tránh che khuất API Key) -->
+                <a href="./hoa-chat/" class="px-2.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 hover:text-white dark:hover:text-white bg-rose-50/90 dark:bg-rose-950/60 hover:bg-gradient-to-r hover:from-rose-600 hover:to-orange-500 dark:hover:from-rose-600 dark:hover:to-orange-500 border border-rose-300/80 dark:border-rose-700/60 transition-all duration-200 flex items-center gap-1.5 shadow-sm shrink-0" title="Mở Cổng Nghiệp Vụ Hóa Chất 2026 & Quét Phân Tích MSDS Tự Động">
+                    <i class="fa-solid fa-flask-vial text-rose-500 text-sm"></i>
+                    <span class="hidden md:inline font-extrabold tracking-tight">Cổng Hóa Chất &amp; Quét MSDS</span>
+                    <span class="md:hidden font-extrabold tracking-tight">Hóa Chất &amp; MSDS</span>
+                    <span class="inline-flex items-center px-1.5 py-0.5 text-[8.5px] font-black uppercase rounded-full bg-rose-600 text-white animate-pulse">MỚI</span>
+                </a>
             </div>
 
             <!-- Segmented Navigation Bar (Compact, Modern, No Wrapping) -->
@@ -201,12 +215,6 @@
                     <i class="fa-solid fa-book-open text-amber-500"></i>
                     <span>Chú Giải WCO 2022</span>
                 </button>
-                <div class="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-1 hidden sm:block"></div>
-                <a href="./hoa-chat/" class="px-3 py-1.5 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 hover:text-white dark:hover:text-white bg-rose-50/90 dark:bg-rose-950/40 hover:bg-gradient-to-r hover:from-rose-600 hover:to-orange-500 dark:hover:from-rose-600 dark:hover:to-orange-500 border border-rose-300/80 dark:border-rose-700/60 transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap cursor-pointer shadow-sm" title="Mở Cổng Nghiệp Vụ Hóa Chất 2026 & Quét Phân Tích MSDS Tự Động">
-                    <i class="fa-solid fa-flask-vial text-rose-500 hover:text-white"></i>
-                    <span>Cổng Hóa Chất &amp; Quét MSDS</span>
-                    <span class="inline-flex items-center px-1.5 py-0.5 text-[9px] font-black uppercase rounded-full bg-rose-600 text-white animate-pulse">MỚI</span>
-                </a>
             </nav>
 
             <!-- Actions: Multi-Theme Switcher & AI Key Modal -->
