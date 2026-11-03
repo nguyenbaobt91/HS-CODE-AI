@@ -1806,7 +1806,7 @@
                     },
                     {
                         name: 'Đường kính danh định DN',
-                        check: (t, tn) => /dn\s*\d+|\d+\s*mm|\d+\s*cm|phi\s*\d+|duong kinh|<= 25|> 25|25mm|25 mm/i.test(tn),
+                        check: (t, tn) => /dn\s*\d+|\b\d+\s*mm|\b\d+\s*cm|phi\s*\d+|duong kinh|<= 25|> 25|25mm|25 mm/i.test(tn),
                         missing_label: 'Đường kính trong danh định (DN <= 25mm hay DN > 25mm)',
                         chips: [
                             'Đường kính trong danh định DN <= 25mm (<= 2,5 cm)',
@@ -1854,7 +1854,7 @@
                 essential_criteria: [
                     {
                         name: 'Loại dòng điện & Số pha',
-                        check: (t, tn) => /ac|dc|xoay chieu|mot chieu|1 pha|3 pha|da pha|stepper|servo|dong bo/i.test(tn),
+                        check: (t, tn) => /\bac\b|\bdc\b|xoay chieu|mot chieu|1 pha|3 pha|da pha|stepper|servo|dong bo/i.test(tn),
                         missing_label: 'Dòng điện định mức (AC xoay chiều 1 pha/3 pha hay DC một chiều)',
                         chips: [
                             'Động cơ điện xoay chiều AC 3 pha',
@@ -1866,7 +1866,7 @@
                     },
                     {
                         name: 'Công suất định mức',
-                        check: (t, tn) => /\d+\s*w|\d+\s*kw|\d+\s*hp|cong suat|37\.5w|750w|7\.5kw|75kw/i.test(tn),
+                        check: (t, tn) => /\b\d+\s*w\b|\b\d+\s*kw\b|\b\d+\s*hp\b|cong suat|37\.5w|750w|7\.5kw|75kw/i.test(tn),
                         missing_label: 'Công suất định mức (W / kW / HP)',
                         chips: [
                             'Công suất định mức không quá 37.5W',
@@ -1923,7 +1923,7 @@
                     },
                     {
                         name: 'Dung lượng / Công suất (kVA / W)',
-                        check: (t, tn) => /\d+\s*w|\d+\s*kw|\d+\s*va|\d+\s*kva|cong suat/i.test(tn),
+                        check: (t, tn) => /\b\d+\s*w\b|\b\d+\s*kw\b|\b\d+\s*va\b|\b\d+\s*kva\b|cong suat/i.test(tn),
                         missing_label: 'Công suất biểu kiến định mức (VA / kVA / W)',
                         chips: [
                             'Công suất định mức không quá 1 kVA',
@@ -2260,7 +2260,7 @@
                     },
                     {
                         name: 'Công suất động cơ dẫn động',
-                        check: (t, tn) => /\d+\s*w|\d+\s*kw|\d+\s*hp|cong suat|<= 750|> 750/i.test(tn),
+                        check: (t, tn) => /\b\d+\s*w\b|\b\d+\s*kw\b|\b\d+\s*hp\b|cong suat|<= 750|> 750/i.test(tn),
                         missing_label: 'Công suất động cơ (<= 750W hay > 750W)',
                         chips: [
                             'Công suất động cơ không quá 750W',
@@ -2512,7 +2512,7 @@
                     },
                     {
                         name: 'Loại polyme cấu thành',
-                        check: (t, tn) => /pe|pp|pvc|pet|polycarbonate|pu|acrylic|polyester/i.test(tn),
+                        check: (t, tn) => /\bpe\b|\bpp\b|\bpvc\b|\bpet\b|polycarbonate|\bpu\b|acrylic|polyester/i.test(tn),
                         missing_label: 'Loại polyme (PE 3920.10 / PP 3920.20 / PVC 3920.43 / PC 3920.61 / PU 3921.13)',
                         chips: [
                             'Vật liệu từ polyme etylen (PE - 3920.10)',
@@ -4241,6 +4241,10 @@ MA TRẬN CHÚ GIẢI PHÁP LÝ BẮT BUỘC TOÀN DIỆN (21 PHẦN & 97 CHƯƠ
    - Quy tắc 2 (GRI 2): Chú ý chính tả tiếng Việt: ghi rõ "sản phẩm hoàn chỉnh, không ở dạng chưa lắp ráp hay chưa hoàn chỉnh" (tuyệt đối không viết sai chính tả thành "chứa hoàn chỉnh").
    - Quy tắc 5 (GRI 5): Đối với thiết bị đo lường cầm tay chuyên dụng có kèm hộp đựng hoặc vali định hình bảo vệ máy/đầu dò từ nhà sản xuất, ghi rõ: "Áp dụng Quy tắc 5(a), hộp đựng chuyên dụng đi kèm cùng sản phẩm được phân loại cùng thiết bị."
 
+15. NGUYÊN TẮC PHÂN LOẠI DÂY VÀ CÁP ĐIỆN / CÁP VIỄN THÔNG (NHÓM 85.44):
+   - Cáp truyền tín hiệu viễn thông, cáp mạng dữ liệu (Cat5, Cat6, Cat6A, Cat7, UTP, FTP, STP, mạng LAN, tín hiệu viễn thông...) điện áp tín hiệu <= 80V, chưa gắn đầu nối: BẮT BUỘC thuộc phân nhánh 3 gạch: "- - - Dùng cho viễn thông, điện áp không quá 80 V:" (Phân nhóm 8544.49.1x). Vỏ bọc plastic/PVC -> BẮT BUỘC MÃ 8544.49.13 (- - - - Loại khác, cách điện bằng cao su, plastic hoặc giấy). Thuế MFN: 0%.
+   - TUYỆT ĐỐI KHÔNG xếp cáp viễn thông / mạng LAN vào phân nhánh "- - - Loại không dùng cho viễn thông" (8544.49.2x hoặc 8544.49.4x), đặc biệt TUYỆT ĐỐI KHÔNG phân loại vào mã 8544.49.21 ("Dây đơn có vỏ bọc (chống nhiễu) dùng trong sản xuất bó dây dẫn điện của ô tô", MFN 10%) vì cáp viễn thông Cat6 UTP không phải là dây đơn, không dùng cho ô tô, và là cáp UTP không có lớp bọc chống nhiễu!
+
 YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON (không kèm văn bản nào ngoài JSON):
 Trường hợp thiếu thông tin:
 {
@@ -5135,6 +5139,40 @@ Trường hợp đủ thông tin:
                 const isOpticalCable = ['cap quang', 'cap soi quang', 'optical fibre cable'].some(k => fullTextNorm.includes(k));
                 if (isOpticalCable && sub !== '854470') {
                     return { isDisqualified: true, penalty: -3500, reason: "Vi phạm phân loại cáp quang: Cáp sợi quang có bọc từng sợi riêng bắt buộc thuộc phân nhóm 8544.70" };
+                }
+
+                // K4: Phân nhánh Cáp dùng cho viễn thông (8544.49.1x / 8544.49.3x) vs Loại KHÔNG dùng cho viễn thông (8544.49.2x / 8544.49.4x) theo GRI 6
+                const isTelecom = /\b(?:vien\s+thong|cat\s*6|cat\s*5|cat\s*7|cat\s*8|lan\b|utp|ftp|stp|truyen\s+tin\s+hieu|mang\s+noi\s+bo|mang\s+lan|ethernet|cap\s+mang|telecom|telecommunication|data\s+cable)\b/i.test(fullTextNorm);
+                const isNonTelecomExplicit = /\b(?:khong\s+dung\s+cho\s+vien\s+thong|non-telecom)\b/i.test(fullTextNorm);
+
+                if (isTelecom && !isNonTelecomExplicit) {
+                    if (['8544492', '8544494', '8544422', '8544429'].some(p => cRaw.startsWith(p))) {
+                        return { 
+                            isDisqualified: true, 
+                            penalty: -7000, 
+                            reason: "Vi phạm phân nhánh viễn thông (GRI 6): Cáp truyền tín hiệu dùng cho viễn thông / mạng LAN bắt buộc thuộc phân nhóm dùng cho viễn thông (8544.49.1x hoặc 8544.49.3x), loại trừ tuyệt đối phân nhóm KHÔNG dùng cho viễn thông (8544.49.2x và 8544.49.4x)" 
+                        };
+                    }
+                }
+
+                // K5: Phân định Cáp không bọc chống nhiễu (UTP) vs Dây có vỏ bọc chống nhiễu ô tô (8544.49.21)
+                const isUnshielded = /\b(?:khong\s+(?:co\s+)?(?:lop\s+boc\s+)?chong\s+nhieu|khong\s+boc\s+kim|utp|unshielded)\b/i.test(fullTextNorm);
+                if (isUnshielded && cRaw === '85444921') {
+                    return { 
+                        isDisqualified: true, 
+                        penalty: -8000, 
+                        reason: "Vi phạm cấu tạo chống nhiễu: Cáp không có lớp bọc chống nhiễu (UTP) loại trừ tuyệt đối khỏi mã 8544.49.21 (Dây đơn có vỏ bọc chống nhiễu dùng trong sản xuất bó dây dẫn điện của ô tô)" 
+                    };
+                }
+
+                // K6: Phân định Cáp mạng nhiều cặp xoắn (Cat6, twisted pair, 4 cặp, 8 lõi) vs Dây đơn (8544.49.21)
+                const isMultiCoreOrNetwork = /\b(?:cat\s*6|cat\s*5|utp|cap\s+mang|4\s+cap|8\s+loi|xoan\s+doi|twisted\s+pair|multi\s+core|nhieu\s+loi)\b/i.test(fullTextNorm);
+                if (isMultiCoreOrNetwork && cRaw === '85444921') {
+                    return { 
+                        isDisqualified: true, 
+                        penalty: -8000, 
+                        reason: "Vi phạm cấu tạo số lõi: Cáp mạng xoắn đôi nhiều lõi loại trừ tuyệt đối khỏi mã 8544.49.21 (Dây đơn dùng cho ô tô)" 
+                    };
                 }
             }
 
@@ -6090,11 +6128,45 @@ Trường hợp đủ thông tin:
                         }
                     } else if (sub === '854420') {
                         itemScore -= 1500;
-                    } else if (['ha the', 'duoi 1000v', '0.6/1kv', 'dien ap khong qua 1000', '220v', '110v', '380v'].some(k => fullTextNorm.includes(k)) || (specsDict.v !== undefined && specsDict.v <= 1000)) {
-                        if (['da gan dau noi', 'co gan dau noi', 'gan dau noi', 'co dau noi', 'fitted with connector'].some(k => fullTextNorm.includes(k))) {
-                            if (code.startsWith('854442')) itemScore += 450;
-                        } else {
-                            if (code.startsWith('854449')) itemScore += 450;
+                    } else {
+                        // 2. Cáp viễn thông & truyền dữ liệu tín hiệu mạng (Cat6, Cat5, UTP, STP, LAN,...)
+                        const isTelecomCable = /\b(?:vien\s+thong|cat\s*6|cat\s*5|cat\s*7|cat\s*8|lan\b|utp|ftp|stp|truyen\s+tin\s+hieu|mang\s+noi\s+bo|mang\s+lan|ethernet|cap\s+mang|telecom|telecommunication|data\s+cable)\b/i.test(fullTextNorm);
+                        const hasConnector = ['da gan dau noi', 'co gan dau noi', 'gan dau noi', 'co dau noi', 'fitted with connector', 'with connector'].some(k => fullTextNorm.includes(k)) && !['chua gan dau noi', 'khong co dau noi', 'without connector', 'not fitted'].some(k => fullTextNorm.includes(k));
+                        const isPlasticOrRubber = ['plastic', 'nhua', 'cao su', 'rubber', 'pvc', 'pe', 'xlpe'].some(k => fullTextNorm.includes(k));
+                        const isSubmarine = ['ngam duoi bien', 'duoi bien', 'submarine'].some(k => fullTextNorm.includes(k));
+
+                        if (isTelecomCable) {
+                            if (!hasConnector) {
+                                // Cáp chưa gắn đầu nối (8544.49)
+                                const isOver80V = specsDict.v !== undefined ? specsDict.v > 80 : ['tren 80 v', 'tren 80v', '> 80 v', '>80v'].some(k => fullTextNorm.includes(k));
+                                if (!isOver80V) {
+                                    // 8544.49.1x: Dùng cho viễn thông, điện áp không quá 80 V
+                                    if (isSubmarine) {
+                                        if (code === '85444911') itemScore += 2500;
+                                    } else {
+                                        if (isPlasticOrRubber && code === '85444913') itemScore += 3200; // - - - - Loại khác, cách điện bằng cao su, plastic hoặc giấy
+                                        else if (code === '85444919') itemScore += 1500;
+                                        else if (code === '85444911') itemScore -= 2000;
+                                    }
+                                    if (code.startsWith('8544492') || code.startsWith('8544494')) itemScore -= 6000;
+                                } else {
+                                    // 8544.49.3x: Dùng cho viễn thông, điện áp trên 80 V nhưng không quá 1.000 V
+                                    if (isSubmarine && code === '85444931') itemScore += 2500;
+                                    else if (isPlasticOrRubber && code === '85444932') itemScore += 3000;
+                                    else if (code === '85444939') itemScore += 1500;
+                                    if (code.startsWith('8544492') || code.startsWith('8544494')) itemScore -= 6000;
+                                }
+                            } else {
+                                // Cáp đã gắn đầu nối (8544.42)
+                                if (code === '85444213') itemScore += 2500;
+                                else if (code === '85444211') itemScore += 1500;
+                            }
+                        } else if (['ha the', 'duoi 1000v', '0.6/1kv', 'dien ap khong qua 1000', '220v', '110v', '380v'].some(k => fullTextNorm.includes(k)) || (specsDict.v !== undefined && specsDict.v <= 1000)) {
+                            if (hasConnector) {
+                                if (code.startsWith('854442')) itemScore += 450;
+                            } else {
+                                if (code.startsWith('854449')) itemScore += 450;
+                            }
                         }
                     }
                 } else if (head === '8537') {
