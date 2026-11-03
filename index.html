@@ -174,7 +174,7 @@
                 <div class="hidden sm:block">
                     <div class="flex items-center gap-1.5">
                         <span class="text-lg sm:text-xl font-black bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">HSCoder AI</span>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300 border border-sky-300/80 dark:border-sky-800 uppercase tracking-wider">2026</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-400 dark:border-emerald-700 uppercase tracking-wider">v2.6 Cập nhật Mới Nhất</span>
                     </div>
                 </div>
             </div>
@@ -4134,7 +4134,14 @@
                     const qNorm = (typeof removeAccents === 'function') ? removeAccents(qRaw) : qRaw;
                     const stopKws = new Set(['bo', 'dieu', 'khien', 'dung', 'cho', 'trong', 'may', 'thiet', 'bi', 'he', 'thong', 'khi', 'day', 'cong', 'nghiep', 'hieu', 'model']);
                     
-                    const quickCand = (typeof classifyProductClientSide === 'function') ? classifyProductClientSide(name, desc, use, specs, model_en) : null;
+                    let quickCand = null;
+                    try {
+                        if (typeof classifyProductClientSide === 'function') {
+                            quickCand = classifyProductClientSide(name, desc, use, specs, model_en);
+                        }
+                    } catch (eQC) {
+                        console.warn("Lỗi tính quickCand:", eQC);
+                    }
                     const expectedChap = quickCand && quickCand.c ? quickCand.c.replace(/\./g, '').substring(0, 2) : '';
                     const expectedHead = quickCand && quickCand.c ? quickCand.c.replace(/\./g, '').substring(0, 4) : '';
 
