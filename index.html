@@ -8565,8 +8565,11 @@ Trường hợp đủ thông tin:
                 // Tier 2: Direct Google Gemini AI Call from Browser (Pure AI Agent - Option 1)
                 if (activeKey && activeKey.length > 15) {
                     try {
-                        const gemRes = await callGeminiAIClassification(name, desc, use, specs, model_en);
+                        let gemRes = await callGeminiAIClassification(name, desc, use, specs, model_en);
                         
+                        // Áp dụng Cổng thẩm định ngược đối chiếu pháp lý (Post-Audit Gatekeeper)
+                        gemRes = auditAndSanitizeProposedHS(gemRes, inputData);
+
                         // 1. Cổng Thẩm Định Thông Tin (Information Gate)
                         if (gemRes && gemRes.is_insufficient_info) {
                             const html = renderInsufficientInfoAlertHtml(gemRes, inputData);
@@ -8617,7 +8620,6 @@ Trường hợp đủ thông tin:
                                 }).catch(() => {});
                             }
 
-                            gemRes = auditAndSanitizeProposedHS(gemRes, inputData);
                             const html = renderGeminiAIReportHtml(gemRes, inputData);
                             if (container) container.innerHTML = html;
                             return;
