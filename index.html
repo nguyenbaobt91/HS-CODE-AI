@@ -4081,6 +4081,41 @@
         // =========================================================================
         // GOOGLE GEMINI AI CALLER (ULTRA-FAST WITH 4S TIMEOUT)
         // =========================================================================
+                // =========================================================================
+        // DYNAMIC TARIFF TREE INJECTION ENGINE (RAG GROUNDING FOR GEMINI AI)
+        // =========================================================================
+        function extractCandidateTariffBranch(headCode) {
+            const db = window.HS_DATABASE || [];
+            if (!db.length || !headCode) return '';
+            const hClean = headCode.replace(/\./g, '').substring(0, 4);
+            const lines = [];
+            let inHeading = false;
+            for (let i = 0; i < db.length; i++) {
+                const item = db[i];
+                if (!item) continue;
+                const c = (item.c || '').replace(/\./g, '');
+                const vn = item.vn || '';
+                const mfn = item.mfn || '';
+                const vat = item.vat || '';
+
+                if (c === hClean) {
+                    inHeading = true;
+                    lines.push(`NHÓM ${c.substring(0, 2)}.${c.substring(2, 4)}: ${vn}`);
+                    continue;
+                }
+
+                if (inHeading) {
+                    if (c.length === 4 && c.substring(0, 4) !== hClean) break;
+                    if (['1', '2', '3'].includes(item.l) && vn.includes('Chương')) break;
+
+                    const codeStr = c.length === 8 ? `[${c.substring(0, 4)}.${c.substring(4, 6)}.${c.substring(6, 8)}] ` : (c.length === 6 ? `[${c.substring(0, 4)}.${c.substring(4, 6)}] ` : '');
+                    const taxStr = c.length === 8 ? ` (MFN: ${mfn}%, VAT: ${vat}%)` : '';
+                    lines.push(`  ${codeStr}${vn}${taxStr}`);
+                }
+            }
+            return lines.join('\n');
+        }
+
         async function callGeminiAIClassification(name, desc, use, specs, model_en) {
             const apiKey = getActiveApiKey();
             if (!apiKey || apiKey.length < 15) throw new Error("Chưa cấu hình Google Gemini API Key hợp lệ");
@@ -4146,6 +4181,37 @@
                 console.warn("Lỗi trích xuất Chú giải WCO:", errWco);
             }
 
+            // Extract official 8-digit Tariff Lineage Tree from Database (RAG / Grounding)
+            let tariffContext = "";
+            try {
+                const candHeads = new Set();
+                if (quickCand && quickCand.c) {
+                    candHeads.add(quickCand.c.replace(/\./g, '').substring(0, 4));
+                }
+                if (quickCand && Array.isArray(quickCand._top_headings)) {
+                    for (let th of quickCand._top_headings.slice(0, 2)) candHeads.add(th);
+                }
+                if (candHeads.size === 0) {
+                    const wMatches = (wcoContext || '').match(/NHÓM\s+(\d{2}\.\d{2})/g) || [];
+                    for (let wm of wMatches) {
+                        const h = wm.replace(/[^\d]/g, '');
+                        if (h.length === 4) candHeads.add(h);
+                    }
+                }
+                if (candHeads.size === 0) candHeads.add('8544');
+
+                const treeLines = [];
+                for (let h of candHeads) {
+                    const branch = extractCandidateTariffBranch(h);
+                    if (branch) treeLines.push(branch);
+                }
+                if (treeLines.length > 0) {
+                    tariffContext = `\nCÂY PHÂN CẤP DÒNG HÀNG BIỂU THUẾ XNK VIỆT NAM 2026 CHÍNH THỨC (BẮT BUỘC ĐỐI CHIẾU VÀ CHỈ ĐƯỢC CHỌN MÃ TRONG DANH MỤC NÀY):\n${treeLines.join('\n\n')}\n`;
+                }
+            } catch (errTariff) {
+                console.warn("Lỗi trích xuất Cây Biểu thuế:", errTariff);
+            }
+
             const prompt = `Bạn là Chuyên gia Cao cấp Phân loại Biểu thuế & Mã số HS (Hải quan Việt Nam) theo Danh mục HS 2022 (Công văn 1810/TCHQ-TXNK & HQKV8) và Biểu thuế XNK 2026.
 BẮT BUỘC TUÂN THỦ QUY TRÌNH 2 GIAI ĐOẠN TUẦN TỰ (GRI 1 -> GRI 6) VÀ RÀ SOÁT TOÀN DIỆN CHÚ GIẢI HS 2022:
 THÔNG TIN ĐẦU VÀO CỦA MẶT HÀNG:
@@ -4155,8 +4221,16 @@ THÔNG TIN ĐẦU VÀO CỦA MẶT HÀNG:
 4. Công dụng & Chức năng thực tế (Function & Transmission): ${use || 'Đa dụng / Chưa rõ'}
 ${rulingsContext}
 ${wcoContext}
+${tariffContext}
 
 QUY TRÌNH PHÂN LOẠI TUẦN TỰ BẮT BUỘC 2 GIAI ĐOẠN (TWO-STAGE MANDATORY HS WORKFLOW):
+BẮT BUỘC TUÂN THỦ NGUYÊN TẮC PHÂN CẤP GẠCH NỐI (GRI 6) THEO CÂY BIỂU THUẾ VIỆT NAM CUNG CẤP Ở TRÊN:
+1. BẠN TUYỆT ĐỐI CHỈ ĐƯỢC PHÉP CHỌN MÃ SỐ 8 SỐ CÓ THỰC TRONG BẢNG CÂY BIỂU THUẾ ĐÃ CUNG CẤP Ở TRÊN. TUYỆT ĐỐI KHÔNG TỰ BỊA MÃ KHÔNG CÓ TRONG BẢNG!
+2. So sánh tuần tự ở CÙNG CẤP ĐỘ GẠCH NỐI:
+   - Nếu hàng hóa ghi rõ "DÙNG CHO VIỄN THÔNG" (hoặc truyền tín hiệu mạng Cat6/Cat5 UTP): BẮT BUỘC chọn dòng con thuộc nhánh 3 gạch "- - - Dùng cho viễn thông" (mã 8544.49.13). TUYỆT ĐỐI CẤM chọn dòng con thuộc nhánh "- - - Loại không dùng cho viễn thông" (như 8544.49.21)!
+   - Nếu hàng hóa "KHÔNG CÓ LỚP BỌC CHỐNG NHIỄU" (UTP): TUYỆT ĐỐI CẤM chọn mã dây có vỏ bọc chống nhiễu 8544.49.21!
+   - Nếu hàng hóa "KHÔNG CÓ Ổ BI": TUYỆT ĐỐI CẤM chọn nhóm 84.82 (ổ bi), bắt buộc chọn nhóm 84.83!
+   - Nếu hàng hóa "CHƯA GẮN ĐẦU NỐI": TUYỆT ĐỐI CẤM chọn phân nhóm đã gắn đầu nối (8544.42), bắt buộc thuộc 8544.49! (TWO-STAGE MANDATORY HS WORKFLOW):
 - GIAI ĐOẠN 1: ÁP DỤNG QUY TẮC 1 (GRI 1) & RÀ SOÁT TOÀN BỘ NỘI DUNG CHÚ GIẢI HS 2022:
   + Rà soát toàn bộ Chú giải HS 2022 (Công văn 1810/TCHQ-TXNK & HQKV8), Chú giải bắt buộc của Phần và Chương.
   + Kiểm tra toàn diện các Chú giải loại trừ của các Chương liên quan (ví dụ Chú giải 2(a) Phần XVI, Chú giải 2 Phần XV, Chú giải loại trừ 1(g) Phần XVI, Chú giải loại trừ Nhóm 90.15, 84.81...).
@@ -5358,6 +5432,32 @@ Trường hợp đủ thông tin:
 
             const has_negative_bearing = /\b(?:khong|không|chua|chưa|without|no|not)\s+(?:lap\s+|lắp\s+|co\s+|có\s+)?(?:o\s+bi|bi\b|vong\s+bi|ball\s+bearings?|bearings?)/i.test(fullText) || /\b(?:khong|không|chua|chưa|without|no|not)\s+(?:lap\s+|lắp\s+|co\s+|có\s+)?(?:o\s+bi|bi\b|vong\s+bi|ball\s+bearings?|bearings?)/i.test(fullTextNorm);
 
+            // =========================================================================
+            // UNIVERSAL NEGATION & ANTI-TOKEN ENGINE (TOÀN BỘ 97 CHƯƠNG)
+            // =========================================================================
+            const negatedPhrases = [];
+            const negRegex = /\b(?:khong\s+(?:co\s+|chua\s+|dung\s+|su\s+dung\s+|boc\s+|lop\s+boc\s+|gan\s+|lap\s+|kem\s+|trang\s+bi\s+)?|chua\s+(?:co\s+|gan\s+|lap\s+|bam\s+|trang\s+bi\s+|lap\s+rap\s+)?|without\s+|non-)([\w\s]{2,30}?)(?=[,.;\-]|\s+(?:khong|chua|va|hoac|dung|de|cho|hang|moi)\b|$)/gi;
+            let nMatch;
+            while ((nMatch = negRegex.exec(fullTextNorm)) !== null) {
+                const phrase = nMatch[1].trim();
+                if (phrase.length >= 2 && !['co', 'dung', 'biet', 'phai'].includes(phrase)) {
+                    negatedPhrases.push(phrase);
+                    if (phrase.includes('chong nhieu')) negatedPhrases.push('chong nhieu');
+                    if (phrase.includes('dau noi')) negatedPhrases.push('dau noi');
+                    if (phrase.includes('o bi')) negatedPhrases.push('o bi');
+                    if (phrase.includes('ren')) negatedPhrases.push('ren');
+                }
+            }
+
+            // Sanitize query text for positive token matching
+            let sanitizedSubjNorm = subjNorm;
+            let sanitizedFullTextNorm = fullTextNorm;
+            for (let np of negatedPhrases) {
+                const reg = new RegExp('\\b' + np.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi');
+                sanitizedSubjNorm = sanitizedSubjNorm.replace(reg, ' ');
+                sanitizedFullTextNorm = sanitizedFullTextNorm.replace(reg, ' ');
+            }
+
             // 3. Detect Materials (prevent 'đường kính' collision with 'kính' and 'đồng bộ/truyền động' collision with 'đồng')
             const materials = [];
             const textNoDiam = fullText.replace(/đường\s+kính|duong\s+kinh/gi, '');
@@ -5599,7 +5699,10 @@ Trường hợp đủ thông tin:
                 specs: specsDict,
                 materials: cleanMaterials,
                 activeCategories,
-                has_negative_bearing
+                has_negative_bearing,
+                negatedPhrases,
+                sanitizedSubjNorm,
+                sanitizedFullTextNorm
             };
         }
 
@@ -5638,8 +5741,9 @@ Trường hợp đủ thông tin:
 
             const subjNorm = removeAccents(decomp.subjectPart);
             const hostNorm = removeAccents(decomp.hostPart);
+            const cleanSubjNorm = decomp.sanitizedSubjNorm || subjNorm;
 
-            const subjectWords = extractWordTokens(subjNorm);
+            const subjectWords = extractWordTokens(cleanSubjNorm);
             const hostWords = extractWordTokens(hostNorm);
 
             const rawTokens = (subjNorm.match(/[\w]+/g) || []).map(w => w.toLowerCase());
@@ -5890,6 +5994,16 @@ Trường hợp đủ thông tin:
                 // Universal Pre-Flight Legal Audit & Boundary Constraint Enforcement
                 const audit = auditStatutoryConstraintsClientSide(code, head, itemDesc, subDesc, decomp, fullTextNorm);
                 itemScore += audit.penalty;
+
+                // Universal Negation Barrier: Disqualify any item matching negated features (97 Chapters)
+                if (decomp.negatedPhrases && decomp.negatedPhrases.length > 0) {
+                    for (let np of decomp.negatedPhrases) {
+                        if (np.length >= 3 && (itemDescNorm.includes(np) || (linDescNorm && linDescNorm.includes(np)))) {
+                            itemScore -= 8000;
+                            break;
+                        }
+                    }
+                }
 
                 const iTokens = getTokens(itemDescNorm);
                 const sTokens = getTokens(subDescNorm);
@@ -6500,7 +6614,8 @@ Trường hợp đủ thông tin:
                 const use = document.getElementById('auto-use')?.value || 'Sử dụng trong công nghiệp';
                 const specs = document.getElementById('auto-specs')?.value || desc;
                 input = { name, model_en, desc, use, specs };
-                const bestItem = classifyProductClientSide(name, desc, use, specs, model_en);
+                let bestItem = classifyProductClientSide(name, desc, use, specs, model_en);
+            bestItem = auditAndSanitizeProposedHS(bestItem, data);
                 r = {
                     hs_code: formatHSCode(cleanCode || bestItem.c || '85365096'),
                     clean_code: cleanCode || (bestItem.c || '85365096').replace(/\./g, ''),
@@ -7374,6 +7489,54 @@ Trường hợp đủ thông tin:
                     </div>
                 </div>
             `;
+        }
+
+                // =========================================================================
+        // UNIVERSAL POST-AUDIT GATEKEEPER (LƯỚI AN TOÀN CHỐNG SAI LỆCH PHÁP LÝ)
+        // =========================================================================
+        function auditAndSanitizeProposedHS(res, rawInput) {
+            if (!res) return res;
+            const fullText = `${rawInput.name || ''} ${rawInput.desc || ''} ${rawInput.specs || ''} ${rawInput.use || ''}`.trim();
+            const fullNorm = (typeof removeAccents === 'function') ? removeAccents(fullText) : fullText.toLowerCase();
+            let cCode = (res.clean_code || res.hs_code || '').replace(/\./g, '');
+
+            const isTelecom = /\b(?:vien\s+thong|cat\s*6|cat\s*5|cat\s*7|cat\s*8|lan\b|utp|ftp|stp|truyen\s+tin\s+hieu|mang\s+noi\s+bo|mang\s+lan|ethernet|cap\s+mang|telecom|telecommunication|data\s+cable)\b/i.test(fullNorm);
+            const isUnshielded = /\b(?:khong\s+(?:co\s+)?(?:lop\s+boc\s+)?chong\s+nhieu|khong\s+boc\s+kim|utp|unshielded)\b/i.test(fullNorm);
+            const isNoConnector = /\b(?:chua\s+gan\s+dau\s+noi|khong\s+co\s+dau\s+noi|without\s+connectors?|chua\s+bam\s+cos)\b/i.test(fullNorm);
+
+            // Gatekeeper 1: Cáp viễn thông bị bắt nhầm vào nhánh không dùng cho viễn thông (8544.49.2x)
+            if (isTelecom && ['85444921', '85444922', '85444923', '85444924', '85444929'].includes(cCode)) {
+                console.warn("[Post-Audit Gatekeeper] Auto-correcting 8544.49.2x -> 8544.49.13 (Telecom Branch Guard)");
+                res.clean_code = '85444913';
+                res.hs_code = '8544.49.13';
+                res.item_description = '- - - - Loại khác, cách điện bằng cao su, plastic hoặc giấy';
+                res.mfn = '0%';
+                res.vat = '8/10';
+                res.gri6 = "Áp dụng Quy tắc 6 (GRI 6): Cáp truyền tín hiệu dùng cho viễn thông mạng LAN (Cat6 UTP) điện áp tín hiệu <= 80V, chưa gắn đầu nối, có lớp cách điện bằng nhựa PVC thuộc phân nhóm 8544.49, phân nhánh 3 gạch '- - - Dùng cho viễn thông, điện áp không quá 80 V:', dòng 4 gạch '- - - - Loại khác, cách điện bằng cao su, plastic hoặc giấy', mã số chính xác là 8544.49.13 (Thuế NK MFN 0%). Loại trừ tuyệt đối mã 8544.49.21 (Dây đơn có vỏ bọc chống nhiễu dùng cho ô tô, thuế 10%).";
+                res.exclusions = "Loại trừ mã 8544.49.21: Do mặt hàng dùng cho viễn thông (không thuộc nhánh không dùng cho viễn thông), là cáp nhiều lõi xoắn đôi (không phải dây đơn), là cáp UTP không có lớp bọc chống nhiễu, và không dùng cho sản xuất bó dây điện ô tô.";
+            }
+
+            // Gatekeeper 2: Hàng không có ổ bi bị bắt nhầm vào Nhóm 84.82 (Ổ bi)
+            const hasNoBearing = /\b(?:khong\s+(?:co\s+|lap\s+)?(?:o\s+bi|bi\b|vong\s+bi)|without\s+bearings?)\b/i.test(fullNorm);
+            if (hasNoBearing && cCode.startsWith('8482')) {
+                console.warn("[Post-Audit Gatekeeper] Auto-correcting 8482 -> 8483.30.90 (Negative Bearing Guard)");
+                res.clean_code = '84833090';
+                res.hs_code = '8483.30.90';
+                res.item_description = '- - Thân ổ không có ổ bi hoặc ổ đũa; gối đỡ trục loại khác';
+                res.mfn = '0%';
+                res.vat = '8/10';
+            }
+
+            // Gatekeeper 3: Dây cáp chưa gắn đầu nối bị bắt nhầm vào 8544.42 (Đã gắn đầu nối)
+            if (isNoConnector && cCode.startsWith('854442')) {
+                console.warn("[Post-Audit Gatekeeper] Auto-correcting 8544.42 -> 8544.49 (No Connector Guard)");
+                if (isTelecom) {
+                    res.clean_code = '85444913';
+                    res.hs_code = '8544.49.13';
+                }
+            }
+
+            return res;
         }
 
         function renderGeminiAIReportHtml(res, rawInput) {
@@ -8454,6 +8617,7 @@ Trường hợp đủ thông tin:
                                 }).catch(() => {});
                             }
 
+                            gemRes = auditAndSanitizeProposedHS(gemRes, inputData);
                             const html = renderGeminiAIReportHtml(gemRes, inputData);
                             if (container) container.innerHTML = html;
                             return;
