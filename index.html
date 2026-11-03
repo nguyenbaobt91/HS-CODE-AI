@@ -5990,6 +5990,9 @@ Trường hợp đủ thông tin:
                 const subhead = code.substring(0, 6);
                 const subDesc = subheadMap && subheadMap[subhead] ? subheadMap[subhead] : '';
                 const subDescNorm = removeAccents(subDesc);
+                const linDesc = item.lin || item.st || '';
+                const linDescNorm = removeAccents(linDesc);
+                const lTokens = linDesc ? getTokens(linDescNorm) : null;
 
                 // Universal Pre-Flight Legal Audit & Boundary Constraint Enforcement
                 const audit = auditStatutoryConstraintsClientSide(code, head, itemDesc, subDesc, decomp, fullTextNorm);
@@ -6007,11 +6010,6 @@ Trường hợp đủ thông tin:
 
                 const iTokens = getTokens(itemDescNorm);
                 const sTokens = getTokens(subDescNorm);
-
-                // Match bigrams & subject words across leaf item, subheading AND hierarchical lineage (lin / st)
-                const linDesc = item.lin || item.st || '';
-                const linDescNorm = removeAccents(linDesc);
-                const lTokens = linDesc ? getTokens(linDescNorm) : null;
 
                 for (let bg of bigrams) {
                     const bgRegex = new RegExp('\\b' + bg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
