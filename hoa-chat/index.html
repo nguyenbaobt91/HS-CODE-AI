@@ -627,6 +627,9 @@ footer {
 
 <!-- PDF.js Client-Side Parser for MSDS / SDS Scanning -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<!-- Tesseract.js Client-Side Optical Character Recognition (OCR) for Scanned Images & Documents -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
 
@@ -823,24 +826,25 @@ footer {
 
       <!-- Mode Selector Tabs -->
       <div style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
-        <button id="msds-tab-pdf" class="btn btn-primary" style="padding: 7px 16px; font-size: 13px; font-weight: 700;" onclick="switchMsdsInputMode('pdf')">📂 1. Kéo Thả Tệp PDF MSDS</button>
+        <button id="msds-tab-pdf" class="btn btn-primary" style="padding: 7px 16px; font-size: 13px; font-weight: 700;" onclick="switchMsdsInputMode('pdf')">📂 1. Tệp PDF &amp; Ảnh Scan (Có OCR Tự Động)</button>
         <button id="msds-tab-text" class="btn btn-outline" style="padding: 7px 16px; font-size: 13px; font-weight: 700;" onclick="switchMsdsInputMode('text')">📝 2. Dán Nội Dung Mục 3 / Danh Sách CAS</button>
       </div>
 
-      <!-- PDF Drag & Drop Zone -->
+      <!-- PDF & Scanned Image Drag & Drop Zone (With Hybrid Text + OCR) -->
       <div id="msds-zone-pdf" style="display: block;">
         <div id="msds-drop-area" style="border: 2px dashed #0284c7; border-radius: var(--radius-md); padding: 30px 20px; text-align: center; background: #ffffff; cursor: pointer; transition: all 0.25s ease;"
              onclick="document.getElementById('msds-file-input').click()"
              ondragover="handleMsdsDragOver(event)"
              ondragleave="handleMsdsDragLeave(event)"
              ondrop="handleMsdsDrop(event)">
-          <input type="file" id="msds-file-input" accept=".pdf" style="display: none;" onchange="handleMsdsFileSelect(event)">
+          <input type="file" id="msds-file-input" accept=".pdf,image/png,image/jpeg,image/webp,image/jpg" style="display: none;" onchange="handleMsdsFileSelect(event)">
           <div style="font-size: 42px; margin-bottom: 6px;">📥</div>
           <div style="font-size: 15.5px; font-weight: 700; color: var(--navy); margin-bottom: 4px;">
-            Kéo &amp; Thả tệp PDF MSDS/SDS vào đây, hoặc <span style="color: var(--primary); text-decoration: underline;">nhấp để duyệt tệp</span>
+            Kéo &amp; Thả tệp PDF hoặc Hình Ảnh Scan MSDS/SDS vào đây, hoặc <span style="color: var(--primary); text-decoration: underline;">nhấp để duyệt tệp</span>
           </div>
-          <div style="font-size: 12.5px; color: var(--gray-500);">
-            Hỗ trợ tất cả định dạng SDS/MSDS chuẩn GHS (Tiếng Anh, Tiếng Việt, Song ngữ). Quét an toàn tuyệt đối tại máy tính của bạn, không upload tệp ra ngoài.
+          <div style="font-size: 12.5px; color: var(--gray-500); line-height: 1.6;">
+            <span style="display: inline-block; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 4px; font-weight: 700; margin-right: 4px;">🚀 Hybrid Text + OCR</span>
+            Tự động phát hiện: Đọc siêu tốc từ <strong>PDF văn bản số hóa</strong> và tự động kích hoạt <strong>OCR quang học</strong> khi gặp <strong>PDF bản scan ảnh hoặc file ảnh (PNG, JPG)</strong>. Quét 100% tại máy tính của bạn, bảo mật tuyệt đối.
           </div>
         </div>
       </div>
@@ -2160,7 +2164,11 @@ function extractConcentrationFromLine(line, cas) {
 // Extract ingredients from raw text (either PDF output or user paste)
 function parseIngredientsFromText(fullText) {
   if (!fullText) return [];
-  const lines = fullText.split(/\r?\n/);
+  // Chuẩn hóa lỗi ký tự OCR: chuyển đổi gạch ngang dài (en-dash, em-dash, gạch dưới) sang dấu gạch nối CAS chuẩn
+  const normalizedText = fullText
+    .replace(/(\d+)\s*[–—_]\s*(\d+)/g, '$1-$2')
+    .replace(/(\d+)\s*-\s*(\d+)/g, '$1-$2');
+  const lines = normalizedText.split(/\r?\n/);
   const casRegex = /\b([1-9]\d{1,6}-\d{2}-\d)\b/g;
 
   const foundIngredients = [];
@@ -2521,7 +2529,7 @@ function renderMsdsAnalysisResults(evaluatedList, sourceTitle) {
   container.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// Process PDF file using PDF.js
+// Process PDF or Image file using Hybrid Text-First + Tesseract OCR Fallback
 async function processMsdsPdfFile(file) {
   const loading = document.getElementById('msds-loading');
   const loadingMsg = document.getElementById('msds-loading-msg');
@@ -2533,52 +2541,126 @@ async function processMsdsPdfFile(file) {
   if (loading) loading.style.display = 'block';
 
   try {
-    if (typeof pdfjsLib === 'undefined') {
-      throw new Error('Thư viện PDF.js chưa được tải đầy đủ. Vui lòng kết nối mạng hoặc chuyển sang tab "Dán Nội Dung Mục 3" để phân tích!');
-    }
-
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-    if (loadingMsg) loadingMsg.textContent = `Đang đọc tệp "${file.name}"...`;
-
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-    
     let extractedText = '';
-    const totalPages = pdf.numPages;
+    const fileName = file.name || 'Tài liệu MSDS';
+    const isImageFile = (file.type && file.type.startsWith('image/')) || /\.(png|jpe?g|webp|bmp|gif|tiff)$/i.test(fileName);
 
-    for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
-      if (loadingMsg) loadingMsg.textContent = `Đang quét nội dung Trang ${pageNum} / ${totalPages}...`;
-      const page = await pdf.getPage(pageNum);
-      const content = await page.getTextContent();
-      
-      let lastY = null;
-      let pageText = '';
-      for (const item of content.items) {
-        if (lastY !== null && Math.abs(item.transform[5] - lastY) > 5) {
-          pageText += '\n';
-        } else {
-          pageText += ' ';
-        }
-        pageText += item.str;
-        lastY = item.transform[5];
+    if (isImageFile) {
+      // -----------------------------------------------------------------
+      // TRƯỜNG HỢP 1: TỆP LÀ HÌNH ẢNH SCAN TRỰC TIẾP (PNG, JPG, WEBP...)
+      // -----------------------------------------------------------------
+      if (typeof Tesseract === 'undefined') {
+        throw new Error('Thư viện Tesseract OCR chưa được tải đầy đủ. Vui lòng kết nối mạng để kích hoạt tính năng quét OCR hình ảnh!');
       }
-      extractedText += `\n[PAGE ${pageNum}]\n` + pageText;
+
+      if (loadingMsg) loadingMsg.textContent = `Đang quét OCR nhận diện quang học hình ảnh "${fileName}"...`;
+
+      const ocrResult = await Tesseract.recognize(file, 'eng', {
+        logger: m => {
+          if (m.status === 'recognizing text' && loadingMsg) {
+            const pct = Math.round((m.progress || 0) * 100);
+            loadingMsg.textContent = `Đang quét OCR nhận diện chữ từ ảnh... (${pct}%)`;
+          }
+        }
+      });
+      extractedText = ocrResult.data.text || '';
+
+    } else {
+      // -----------------------------------------------------------------
+      // TRƯỜNG HỢP 2: TỆP LÀ PDF (HYBRID TEXT-FIRST + OCR TỰ ĐỘNG KHI GẶP TRANG ẢNH)
+      // -----------------------------------------------------------------
+      if (typeof pdfjsLib === 'undefined') {
+        throw new Error('Thư viện PDF.js chưa được tải đầy đủ. Vui lòng kết nối mạng hoặc chuyển sang tab "Dán Nội Dung Mục 3" để phân tích!');
+      }
+
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+      if (loadingMsg) loadingMsg.textContent = `Đang đọc tệp "${fileName}"...`;
+
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const totalPages = pdf.numPages;
+
+      let hasDigitalText = false;
+      const pageTexts = [];
+
+      // Bước 1: Quét lớp văn bản số hóa (Digital Text) cực nhanh
+      for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+        if (loadingMsg) loadingMsg.textContent = `Đang kiểm tra lớp văn bản Trang ${pageNum} / ${totalPages}...`;
+        const page = await pdf.getPage(pageNum);
+        const content = await page.getTextContent();
+
+        let lastY = null;
+        let pageText = '';
+        for (const item of content.items) {
+          if (lastY !== null && Math.abs(item.transform[5] - lastY) > 5) {
+            pageText += '\n';
+          } else {
+            pageText += ' ';
+          }
+          pageText += item.str;
+          lastY = item.transform[5];
+        }
+
+        pageTexts.push({ pageNum, page, text: pageText });
+        if (pageText.trim().length >= 40) {
+          hasDigitalText = true;
+          extractedText += `\n[PAGE ${pageNum}]\n` + pageText;
+        }
+      }
+
+      // Bước 2: Nếu phát hiện PDF dạng scan ảnh (không có văn bản số hóa), tự động kích hoạt OCR!
+      if (!hasDigitalText || extractedText.trim().length < 50) {
+        if (typeof Tesseract === 'undefined') {
+          throw new Error('Phát hiện tệp PDF là bản scan ảnh, nhưng thư viện Tesseract OCR chưa sẵn sàng. Vui lòng kiểm tra kết nối mạng!');
+        }
+
+        extractedText = '';
+        // Quét OCR tối đa 4 trang đầu tiên (nơi tập trung Mục 1-3 Thành phần MSDS) để tối ưu thời gian
+        const maxOcrPages = Math.min(totalPages, 4);
+
+        for (let i = 0; i < maxOcrPages; i++) {
+          const { pageNum, page } = pageTexts[i];
+          if (loadingMsg) loadingMsg.textContent = `Phát hiện bản scan ảnh: Đang chuẩn bị quét OCR Trang ${pageNum} / ${maxOcrPages}...`;
+
+          // Render trang PDF ra Canvas độ phân giải cao 2x để OCR sắc nét
+          const viewport = page.getViewport({ scale: 2.0 });
+          const canvas = document.createElement('canvas');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          const ctx = canvas.getContext('2d');
+
+          await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+          if (loadingMsg) loadingMsg.textContent = `Đang quét OCR nhận diện quang học Trang ${pageNum} / ${maxOcrPages}...`;
+
+          const ocrResult = await Tesseract.recognize(canvas, 'eng', {
+            logger: m => {
+              if (m.status === 'recognizing text' && loadingMsg) {
+                const pct = Math.round((m.progress || 0) * 100);
+                loadingMsg.textContent = `Quét OCR Trang ${pageNum} / ${maxOcrPages}: ${pct}%`;
+              }
+            }
+          });
+
+          extractedText += `\n[PAGE ${pageNum} (OCR)]\n` + (ocrResult.data.text || '');
+        }
+      }
     }
 
-    if (loadingMsg) loadingMsg.textContent = 'Đang phân tích thành phần & đối soát CSDL...';
+    if (loadingMsg) loadingMsg.textContent = 'Đang phân tích thành phần & đối soát CSDL 1.382 hóa chất...';
 
     const ingredients = parseIngredientsFromText(extractedText);
     const evaluated = ingredients.map(evaluateIngredient);
 
     if (loading) loading.style.display = 'none';
-    renderMsdsAnalysisResults(evaluated, file.name);
+    renderMsdsAnalysisResults(evaluated, fileName);
 
   } catch (err) {
-    console.error('Error parsing PDF:', err);
+    console.error('Error parsing document:', err);
     if (loading) loading.style.display = 'none';
     if (errorBox) {
-      errorBox.innerHTML = `<strong>⚠️ Lỗi phân tích tệp:</strong> ${err.message || 'Không thể trích xuất văn bản từ tệp PDF này. Nếu là file scan ảnh, vui lòng dán nội dung Mục 3 dạng văn bản.'}`;
+      errorBox.innerHTML = `<strong>⚠️ Lỗi phân tích tệp:</strong> ${err.message || 'Không thể trích xuất văn bản từ tệp này.'}`;
       errorBox.style.display = 'block';
     }
   }
