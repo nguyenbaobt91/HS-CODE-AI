@@ -12,3 +12,17 @@ __pycache__/
 # Operating system files
 Thumbs.db
 .DS_Store
+
+# Temporary files & backups
+*.bak*
+diff.txt
+
+# Heavy source PDF/DOC files in chuyen-nganh (to stay well below GitHub 50MB/100MB limit)
+chuyen-nganh/*.pdf
+chuyen-nganh/*.doc*
+
+# Heavy local json / source chapters
+wco_chapters/
+official_chapter_titles.json
+tariff_8digit_details.json
+wco2022_official_notes.json
