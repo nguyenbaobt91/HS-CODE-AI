@@ -174,13 +174,13 @@
     </a>
 
     <!-- Floating Quick-Access Tab KTCN 2026: Mép Ngoài Cùng Bên Trái (Kiểm Tra Chuyên Ngành) -->
-    <a href="./chuyen-nganh/" class="fixed left-0 top-48 z-50 flex items-center gap-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-xs px-3 py-2.5 rounded-r-2xl shadow-xl border-y border-r border-blue-400/60 transition-all duration-200 hover:pl-4 group cursor-pointer" title="Mở Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026 (Nghị định 37/2026/NĐ-CP)">
-        <i class="fa-solid fa-table-columns text-yellow-300 text-base group-hover:rotate-12 transition-transform"></i>
+    <a href="./chuyen-nganh/?v=2026" style="top: 195px !important; z-index: 9999 !important;" class="fixed left-0 z-[9999] flex items-center gap-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-xs px-3.5 py-2.5 rounded-r-2xl shadow-2xl border-y-2 border-r-2 border-blue-300 transition-all duration-200 hover:pl-5 group cursor-pointer" title="Mở Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026 (Nghị định 37/2026/NĐ-CP)">
+        <i class="fa-solid fa-shield-halved text-yellow-300 text-lg group-hover:rotate-12 transition-transform"></i>
         <div class="flex flex-col text-left leading-tight">
-            <span class="text-[10px] text-blue-200 font-bold uppercase tracking-wider">Cổng Tra Cứu</span>
+            <span class="text-[10px] text-blue-100 font-extrabold uppercase tracking-wider">Cổng Tra Cứu</span>
             <span class="text-xs font-black">KTCN 4 Bộ 2026</span>
         </div>
-        <span class="inline-flex items-center px-1.5 py-0.5 text-[8.5px] font-black uppercase rounded-full bg-emerald-400 text-emerald-950 animate-pulse ml-0.5">2026</span>
+        <span class="inline-flex items-center px-1.5 py-0.5 text-[9px] font-black uppercase rounded-full bg-emerald-400 text-emerald-950 animate-pulse ml-1 shadow-sm">MỚI</span>
     </a>
 
     <!-- Header / Navbar (Đã xóa tab Cổng Hóa Chất ở trên, giữ nguyên vẹn bố cục chuẩn) -->
@@ -199,8 +199,13 @@
                 </div>
             </div>
 
-            <!-- Segmented Navigation Bar: 5 Tab Chuẩn Đẹp Của HS Code -->
+            <!-- Segmented Navigation Bar: 5 Tab Chuẩn Đẹp Của HS Code + Nút KTCN 2026 -->
             <nav class="flex items-center bg-slate-100/90 dark:bg-slate-800/80 p-1 rounded-2xl border border-slate-200/70 dark:border-slate-700/60 overflow-x-auto custom-scrollbar shrink-0">
+                <a href="./chuyen-nganh/?v=2026" class="px-3 py-1.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-sm flex items-center gap-1.5 whitespace-nowrap cursor-pointer mr-1 transition" title="Mở Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026">
+                    <i class="fa-solid fa-shield-halved text-yellow-300 text-xs"></i>
+                    <span>KTCN 2026</span>
+                    <span class="px-1 py-0.2 rounded-full bg-emerald-400 text-emerald-950 text-[8.5px] font-black">HOT</span>
+                </a>
                 <button onclick="switchTab('propose')" id="tab-btn-propose" class="tab-btn active px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors duration-150 flex items-center gap-1.5 bg-sky-600 text-white shadow-sm whitespace-nowrap cursor-pointer">
                     <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
                     <span>AI Đề Xuất HS</span>
