@@ -3,6 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Theme Initializer (Tối / Sáng - Chống giật màn hình) -->
+<script>
+  (function() {
+    const saved = localStorage.getItem('hoachat_theme') || localStorage.getItem('hscoder_theme');
+    if (saved === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+  })();
+</script>
 <title>Cổng Thông Tin & Tra Cứu Nghiệp Vụ Hóa Chất 2026</title>
 
 <!-- Modern International Web Fonts: Plus Jakarta Sans, Outfit, JetBrains Mono -->
@@ -622,6 +632,353 @@ footer {
   to { opacity: 1; transform: translateY(0); }
 }
 
+
+/* ============================================================
+   DARK MODE SYSTEM (CHẾ ĐỘ TỐI / SÁNG CHUYÊN NGHIỆP)
+   ============================================================ */
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  user-select: none;
+}
+.theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Dark Mode CSS Variables */
+html.dark {
+  --navy: #f8fafc;
+  --gray-50: #1e293b;
+  --gray-100: #273549;
+  --gray-200: #334155;
+  --gray-300: #475569;
+  --gray-400: #64748b;
+  --gray-500: #94a3b8;
+  --gray-600: #cbd5e1;
+  --gray-700: #e2e8f0;
+  --gray-800: #f1f5f9;
+  --gray-900: #f8fafc;
+  --primary-light: rgba(2, 132, 199, 0.2);
+  --success-light: rgba(22, 163, 74, 0.2);
+  --warning-light: rgba(217, 119, 6, 0.2);
+  --danger-light: rgba(220, 38, 38, 0.2);
+  --purple-light: rgba(124, 58, 237, 0.2);
+}
+
+html.dark body,
+body.dark {
+  background-color: #0b1120;
+  color: #cbd5e1;
+}
+
+/* Dark Cards & Layout */
+html.dark .card {
+  background: #111827;
+  border-color: #1f2937;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 2px 6px -1px rgba(0, 0, 0, 0.3);
+  color: #cbd5e1;
+}
+
+html.dark .card-title {
+  color: #f8fafc;
+}
+
+html.dark .card-header-clean {
+  border-bottom-color: #1f2937;
+}
+
+/* Dark Navigation Tabs */
+html.dark .nav-tab-btn {
+  background: rgba(15, 23, 42, 0.65);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+}
+
+html.dark .nav-tab-btn:hover {
+  background: rgba(30, 41, 59, 0.85);
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #f1f5f9;
+}
+
+html.dark .nav-tab-btn.active {
+  background: #1e293b;
+  color: #38bdf8;
+  border-color: #38bdf8;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+html.dark .nav-tab-btn.active .tab-icon-box {
+  background: #0f172a;
+  box-shadow: 0 2px 8px rgba(56, 189, 248, 0.35);
+}
+
+html.dark .nav-tab-btn.active .tab-info-sub {
+  color: #38bdf8;
+}
+
+/* Dark Search & Inputs */
+html.dark .search-input {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+html.dark .search-input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+}
+
+html.dark .search-input::placeholder {
+  color: #64748b;
+}
+
+html.dark select.search-input option {
+  background: #1e293b;
+  color: #f8fafc;
+}
+
+html.dark .search-icon {
+  color: #64748b;
+}
+
+/* Dark Filter Buttons */
+html.dark .filter-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+html.dark .filter-btn:hover {
+  background: #334155;
+  border-color: #475569;
+  color: #f8fafc;
+}
+
+html.dark .filter-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+
+/* Dark Tables */
+html.dark .table-responsive {
+  border-color: #1f2937;
+}
+
+html.dark table {
+  border-color: #1f2937;
+}
+
+html.dark th {
+  background: #1e293b;
+  color: #94a3b8;
+  border-bottom: 1px solid #334155;
+}
+
+html.dark td {
+  border-bottom: 1px solid #1f2937;
+  color: #cbd5e1;
+}
+
+html.dark tr:hover td {
+  background: rgba(30, 41, 59, 0.7);
+}
+
+/* Dark Modals */
+html.dark .modal-content {
+  background: #111827;
+  border-color: #374151;
+  color: #cbd5e1;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+}
+
+html.dark .modal-header {
+  border-bottom-color: #1f2937;
+}
+
+html.dark .modal-title {
+  color: #f8fafc;
+}
+
+html.dark .modal-close {
+  background: #1e293b;
+  border-color: #374151;
+  color: #94a3b8;
+}
+
+html.dark .modal-close:hover {
+  background: rgba(220, 38, 38, 0.25);
+  border-color: #f87171;
+  color: #f87171;
+}
+
+/* Dark Buttons */
+html.dark .btn-outline {
+  background: #1e293b;
+  border-color: #374151;
+  color: #cbd5e1;
+}
+
+html.dark .btn-outline:hover {
+  background: #334155;
+  border-color: #475569;
+  color: #ffffff;
+}
+
+/* Dark MSDS & Drop Area */
+html.dark #msds-drop-area {
+  background: #111827 !important;
+  border-color: #0284c7 !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark .msds-drop-active {
+  background: #0c2340 !important;
+  border-color: #38bdf8 !important;
+}
+
+/* Dark Callouts & Alerts */
+html.dark .callout-info {
+  background: rgba(2, 132, 199, 0.16);
+  border-color: #38bdf8;
+  color: #93c5fd;
+}
+
+html.dark .callout-success {
+  background: rgba(22, 163, 74, 0.16);
+  border-color: #4ade80;
+  color: #86efac;
+}
+
+html.dark .callout-warning {
+  background: rgba(217, 119, 6, 0.16);
+  border-color: #facc15;
+  color: #fde047;
+}
+
+html.dark .callout-danger {
+  background: rgba(220, 38, 38, 0.16);
+  border-color: #f87171;
+  color: #fca5a5;
+}
+
+/* Dark Pills */
+html.dark .pill-primary {
+  background: rgba(2, 132, 199, 0.25);
+  color: #7dd3fc;
+}
+
+html.dark .pill-success {
+  background: rgba(22, 163, 74, 0.25);
+  color: #86efac;
+}
+
+html.dark .pill-warning {
+  background: rgba(217, 119, 6, 0.25);
+  color: #fde047;
+}
+
+html.dark .pill-danger {
+  background: rgba(220, 38, 38, 0.25);
+  color: #fca5a5;
+}
+
+html.dark .pill-purple {
+  background: rgba(124, 58, 237, 0.25);
+  color: #d8b4fe;
+}
+
+/* Dark Footer */
+html.dark footer {
+  background: #111827 !important;
+  border-color: #1f2937 !important;
+  color: #64748b !important;
+}
+
+/* Inline Style Overrides for Dark Mode */
+html.dark [style*="color: #1e293b"],
+html.dark [style*="color:#1e293b"] {
+  color: #e2e8f0 !important;
+}
+
+html.dark [style*="color: #0f172a"],
+html.dark [style*="color:#0f172a"] {
+  color: #f8fafc !important;
+}
+
+html.dark [style*="background: var(--gray-50)"],
+html.dark [style*="background:var(--gray-50)"],
+html.dark [style*="background: #f8fafc"],
+html.dark [style*="background:#f8fafc"] {
+  background: #1e293b !important;
+}
+
+html.dark [style*="background: #ffffff"],
+html.dark [style*="background:#ffffff"] {
+  background: #111827 !important;
+}
+
+html.dark [style*="background: #fffbeb"],
+html.dark [style*="background:#fffbeb"] {
+  background: rgba(217, 119, 6, 0.15) !important;
+  color: #fde047 !important;
+  border-color: rgba(250, 204, 21, 0.35) !important;
+}
+
+html.dark [style*="background: #fff1f2"],
+html.dark [style*="background:#fff1f2"] {
+  background: rgba(225, 29, 72, 0.15) !important;
+  color: #fda4af !important;
+  border-color: rgba(244, 63, 94, 0.35) !important;
+}
+
+html.dark [style*="background: #fefce8"],
+html.dark [style*="background:#fefce8"] {
+  background: rgba(234, 179, 8, 0.15) !important;
+  color: #fef08a !important;
+  border-color: rgba(250, 204, 21, 0.35) !important;
+}
+
+html.dark [style*="background: #f0fdf4"],
+html.dark [style*="background:#f0fdf4"] {
+  background: rgba(22, 163, 74, 0.15) !important;
+  color: #86efac !important;
+  border-color: rgba(74, 222, 128, 0.35) !important;
+}
+
+html.dark [style*="linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%)"] {
+  background: linear-gradient(180deg, #1e293b 0%, #111827 100%) !important;
+  border-color: #0284c7 !important;
+}
+
+html.dark [style*="linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%)"] {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+  border-color: #1e3a8a !important;
+}
+
+html.dark strong {
+  color: #f8fafc;
+}
+
 </style>
 
 
@@ -642,9 +999,14 @@ footer {
     </div>
 </a>
 
-
-
-
+<!-- Floating Quick-Access Tab 2: KTCN 2026 (Mép Trái) -->
+<a href="../chuyen-nganh/" style="text-decoration: none; position: fixed; left: 0; top: 210px; z-index: 9999; display: flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #2563eb, #4f46e5); color: #fff; padding: 10px 14px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; box-shadow: 0 10px 25px rgba(37,99,235,0.4); font-family: 'Segoe UI', system-ui, sans-serif; transition: all 0.2s;" onmouseover="this.style.paddingLeft='18px'" onmouseout="this.style.paddingLeft='14px'" title="Mở Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026 (Nghị định 37/2026/NĐ-CP)">
+    <span style="font-size: 18px;">⚖️</span>
+    <div style="display: flex; flex-direction: column; text-align: left; line-height: 1.2;">
+        <span style="font-size: 10px; color: #bfdbfe; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Cổng Tra Cứu</span>
+        <span style="font-size: 12px; font-weight: 900;">KTCN 4 Bộ 2026</span>
+    </div>
+</a>
 
 <header>
   <div class="header-top">
@@ -654,6 +1016,10 @@ footer {
     </div>
     <div class="header-meta">
       <a href="./Quy_trinh_huong_dan_nghiep_vu_hoa_chat.pdf" target="_blank" class="btn btn-primary" style="background: #e11d48; color: #ffffff; border: 1px solid #fda4af; padding: 6px 15px; font-size: 13px; font-weight: 700; border-radius: 20px; box-shadow: 0 2px 8px rgba(225,29,72,0.35); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">📘 Toàn văn Quy trình Hóa chất (Master SOP PDF)</a>
+      <button type="button" id="theme-btn" onclick="toggleDarkMode()" class="theme-toggle-btn" title="Chuyển chế độ Tối / Sáng (Dark / Light Mode)">
+        <span id="theme-icon">🌙</span>
+        <span id="theme-text">Tối / Sáng</span>
+      </button>
       <span>📅 Cập nhật Luật Hóa chất 2025 &amp; NĐ 24, 25, 26, 28/2026/NĐ-CP</span>
       <span>⚡ QĐ 1040/QĐ-BCT &amp; NQ 19/2026/NQ-CP</span>
     </div>
@@ -2773,6 +3139,45 @@ document.addEventListener('keydown', (e) => {
 
 
 
+</script>
+<script>
+// ============================================================
+// CHẾ ĐỘ GIAO DIỆN TỐI / SÁNG (DARK / LIGHT MODE)
+// ============================================================
+function toggleDarkMode() {
+  const html = document.documentElement;
+  const isDark = html.classList.toggle('dark');
+  if (document.body) {
+    document.body.classList.toggle('dark', isDark);
+  }
+  localStorage.setItem('hoachat_theme', isDark ? 'dark' : 'light');
+  localStorage.setItem('hscoder_theme', isDark ? 'dark' : 'light');
+  
+  updateThemeButtonUI(isDark);
+  
+  if (typeof showToast === 'function') {
+    showToast(isDark ? '🌙 Đã kích hoạt Giao diện Tối' : '☀️ Đã kích hoạt Giao diện Sáng');
+  }
+}
+
+function updateThemeButtonUI(isDark) {
+  const icon = document.getElementById('theme-icon');
+  const text = document.getElementById('theme-text');
+  if (icon) {
+    icon.textContent = isDark ? '☀️' : '🌙';
+  }
+  if (text) {
+    text.textContent = isDark ? 'Sáng' : 'Tối / Sáng';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const isDark = document.documentElement.classList.contains('dark');
+  if (document.body) {
+    document.body.classList.toggle('dark', isDark);
+  }
+  updateThemeButtonUI(isDark);
+});
 </script>
 </body>
 </html>
