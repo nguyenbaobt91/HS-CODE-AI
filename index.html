@@ -163,8 +163,8 @@
 
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen">
-    <!-- Floating Quick-Access Tab: Mép Ngoài Cùng Bên Trái (Hóa Chất) -->
-    <a href="./hoa-chat/" class="fixed left-0 top-32 z-50 flex items-center gap-2 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-300 hover:from-amber-500 hover:to-orange-500 text-amber-950 font-black text-xs px-3 py-2.5 rounded-r-2xl shadow-xl border-y border-r border-amber-400 transition-all duration-200 hover:pl-4 group cursor-pointer" title="Mở Cổng Nghiệp Vụ Hóa Chất 2026 & Quét Phân Tích MSDS Tự Động">
+    <!-- Floating Quick-Access Tab 1: Hóa Chất (Mép Trái) -->
+    <a href="./hoa-chat/" style="top: 130px !important; z-index: 9999 !important;" class="fixed left-0 z-[9999] flex items-center gap-2 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-300 hover:from-amber-500 hover:to-orange-500 text-amber-950 font-black text-xs px-3 py-2.5 rounded-r-2xl shadow-xl border-y border-r border-amber-400 transition-all duration-200 hover:pl-4 group cursor-pointer" title="Mở Cổng Nghiệp Vụ Hóa Chất 2026 & Quét Phân Tích MSDS Tự Động">
         <i class="fa-solid fa-flask-vial text-rose-600 text-base group-hover:rotate-12 transition-transform"></i>
         <div class="flex flex-col text-left leading-tight">
             <span class="text-[10px] text-amber-900/80 font-bold uppercase tracking-wider">Cổng Tra Cứu</span>
@@ -173,14 +173,14 @@
         <span class="inline-flex items-center px-1.5 py-0.5 text-[8.5px] font-black uppercase rounded-full bg-rose-600 text-white animate-pulse ml-0.5">MỚI</span>
     </a>
 
-    <!-- Floating Quick-Access Tab KTCN 2026: Mép Ngoài Cùng Bên Trái (Kiểm Tra Chuyên Ngành) -->
-    <a href="./chuyen-nganh/?v=2026" style="top: 195px !important; z-index: 9999 !important;" class="fixed left-0 z-[9999] flex items-center gap-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-xs px-3.5 py-2.5 rounded-r-2xl shadow-2xl border-y-2 border-r-2 border-blue-300 transition-all duration-200 hover:pl-5 group cursor-pointer" title="Mở Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026 (Nghị định 37/2026/NĐ-CP)">
-        <i class="fa-solid fa-shield-halved text-yellow-300 text-lg group-hover:rotate-12 transition-transform"></i>
+    <!-- Floating Quick-Access Tab 2: KTCN 2026 (Mép Trái - Thể hiện y chang Hóa chất, cách nhau sạch sẽ) -->
+    <a href="./chuyen-nganh/" style="top: 210px !important; z-index: 9999 !important;" class="fixed left-0 z-[9999] flex items-center gap-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-xs px-3 py-2.5 rounded-r-2xl shadow-xl border-y border-r border-blue-400/60 transition-all duration-200 hover:pl-4 group cursor-pointer" title="Mở Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026 (Nghị định 37/2026/NĐ-CP)">
+        <i class="fa-solid fa-table-columns text-yellow-300 text-base group-hover:rotate-12 transition-transform"></i>
         <div class="flex flex-col text-left leading-tight">
-            <span class="text-[10px] text-blue-100 font-extrabold uppercase tracking-wider">Cổng Tra Cứu</span>
+            <span class="text-[10px] text-blue-200 font-bold uppercase tracking-wider">Cổng Tra Cứu</span>
             <span class="text-xs font-black">KTCN 4 Bộ 2026</span>
         </div>
-        <span class="inline-flex items-center px-1.5 py-0.5 text-[9px] font-black uppercase rounded-full bg-emerald-400 text-emerald-950 animate-pulse ml-1 shadow-sm">MỚI</span>
+        <span class="inline-flex items-center px-1.5 py-0.5 text-[8.5px] font-black uppercase rounded-full bg-emerald-400 text-emerald-950 animate-pulse ml-0.5">2026</span>
     </a>
 
     <!-- Header / Navbar (Đã xóa tab Cổng Hóa Chất ở trên, giữ nguyên vẹn bố cục chuẩn) -->
@@ -199,13 +199,8 @@
                 </div>
             </div>
 
-            <!-- Segmented Navigation Bar: 5 Tab Chuẩn Đẹp Của HS Code + Nút KTCN 2026 -->
+            <!-- Segmented Navigation Bar: 5 Tab Chuẩn Đẹp Của HS Code -->
             <nav class="flex items-center bg-slate-100/90 dark:bg-slate-800/80 p-1 rounded-2xl border border-slate-200/70 dark:border-slate-700/60 overflow-x-auto custom-scrollbar shrink-0">
-                <a href="./chuyen-nganh/?v=2026" class="px-3 py-1.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-sm flex items-center gap-1.5 whitespace-nowrap cursor-pointer mr-1 transition" title="Mở Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026">
-                    <i class="fa-solid fa-shield-halved text-yellow-300 text-xs"></i>
-                    <span>KTCN 2026</span>
-                    <span class="px-1 py-0.2 rounded-full bg-emerald-400 text-emerald-950 text-[8.5px] font-black">HOT</span>
-                </a>
                 <button onclick="switchTab('propose')" id="tab-btn-propose" class="tab-btn active px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors duration-150 flex items-center gap-1.5 bg-sky-600 text-white shadow-sm whitespace-nowrap cursor-pointer">
                     <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
                     <span>AI Đề Xuất HS</span>
@@ -1220,11 +1215,6 @@
     <!-- Global Footer: Legal Disclaimer & Internal Use Notice -->
     <footer class="mt-16 border-t border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 backdrop-blur-sm py-8 px-4 sm:px-6">
         <div class="max-w-7xl mx-auto space-y-4">
-            <div class="p-3 px-4 rounded-xl bg-rose-500/10 dark:bg-rose-400/10 border border-dashed border-rose-500/40 text-center">
-                <p class="text-xs sm:text-sm font-semibold text-rose-700 dark:text-rose-400">
-                    ⚠️ LƯU HÀNH NỘI BỘ: Dữ liệu chỉ dùng cho mục đích tham khảo nghiệp vụ, vui lòng đối chiếu văn bản pháp luật hiện hành khi làm thủ tục Hải quan.
-                </p>
-            </div>
             <div class="p-4 sm:p-5 rounded-2xl bg-amber-500/5 dark:bg-amber-400/5 border border-amber-500/20 dark:border-amber-400/20">
                 <div class="flex items-center gap-2 text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider mb-2">
                     <i class="fa-solid fa-shield-halved text-sm"></i>

@@ -97,21 +97,24 @@
 </head>
 <body id="app-body" class="bg-custom-port text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased transition-colors duration-200">
 
-    <!-- Floating Navigation Tabs: Trở về Trang Chủ & Hóa Chất -->
-    <a href="../" class="fixed left-0 top-32 z-50 flex items-center gap-2 bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-700 hover:to-blue-800 text-white font-black text-xs px-3 py-2 rounded-r-2xl shadow-xl border-y border-r border-sky-400/50 transition-all duration-200 hover:pl-4 group cursor-pointer" title="Quay lại Cổng Tra Cứu HS Code AI">
-        <i class="fa-solid fa-house text-yellow-300 text-sm group-hover:-translate-x-0.5 transition-transform"></i>
+        <!-- Floating Navigation Tab 1: Trở Về Trang Chủ HS Code AI (Thể Hiện Y Chang Hóa Chất) -->
+    <a href="../" style="top: 130px !important; z-index: 9999 !important;" class="fixed left-0 z-[9999] flex items-center gap-2 bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-700 hover:from-sky-700 hover:to-indigo-800 text-white font-black text-xs px-3 py-2.5 rounded-r-2xl shadow-xl border-y border-r border-sky-400/60 transition-all duration-200 hover:pl-4 group cursor-pointer" title="Quay lại Cổng Tra Cứu & Đề Xuất Mã HS Code AI">
+        <i class="fa-solid fa-arrow-left text-yellow-300 text-base group-hover:-translate-x-1 transition-transform"></i>
         <div class="flex flex-col text-left leading-tight">
-            <span class="text-[9px] text-sky-200 font-bold uppercase tracking-wider">Trang Chủ</span>
+            <span class="text-[10px] text-sky-200 font-bold uppercase tracking-wider">Trở Về</span>
             <span class="text-xs font-black">HS Code AI</span>
         </div>
+        <span class="inline-flex items-center px-1.5 py-0.5 text-[8.5px] font-black uppercase rounded-full bg-yellow-400 text-slate-900 ml-0.5">CHÍNH</span>
     </a>
 
-    <a href="../hoa-chat/" class="fixed left-0 top-48 z-50 flex items-center gap-2 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-300 hover:from-amber-500 hover:to-orange-500 text-amber-950 font-black text-xs px-3 py-2 rounded-r-2xl shadow-xl border-y border-r border-amber-400 transition-all duration-200 hover:pl-4 group cursor-pointer" title="Mở Cổng Nghiệp Vụ Hóa Chất 2026 & Quét MSDS">
-        <i class="fa-solid fa-flask-vial text-rose-600 text-sm group-hover:rotate-12 transition-transform"></i>
+    <!-- Floating Navigation Tab 2: Cổng Tra Cứu Hóa Chất (Thể Hiện Y Chang Hóa Chất) -->
+    <a href="../hoa-chat/" style="top: 210px !important; z-index: 9999 !important;" class="fixed left-0 z-[9999] flex items-center gap-2 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-300 hover:from-amber-500 hover:to-orange-500 text-amber-950 font-black text-xs px-3 py-2.5 rounded-r-2xl shadow-xl border-y border-r border-amber-400 transition-all duration-200 hover:pl-4 group cursor-pointer" title="Mở Cổng Nghiệp Vụ Hóa Chất 2026 & Quét Phân Tích MSDS Tự Động">
+        <i class="fa-solid fa-flask-vial text-rose-600 text-base group-hover:rotate-12 transition-transform"></i>
         <div class="flex flex-col text-left leading-tight">
-            <span class="text-[9px] text-amber-900/80 font-bold uppercase tracking-wider">Cổng Tra Cứu</span>
-            <span class="text-xs font-black">Hóa Chất 2026</span>
+            <span class="text-[10px] text-amber-900/80 font-bold uppercase tracking-wider">Cổng Tra Cứu</span>
+            <span class="text-xs font-black">Hóa Chất &amp; MSDS</span>
         </div>
+        <span class="inline-flex items-center px-1.5 py-0.5 text-[8.5px] font-black uppercase rounded-full bg-rose-600 text-white animate-pulse ml-0.5">MỚI</span>
     </a>
 
     <!-- TOP NAVIGATION (CHUẨN QUỐC TẾ) -->
