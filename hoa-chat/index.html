@@ -18,6 +18,7 @@
 <!-- Modern International Web Fonts: Plus Jakarta Sans, Outfit, JetBrains Mono -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -637,6 +638,52 @@ footer {
    DARK MODE SYSTEM (CHẾ ĐỘ TỐI / SÁNG CHUYÊN NGHIỆP)
    ============================================================ */
 
+
+/* Top-Right Header Actions & Theme Toggle (Góc phải y chang Web AI) */
+.header-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.theme-toggle-btn-corner {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fbbf24;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.theme-toggle-btn-corner:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+html.dark .theme-toggle-btn-corner {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f59e0b;
+}
+
+html.dark .theme-toggle-btn-corner:hover {
+  background: #334155;
+  border-color: #475569;
+}
+
 /* Theme Toggle Button */
 .theme-toggle-btn {
   background: rgba(255, 255, 255, 0.16);
@@ -1010,18 +1057,29 @@ html.dark strong {
 
 <header>
   <div class="header-top">
-    <div class="brand-title">
-      <span>🛡️ Cổng Thông Tin & Tra Cứu Nghiệp Vụ Hóa Chất 2026</span>
-      <span class="brand-badge">🏢 Bản quyền: MOL LOGISTICS VIETNAM</span>
+    <!-- Bên trái: Tiêu đề Cổng & Bản quyền -->
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+      <div class="brand-title">
+        <span>🛡️ Cổng Thông Tin & Tra Cứu Nghiệp Vụ Hóa Chất 2026</span>
+        <span class="brand-badge">🏢 MOL LOGISTICS VIETNAM</span>
+      </div>
+      <div class="header-meta" style="margin-top: 2px;">
+        <span>📅 Cập nhật Luật Hóa chất 2025 &amp; NĐ 24, 25, 26, 28/2026/NĐ-CP</span>
+        <span>⚡ QĐ 1040/QĐ-BCT &amp; NQ 19/2026/NQ-CP</span>
+      </div>
     </div>
-    <div class="header-meta">
-      <a href="./Quy_trinh_huong_dan_nghiep_vu_hoa_chat.pdf" target="_blank" class="btn btn-primary" style="background: #e11d48; color: #ffffff; border: 1px solid #fda4af; padding: 6px 15px; font-size: 13px; font-weight: 700; border-radius: 20px; box-shadow: 0 2px 8px rgba(225,29,72,0.35); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">📘 Toàn văn Quy trình Hóa chất (Master SOP PDF)</a>
-      <button type="button" id="theme-btn" onclick="toggleDarkMode()" class="theme-toggle-btn" title="Chuyển chế độ Tối / Sáng (Dark / Light Mode)">
-        <span id="theme-icon">🌙</span>
-        <span id="theme-text">Tối / Sáng</span>
+
+    <!-- Góc phải: Tác vụ & Nút Đổi Sáng / Tối y chang Web AI -->
+    <div class="header-actions-right">
+      <a href="./Quy_trinh_huong_dan_nghiep_vu_hoa_chat.pdf" target="_blank" class="btn btn-primary" style="background: #e11d48; color: #ffffff; border: 1px solid #fda4af; padding: 7px 16px; font-size: 13px; font-weight: 700; border-radius: 20px; box-shadow: 0 2px 8px rgba(225,29,72,0.35); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
+        <i class="fa-solid fa-file-pdf"></i>
+        <span>Master SOP PDF</span>
+      </a>
+
+      <!-- Nút Chuyển Đổi Sáng / Tối Ở Góc Phải Y Chang Web AI -->
+      <button type="button" id="btn-theme-toggle" onclick="toggleDarkMode()" class="theme-toggle-btn-corner" title="Chuyển chế độ Sáng / Tối (Dark / Light Mode)">
+        <i id="theme-icon" class="fa-solid fa-moon"></i>
       </button>
-      <span>📅 Cập nhật Luật Hóa chất 2025 &amp; NĐ 24, 25, 26, 28/2026/NĐ-CP</span>
-      <span>⚡ QĐ 1040/QĐ-BCT &amp; NQ 19/2026/NQ-CP</span>
     </div>
   </div>
 
@@ -3162,12 +3220,8 @@ function toggleDarkMode() {
 
 function updateThemeButtonUI(isDark) {
   const icon = document.getElementById('theme-icon');
-  const text = document.getElementById('theme-text');
   if (icon) {
-    icon.textContent = isDark ? '☀️' : '🌙';
-  }
-  if (text) {
-    text.textContent = isDark ? 'Sáng' : 'Tối / Sáng';
+    icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
   }
 }
 
