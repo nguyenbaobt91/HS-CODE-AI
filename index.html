@@ -201,7 +201,7 @@
                 <div class="hidden sm:block">
                     <div class="flex items-center gap-1.5">
                         <span class="text-lg sm:text-xl font-black bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">HSCoder AI</span>
-                        <span class="text-[10px] px-2.5 py-0.5 rounded-full font-black bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-sm uppercase tracking-wider">Bản B • UI Tinh Gọn</span>
+                        <span class="text-[10px] px-2.5 py-0.5 rounded-full font-black bg-gradient-to-r from-emerald-500 via-teal-600 to-sky-600 text-white shadow-sm uppercase tracking-wider">Bản C • AI Hybrid Toàn Năng</span>
                     </div>
                 </div>
             </div>
@@ -1365,11 +1365,11 @@
                     badge.title = 'Google Gemini AI đang hoạt động và áp dụng cho mọi phân tích (Bấm để đổi Key)';
                 }
             } else {
-                if (label && label.innerText !== 'Nhập Gemini API Key') label.innerText = 'Nhập Gemini API Key';
-                if (dot && dot.className !== 'w-2 h-2 rounded-full bg-amber-400 animate-ping') dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-ping';
-                if (badge && !badge.classList.contains('bg-amber-100')) {
-                    badge.className = 'px-3 py-1.5 rounded-xl bg-amber-100 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-600/50 text-amber-800 dark:text-amber-300 hover:border-amber-500 text-xs font-semibold transition-colors duration-150 flex items-center space-x-1.5 shadow-sm cursor-pointer shrink-0';
-                    badge.title = 'Nhấp vào đây để nhập Google Gemini API Key giúp nâng cao độ chính xác 100%';
+                if (label && label.innerText !== 'AI Sẵn Sàng') label.innerText = 'AI Sẵn Sàng';
+                if (dot && dot.className !== 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse') dot.className = 'w-2 h-2 rounded-full bg-emerald-500 animate-pulse';
+                if (badge && !badge.classList.contains('bg-emerald-100')) {
+                    badge.className = 'px-3 py-1.5 rounded-xl bg-emerald-100/80 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-600/50 text-emerald-800 dark:text-emerald-300 hover:border-emerald-500 text-xs font-semibold transition-colors duration-150 flex items-center space-x-1.5 shadow-sm cursor-pointer shrink-0';
+                    badge.title = 'Hệ thống đang hoạt động với Bộ Não Cục Bộ (12.000 dòng thuế & WCO 2022). Nhấp vào đây nếu muốn thêm Gemini API Key.';
                 }
             }
         }
@@ -1420,7 +1420,8 @@
             const candidateModels = [
                 'gemini-3.5-flash',
                 'gemini-3.5-flash-lite',
-                'gemini-flash-latest'
+                'gemini-flash-lite-latest',
+                'gemini-3.8-flash'
             ];
             let successModel = null;
             let lastError = null;
@@ -4158,9 +4159,10 @@
             if (!apiKey || apiKey.length < 15) throw new Error("Chưa cấu hình Google Gemini API Key hợp lệ");
 
             const candidateModels = [
+                'gemini-3.5-flash',
+                'gemini-3.5-flash-lite',
                 'gemini-flash-lite-latest',
-                'gemini-flash-latest',
-                'gemini-2.5-flash-lite'
+                'gemini-3.8-flash'
             ];
 
             // Extract relevant Customs Rulings Precedents from Database (Strict Chapter Guard)
@@ -8667,14 +8669,14 @@ Trường hợp đủ thông tin:
                             return;
                         }
                     } catch (gemErr) {
-                        console.warn("Lỗi gọi Gemini AI:", gemErr);
-                        const html = renderApiKeyRequiredAlertHtml(gemErr.message || "Lỗi kết nối tới máy chủ Google Gemini AI");
+                        console.warn("Lỗi gọi Gemini AI, tự động chuyển sang Bộ Não Cục Bộ:", gemErr);
+                        const html = generateClientSideAIReport(inputData);
                         if (container) container.innerHTML = html;
                         return;
                     }
                 } else {
-                    // Chưa cấu hình API Key: Hiện bảng yêu cầu nhập Key, TUYỆT ĐỐI KHÔNG ĐOÁN MÒ (Phương Án 1)
-                    const html = renderApiKeyRequiredAlertHtml("Chưa cấu hình Google Gemini API Key. Vui lòng bấm nút 'Nhập Gemini API Key' trên góc phải màn hình để kích hoạt AI Agent.");
+                    // Chưa có API Key: Tự động phân tích tức thì bằng Bộ Não Cục Bộ Toàn Năng (12.000 dòng thuế + Chú giải WCO 2022 + GRI 1-6)
+                    const html = generateClientSideAIReport(inputData);
                     if (container) container.innerHTML = html;
                     return;
                 }
