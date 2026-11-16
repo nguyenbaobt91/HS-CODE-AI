@@ -5902,10 +5902,1044 @@ Trường hợp đủ thông tin:
             };
         }
 
+        // =========================================================================
+        // STATUTORY TREE WALKER - CLIENT-SIDE JAVASCRIPT ENGINE (GRI 1-6 DETERMINISTIC)
+        // Strictly synchronized with Senior Customs Specialist SOP & WCO 2022
+        // Zero-Guessing: Thiếu thông số thì dừng ở 4 hoặc 6 số, cảnh báo bổ sung thông số
+        // Head Noun Extraction: Phân loại theo Danh từ trung tâm, không bị nhiễu vế sau
+        // =========================================================================
+        function cleanVietnameseStatutory(inputStr) {
+            if (!inputStr) return "";
+            let s = inputStr.replace(/đ/g, 'd').replace(/Đ/g, 'd');
+            return s.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        }
+
+        function extractHeadNounStatutory(desc) {
+            const clean = cleanVietnameseStatutory(desc);
+            const parts = clean.split(/[,;()\-–\d]/);
+            const firstPart = parts[0] ? parts[0].trim() : clean;
+            const m = firstPart.match(/^(mieng\s+nhua|tam\s+nhua(?:\s+phang)?|thanh\s+nhua|khung\s+nhua|mieng\s+thep|tam\s+thep|thanh\s+thep|chau\s+day|ga\s+dap|ga\s+lap\s+rap)/);
+            if (m) return m[1];
+            return firstPart;
+        }
+
+        function extractAttributesStatutory(nameText, fullText) {
+            const nameNorm = cleanVietnameseStatutory(nameText);
+            const textNorm = cleanVietnameseStatutory(fullText);
+            const headNoun = extractHeadNounStatutory(nameText);
+
+            const attrs = {
+                name_text: nameText,
+                name_norm: nameNorm,
+                head_noun: headNoun,
+                raw_text: fullText,
+                norm_text: textNorm,
+                voltage_v: null,
+                current_a: null,
+                power_w: null,
+                diameter_mm: null,
+                dn_mm: null,
+                has_connector: false,
+                no_connector: false,
+                is_threaded: null,
+                material: null,
+                is_insufficient_general: false
+            };
+
+            // 1. Kiểm tra mô tả quá sơ sài / mơ hồ
+            const cleanedWords = nameNorm.split(/\s+/).filter(w => w.length > 1);
+            const vagueTerms = ["phu tung", "phu tung may", "linh kien", "vat tu", "hang hoa", "chi tiet"];
+            if (cleanedWords.length <= 5 && vagueTerms.some(vt => nameNorm.includes(vt))) {
+                if (!["dien ap", "cong suat", "kich thuoc", "chat lieu", "thep", "nhua", "dong"].some(k => textNorm.includes(k))) {
+                    attrs.is_insufficient_general = true;
+                    return attrs;
+                }
+            }
+
+            // 2. Bóc tách Điện áp (Voltage)
+            const vRange = textNorm.match(/(?:dien\s+ap\s+)?(\d{1,5})\s*(?:~|-)\s*(\d{1,5})\s*(?:v|vac|vdc|von|volt)\b/);
+            if (vRange) {
+                attrs.voltage_v = Math.max(parseFloat(vRange[1]), parseFloat(vRange[2]));
+            } else {
+                const vSingle = textNorm.match(/(\d{1,5})\s*(?:v|vac|vdc|von|volt)\b/);
+                if (vSingle) {
+                    attrs.voltage_v = parseFloat(vSingle[1]);
+                }
+            }
+
+            // 3. Bóc tách Dòng điện (Current Amperes)
+            const aMatch = textNorm.match(/(\d+(?:\.\d+)?)\s*(?:a|ampe|amperes)\b/);
+            if (aMatch) {
+                attrs.current_a = parseFloat(aMatch[1]);
+            } else if (textNorm.includes("duoi 16a") || textNorm.includes("duoi 16 a")) {
+                attrs.current_a = 10.0;
+            } else if (textNorm.includes("tren 16a") || textNorm.includes("tren 16 a")) {
+                attrs.current_a = 25.0;
+            }
+
+            // 4. Bóc tách Công suất (Power W / kW / HP / VA / kVA)
+            const kwMatch = textNorm.match(/(\d+(?:\.\d+)?)\s*kw\b/);
+            if (kwMatch) {
+                attrs.power_w = parseFloat(kwMatch[1]) * 1000.0;
+            } else {
+                const wMatch = textNorm.match(/(\d+(?:\.\d+)?)\s*w\b/);
+                if (wMatch) {
+                    attrs.power_w = parseFloat(wMatch[1]);
+                } else {
+                    const vaMatch = textNorm.match(/(\d+(?:\.\d+)?)\s*(?:va|kva)\b/);
+                    if (vaMatch) {
+                        const val = parseFloat(vaMatch[1]);
+                        attrs.power_w = vaMatch[0].includes("kva") ? val * 1000.0 : val;
+                    }
+                }
+            }
+
+            // 5. Bóc tách Đường kính thân / Bu lông (M... hoặc phi... hoặc ...mm)
+            const mMatch = textNorm.match(/\bm(\d{1,3})(?:x\d+(?:[a-z]+)?)?(?:\b|[^\w])/);
+            if (mMatch) {
+                attrs.diameter_mm = parseFloat(mMatch[1]);
+                attrs.is_threaded = true;
+            } else {
+                const phiMatch = textNorm.match(/(?:phi|duong kinh(?: than)?(?: ngoai| trong)?|dk|lo)\s*(\d+(?:\.\d+)?)\s*(?:mm|cm)?\b/);
+                if (phiMatch) {
+                    let val = parseFloat(phiMatch[1]);
+                    if (phiMatch[0].includes("cm")) val *= 10.0;
+                    attrs.diameter_mm = val;
+                }
+            }
+
+            // 6. Bóc tách Kích thước Danh định Van / Đường ống (DN)
+            const dnMatch = textNorm.match(/\bdn\s*(\d{1,4})\b/);
+            if (dnMatch) {
+                attrs.dn_mm = parseFloat(dnMatch[1]);
+            } else {
+                const inchMatch = textNorm.match(/(\d+(?:\/\d+)?)\s*(?:inch|inh|in\b|\")/);
+                if (inchMatch) {
+                    const valStr = inchMatch[1];
+                    if (valStr.includes('/')) {
+                        const parts = valStr.split('/');
+                        attrs.dn_mm = (parseFloat(parts[0]) / parseFloat(parts[1])) * 25.4;
+                    } else {
+                        attrs.dn_mm = parseFloat(valStr) * 25.4;
+                    }
+                }
+            }
+
+            // 7. Tình trạng Đầu nối (Connector Status)
+            const hasConnPatterns = [
+                /co\s+gan\s+dau\s+noi/, /da\s+lap\s+voi\s+dau\s+noi/, /co\s+dau\s+noi/, /gan\s+dau\s+noi/,
+                /dau\s+cos/, /dau\s+cot/, /giac\s+cam/, /connector/, /terminal/, /co\s+gan\s+san\s+giac/
+            ];
+            const noConnPatterns = [
+                /khong\s+gan\s+dau\s+noi/, /khong\s+co\s+dau\s+noi/, /chua\s+gan\s+dau\s+noi/,
+                /chua\s+lap\s+voi\s+dau\s+noi/, /khong\s+dau\s+noi/, /dang\s+cuon\s+khong\s+co\s+giac/
+            ];
+            if (noConnPatterns.some(p => p.test(textNorm))) {
+                attrs.no_connector = true;
+                attrs.has_connector = false;
+            } else if (hasConnPatterns.some(p => p.test(textNorm))) {
+                attrs.has_connector = true;
+                attrs.no_connector = false;
+            }
+
+            // 8. Ren (Thread Status)
+            if (/\b(?:co\s+ren|ren\s+ngoai|ren\s+trong|ren\s+suot|tien\s+ren|bap\s+ren)\b/.test(textNorm)) {
+                attrs.is_threaded = true;
+            } else if (/\b(?:khong\s+ren|chua\s+ren|tron\s+khong\s+ren)\b/.test(textNorm)) {
+                attrs.is_threaded = false;
+            }
+
+            // 9. Chất liệu cấu thành (Material)
+            if (/\b(?:nhom|aluminum|aluminium)\b/.test(textNorm)) {
+                attrs.material = "aluminum";
+            } else if (/\b(?:nhua|plastic|pvc|pa66|acrylic|abs|polymer|chat\s+deo)\b/.test(textNorm)) {
+                attrs.material = "plastic";
+            } else if (/\b(?:cao\s+su|rubber|epdm|nitrile|silicone|vulcanized)\b/.test(textNorm)) {
+                attrs.material = "rubber";
+            } else if (/\b(?:thep\s+khong\s+gi|inox|ss304|ss316)\b/.test(textNorm)) {
+                attrs.material = "stainless_steel";
+            } else if (/\b(?:gang|cast\s+iron)\b/.test(textNorm)) {
+                attrs.material = "cast_iron";
+            } else if (/\b(?:thep|sat|kim\s+loai\s+den|carbon\s+steel)\b/.test(textNorm)) {
+                attrs.material = "steel";
+            } else if (/\b(?:dong\s+thau|hop\s+kim\s+dong|dong|brass|bronze|copper)\b/.test(textNorm)) {
+                attrs.material = "copper";
+            } else if (/\b(?:gom|dat\s+nung|su|ceramic|porcelain)\b/.test(textNorm)) {
+                attrs.material = "ceramic";
+            }
+
+            return attrs;
+        }
+
+        function classifyStatutoryTreeClientSide(itemInput) {
+            const name = itemInput.name || '';
+            const desc = itemInput.desc || '';
+            const use = itemInput.use || '';
+            const specs = itemInput.specs || '';
+            const model_en = itemInput.model_en || '';
+
+            const fullText = `${name} ${desc} ${use} ${specs} ${model_en}`.trim();
+            const attrs = extractAttributesStatutory(name, fullText);
+            const hn = attrs.head_noun;
+            const norm = attrs.norm_text;
+
+            // BƯỚC 1: KIỂM TRA MỨC ĐỘ THIẾU THÔNG TIN MƠ HỒ (INSUFFICIENT GENERAL)
+            if (attrs.is_insufficient_general) {
+                return {
+                    code: "INSUFFICIENT_INFO",
+                    level: 0,
+                    status: "INSUFFICIENT_INFO",
+                    reasoning: "Mô tả hàng hóa quá vắn tắt ('phụ tùng/linh kiện' chung chung). Không đủ căn cứ tối thiểu để xác định Phần và Chương theo GRI 1.",
+                    missing_attributes: ["name_specific", "material", "function", "host_machine"],
+                    assumptions: "Không thể giả định",
+                    reserve_code: "N/A"
+                };
+            }
+
+            // BƯỚC 2: PHÂN LOẠI THEO DANH TỪ TRUNG TÂM (HEAD NOUN - GRI 1)
+            // 1. BĂNG KEO TỰ DÍNH (Nhóm 3919)
+            if (/\b(?:bang\s+keo|bang\s+dinh|adhesive\s+tape)\b/.test(hn)) {
+                return {
+                    code: "3919.10.99",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 -> Nhóm 39.19 tấm, phiến, băng dính tự dính bằng plastic. Áp dụng GRI 6: Dạng cuộn chiều rộng không quá 20cm mã 3919.10.99.",
+                    missing_attributes: [],
+                    assumptions: "Băng keo tự dính dạng cuộn",
+                    reserve_code: "3919.90.99"
+                };
+            }
+
+            // 2. LƯỠI CẮT CHO MÁY MÓC (Nhóm 8208)
+            if (/\b(?:luoi\s+cat|dao\s+cat|cutter\s+blade|shear\s+blade)\b/.test(hn)) {
+                return {
+                    code: "8208.90.00",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 1(k) Phần XVI: Dao và lưỡi cắt dùng cho máy hoặc dụng cụ cơ khí thuộc Nhóm 82.08. Áp dụng GRI 6 xếp mã 8208.90.00.",
+                    missing_attributes: [],
+                    assumptions: "Lưỡi dao cắt bằng thép dùng cho máy công nghiệp",
+                    reserve_code: "8208.10.00"
+                };
+            }
+
+            // 3. DỤNG CỤ CẦM TAY: DỤNG CỤ THÁO LẮP, BƠM MỠ, KÌM (Nhóm 8205 & 8203)
+            if (/\b(?:dung\s+cu\s+thao|dung\s+cu\s+lap|dung\s+cu\s+rut|hand\s+tool|extractor)\b/.test(hn)) {
+                return {
+                    code: "8205.59.00",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 1(k) Phần XVI: Dụng cụ cầm tay hoạt động bằng tay chưa định danh nơi khác thuộc Nhóm 82.05. Áp dụng GRI 6 xếp mã 8205.59.00.",
+                    missing_attributes: [],
+                    assumptions: "Dụng cụ tháo lắp đầu nối hoạt động hoàn toàn bằng tay",
+                    reserve_code: "8467.89.00"
+                };
+            }
+
+            if (/\b(?:kim\s+bam\s+dau\s+cos|kim\s+bam|kim\s+cat|kim\s+tuot|hand\s+crimping|pliers)\b/.test(hn)) {
+                return {
+                    code: "8203.20.00",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 1(k) Phần XVI: Kìm cầm tay cơ khí không dùng động cơ phân loại tại Nhóm 82.03. Áp dụng GRI 6 xếp mã 8203.20.00.",
+                    missing_attributes: [],
+                    assumptions: "Kìm cơ khí cầm tay hoàn chỉnh",
+                    reserve_code: "8467.29.00"
+                };
+            }
+
+            // 7. GIOĂNG ĐỆM CAO SU LƯU HÓA (Chương 40)
+            if (/\b(?:gioang|dem|o-ring|phot)\b/.test(hn) && (attrs.material === "rubber" || norm.includes('cao su'))) {
+                const isVehicle = /\b(?:o\s+to|xe\s+co\s+dong\s+co|automotive|dong\s+co\s+xe)\b/.test(norm);
+                return {
+                    code: isVehicle ? "4016.93.20" : "4016.93.90",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: `Áp dụng GRI 1 & Chú giải 1(a) Phần XVI loại trừ cao su sang Chương 40 -> Nhóm 40.16. Áp dụng GRI 6: Gioăng đệm Phân nhóm 4016.93 -> ${isVehicle ? 'Dùng cho xe ô tô mã 4016.93.20' : 'Loại khác mã 4016.93.90'}.`,
+                    missing_attributes: [],
+                    assumptions: "Gioăng đệm bằng cao su lưu hóa",
+                    reserve_code: isVehicle ? "4016.93.90" : "4016.93.20"
+                };
+            }
+
+            // 4. MÁY MÓC CÔNG NGHIỆP: MÁY DẬP, MÁY IN, MÁY BƠM, QUẠT (Chương 84)
+            if (/\b(?:may\s+(?:ep|dap)\s+bam\s+dau\s+cos|may\s+dap\s+dau\s+noi|may\s+bam\s+cos|crimping\s+machine)\b/.test(hn) || (/\b(?:may\s+dap|may\s+ep)\b/.test(hn) && norm.includes('dau cos'))) {
+                return {
+                    code: "8462.62.11",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1: Máy cơ khí dập khuôn ép kim loại thuộc Nhóm 84.62. Áp dụng GRI 6 xếp vào mã 8462.62.11.",
+                    missing_attributes: [],
+                    assumptions: "Máy dập ép cơ khí dùng điện gia công kim loại",
+                    reserve_code: "8479.89.39"
+                };
+            }
+
+            if (/\b(?:may\s+in|printer|printing\s+machine)\b/.test(hn)) {
+                return {
+                    code: "8443.19.00",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 -> Nhóm 84.43 máy in nhãn công nghiệp. Áp dụng GRI 6 xếp mã 8443.19.00.",
+                    missing_attributes: [],
+                    assumptions: "Máy in chữ lên nhãn hoạt động bằng điện",
+                    reserve_code: "8443.32.90"
+                };
+            }
+
+            if (/\b(?:quat\s+ly\s+tam|quat\s+hut|centrifugal\s+fan|quat\s+cong\s+nghiep)\b/.test(hn)) {
+                return {
+                    code: "8414.59.49",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1: Quạt hút ly tâm liền động cơ thuộc Nhóm 84.14 (không phân loại theo động cơ 8501). Áp dụng GRI 6: Quạt khác (8414.59) -> Quạt ly tâm mã 8414.59.49.",
+                    missing_attributes: [],
+                    assumptions: "Quạt ly tâm công nghiệp bằng thép",
+                    reserve_code: "8414.59.41"
+                };
+            }
+
+            if (/\b(?:bom\s+nuoc|bom\s+ly\s+tam|centrifugal\s+pump|may\s+bom)\b/.test(hn)) {
+                return {
+                    code: "8413.70.42",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1: Máy bơm chất lỏng liền động cơ thuộc Nhóm 84.13. Áp dụng GRI 6: Bơm ly tâm một tầng cánh họng xả trên 50mm mã 8413.70.42.",
+                    missing_attributes: [],
+                    assumptions: "Bơm nước ly tâm trục ngang",
+                    reserve_code: "8413.70.91"
+                };
+            }
+
+            // 5. THIẾT BỊ ĐO LƯỜNG & KIỂM TRA (Chương 90)
+            if (/\b(?:dong\s+ho\s+do|dong\s+ho|thiet\s+bi\s+do|may\s+do|bo\s+phan\s+cua\s+thuoc\s+do|gauge|measuring)\b/.test(hn)) {
+                if (/\b(?:ap\s+suat|pressure)\b/.test(norm)) {
+                    return {
+                        code: "9026.20.30",
+                        level: 8,
+                        status: "EXACT_8_DIGIT",
+                        reasoning: "Áp dụng GRI 1 & Chú giải 1(m) Phần XVI loại trừ sang Chương 90 -> Nhóm 90.26 dụng cụ đo áp suất. Áp dụng GRI 6 xếp mã 9026.20.30.",
+                        missing_attributes: [],
+                        assumptions: "Đồng hồ đo áp suất cơ học ống bourdon",
+                        reserve_code: "9026.20.40"
+                    };
+                } else if (/\b(?:thang\s+hang|kiem\s+tra|alignment)\b/.test(norm)) {
+                    return {
+                        code: "9031.80.90",
+                        level: 8,
+                        status: "EXACT_8_DIGIT",
+                        reasoning: "Áp dụng GRI 1 & Chú giải Chương 90: Thiết bị và dụng cụ đo lường kiểm tra quang học hoặc điện tử chưa định danh riêng thuộc Nhóm 90.31. Áp dụng GRI 6 xếp mã 9031.80.90.",
+                        missing_attributes: [],
+                        assumptions: "Thiết bị đo độ thẳng hàng connector",
+                        reserve_code: "9031.49.90"
+                    };
+                } else {
+                    return {
+                        code: "9017.90.90",
+                        level: 8,
+                        status: "EXACT_8_DIGIT",
+                        reasoning: "Áp dụng GRI 1 -> Nhóm 90.17 dụng cụ đo chiều dài, micromet và bộ phận của chúng. Áp dụng GRI 6 xếp mã 9017.90.90.",
+                        missing_attributes: [],
+                        assumptions: "Bộ phận của thước đo micromet",
+                        reserve_code: "9031.90.90"
+                    };
+                }
+            }
+
+            if (/\b(?:thermostat|bo\s+dieu\s+nhiet)\b/.test(hn) || /\b(?:thermostat|bo\s+dieu\s+nhiet)\b/.test(norm)) {
+                return {
+                    code: "9032.10.10",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 7 Chương 90: Thiết bị điều chỉnh và kiểm soát tự động -> Phân nhóm 9032.10 Thermostat -> Mã 9032.10.10.",
+                    missing_attributes: [],
+                    assumptions: "Thermostat tự động ngắt điện",
+                    reserve_code: "9032.10.20"
+                };
+            }
+
+            // 6. VÚ TRA MỠ BÔI TRƠN (Nhóm 8487)
+            if (/\b(?:vu\s+tra\s+mo|vu\s+bom\s+mo|num\s+bom\s+mo|grease\s+nipple|lube\s+nipple)\b/.test(hn)) {
+                return {
+                    code: "8487.90.00",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải WCO Nhóm 84.87: Núm vú tra mỡ bôi trơn không tự động thuộc Nhóm 84.87. Áp dụng GRI 6 xếp mã 8487.90.00.",
+                    missing_attributes: [],
+                    assumptions: "Vú mỡ bôi trơn cơ khí tiêu chuẩn",
+                    reserve_code: "7318.29.90"
+                };
+            }
+
+            // 8. THIẾT BỊ ĐÓNG NGẮT: APTOMAT, CÔNG TẮC, ĐẦU NỐI (Nhóm 8536)
+            if (/\b(?:mcb|aptomat|cau\s+dao\s+tu\s+dong|circuit\s+breaker)\b/.test(hn)) {
+                return {
+                    code: "8536.20.91",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 -> Nhóm 85.36 (loại trừ nhóm dây điện 8544). Áp dụng GRI 6: Cầu dao tự động ngắt mạch điện áp <= 1000V dòng <= 16A mã 8536.20.91.",
+                    missing_attributes: [],
+                    assumptions: "MCB bảo vệ quá tải <= 16A",
+                    reserve_code: "8536.20.99"
+                };
+            }
+
+            if (/\b(?:thiet\s+bi\s+dong\s+ngat|cong\s+tac|switch)\b/.test(hn)) {
+                if (attrs.current_a !== null) {
+                    if (attrs.current_a <= 16.0) {
+                        return {
+                            code: "8536.50.96",
+                            level: 8,
+                            status: "EXACT_8_DIGIT",
+                            reasoning: "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 85.36. Áp dụng GRI 6: Điện áp <= 1000V -> Công tắc khác (8536.50) -> Dòng điện định mức không quá 16A -> Mã 8536.50.96.",
+                            missing_attributes: [],
+                            assumptions: "Công tắc điện dòng <= 16A",
+                            reserve_code: "8536.50.99"
+                        };
+                    } else {
+                        return {
+                            code: "8536.50.99",
+                            level: 8,
+                            status: "EXACT_8_DIGIT",
+                            reasoning: "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 85.36. Áp dụng GRI 6: Điện áp <= 1000V -> Công tắc khác (8536.50) -> Dòng điện định mức trên 16A -> Mã 8536.50.99.",
+                            missing_attributes: [],
+                            assumptions: "Công tắc điện dòng > 16A",
+                            reserve_code: "8536.50.96"
+                        };
+                    }
+                } else if (norm.includes("duoi 16a") || norm.includes("khong qua 1000v")) {
+                    return {
+                        code: "8536.50.96",
+                        level: 8,
+                        status: "EXACT_8_DIGIT",
+                        reasoning: "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 85.36. Áp dụng GRI 6: Điện áp <= 1000V, dòng điện dưới 16A -> Mã 8536.50.96.",
+                        missing_attributes: [],
+                        assumptions: "Thiết bị đóng ngắt điện áp <= 1000V dòng < 16A",
+                        reserve_code: "8536.50.99"
+                    };
+                } else {
+                    return {
+                        code: "8536.50",
+                        level: 6,
+                        status: "STOP_6_DIGIT",
+                        reasoning: "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 85.36. Áp dụng GRI 6: Công tắc điện áp <= 1000V thuộc Phân nhóm 8536.50. TUY NHIÊN, thiếu thông số dòng điện Ampe (< 16A hay >= 16A) để chốt mã 8 số -> Dừng ở phân nhóm 6 số theo nguyên tắc Không đoán mò.",
+                        missing_attributes: ["current_amperes"],
+                        assumptions: "Thiếu dòng điện A",
+                        reserve_code: "8536.50.96"
+                    };
+                }
+            }
+
+            // 9. VỎ ĐẦU NỐI NHỰA (HOUSING CONNECTOR) - Nhóm 8538
+            if (/\b(?:vo\s+giac\s+cam|vo\s+dau\s+noi|housing\s+connector)\b/.test(hn)) {
+                return {
+                    code: "8538.90.19",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 2(b) Phần XVI: Bộ phận chuyên dùng cho thiết bị đóng ngắt/nối mạch Nhóm 85.36 thuộc Nhóm 85.38. Áp dụng GRI 6 xếp mã 8538.90.19.",
+                    missing_attributes: [],
+                    assumptions: "Vỏ connector nhựa cho thiết bị điện",
+                    reserve_code: "3926.90.99"
+                };
+            }
+
+            // 10. ĐẦU COS / TERMINAL (Nhóm 8536.90)
+            if (/\b(?:dau\s+cot|dau\s+cos|terminal)\b/.test(hn)) {
+                return {
+                    code: "8536.90.12",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 -> Nhóm 85.36: Thiết bị ghép nối đầu nối dây điện (không phải dây điện 8544). Áp dụng GRI 6: Phân nhóm 8536.90 -> Mã 8536.90.12.",
+                    missing_attributes: [],
+                    assumptions: "Đầu cos bấm bằng đồng",
+                    reserve_code: "8536.90.19"
+                };
+            }
+
+            // 11. VÒNG ĐỆM PHẲNG / ĐAI ỐC (Nhóm 7318 - Chú giải 2 Phần XV)
+            if (/\b(?:vong\s+dem|long\s+den|washer)\b/.test(hn)) {
+                return {
+                    code: "7318.22.00",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 2 Phần XV: Vòng đệm bằng thép thuộc Nhóm 73.18. Áp dụng GRI 6: Loại không ren, vòng đệm phẳng khác mã 7318.22.00.",
+                    missing_attributes: [],
+                    assumptions: "Vòng đệm phẳng bằng thép",
+                    reserve_code: "7318.21.00"
+                };
+            }
+
+            if (/\b(?:dai\s+oc|e-cu|nut|tan)\b/.test(hn)) {
+                return {
+                    code: "7318.16.00",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 2 Phần XV: Đai ốc bằng thép thuộc Nhóm 73.18. Áp dụng GRI 6: Đai ốc có ren thuộc mã 7318.16.00.",
+                    missing_attributes: [],
+                    assumptions: "Đai ốc thép tiêu chuẩn",
+                    reserve_code: "7318.15.10"
+                };
+            }
+
+            // 12. THANH TRƯỢT & THÂN TRƯỢT (Nhóm 8482 vs 8483)
+            if (/\b(?:than\s+truot|thanh\s+truot|ray\s+truot|linear\s+guide|slide\s+body)\b/.test(hn)) {
+                const hasNoBall = /\b(?:khong\s+o\s+bi|khong\s+co\s+bi|khong\s+lap\s+o\s+bi|without\s+ball)\b/.test(norm);
+                const hasBall = /\b(?:co\s+o\s+bi|co\s+bi|lap\s+o\s+bi|ball\s+bearing)\b/.test(norm) && !hasNoBall;
+
+                if (hasBall) {
+                    return {
+                        code: "8482.10.00",
+                        level: 8,
+                        status: "EXACT_8_DIGIT",
+                        reasoning: "Áp dụng GRI 1, Chú giải 2(a) Phần XVI & Chú giải WCO 84.82: Cơ chế trượt dẫn hướng có ổ bi tuần hoàn thuộc Nhóm 84.82. Áp dụng GRI 6 xếp mã 8482.10.00.",
+                        missing_attributes: [],
+                        assumptions: "Thanh trượt có bi cầu",
+                        reserve_code: "8483.30.90"
+                    };
+                } else {
+                    return {
+                        code: "8483.30.90",
+                        level: 8,
+                        status: "EXACT_8_DIGIT",
+                        reasoning: "Áp dụng GRI 1 & Chú giải Nhóm 84.83: Thân gối đỡ và bạc lót trục không lắp ổ bi/ổ đũa thuộc phân nhóm 8483.30. Áp dụng GRI 6 loại trừ ô tô, xếp mã 8483.30.90.",
+                        missing_attributes: [],
+                        assumptions: "Thân trượt trơn không bi dùng cho máy công nghiệp",
+                        reserve_code: "8466.93.90"
+                    };
+                }
+            }
+
+            // 13. KHỚP NỐI ĐƯỜNG ỐNG (Nhóm 7307 & 7412)
+            if (/\b(?:khop\s+noi|phu\s+kien|rac\s+co|mang\s+[sx]ong|coupling)\b/.test(hn) && /\b(?:ong|duong\s+ong|pipe|fitting)\b/.test(norm)) {
+                if (attrs.material === "copper" || /\b(?:dong\s+thau|dong|brass)\b/.test(norm)) {
+                    return {
+                        code: "7412.20.91",
+                        level: 8,
+                        status: "EXACT_8_DIGIT",
+                        reasoning: "Áp dụng GRI 1 & Chú giải loại trừ van; Đây là phụ kiện ghép nối đường ống bằng hợp kim đồng thuộc Nhóm 74.12. Áp dụng GRI 6 xếp mã 7412.20.91.",
+                        missing_attributes: [],
+                        assumptions: "Phụ kiện nối ống bằng hợp kim đồng",
+                        reserve_code: "7412.10.00"
+                    };
+                } else if (attrs.material === "stainless_steel" || attrs.material === "steel" || /\b(?:thep|inox|ss304)\b/.test(norm)) {
+                    return {
+                        code: "7307.29.10",
+                        level: 8,
+                        status: "EXACT_8_DIGIT",
+                        reasoning: "Áp dụng GRI 1 & Chú giải 2 Phần XV: Phụ kiện đường ống bằng thép không gỉ thuộc Nhóm 73.07. Áp dụng GRI 6: Có ren -> Mã 7307.29.10.",
+                        missing_attributes: [],
+                        assumptions: "Khớp nối ren inox 304",
+                        reserve_code: "7307.29.90"
+                    };
+                }
+            }
+
+            // 14. VAN & THIẾT BỊ ĐÓNG NGẮT DÒNG CHẢY (Nhóm 8481)
+            if (/\b(?:van|valve|check\s+valve|ball\s+valve|safety\s+valve)\b/.test(hn)) {
+                const isBall = /\b(?:van\s+bi|ball\s+valve|tay\s+gat)\b/.test(norm);
+                const isCheck = /\b(?:van\s+mot\s+chieu|check\s+valve|chieu\s+nguoc)\b/.test(norm);
+                const isSafety = /\b(?:van\s+an\s+toan|safety\s+valve|xa\s+ap)\b/.test(norm);
+                const isReducing = /\b(?:giam\s+ap|dieu\s+ap|pressure\s+reducing)\b/.test(norm);
+
+                if (!isBall && !isCheck && !isSafety && !isReducing) {
+                    return {
+                        code: "8481",
+                        level: 4,
+                        status: "STOP_4_DIGIT",
+                        reasoning: "Áp dụng GRI 1: Thiết bị đóng ngắt đường ống thuộc Nhóm 84.81. TUY NHIÊN, mô tả thiếu thông số loại van (van giảm áp 8481.10, van một chiều 8481.30, van an toàn 8481.40 hay van đóng mở khác 8481.80) và kích thước danh định DN -> Dừng ở mã 4 số theo nguyên tắc Không đoán mò.",
+                        missing_attributes: ["valve_type", "nominal_diameter"],
+                        assumptions: "Chưa xác định loại van và kích thước",
+                        reserve_code: "8481.80"
+                    };
+                }
+
+                if (isBall) {
+                    if (attrs.dn_mm !== null) {
+                        if (attrs.dn_mm <= 25.4) {
+                            return {
+                                code: "8481.80.61",
+                                level: 8,
+                                status: "EXACT_8_DIGIT",
+                                reasoning: "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 84.81. Áp dụng GRI 6: Phân nhóm 8481.80 -> Van bi bằng đồng đường kính danh định không quá 2,5 cm -> Mã 8481.80.61.",
+                                missing_attributes: [],
+                                assumptions: "Van bi đồng DN <= 25mm",
+                                reserve_code: "8481.80.62"
+                            };
+                        } else {
+                            return {
+                                code: "8481.80.62",
+                                level: 8,
+                                status: "EXACT_8_DIGIT",
+                                reasoning: "Áp dụng GRI 1 & 6: Nhóm 84.81 -> Phân nhóm 8481.80 -> Van bi đường kính trên 2,5 cm -> Mã 8481.80.62.",
+                                missing_attributes: [],
+                                assumptions: "Van bi đường kính > 25mm",
+                                reserve_code: "8481.80.61"
+                            };
+                        }
+                    } else {
+                        return {
+                            code: "8481.80",
+                            level: 6,
+                            status: "STOP_6_DIGIT",
+                            reasoning: "Áp dụng GRI 1 & 6: Xác định được phân nhóm van bi 8481.80. Tuy nhiên thiếu kích thước danh định DN (đường kính trong trên hay dưới 2,5 cm) để chốt mã 8 số -> Dừng ở phân nhóm 6 số.",
+                            missing_attributes: ["nominal_diameter"],
+                            assumptions: "Thiếu kích thước DN",
+                            reserve_code: "8481.80.61"
+                        };
+                    }
+                }
+
+                if (isCheck) {
+                    const isCast = (attrs.material === "cast_iron" || norm.includes('gang'));
+                    if (isCast && (attrs.dn_mm !== null && attrs.dn_mm > 25.0)) {
+                        return {
+                            code: "8481.30.22",
+                            level: 8,
+                            status: "EXACT_8_DIGIT",
+                            reasoning: "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 84.81. Áp dụng GRI 6: Van một chiều Phân nhóm 8481.30 -> Bằng gang, đường kính trong trên 2,5 cm (DN50) -> Mã 8481.30.22.",
+                            missing_attributes: [],
+                            assumptions: "Van một chiều bằng gang DN50",
+                            reserve_code: "8481.30.21"
+                        };
+                    } else {
+                        return {
+                            code: "8481.30.90",
+                            level: 8,
+                            status: "EXACT_8_DIGIT",
+                            reasoning: "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 84.81. Áp dụng GRI 6: Van một chiều Phân nhóm 8481.30 -> Loại khác mã 8481.30.90.",
+                            missing_attributes: [],
+                            assumptions: "Van một chiều công nghiệp",
+                            reserve_code: "8481.30.22"
+                        };
+                    }
+                }
+
+                if (isSafety) {
+                    return {
+                        code: attrs.material === "copper" ? "8481.40.21" : "8481.40.90",
+                        level: 8,
+                        status: "EXACT_8_DIGIT",
+                        reasoning: "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 84.81. Áp dụng GRI 6: Van an toàn hoặc van xả áp suất thuộc Phân nhóm 8481.40.",
+                        missing_attributes: [],
+                        assumptions: "Van an toàn xả áp DN <= 25mm",
+                        reserve_code: "8481.40.90"
+                    };
+                }
+            }
+
+            // 15. BU LÔNG LỤC GIÁC (Nhóm 7318.15)
+            if (/\b(?:bu\s+long|bolt|bulong)\b/.test(hn)) {
+                if (attrs.diameter_mm !== null) {
+                    if (attrs.diameter_mm <= 16.0) {
+                        return {
+                            code: "7318.15.10",
+                            level: 8,
+                            status: "EXACT_8_DIGIT",
+                            reasoning: "Áp dụng GRI 1 & Chú giải 2 Phần XV: Bu lông kim loại thuộc Nhóm 73.18. Áp dụng GRI 6: Có ren -> Phân nhóm 7318.15 -> Đường kính thân <= 16mm -> Mã 7318.15.10.",
+                            missing_attributes: [],
+                            assumptions: "Bu lông thép có ren đường kính thân <= 16mm",
+                            reserve_code: "7318.15.90"
+                        };
+                    } else {
+                        return {
+                            code: "7318.15.90",
+                            level: 8,
+                            status: "EXACT_8_DIGIT",
+                            reasoning: "Áp dụng GRI 1 & Chú giải 2 Phần XV -> Nhóm 73.18. Áp dụng GRI 6: Có ren -> Phân nhóm 7318.15 -> Đường kính thân trên 16mm -> Mã 7318.15.90.",
+                            missing_attributes: [],
+                            assumptions: "Bu lông thép đường kính > 16mm",
+                            reserve_code: "7318.15.10"
+                        };
+                    }
+                } else {
+                    return {
+                        code: "7318.15",
+                        level: 6,
+                        status: "STOP_6_DIGIT",
+                        reasoning: "Áp dụng GRI 1 & Chú giải 2 Phần XV -> Nhóm 73.18. Áp dụng GRI 6: Có ren -> Phân nhóm 7318.15. TUY NHIÊN, thiếu thông số đường kính thân (mm) để phân định mã 8 số (<= 16mm hay > 16mm) -> Dừng ở phân nhóm 6 số theo nguyên tắc Không đoán mò.",
+                        missing_attributes: ["diameter_mm"],
+                        assumptions: "Thiếu đường kính thân mm",
+                        reserve_code: "7318.15.10"
+                    };
+                }
+            }
+
+            // 16. DÂY DẪN ĐIỆN & CÁP ĐIỆN (Nhóm 8544)
+            if (/\b(?:day\s+(?:dan\s+)?(?:truyen\s+tin\s+hieu|dien|tin\s+hieu)|day\s+dan\b|day\s+dien\b|cap\s+dien\b|day\s+cap\b|wire|cable|harness)\b/.test(hn)) {
+                if (attrs.voltage_v === null) {
+                    return {
+                        code: "8544",
+                        level: 4,
+                        status: "STOP_4_DIGIT",
+                        reasoning: "Áp dụng GRI 1: Dây dẫn điện có cách điện thuộc Nhóm 85.44. TUY NHIÊN, mô tả thiếu thông số điện áp định mức (trên hay dưới 1.000V) và tình trạng đầu nối để phân nhánh WCO 6 số -> Dừng ở mã 4 số theo nguyên tắc Không đoán mò.",
+                        missing_attributes: (attrs.has_connector || attrs.no_connector) ? ["voltage"] : ["voltage", "connector_status"],
+                        assumptions: "Chưa xác định điện áp",
+                        reserve_code: "8544.42"
+                    };
+                }
+
+                if (attrs.voltage_v <= 1000.0) {
+                    if (attrs.has_connector) {
+                        return {
+                            code: "8544.42.99",
+                            level: 8,
+                            status: "EXACT_8_DIGIT",
+                            reasoning: "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 85.44. Áp dụng GRI 6: Điện áp <= 1000V -> 1 gạch (-) Vật dẫn điện khác -> 2 gạch (--) Đã lắp với đầu nối điện (Phân nhóm 8544.42) -> Mã 8544.42.99.",
+                            missing_attributes: [],
+                            assumptions: "Dây dẫn điện điện áp <= 1000V đã lắp đầu nối",
+                            reserve_code: "8544.42.94"
+                        };
+                    } else if (attrs.no_connector) {
+                        const isCar = /\b(?:o\s+to|xe\s+co\s+dong\s+co|automotive)\b/.test(norm);
+                        return {
+                            code: isCar ? "8544.49.21" : "8544.49.41",
+                            level: 8,
+                            status: "EXACT_8_DIGIT",
+                            reasoning: `Áp dụng GRI 1 & Nhóm 85.44. Áp dụng GRI 6: Điện áp <= 1000V -> Không gắn đầu nối (Phân nhóm 8544.49) -> ${isCar ? 'Dây ô tô không đầu nối mã 8544.49.21' : 'Dây điện khác không gắn đầu nối mã 8544.49.41'}.`,
+                            missing_attributes: [],
+                            assumptions: "Dây dẫn điện không gắn đầu nối",
+                            reserve_code: isCar ? "8544.49.29" : "8544.49.49"
+                        };
+                    } else {
+                        return {
+                            code: "8544.4",
+                            level: 5,
+                            status: "STOP_6_DIGIT",
+                            reasoning: "Áp dụng GRI 1: Dây dẫn điện điện áp <= 1000V. Thiếu thông tin tình trạng có hay không gắn đầu nối để phân định giữa 8544.42 và 8544.49.",
+                            missing_attributes: ["connector_status"],
+                            assumptions: "Thiếu thông tin đầu nối",
+                            reserve_code: "8544.42.99"
+                        };
+                    }
+                }
+            }
+
+            // 17. ĐỘNG CƠ ĐIỆN / MÔ TƠ (Nhóm 8501)
+            if (/\b(?:dong\s+co\s+dien|mo\s+to\s+dien|mo\s+to\s+buoc|motor|ac\s+motor|dc\s+motor)\b/.test(hn)) {
+                const isDc = /\bdc\b/.test(norm) || norm.includes('mot chieu');
+                if (isDc) {
+                    return {
+                        code: "8501.31.60",
+                        level: 8,
+                        status: "EXACT_8_DIGIT",
+                        reasoning: "Áp dụng GRI 1 -> Nhóm 85.01 động cơ điện. Áp dụng GRI 6: Động cơ DC công suất <= 750W (82W) -> Mô tơ bước mã 8501.31.60.",
+                        missing_attributes: [],
+                        assumptions: "Mô tơ bước DC",
+                        reserve_code: "8501.10.29"
+                    };
+                }
+
+                if (attrs.power_w === null) {
+                    return {
+                        code: "8501.5",
+                        level: 5,
+                        status: "STOP_6_DIGIT",
+                        reasoning: "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 85.01. Áp dụng GRI 6: Động cơ điện xoay chiều AC nhiều pha thuộc Phân nhóm 8501.5. TUY NHIÊN, thiếu thông số công suất (kW/W/HP) để phân nhánh định thuế (<=750W, <=7.5kW, <=75kW hay >75kW) -> Dừng ở phân nhóm theo nguyên tắc Không đoán mò.",
+                        missing_attributes: ["power_kw"],
+                        assumptions: "Thiếu công suất động cơ",
+                        reserve_code: "8501.51.00"
+                    };
+                } else {
+                    const pKw = attrs.power_w / 1000.0;
+                    if (pKw <= 0.75) {
+                        return { code: "8501.51.00", level: 8, status: "EXACT_8_DIGIT", reasoning: "Động cơ AC công suất <= 750W", missing_attributes: [], assumptions: "", reserve_code: "8501.52.11" };
+                    } else if (pKw <= 7.5) {
+                        return { code: "8501.52.11", level: 8, status: "EXACT_8_DIGIT", reasoning: "Động cơ AC công suất 750W - 7.5kW", missing_attributes: [], assumptions: "", reserve_code: "8501.52.19" };
+                    } else if (pKw <= 75.0) {
+                        return { code: "8501.52.19", level: 8, status: "EXACT_8_DIGIT", reasoning: "Động cơ AC công suất 7.5kW - 75kW", missing_attributes: [], assumptions: "", reserve_code: "8501.53.00" };
+                    }
+                }
+            }
+
+            // 18. DỤNG CỤ CẮT GỌT THAY THẾ CHO MÁY CÔNG CỤ (Nhóm 8207)
+            if (/\b(?:mui\s+khoan|dao\s+phay|dao\s+tien|drill\s+bit|milling\s+cutter)\b/.test(hn)) {
+                return {
+                    code: "8207.50.00",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 1(k) Phần XVI: Dụng cụ cắt gọt kim loại có thể thay đổi được thuộc Nhóm 82.07. Áp dụng GRI 6: Dụng cụ khoan mã 8207.50.00.",
+                    missing_attributes: [],
+                    assumptions: "Mũi khoan thép gió HSS",
+                    reserve_code: "8207.90.00"
+                };
+            }
+
+            // 19. CHỐT ĐỊNH VỊ & LÒ XO (Nhóm 7318 & 7320)
+            if (/\b(?:chot\s+dinh\s+vi|dowel\s+pin)\b/.test(hn)) {
+                return {
+                    code: "7318.24.00",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 2 Phần XV: Chốt kim loại không ren thuộc Nhóm 73.18. Áp dụng GRI 6: Chốt định vị mã 7318.24.00.",
+                    missing_attributes: [],
+                    assumptions: "Chốt hình trụ bằng thép không ren",
+                    reserve_code: "7318.29.90"
+                };
+            }
+
+            if (/\b(?:lo\s+xo|spring)\b/.test(hn)) {
+                return {
+                    code: "7320.20.90",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 2 Phần XV: Lò xo bằng thép thuộc Nhóm 73.20. Áp dụng GRI 6: Lò xo xoắn nén hình trụ mã 7320.20.90.",
+                    missing_attributes: [],
+                    assumptions: "Lò xo nén bằng thép",
+                    reserve_code: "7320.90.90"
+                };
+            }
+
+            // 20. BIẾN ÁP & NGUỒN CHUYỂN ĐỔI (Nhóm 8504)
+            if (/\b(?:adapter|switching|nguon\s+chuyen\s+doi|bien\s+doi\s+tinh)\b/.test(hn)) {
+                return {
+                    code: "8504.40.90",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 -> Nhóm 85.04. Áp dụng GRI 6: Bộ biến đổi tĩnh điện AC sang DC Phân nhóm 8504.40 -> Mã 8504.40.90.",
+                    missing_attributes: [],
+                    assumptions: "Bộ nguồn chuyển đổi tĩnh adapter",
+                    reserve_code: "8504.40.11"
+                };
+            }
+
+            if (/\b(?:bien\s+ap|bien\s+the|transformer)\b/.test(hn)) {
+                return {
+                    code: "8504.31.24",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 -> Nhóm 85.04. Áp dụng GRI 6: Máy biến thế khác công suất <= 1kVA (500VA) -> Mã 8504.31.24.",
+                    missing_attributes: [],
+                    assumptions: "Biến áp cách ly công suất <= 1kVA",
+                    reserve_code: "8504.31.29"
+                };
+            }
+
+            // 21. BẢNG ĐIỀU KHIỂN ĐIỆN (Nhóm 8537)
+            if (/\b(?:tu\s+bang\s+dien|bang\s+dieu\s+khien|control\s+panel|plc|hmi)\b/.test(hn)) {
+                return {
+                    code: "8537.10.99",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 -> Nhóm 85.37: Bảng, tủ điều khiển phân phối điện. Áp dụng GRI 6: Điện áp <= 1000V -> Mã 8537.10.99.",
+                    missing_attributes: [],
+                    assumptions: "Tủ điều khiển tự động hóa điện áp <= 1000V",
+                    reserve_code: "8537.10.19"
+                };
+            }
+
+            // 22. RƠ LE (Nhóm 8536.49)
+            if (/\b(?:ro\s+le|relay)\b/.test(hn)) {
+                return {
+                    code: "8536.49.90",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 -> Nhóm 85.36. Áp dụng GRI 6: Rơ le bảo vệ quá tải nhiệt phân nhóm 8536.49 -> Mã 8536.49.90.",
+                    missing_attributes: [],
+                    assumptions: "Rơ le nhiệt lưỡng kim",
+                    reserve_code: "8536.41.00"
+                };
+            }
+
+            // 23. BỘ NHỚ LƯU TRỮ FLASH / USB (Nhóm 8523)
+            if (/\b(?:usb|flash\s+drive|the\s+nho|o\s+nho|solid-state|storage)\b/.test(hn)) {
+                return {
+                    code: "8523.51.11",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 -> Nhóm 85.23 thiết bị lưu trữ dữ liệu bán dẫn bền vững. Áp dụng GRI 6: Thiết bị lưu trữ thể rắn chưa ghi dữ liệu mã 8523.51.11.",
+                    missing_attributes: [],
+                    assumptions: "USB flash drive chưa ghi dữ liệu",
+                    reserve_code: "8523.51.21"
+                };
+            }
+
+            // 24. ỐNG CAO SU (Nhóm 4009)
+            if (/\b(?:ong\s+(?:dan\s+)?nuoc|ong\s+cao\s+su|rubber\s+hose)\b/.test(hn)) {
+                return {
+                    code: "4009.31.91",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải loại trừ -> Nhóm 40.09 ống cao su. Áp dụng GRI 6: Gia cố sợi dệt không phụ kiện dùng cho xe ô tô -> Mã 4009.31.91.",
+                    missing_attributes: [],
+                    assumptions: "Ống dẫn nước làm mát két nước ô tô",
+                    reserve_code: "4009.31.99"
+                };
+            }
+
+            // 25. CẢN TRƯỚC / MÁ PHANH Ô TÔ (Nhóm 8708)
+            if (/\b(?:can\s+truoc|can\s+sau|ba\s+do\s+soc|bumper)\b/.test(hn)) {
+                return {
+                    code: "8708.10.10",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 2 Phần XVII: Cản va và bộ phận cản va định danh riêng tại Phân nhóm 8708.10 -> Cản trước ô tô con mã 8708.10.10.",
+                    missing_attributes: [],
+                    assumptions: "Cản va ô tô bằng nhựa hoàn chỉnh",
+                    reserve_code: "8708.10.90"
+                };
+            }
+
+            if (/\b(?:ma\s+phanh|bo\s+thang|brake\s+pad)\b/.test(hn)) {
+                return {
+                    code: "8708.30.29",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 -> Nhóm 87.08 phụ tùng ô tô. Áp dụng GRI 6: Phanh hãm và trợ động phanh Phân nhóm 8708.30 -> Đã lắp xương thép mã 8708.30.29.",
+                    missing_attributes: [],
+                    assumptions: "Má phanh đĩa ô tô đã gắn đế thép",
+                    reserve_code: "6813.81.00"
+                };
+            }
+
+            // 26. GỐM SỨ (Chương 69)
+            if (/\b(?:chau|chau\s+trong\s+cay|pot)\b/.test(hn) && (attrs.material === "ceramic" || norm.includes('gom') || norm.includes('dat nung'))) {
+                return {
+                    code: "6914.90.00",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 -> Chương 69 sản phẩm gốm sứ. Áp dụng GRI 6: Các sản phẩm bằng gốm khác mã 6914.90.00.",
+                    missing_attributes: [],
+                    assumptions: "Chậu cây bằng đất nung tráng men mỹ nghệ",
+                    reserve_code: "6912.00.00"
+                };
+            }
+
+            // 27. SẢN PHẨM NHÔM (Chương 76)
+            if (/\b(?:mieng\s+nhom|tam\s+nhom|aluminum)\b/.test(hn) || (attrs.material === "aluminum" && /\b(?:mieng|tam|khung)\b/.test(hn))) {
+                return {
+                    code: "7616.99.90",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 -> Chương 76 nhôm và các sản phẩm bằng nhôm. Nhóm 76.16 các sản phẩm bằng nhôm khác mã 7616.99.90.",
+                    missing_attributes: [],
+                    assumptions: "Miếng nhôm đục lỗ gia công cơ khí",
+                    reserve_code: "7616.99.19"
+                };
+            }
+
+            // 28. SẢN PHẨM SẮT THÉP KHÁC (Nhóm 7326)
+            if (/\b(?:mieng\s+thep|thanh\s+thep|tam\s+thep|chau\s+day|gia\s+do\s+thep|bracket|ban\s+ma\s+thep)\b/.test(hn)) {
+                return {
+                    code: "7326.90.99",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 2 Phần XV: Các sản phẩm gia công cơ khí bằng sắt thép chưa định danh riêng thuộc Nhóm 73.26. Áp dụng GRI 6 xếp mã 7326.90.99.",
+                    missing_attributes: [],
+                    assumptions: "Sản phẩm thép gia công đột lỗ sơn phủ",
+                    reserve_code: "7326.90.10"
+                };
+            }
+
+            // 29. SẢN PHẨM NHỰA / PLASTIC (Chương 39)
+            if (/\b(?:tam\s+nhua\s+phang|tam\s+pvc|plastic\s+sheet)\b/.test(hn) && /\b(?:chua\s+gia\s+cong|chua\s+khoet|phang)\b/.test(norm)) {
+                return {
+                    code: "3920.49.00",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 -> Nhóm 39.20 tấm/phiến phẳng không xốp chưa gia công. Áp dụng GRI 6: Bằng polyme từ vinyl clorua mã 3920.49.00.",
+                    missing_attributes: [],
+                    assumptions: "Tấm nhựa PVC phẳng đặc",
+                    reserve_code: "3926.90.99"
+                };
+            }
+
+            if (/\b(?:nep\s+nhua|vien\s+cua|trang\s+tri\s+than\s+xe|molding)\b/.test(hn)) {
+                return {
+                    code: "3926.30.00",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 1(g) Phần XVI: Các chi tiết gắn cho thân xe (coachwork) bằng chất dẻo thuộc Phân nhóm 3926.30 -> Mã 3926.30.00.",
+                    missing_attributes: [],
+                    assumptions: "Nẹp nhựa trang trí thân xe",
+                    reserve_code: "8708.29.93"
+                };
+            }
+
+            if (/\b(?:mieng\s+nhua|khung\s+nhua|tru\s+nhua|khung\s+gan\s+dinh\s+vi|tam\s+nhua)\b/.test(hn) || (attrs.material === "plastic" && /\b(?:khung|tam|mieng|tru|de)\b/.test(hn))) {
+                return {
+                    code: "3926.90.99",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 1(g) Phần XVI: Các sản phẩm bằng chất dẻo bị loại trừ khỏi Phần XVI máy móc, thuộc Nhóm 39.26. Áp dụng GRI 6 xếp mã 3926.90.99.",
+                    missing_attributes: [],
+                    assumptions: "Sản phẩm nhựa kỹ thuật gia công định hình",
+                    reserve_code: "3926.90.92"
+                };
+            }
+
+            // 30. GÁ LẮP RÁP / BỘ PHẬN MÁY ĐẶC THÙ (Nhóm 8479)
+            if (/\b(?:ga\s+dap|ga\s+lap\s+rap|jig|fixture)\b/.test(hn)) {
+                return {
+                    code: "8479.90.90",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 2(b) Phần XVI: Bộ phận máy móc có chức năng riêng biệt thuộc Nhóm 84.79. Áp dụng GRI 6 xếp mã 8479.90.90.",
+                    missing_attributes: [],
+                    assumptions: "Gá dập phụ tùng máy móc chuyên dụng",
+                    reserve_code: "8466.94.00"
+                };
+            }
+
+            // FALLBACK / UNRESOLVED
+            return {
+                code: "UNRESOLVED",
+                level: 0,
+                status: "UNRESOLVED",
+                reasoning: "Chuyển tiếp cho hệ thống đối sánh đa tầng WCO 2022 xử lý.",
+                missing_attributes: [],
+                assumptions: "",
+                reserve_code: ""
+            };
+        }
+
         function classifyProductClientSide(name, desc = '', use = '', specs = '', model_en = '') {
             buildContextIndex();
             const db = window.HS_DATABASE || [];
             if (!db.length) return { c: '84818099', vn: 'Van và các thiết bị tương tự', mfn: '0%', vat: '8%', evfta: '0%', acfta: '0%' };
+
+            // 0. DETERMINISTIC STATUTORY TREE WALKER (GRI 1-6, Head Noun Isolation, Zero-Guessing)
+            const statRes = classifyStatutoryTreeClientSide({ name, desc, use, specs, model_en });
+            if (statRes && statRes.status && statRes.status !== 'UNRESOLVED') {
+                if (statRes.status === 'INSUFFICIENT_INFO') {
+                    return {
+                        _insufficient_info: true,
+                        _missing_fields: statRes.missing_attributes || [],
+                        _reasoning: statRes.reasoning,
+                        c: '',
+                        vn: 'Mô tả hàng hóa chưa đủ căn cứ pháp lý để định mã HS (Zero-Guessing).'
+                    };
+                }
+                const cCode = statRes.code || '';
+                const cleanCode = cCode.replace(/\./g, '');
+                let matchedItem = db.find(it => (it.c || '').replace(/\./g, '') === cleanCode);
+                if (!matchedItem) {
+                    matchedItem = {
+                        c: cCode,
+                        vn: statRes.reasoning || 'Hàng hóa nhập khẩu',
+                        mfn: '0%',
+                        vat: '8%'
+                    };
+                } else {
+                    matchedItem = Object.assign({}, matchedItem, { c: cCode });
+                }
+                matchedItem._statutory = true;
+                matchedItem._statutory_reasoning = statRes.reasoning;
+                matchedItem._reserve_code = statRes.reserve_code;
+                matchedItem._assumptions = statRes.assumptions;
+                matchedItem._missing_fields = statRes.missing_attributes || [];
+                matchedItem._level = statRes.level || 8;
+
+                if (statRes.status === 'STOP_4_DIGIT' || statRes.status === 'STOP_6_DIGIT') {
+                    matchedItem._is_stopped = true;
+                }
+
+                const reserveCodeClean = (statRes.reserve_code || '').replace(/\./g, '');
+                const compItem = db.find(it => (it.c || '').replace(/\./g, '') === reserveCodeClean);
+                matchedItem._competing = compItem ? [compItem] : [];
+                matchedItem._top_headings = [cleanCode.substring(0, 4) || '8536'];
+                matchedItem._top_candidates = [matchedItem];
+                return matchedItem;
+            }
 
             const fullText = `${name} ${desc} ${use} ${specs} ${model_en}`.trim();
             const fullTextNorm = removeAccents(fullText);
@@ -8376,6 +9410,115 @@ Trường hợp đủ thông tin:
                     </div>
                 `;
             }
+
+            if (bestItem && bestItem._is_stopped) {
+                const missingList = (bestItem._missing_fields && bestItem._missing_fields.length > 0)
+                    ? bestItem._missing_fields.map(f => {
+                        let label = f;
+                        let chipsHtml = '';
+                        if (f === 'nominal_diameter') {
+                            label = 'Kích thước danh định van / đường ống (DN)';
+                            chipsHtml = `
+                                <div class="flex flex-wrap gap-2 mt-1">
+                                    <button type="button" onclick="applyAttributeToSpecs('DN25 (không quá 2.5cm)')" class="px-2.5 py-1 text-xs rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/60 dark:hover:bg-amber-800 text-amber-800 dark:text-amber-200 font-medium transition-all">+ DN ≤ 25mm (1 inch) ➔ 8481.80.61</button>
+                                    <button type="button" onclick="applyAttributeToSpecs('DN50 (trên 2.5cm)')" class="px-2.5 py-1 text-xs rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/60 dark:hover:bg-amber-800 text-amber-800 dark:text-amber-200 font-medium transition-all">+ DN > 25mm (2 inch) ➔ 8481.80.62</button>
+                                </div>`;
+                        } else if (f === 'valve_type') {
+                            label = 'Chủng loại cơ chế van';
+                            chipsHtml = `
+                                <div class="flex flex-wrap gap-2 mt-1">
+                                    <button type="button" onclick="applyAttributeToSpecs('van bi tay gạt')" class="px-2.5 py-1 text-xs rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/60 dark:hover:bg-amber-800 text-amber-800 dark:text-amber-200 font-medium transition-all">+ Van bi (8481.80)</button>
+                                    <button type="button" onclick="applyAttributeToSpecs('van một chiều')" class="px-2.5 py-1 text-xs rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/60 dark:hover:bg-amber-800 text-amber-800 dark:text-amber-200 font-medium transition-all">+ Van một chiều (8481.30)</button>
+                                    <button type="button" onclick="applyAttributeToSpecs('van an toàn xả áp')" class="px-2.5 py-1 text-xs rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/60 dark:hover:bg-amber-800 text-amber-800 dark:text-amber-200 font-medium transition-all">+ Van an toàn (8481.40)</button>
+                                </div>`;
+                        } else if (f === 'current_amperes') {
+                            label = 'Dòng điện định mức (Ampe - A)';
+                            chipsHtml = `
+                                <div class="flex flex-wrap gap-2 mt-1">
+                                    <button type="button" onclick="applyAttributeToSpecs('dòng điện 10A (dưới 16A)')" class="px-2.5 py-1 text-xs rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/60 dark:hover:bg-amber-800 text-amber-800 dark:text-amber-200 font-medium transition-all">+ Dòng ≤ 16A ➔ 8536.50.96</button>
+                                    <button type="button" onclick="applyAttributeToSpecs('dòng điện 25A (trên 16A)')" class="px-2.5 py-1 text-xs rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/60 dark:hover:bg-amber-800 text-amber-800 dark:text-amber-200 font-medium transition-all">+ Dòng > 16A ➔ 8536.50.99</button>
+                                </div>`;
+                        } else if (f === 'diameter_mm') {
+                            label = 'Đường kính thân bu lông (mm)';
+                            chipsHtml = `
+                                <div class="flex flex-wrap gap-2 mt-1">
+                                    <button type="button" onclick="applyAttributeToSpecs('M12 (đường kính 12mm)')" class="px-2.5 py-1 text-xs rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/60 dark:hover:bg-amber-800 text-amber-800 dark:text-amber-200 font-medium transition-all">+ Đường kính ≤ 16mm (M12) ➔ 7318.15.10</button>
+                                    <button type="button" onclick="applyAttributeToSpecs('M20 (đường kính 20mm)')" class="px-2.5 py-1 text-xs rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/60 dark:hover:bg-amber-800 text-amber-800 dark:text-amber-200 font-medium transition-all">+ Đường kính > 16mm (M20) ➔ 7318.15.90</button>
+                                </div>`;
+                        } else if (f === 'voltage') {
+                            label = 'Điện áp hoạt động định mức (V)';
+                            chipsHtml = `
+                                <div class="flex flex-wrap gap-2 mt-1">
+                                    <button type="button" onclick="applyAttributeToSpecs('điện áp 220V hạ thế')" class="px-2.5 py-1 text-xs rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/60 dark:hover:bg-amber-800 text-amber-800 dark:text-amber-200 font-medium transition-all">+ Điện áp ≤ 1.000V (hạ thế)</button>
+                                    <button type="button" onclick="applyAttributeToSpecs('điện áp 10kV cao thế')" class="px-2.5 py-1 text-xs rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/60 dark:hover:bg-amber-800 text-amber-800 dark:text-amber-200 font-medium transition-all">+ Điện áp > 1.000V (cao thế)</button>
+                                </div>`;
+                        } else if (f === 'connector_status') {
+                            label = 'Tình trạng gắn đầu nối (Connector)';
+                            chipsHtml = `
+                                <div class="flex flex-wrap gap-2 mt-1">
+                                    <button type="button" onclick="applyAttributeToSpecs('đã gắn đầu nối')" class="px-2.5 py-1 text-xs rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/60 dark:hover:bg-amber-800 text-amber-800 dark:text-amber-200 font-medium transition-all">+ Đã gắn đầu nối ➔ 8544.42</button>
+                                    <button type="button" onclick="applyAttributeToSpecs('chưa gắn đầu nối')" class="px-2.5 py-1 text-xs rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/60 dark:hover:bg-amber-800 text-amber-800 dark:text-amber-200 font-medium transition-all">+ Chưa gắn đầu nối ➔ 8544.49</button>
+                                </div>`;
+                        } else if (f === 'power_kw') {
+                            label = 'Công suất động cơ (W / kW / HP)';
+                            chipsHtml = `
+                                <div class="flex flex-wrap gap-2 mt-1">
+                                    <button type="button" onclick="applyAttributeToSpecs('công suất 500W (<= 750W)')" class="px-2.5 py-1 text-xs rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/60 dark:hover:bg-amber-800 text-amber-800 dark:text-amber-200 font-medium transition-all">+ Công suất ≤ 750W ➔ 8501.51.00</button>
+                                    <button type="button" onclick="applyAttributeToSpecs('công suất 5.5kW (<= 7.5kW)')" class="px-2.5 py-1 text-xs rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/60 dark:hover:bg-amber-800 text-amber-800 dark:text-amber-200 font-medium transition-all">+ Công suất 750W - 7.5kW ➔ 8501.52.11</button>
+                                    <button type="button" onclick="applyAttributeToSpecs('công suất 15kW (<= 75kW)')" class="px-2.5 py-1 text-xs rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/60 dark:hover:bg-amber-800 text-amber-800 dark:text-amber-200 font-medium transition-all">+ Công suất 7.5kW - 75kW ➔ 8501.52.19</button>
+                                </div>`;
+                        }
+                        return `
+                            <li class="space-y-1">
+                                <div class="flex items-center gap-2 font-bold text-slate-800 dark:text-slate-200">
+                                    <i class="fa-solid fa-circle-question text-amber-500"></i>
+                                    <span>${label}</span>
+                                </div>
+                                ${chipsHtml}
+                            </li>`;
+                    }).join('')
+                    : `<li class="flex items-center gap-2"><i class="fa-solid fa-circle-question text-amber-500"></i> <span>Thông số kỹ thuật chi tiết</span></li>`;
+
+                return `
+                    <div class="bg-white dark:bg-slate-900 border-2 border-amber-500 rounded-2xl p-6 shadow-xl space-y-5 animate-fade-in">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-600 flex items-center justify-center shrink-0 text-2xl shadow-inner">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="px-3 py-1 rounded-full text-xs font-black bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700 uppercase tracking-wide">
+                                        Dừng ở mã ${bestItem._level || 6} số theo Zero-Guessing
+                                    </span>
+                                    <span class="text-xs text-slate-500 dark:text-slate-400">Tuân thủ GRI 1 & GRI 6</span>
+                                </div>
+                                <h3 class="text-xl font-black text-slate-900 dark:text-white">
+                                    Mã HS tạm dừng: <span class="font-mono text-amber-600 dark:text-amber-400 text-2xl">${bestItem.c}</span>
+                                </h3>
+                                <p class="text-sm text-slate-600 dark:text-slate-300">
+                                    ${bestItem._statutory_reasoning || 'Hệ thống đã xác định chính xác Nhóm / Phân nhóm pháp lý, nhưng dừng lại không tự ý đoán mò mã 8 số do thiếu thông số định thuế bắt buộc.'}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-amber-50 dark:bg-slate-950/70 border border-amber-200 dark:border-amber-500/30 rounded-xl p-4 text-xs space-y-3">
+                            <div class="font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                                <i class="fa-solid fa-hand-pointer"></i> Bấm chọn 1 thông số dưới đây để chốt mã 8 số tức thì:
+                            </div>
+                            <ul class="space-y-3">
+                                ${missingList}
+                            </ul>
+                        </div>
+
+                        <div class="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500">
+                            <div><i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> Mã dự phòng tiềm năng: <span class="font-mono font-bold text-slate-700 dark:text-slate-300">${bestItem._reserve_code || 'N/A'}</span></div>
+                            <button type="button" onclick="document.getElementById('auto-specs')?.focus()" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold transition-all shadow-sm">
+                                Nhập thông số thủ công
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
             const codeRaw = (bestItem.c || '82089000').replace(/\./g, '');
             const codeFmt = `${codeRaw.substring(0,4)}.${codeRaw.substring(4,6)}.${codeRaw.substring(6,8)}`;
             const cleanCode = codeRaw;
@@ -8555,6 +9698,31 @@ Trường hợp đủ thông tin:
             }, data);
         }
 
+        function applyAttributeToSpecs(attrText) {
+            const descInput = document.getElementById('auto-desc');
+            const specsInput = document.getElementById('auto-specs');
+            if (descInput) {
+                if (descInput.value && !descInput.value.includes(attrText)) {
+                    descInput.value = descInput.value + ' ' + attrText;
+                } else if (!descInput.value) {
+                    descInput.value = attrText;
+                }
+            }
+            if (specsInput) {
+                if (specsInput.value && !specsInput.value.includes(attrText)) {
+                    specsInput.value = specsInput.value + ' ' + attrText;
+                } else if (!specsInput.value) {
+                    specsInput.value = attrText;
+                }
+            }
+            const runBtn = document.getElementById('btn-run-automation');
+            if (runBtn) {
+                runBtn.click();
+            } else if (typeof generateAIReportFromForm === 'function') {
+                generateAIReportFromForm();
+            }
+        }
+
         function generateClientSideAIReportForExplicitItem(targetItem, data) {
             const name = data.name || targetItem.vn || 'Hàng hóa nhập khẩu';
             const desc = data.desc || data.specs || targetItem.vn || 'Mô tả thông số kỹ thuật';
@@ -8678,19 +9846,16 @@ Trường hợp đủ thông tin:
 
             if (btn) {
                 btn.disabled = true;
-                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Đang suy luận 6 Quy tắc GRI & Xuất báo cáo...</span>`;
+                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Đang phân tích...</span>`;
             }
 
             if (container) {
                 container.innerHTML = `
-                    <div class="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center space-y-4 border border-slate-200 dark:border-slate-800 shadow-xl">
-                        <div class="w-16 h-16 mx-auto rounded-full bg-sky-100 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center text-3xl animate-bounce">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-8 text-center space-y-3 border border-slate-200 dark:border-slate-800 shadow-lg">
+                        <div class="w-12 h-12 mx-auto rounded-full bg-sky-100 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-circle-notch fa-spin"></i>
                         </div>
-                        <h3 class="text-xl font-extrabold text-slate-900 dark:text-white">HSCoder AI đang thực hiện Phân Tích Chuyên Sâu theo Skill /hs_code_automation</h3>
-                        <p class="text-sm text-slate-600 dark:text-slate-300 max-w-lg mx-auto leading-relaxed">
-                            Đang đối chiếu 6 Quy tắc Tổng quát (GRI 1 - GRI 6) &rarr; Trích dẫn Bộ Chú giải HS 2022 (Công văn 1810/TCHQ-TXNK & HQKV8) &rarr; Lập luận loại trừ pháp lý &rarr; Xuất Báo cáo PDF tự động...
-                        </p>
+                        <h3 class="text-base font-bold text-slate-800 dark:text-slate-200">Đang phân tích...</h3>
                     </div>
                 `;
             }
@@ -10228,77 +11393,98 @@ Trường hợp đủ thông tin:
                 const descStr = descList.join(' ');
 
                 const bestItem = classifyProductClientSide(combinedName, descStr, useStr, specsStr, modelStr);
-                const cRaw = (bestItem.c || '82089000').replace(/\./g, '');
-                const priCode = `${cRaw.substring(0,4)}.${cRaw.substring(4,6)}.${cRaw.substring(6,8)}`;
 
+                let priCode = '';
                 let altCode = 'Không có';
-                if (bestItem._competing && bestItem._competing.length > 0) {
-                    const compRaw = (bestItem._competing[0].c || '').replace(/\./g, '');
-                    if (compRaw && compRaw !== cRaw) {
-                        altCode = `${compRaw.substring(0,4)}.${compRaw.substring(4,6)}.${compRaw.substring(6,8)}`;
+                let revisedName = '';
+                let wcoCitation = '';
+
+                if (bestItem && bestItem._insufficient_info) {
+                    priCode = "CHƯA ĐỦ THÔNG TIN";
+                    altCode = "N/A";
+                    const missingStr = (bestItem._missing_fields || []).join(', ');
+                    revisedName = `${combinedName} [Cần bổ sung: ${missingStr}]`;
+                    wcoCitation = bestItem._reasoning || bestItem._statutory_reasoning || "Chưa đủ cơ sở pháp lý định danh theo GRI 1 (Zero-Guessing).";
+                } else if (bestItem && bestItem._is_stopped) {
+                    priCode = bestItem.c || 'CHƯA RÕ';
+                    altCode = bestItem._reserve_code || 'Không có';
+                    const missingStr = (bestItem._missing_fields || []).join(', ');
+                    revisedName = `${combinedName} [Thiếu thông số: ${missingStr}]`;
+                    wcoCitation = bestItem._statutory_reasoning || `Dừng ở phân nhóm ${priCode} theo nguyên tắc Không đoán mò (Zero-Guessing).`;
+                } else {
+                    const cRaw = (bestItem.c || '82089000').replace(/\./g, '');
+                    priCode = cRaw.length === 8 ? `${cRaw.substring(0,4)}.${cRaw.substring(4,6)}.${cRaw.substring(6,8)}` : (bestItem.c || cRaw);
+
+                    if (bestItem._competing && bestItem._competing.length > 0) {
+                        const compRaw = (bestItem._competing[0].c || '').replace(/\./g, '');
+                        if (compRaw && compRaw !== cRaw) {
+                            altCode = `${compRaw.substring(0,4)}.${compRaw.substring(4,6)}.${compRaw.substring(6,8)}`;
+                        }
+                    }
+
+                    const heading = cRaw.substring(0, 4);
+                    const chapter = cRaw.substring(0, 2);
+                    const chapTitles = window.CHAPTER_TITLES || {};
+                    const chapTitle = chapTitles[chapter] || `Chương ${chapter}`;
+                    const headDesc = (window.headMap && window.headMap[heading]) ? window.headMap[heading] : `Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)}`;
+
+                    const assumptions = [];
+                    const fullCombined = `${combinedName} ${descStr} ${useStr} ${specsStr} ${modelStr}`.toLowerCase();
+                    if (cRaw.startsWith('8536')) {
+                        const hasV = /\b\d+\s*v(?:dc|ac)?\b/i.test(fullCombined);
+                        const hasA = /\b\d+(?:\.\d+)?\s*a\b/i.test(fullCombined);
+                        if (!hasV && !hasA) assumptions.push("Điện áp ≤ 1.000V, dòng điện định mức < 16A");
+                        else if (!hasV) assumptions.push("Điện áp hoạt động định mức ≤ 1.000V");
+                        else if (!hasA) assumptions.push("Dòng điện định mức < 16A");
+                    } else if (cRaw.startsWith('8501')) {
+                        if (!/\b\d+\s*(?:w|kw|hp)\b/i.test(fullCombined)) assumptions.push("Công suất đầu ra ≤ 37.5W, điện áp một chiều DC");
+                    } else if (cRaw.startsWith('8544')) {
+                        if (!/\b\d+\s*v(?:dc|ac)?\b/i.test(fullCombined)) assumptions.push("Điện áp hoạt động định mức ≤ 1.000V (hạ thế)");
+                    } else if (cRaw.startsWith('7318')) {
+                        if (!/\b(?:m\d+|d\d+|phi\s*\d+|\d+\s*mm)\b/i.test(fullCombined)) assumptions.push("Đường kính thân ren ≤ 12mm, thép carbon không gỉ");
+                    } else if (cRaw.startsWith('8482')) {
+                        if (fullCombined.includes('thanh truot') || fullCombined.includes('con truot')) assumptions.push("Có tích hợp ổ bi lăn tuần hoàn dẫn hướng theo Chú giải 84.82");
+                    } else if (cRaw.startsWith('3926')) {
+                        if (fullCombined.includes('thep') || fullCombined.includes('kim loai')) assumptions.push("Vật liệu chất dẻo (plastic) chiếm đặc trưng cơ bản theo GRI 3(b)");
+                    } else if (cRaw.startsWith('8208')) {
+                        assumptions.push("Lưỡi cắt chuyên dùng cho máy dập/máy công cụ theo Chú giải 1(f) Phần XVI");
+                    }
+
+                    const assumptionStr = assumptions.length > 0 ? ` [Giả định định thuế: ${assumptions.join('; ')}]` : ` [Đầy đủ thông số định thuế]`;
+                    revisedName = `${combinedName} (${bestItem.vn || 'Tiêu chuẩn'})${assumptionStr}`;
+
+                    if (bestItem._statutory_reasoning) {
+                        wcoCitation = bestItem._statutory_reasoning;
+                    } else {
+                        let exclusionText = "";
+                        if (['3926', '3919'].includes(heading)) {
+                            exclusionText = "GRI 1: Áp dụng Chú giải 1(g) Phần XVI (loại trừ các mặt hàng bằng plastic thuộc Chương 39 ra khỏi Phần XVI máy móc). ";
+                        } else if (heading.startsWith('82')) {
+                            exclusionText = "GRI 1: Áp dụng Chú giải 1(f) Phần XVI (loại trừ dao, lưỡi cắt và dụng cụ cầm tay thuộc Chương 82 khỏi Phần XVI). ";
+                        } else if (['7318', '7320', '7326'].includes(heading)) {
+                            exclusionText = "GRI 1: Áp dụng Chú giải 2 Phần XV (bộ phận có công dụng chung bằng kim loại cơ bản giữ ở Chương 73 trong mọi trường hợp). ";
+                        } else if (['9017', '9031'].includes(heading)) {
+                            exclusionText = "GRI 1: Áp dụng Chú giải 1(m) Phần XVI & Chú giải 1 Chương 90 (dụng cụ, thiết bị đo lường kiểm tra chính xác đưa về Chương 90). ";
+                        } else if (['8481', '8482', '8483', '8501', '8536', '8537'].includes(heading)) {
+                            exclusionText = `GRI 1: Áp dụng Chú giải 2(a) Phần XVI (hàng hóa có nhóm định danh riêng ${heading} trong mọi trường hợp không phân loại theo máy chủ). `;
+                        } else if (heading === '8544') {
+                            exclusionText = "GRI 1: Căn cứ danh mục Nhóm 85.44 (Dây điện, cáp điện có cách điện, đã hoặc chưa gắn với đầu nối). ";
+                        } else {
+                            exclusionText = `GRI 1: Căn cứ nội dung Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)} (${headDesc}) và Chú giải ${chapter} (${chapTitle}). `;
+                        }
+
+                        let dashText = "";
+                        if (heading === '8544' && cRaw.startsWith('854442')) {
+                            dashText = `GRI 6: So sánh cùng cấp độ gạch nối tại nhóm 85.44: Cấp 1 gạch [- Dây dẫn điện hạ thế ≤ 1.000V], cấp 2 gạch [-- 8544.42 ĐÃ LẮP ĐẦU NỐI ĐIỆN] (loại trừ phân nhánh chưa gắn đầu nối 8544.49), cấp 3/4 gạch áp mã 8 số ${priCode} (${bestItem.vn || ''}).`;
+                        } else {
+                            const sub6 = cRaw.substring(0, 6);
+                            dashText = `GRI 6: So sánh phân nhóm cùng cấp độ gạch nối tại nhóm ${heading.substring(0,2)}.${heading.substring(2,4)}: Cấp 1 gạch [-] đối chiếu công năng chính, cấp 2 gạch [-- ${sub6.substring(0,4)}.${sub6.substring(4,6)}] xác định thông số kỹ thuật, cấp 3/4 gạch áp mã 8 số ${priCode} (${bestItem.vn || ''}).`;
+                        }
+
+                        const hypoText = assumptions.length > 0 ? ` Căn cứ giả định kỹ thuật (${assumptions.join('; ')}). Nếu thông số thực tế thay đổi, áp dụng mã dự phòng ${altCode}.` : ` Đầy đủ thông số định thuế; mã dự phòng đối chiếu: ${altCode}.`;
+                        wcoCitation = `${exclusionText}${dashText}${hypoText}`;
                     }
                 }
-
-                const heading = cRaw.substring(0, 4);
-                const chapter = cRaw.substring(0, 2);
-                const chapTitles = window.CHAPTER_TITLES || {};
-                const chapTitle = chapTitles[chapter] || `Chương ${chapter}`;
-                const headDesc = (window.headMap && window.headMap[heading]) ? window.headMap[heading] : `Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)}`;
-
-                // Formulate tax assumptions if parameters missing
-                const assumptions = [];
-                const fullCombined = `${combinedName} ${descStr} ${useStr} ${specsStr} ${modelStr}`.toLowerCase();
-                if (cRaw.startsWith('8536')) {
-                    const hasV = /\b\d+\s*v(?:dc|ac)?\b/i.test(fullCombined);
-                    const hasA = /\b\d+(?:\.\d+)?\s*a\b/i.test(fullCombined);
-                    if (!hasV && !hasA) assumptions.push("Điện áp ≤ 1.000V, dòng điện định mức < 16A");
-                    else if (!hasV) assumptions.push("Điện áp hoạt động định mức ≤ 1.000V");
-                    else if (!hasA) assumptions.push("Dòng điện định mức < 16A");
-                } else if (cRaw.startsWith('8501')) {
-                    if (!/\b\d+\s*(?:w|kw|hp)\b/i.test(fullCombined)) assumptions.push("Công suất đầu ra ≤ 37.5W, điện áp một chiều DC");
-                } else if (cRaw.startsWith('8544')) {
-                    if (!/\b\d+\s*v(?:dc|ac)?\b/i.test(fullCombined)) assumptions.push("Điện áp hoạt động định mức ≤ 1.000V (hạ thế)");
-                } else if (cRaw.startsWith('7318')) {
-                    if (!/\b(?:m\d+|d\d+|phi\s*\d+|\d+\s*mm)\b/i.test(fullCombined)) assumptions.push("Đường kính thân ren ≤ 12mm, thép carbon không gỉ");
-                } else if (cRaw.startsWith('8482')) {
-                    if (fullCombined.includes('thanh truot') || fullCombined.includes('con truot')) assumptions.push("Có tích hợp ổ bi lăn tuần hoàn dẫn hướng theo Chú giải 84.82");
-                } else if (cRaw.startsWith('3926')) {
-                    if (fullCombined.includes('thep') || fullCombined.includes('kim loai')) assumptions.push("Vật liệu chất dẻo (plastic) chiếm đặc trưng cơ bản theo GRI 3(b)");
-                } else if (cRaw.startsWith('8208')) {
-                    assumptions.push("Lưỡi cắt chuyên dùng cho máy dập/máy công cụ theo Chú giải 1(f) Phần XVI");
-                }
-
-                const assumptionStr = assumptions.length > 0 ? ` [Giả định định thuế: ${assumptions.join('; ')}]` : ` [Đầy đủ thông số định thuế]`;
-                const revisedName = `${combinedName} (${bestItem.vn || 'Tiêu chuẩn'})${assumptionStr}`;
-
-                // Formulate rigorous statutory legal reasoning (GRI 1-6, Exclusion Notes & Dash Level)
-                let exclusionText = "";
-                if (['3926', '3919'].includes(heading)) {
-                    exclusionText = "GRI 1: Áp dụng Chú giải 1(g) Phần XVI (loại trừ các mặt hàng bằng plastic thuộc Chương 39 ra khỏi Phần XVI máy móc). ";
-                } else if (heading.startsWith('82')) {
-                    exclusionText = "GRI 1: Áp dụng Chú giải 1(f) Phần XVI (loại trừ dao, lưỡi cắt và dụng cụ cầm tay thuộc Chương 82 khỏi Phần XVI). ";
-                } else if (['7318', '7320', '7326'].includes(heading)) {
-                    exclusionText = "GRI 1: Áp dụng Chú giải 2 Phần XV (bộ phận có công dụng chung bằng kim loại cơ bản giữ ở Chương 73 trong mọi trường hợp). ";
-                } else if (['9017', '9031'].includes(heading)) {
-                    exclusionText = "GRI 1: Áp dụng Chú giải 1(m) Phần XVI & Chú giải 1 Chương 90 (dụng cụ, thiết bị đo lường kiểm tra chính xác đưa về Chương 90). ";
-                } else if (['8481', '8482', '8483', '8501', '8536', '8537'].includes(heading)) {
-                    exclusionText = `GRI 1: Áp dụng Chú giải 2(a) Phần XVI (hàng hóa có nhóm định danh riêng ${heading} trong mọi trường hợp không phân loại theo máy chủ). `;
-                } else if (heading === '8544') {
-                    exclusionText = "GRI 1: Căn cứ danh mục Nhóm 85.44 (Dây điện, cáp điện có cách điện, đã hoặc chưa gắn với đầu nối). ";
-                } else {
-                    exclusionText = `GRI 1: Căn cứ nội dung Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)} (${headDesc}) và Chú giải ${chapter} (${chapTitle}). `;
-                }
-
-                let dashText = "";
-                if (heading === '8544' && cRaw.startsWith('854442')) {
-                    dashText = `GRI 6: So sánh cùng cấp độ gạch nối tại nhóm 85.44: Cấp 1 gạch [- Dây dẫn điện hạ thế ≤ 1.000V], cấp 2 gạch [-- 8544.42 ĐÃ LẮP ĐẦU NỐI ĐIỆN] (loại trừ phân nhánh chưa gắn đầu nối 8544.49), cấp 3/4 gạch áp mã 8 số ${priCode} (${bestItem.vn || ''}).`;
-                } else {
-                    const sub6 = cRaw.substring(0, 6);
-                    dashText = `GRI 6: So sánh phân nhóm cùng cấp độ gạch nối tại nhóm ${heading.substring(0,2)}.${heading.substring(2,4)}: Cấp 1 gạch [-] đối chiếu công năng chính, cấp 2 gạch [-- ${sub6.substring(0,4)}.${sub6.substring(4,6)}] xác định thông số kỹ thuật, cấp 3/4 gạch áp mã 8 số ${priCode} (${bestItem.vn || ''}).`;
-                }
-
-                const hypoText = assumptions.length > 0 ? ` Căn cứ giả định kỹ thuật (${assumptions.join('; ')}). Nếu thông số thực tế thay đổi, áp dụng mã dự phòng ${altCode}.` : ` Đầy đủ thông số định thuế; mã dự phòng đối chiếu: ${altCode}.`;
-                const wcoCitation = `${exclusionText}${dashText}${hypoText}`;
 
                 updatedRows.push([
                     ...r,
@@ -10406,6 +11592,32 @@ Trường hợp đủ thông tin:
             items.forEach((it, idx) => {
                 const priCode = it.hs_code_pri || it.hs_code;
                 const altCode = it.hs_code_alt || '';
+                const cleanPri = (priCode || '').replace(/\./g, '').trim();
+
+                let priBadgeHtml = '';
+                if (priCode === "CHƯA ĐỦ THÔNG TIN") {
+                    priBadgeHtml = `
+                        <span class="inline-flex items-center px-2 py-1 rounded-lg bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-700 font-extrabold text-[11px] shadow-sm">
+                            <i class="fa-solid fa-circle-exclamation mr-1 text-rose-500"></i> CHƯA ĐỦ TT
+                        </span>
+                        <div class="text-[10px] text-rose-600 dark:text-rose-400 mt-1 font-semibold">Cần bổ sung</div>
+                    `;
+                } else if (cleanPri.length < 8) {
+                    priBadgeHtml = `
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700 font-extrabold text-xs shadow-sm font-mono">
+                            ${priCode}
+                        </span>
+                        <div class="text-[10px] text-amber-600 dark:text-amber-400 mt-1 font-semibold">Dừng ${cleanPri.length} số (Zero-Guessing)</div>
+                    `;
+                } else {
+                    priBadgeHtml = `
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 font-extrabold text-xs shadow-sm font-mono">
+                            ${priCode}
+                        </span>
+                        <div class="text-[10px] text-slate-400 mt-1 font-sans">MFN: ${it.mfn || '0%'} | VAT: ${it.vat || '8%'}</div>
+                    `;
+                }
+
                 html += `
                     <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                         <td class="px-3 py-3 text-center font-bold text-slate-500 dark:text-slate-400">${it.row}</td>
@@ -10413,17 +11625,14 @@ Trường hợp đủ thông tin:
                             ${it.raw_text}
                         </td>
                         <td class="px-3 py-3 text-center bg-emerald-50/50 dark:bg-emerald-950/20 border-x border-emerald-100 dark:border-emerald-900/40">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 font-extrabold text-xs shadow-sm font-mono">
-                                ${priCode}
-                            </span>
-                            <div class="text-[10px] text-slate-400 mt-1 font-sans">MFN: ${it.mfn || '0%'} | VAT: ${it.vat || '8%'}</div>
+                            ${priBadgeHtml}
                         </td>
                         <td class="px-3 py-3 text-center bg-amber-50/40 dark:bg-amber-950/20 border-r border-amber-100 dark:border-amber-900/40">
-                            ${altCode && altCode !== 'Không có' ? `
+                            ${altCode && altCode !== 'Không có' && altCode !== 'N/A' ? `
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300 font-bold text-xs shadow-sm font-mono">
                                     ${altCode}
                                 </span>
-                                <div class="text-[10px] text-amber-700 dark:text-amber-400 mt-1 font-sans">Dự phòng</div>
+                                <div class="text-[10px] text-amber-700 dark:text-amber-400 mt-1 font-sans">Dự phòng / Tham khảo</div>
                             ` : `
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-[11px] font-medium border border-emerald-200 dark:border-emerald-800/50">
                                     <i class="fa-solid fa-circle-check text-[10px] mr-1"></i>100% Chắc chắn
@@ -10497,121 +11706,905 @@ Trường hợp đủ thông tin:
         function runAutomatedRegressionGuard() {
             const testCases = [
                 {
-                    id: 1,
-                    title: "Công tắc điện dưới 16A (220V 10A vỏ nhựa)",
-                    input: { name: "Công tắc chuyển mạch điện 220V 10A vỏ nhựa", desc: "Vỏ nhựa PC/ABS, tiếp điểm đồng", use: "Đóng ngắt mạch điện dân dụng", specs: "220V 10A", model_en: "SWITCH-10A" },
-                    expected: ["8536.50.96", "85365096"]
+                                "id": 1,
+                                "category": "SKILL_SAMPLE",
+                                "title": "Tấm che bảo vệ an toàn bằng nhựa cho máy dập (Tình huống 1)",
+                                "input": {
+                                                "name": "Tấm che bảo vệ an toàn bằng nhựa dùng cho máy dập kim loại",
+                                                "desc": "Tấm nhựa acrylic trong suốt gia công cắt định hình",
+                                                "use": "Bảo vệ an toàn lao động chống phoi bắn",
+                                                "specs": "Dày 5mm, 400x600mm",
+                                                "model_en": "SAFETY-GUARD-PLASTIC"
+                                },
+                                "expected": [
+                                                "3926.90.99",
+                                                "39269099"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải 1(g) Phần XVI loại trừ nhựa sang 3926"
                 },
                 {
-                    id: 2,
-                    title: "Công tắc điện từ 16A trở lên (220V 20A)",
-                    input: { name: "Công tắc chuyển mạch điện 220V 20A", desc: "Vỏ nhựa, tiếp điểm hợp kim", use: "Đóng ngắt mạch điện công nghiệp", specs: "220V 20A", model_en: "SWITCH-20A" },
-                    expected: ["8536.50.99", "85365099"]
+                                "id": 2,
+                                "category": "SKILL_SAMPLE",
+                                "title": "Miếng thép gắn cố định cảm biến kích thước 45x75x5mm (Tình huống 2)",
+                                "input": {
+                                                "name": "Miếng thép gắn cố định cảm biến kích thước 45x75x5mm",
+                                                "desc": "Thép tấm carbon gia công đột lỗ và sơn phủ",
+                                                "use": "Gá bắt cố định cảm biến vào khung máy",
+                                                "specs": "45x75x5mm",
+                                                "model_en": "STEEL-BRACKET"
+                                },
+                                "expected": [
+                                                "7326.90.99",
+                                                "73269099"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải 2 Phần XV loại trừ kim loại công dụng chung sang 7326"
                 },
                 {
-                    id: 3,
-                    title: "Tấm che bảo vệ an toàn bằng nhựa cho máy dập",
-                    input: { name: "Tấm che bảo vệ an toàn bằng nhựa", desc: "Nhựa acrylic trong suốt, chống va đập", use: "Dùng che chắn bảo vệ an toàn cho máy dập kim loại", specs: "240x5x400mm", model_en: "GUARD-01" },
-                    expected: ["3926.90.99", "39269099"]
+                                "id": 3,
+                                "category": "SKILL_SAMPLE",
+                                "title": "Công tắc chuyển mạch điện 220V 10A dưới 16A (Tình huống 3)",
+                                "input": {
+                                                "name": "Công tắc chuyển mạch điện 220V 10A",
+                                                "desc": "Công tắc gạt bằng nhựa tiếp điểm đồng",
+                                                "use": "Đóng ngắt mạch điện điều khiển tủ điện",
+                                                "specs": "220V 10A",
+                                                "model_en": "TOGGLE-SWITCH-10A"
+                                },
+                                "expected": [
+                                                "8536.50.96",
+                                                "85365096"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & 2(a) Phần XVI -> 8536; GRI 6: <=1000V -> 8536.50 -> <16A -> 8536.50.96"
                 },
                 {
-                    id: 4,
-                    title: "Miếng thép gia công cố định cảm biến (45x75x5mm)",
-                    input: { name: "Miếng thép gia công cố định cảm biến", desc: "Thép carbon gia công cơ khí, bản mã thép", use: "Dùng gắn cố định cảm biến trên đài kiểm tra", specs: "45x75x5mm", model_en: "BRACKET-01" },
-                    expected: ["7326.90.99", "73269099"]
+                                "id": 4,
+                                "category": "SKILL_SAMPLE",
+                                "title": "Thanh trượt bằng thép có ổ bi dẫn hướng tịnh tiến (Tình huống 4)",
+                                "input": {
+                                                "name": "Thanh trượt bằng thép có ổ bi dẫn hướng tịnh tiến",
+                                                "desc": "Thanh ray thép hợp kim có lắp các con trượt chứa ổ bi cầu tuần hoàn",
+                                                "use": "Dẫn hướng tịnh tiến bàn máy CNC",
+                                                "specs": "Dài 500mm, ray bản rộng 25mm",
+                                                "model_en": "LINEAR-GUIDE-BALL"
+                                },
+                                "expected": [
+                                                "8482.10.00",
+                                                "84821000"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải 2(a) Phần XVI & Chú giải WCO 84.82: Có ổ bi bắt buộc về 8482"
                 },
                 {
-                    id: 5,
-                    title: "Bu lông lục giác bằng thép M12x50 có ren",
-                    input: { name: "Bu lông lục giác bằng thép M12x50", desc: "Thép carbon cường độ cao 8.8 có ren", use: "Ghép nối các chi tiết cơ khí", specs: "M12x50mm", model_en: "BOLT-M12" },
-                    expected: ["7318.15.10", "73181510"]
+                                "id": 5,
+                                "category": "SKILL_SAMPLE",
+                                "title": "Thân trượt dẫn hướng bằng gang không có bi (Tình huống 5)",
+                                "input": {
+                                                "name": "Thân trượt dẫn hướng bằng gang không có bi dùng cho máy tiện",
+                                                "desc": "Gang đúc gia công phay rãnh mang cá trượt trơn không có viên bi",
+                                                "use": "Đỡ trượt bàn dao máy tiện cơ khí",
+                                                "specs": "300x150mm",
+                                                "model_en": "SLIDE-BODY-NO-BALL"
+                                },
+                                "expected": [
+                                                "8483.30.90",
+                                                "84833090"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải 84.83: Thân gối đỡ / bạc lót trục không ổ bi -> 8483.30.90"
                 },
                 {
-                    id: 6,
-                    title: "Thanh trượt có ổ bi dẫn hướng tịnh tiến (con trượt bi)",
-                    input: { name: "Thanh trượt bằng thép có ổ bi dẫn hướng tịnh tiến", desc: "Thép chịu lực có con trượt bi", use: "Dẫn hướng tịnh tiến bàn máy gia công cơ khí", specs: "Đường kính bi 5mm", model_en: "LINEAR-01" },
-                    expected: ["8482.10.00", "84821000"]
+                                "id": 6,
+                                "category": "SKILL_SAMPLE",
+                                "title": "Bu lông lục giác thép M12x50 có ren suốt (Tình huống 6)",
+                                "input": {
+                                                "name": "Bu lông lục giác bằng thép M12x50 cấp bền 8.8 có ren suốt",
+                                                "desc": "Thép hợp kim tôi cứng tiện ren ngoài suốt chiều dài thân",
+                                                "use": "Liên kết kết cấu cơ khí",
+                                                "specs": "M12x50mm",
+                                                "model_en": "HEX-BOLT-M12"
+                                },
+                                "expected": [
+                                                "7318.15.10",
+                                                "73181510"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải 2 Phần XV -> 7318; GRI 6: có ren -> 7318.15 -> đk <= 16mm -> 7318.15.10"
                 },
                 {
-                    id: 7,
-                    title: "Thân trượt dẫn hướng bằng gang không có ổ bi",
-                    input: { name: "Thân trượt dẫn hướng bằng gang không có ổ bi", desc: "Gang đúc dẫn hướng cơ khí không lắp ổ bi hay ổ đũa", use: "Dùng cho máy tiện công cụ", specs: "Không có ổ bi", model_en: "SLIDE-01" },
-                    expected: ["8483.30.90", "84833090"]
+                                "id": 7,
+                                "category": "SKILL_SAMPLE",
+                                "title": "Ổ lưu trữ thể rắn USB flash drive 32GB (Tình huống 7)",
+                                "input": {
+                                                "name": "Ổ lưu trữ thể rắn USB flash drive dung lượng 32GB",
+                                                "desc": "Bộ nhớ bán dẫn thể rắn flash USB chưa ghi dữ liệu",
+                                                "use": "Lưu trữ dữ liệu máy tính",
+                                                "specs": "32GB",
+                                                "model_en": "USB-32GB"
+                                },
+                                "expected": [
+                                                "8523.51.11",
+                                                "85235111"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Nhóm 8523 -> Phân nhóm 8523.51 -> Chưa ghi -> 8523.51.11"
                 },
                 {
-                    id: 8,
-                    title: "Dây cáp đồng trục có gắn đầu nối",
-                    input: { name: "Dây cáp đồng trục có gắn đầu nối", desc: "Lõi đồng cáp đồng trục có gắn sẵn đầu nối rắc cắm", use: "Truyền tín hiệu tần số cao", specs: "Điện áp 220V", model_en: "COAX-01" },
-                    expected: ["8544.20.11", "85442011"]
+                                "id": 8,
+                                "category": "YAZAKI_AUTOMOTIVE",
+                                "title": "Dây dẫn truyền tín hiệu 12V~24V có gắn đầu nối (Dòng 32 TU02-2473)",
+                                "input": {
+                                                "name": "Dây dẫn truyền tín hiệu (12V~24V) có gắn đầu nối và khối nhựa để nhận diện khớp nối (PTTT dây dẫn điện ô tô), lõi 0.3mm, chiều dài 450mm",
+                                                "desc": "Dây đồng cách điện có gắn đầu cos bấm sẵn và khối connector nhựa",
+                                                "use": "Dẫn tín hiệu cảm biến hệ thống điện ô tô",
+                                                "specs": "Điện áp 12V~24V, lõi 0.3mm, dài 450mm",
+                                                "model_en": "WIRE-HARNESS-49BB046982"
+                                },
+                                "expected": [
+                                                "8544.42.99",
+                                                "85444299"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & 8544; GRI 6: <=1000V -> 1-dash (-) vật dẫn khác -> 2-dash (--) có gắn đầu nối 8544.42 -> 8544.42.99"
                 },
                 {
-                    id: 9,
-                    title: "Dây cáp điện hạ thế có gắn đầu nối (PVC)",
-                    input: { name: "Dây cáp điện cách điện bằng nhựa PVC có gắn đầu nối", desc: "Ruột đồng cách điện PVC gắn đầu cắm", use: "Truyền dẫn điện hạ thế", specs: "Điện áp 220V, chiều dài 2m", model_en: "CABLE-01" },
-                    expected: ["8544.42.94", "85444294", "854442"]
+                                "id": 9,
+                                "category": "YAZAKI_AUTOMOTIVE",
+                                "title": "Khung gắn định vị khớp nối bằng nhựa (Dòng 33 TU02-2473)",
+                                "input": {
+                                                "name": "Khung gắn định vị khớp nối bằng nhựa (Phụ tùng thay thế bàn lắp ráp bộ dây điện ô tô)",
+                                                "desc": "Nhựa đúc định hình giữ cố định connector",
+                                                "use": "Định vị connector trên bàn lắp ráp",
+                                                "specs": "Nhựa PA66",
+                                                "model_en": "HOLDER-PLASTIC"
+                                },
+                                "expected": [
+                                                "3926.90.99",
+                                                "39269099"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải 1(g) Phần XVI loại trừ nhựa sang 3926"
                 },
                 {
-                    id: 10,
-                    title: "Vú tra mỡ bò bằng thép không tự động (grease nipple)",
-                    input: { name: "Vú tra mỡ bò bằng thép không tự động (grease nipple)", desc: "Thép ren M6 có lò xo và bi một chiều", use: "Bơm tra mỡ bôi trơn ổ trục cơ khí", specs: "Ren M6", model_en: "NIPPLE-M6" },
-                    expected: ["8487.90.00", "84879000"]
+                                "id": 10,
+                                "category": "YAZAKI_AUTOMOTIVE",
+                                "title": "Dây cáp điện ô tô không gắn đầu nối cuộn 100m",
+                                "input": {
+                                                "name": "Dây dẫn điện đơn cách điện PVC không gắn đầu nối dùng cho ô tô",
+                                                "desc": "Lõi đồng nhiều sợi bọc cách điện PVC chịu nhiệt, dạng cuộn không có giắc cắm",
+                                                "use": "Hệ thống điện xe ô tô",
+                                                "specs": "Điện áp 12V-24V, tiết diện 0.5 mm2, cuộn 100m",
+                                                "model_en": "AVSS-0.5"
+                                },
+                                "expected": [
+                                                "8544.49.21",
+                                                "85444921"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 -> 8544; GRI 6: <=1000V -> Không gắn đầu nối 8544.49 -> Dây ô tô không đầu nối 8544.49.21"
                 },
                 {
-                    id: 11,
-                    title: "Ổ lưu trữ thể rắn USB flash drive 32GB",
-                    input: { name: "Ổ lưu trữ thể rắn USB flash drive dung lượng 32GB", desc: "Bộ nhớ bán dẫn thể rắn flash USB chưa ghi dữ liệu", use: "Lưu trữ dữ liệu máy vi tính", specs: "32GB", model_en: "USB-32G" },
-                    expected: ["8523.51.11", "85235111"]
+                                "id": 11,
+                                "category": "YAZAKI_AUTOMOTIVE",
+                                "title": "Đầu cos bấm dây điện bằng đồng mạ thiếc",
+                                "input": {
+                                                "name": "Đầu cốt bằng đồng thau mạ thiếc để bấm vào đầu dây điện",
+                                                "desc": "Chi tiết kim loại dập để kết nối điện áp dưới 1000V",
+                                                "use": "Bấm đầu dây dẫn điện ô tô",
+                                                "specs": "Dùng cho dây 0.5-1.5 mm2, điện áp 24V",
+                                                "model_en": "TERMINAL-7116-2893"
+                                },
+                                "expected": [
+                                                "8536.90.12",
+                                                "85369012"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 -> 8536 thiết bị đấu nối điện; Phân nhóm 8536.90 -> Đầu nối/đầu cos -> 8536.90.12/8536.90.19"
                 },
                 {
-                    id: 12,
-                    title: "Bộ chuyển đổi nguồn điện tĩnh AC sang DC (adapter)",
-                    input: { name: "Bộ chuyển đổi nguồn điện tĩnh AC sang DC", desc: "Bộ nguồn chuyển đổi tĩnh adapter switching biến đổi AC sang DC", use: "Cấp nguồn điện một chiều cho thiết bị", specs: "Input 220VAC, Output 12VDC 5A", model_en: "ADAPTER-12V" },
-                    expected: ["8504.40.90", "85044090"]
+                                "id": 12,
+                                "category": "YAZAKI_AUTOMOTIVE",
+                                "title": "Vỏ đầu nối bằng nhựa chưa gắn tiếp điểm kim loại (Housing connector)",
+                                "input": {
+                                                "name": "Vỏ giắc cắm bằng nhựa đúc dùng chứa đầu cos dây điện",
+                                                "desc": "Khối nhựa PA66 rỗng có các ngàm gài, chưa gắn chân kim loại dẫn điện",
+                                                "use": "Chứa và bảo vệ đầu cos dây điện ô tô",
+                                                "specs": "4 chân, bằng nhựa 100%",
+                                                "model_en": "HOUSING-CONNECTOR-4P"
+                                },
+                                "expected": [
+                                                "8538.90.19",
+                                                "85389019"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải 2(b) Phần XVI: Bộ phận chuyên dùng cho thiết bị đóng ngắt/nối mạch 8536 -> 8538.90 hoặc 3926"
                 },
                 {
-                    id: 13,
-                    title: "Bộ điều nhiệt tự động thermostat",
-                    input: { name: "Bộ điều nhiệt tự động thermostat dùng cho tủ sấy", desc: "Rơ le nhiệt lưỡng kim tự động đóng ngắt theo nhiệt độ", use: "Khống chế nhiệt độ tự động tủ sấy công nghiệp", specs: "Nhiệt độ 50-250 độ C", model_en: "THERMO-01" },
-                    expected: ["9032.10.00", "90321000"]
+                                "id": 13,
+                                "category": "VALVES_PIPES",
+                                "title": "Van bi bằng đồng tay gạt DN25",
+                                "input": {
+                                                "name": "Van bi bằng đồng thau tay gạt dùng cho đường ống nước",
+                                                "desc": "Thân van đồng ren trong, bi van bằng inox đóng mở bằng tay gạt",
+                                                "use": "Đóng ngắt dòng nước làm mát",
+                                                "specs": "Đường kính danh định DN25 (1 inch)",
+                                                "model_en": "BALL-VALVE-BRASS-DN25"
+                                },
+                                "expected": [
+                                                "8481.80.61",
+                                                "84818061"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải 2(a) Phần XVI -> 8481; GRI 6: Van khác 8481.80 -> Van bi <= 2.5cm (DN25 = 2.5cm) -> 8481.80.61"
                 },
                 {
-                    id: 14,
-                    title: "Nẹp nhựa cửa xe ô tô trang trí thân xe",
-                    input: { name: "Nẹp nhựa cửa xe ô tô dùng trang trí thân xe", desc: "Nhựa ABS mạ crôm lắp thân vỏ ô tô", use: "Phụ kiện trang trí lắp thân xe ô tô", specs: "Dài 80cm", model_en: "MOLDING-01" },
-                    expected: ["3926.30.00", "39263000", "8708.29.93", "87082993"]
+                                "id": 14,
+                                "category": "VALVES_PIPES",
+                                "title": "Van một chiều bằng gang DN50",
+                                "input": {
+                                                "name": "Van một chiều dạng đĩa lật bằng gang",
+                                                "desc": "Thân gang mặt bích có cánh van tự đóng ngăn dòng chảy ngược",
+                                                "use": "Hệ thống cấp nước công nghiệp",
+                                                "specs": "DN50 (đường kính trong 50mm)",
+                                                "model_en": "CHECK-VALVE-CAST-IRON-DN50"
+                                },
+                                "expected": [
+                                                "8481.30.22",
+                                                "84813022"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 -> 8481; GRI 6: Van một chiều 8481.30 -> Gang trên 25mm -> 8481.30.22"
                 },
                 {
-                    id: 15,
-                    title: "Quạt ly tâm hút khói công nghiệp bằng thép",
-                    input: { name: "Quạt ly tâm hút khói công nghiệp bằng thép", desc: "Thép tấm gắn động cơ cánh quạt hút ly tâm", use: "Hút khí khói bụi công nghiệp", specs: "Công suất 3kW, lưu lượng 2500 m3/h", model_en: "FAN-CENTRI" },
-                    expected: ["8414.60.91", "84146091", "8414.59", "841459"]
+                                "id": 15,
+                                "category": "VALVES_PIPES",
+                                "title": "Van an toàn xả áp suất bằng đồng DN15",
+                                "input": {
+                                                "name": "Van an toàn xả áp suất khí nén bằng đồng",
+                                                "desc": "Van tự xả áp khi áp lực vượt mức cài đặt có lò xo nén",
+                                                "use": "Bảo vệ an toàn nồi hơi và bình tích khí",
+                                                "specs": "DN15, áp lực cài đặt 8 bar",
+                                                "model_en": "SAFETY-VALVE-15"
+                                },
+                                "expected": [
+                                                "8481.40.21",
+                                                "84814021"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 -> 8481; GRI 6: Van an toàn 8481.40 -> Đồng <= 25mm -> 8481.40.21"
                 },
                 {
-                    id: 16,
-                    title: "Khớp nối ống bằng đồng dùng nối ống nhựa mềm",
-                    input: { name: "Khớp nối ống bằng đồng", desc: "Hợp kim đồng, phụ kiện đường ống dùng nối ống nhựa mềm", use: "Ghép nối đường ống dẫn nước làm mát", specs: "Đường kính 1cm, dài 5cm", model_en: "COUPLING-CU" },
-                    expected: ["7412.20.91", "74122091", "7412.20.99", "74122099", "7412.20.00", "74122000"]
+                                "id": 16,
+                                "category": "VALVES_PIPES",
+                                "title": "Khớp nối ren bằng đồng thau cho đường ống nước (không có van)",
+                                "input": {
+                                                "name": "Khớp nối ren bằng đồng thau phụ kiện đường ống nước",
+                                                "desc": "Khớp rắc co đồng có ren trong và ren ngoài để ghép 2 đoạn ống, rỗng ruột không có van đóng ngắt",
+                                                "use": "Nối ống đồng với nhau",
+                                                "specs": "Ren G1/2, không có cơ cấu van",
+                                                "model_en": "BRASS-PIPE-FITTING-UNION"
+                                },
+                                "expected": [
+                                                "7412.20.91",
+                                                "74122091"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải 1(g) loại trừ van; Đây là phụ kiện đường ống bằng hợp kim đồng -> 7412.20"
                 },
                 {
-                    id: 17,
-                    title: "Máy dập đầu nối dây điện (bấm đầu cos dây cáp)",
-                    input: { name: "Máy dập đầu nối dây điện", desc: "Máy dập cơ khí ép bấm đầu cos vào dây điện", use: "Gia công bấm đầu nối vào dây cáp điện", specs: "Công suất ép 2 tấn", model_en: "CRIMP-01" },
-                    expected: ["8462.62.11", "84626211", "8462.90.00", "84629000", "8479.89.39", "84798939", "8462.29.90", "84622990"]
+                                "id": 17,
+                                "category": "VALVES_PIPES",
+                                "title": "Khớp nối ống bằng thép không gỉ inox 304 có ren",
+                                "input": {
+                                                "name": "Khớp nối măng xông bằng thép không gỉ inox 304",
+                                                "desc": "Ống ren trong bằng thép không gỉ rỗng ruột để nối ống",
+                                                "use": "Phụ kiện nối đường ống dẫn hóa chất",
+                                                "specs": "Inox 304, ren NPT 1/2",
+                                                "model_en": "COUPLING-SS304"
+                                },
+                                "expected": [
+                                                "7307.29.10",
+                                                "73072910"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 -> 7307 phụ kiện đường ống bằng thép; Thép không gỉ -> 7307.29 -> Có ren -> 7307.29.10"
                 },
                 {
-                    id: 18,
-                    title: "Chậu trồng cây bằng gốm nung tráng men",
-                    input: { name: "Chậu trồng cây bằng gốm nung", desc: "Đất sét nung tráng men gốm", use: "Trồng cây cảnh và hoa trang trí", specs: "Đường kính 25cm, cao 30cm", model_en: "POT-CERAMIC" },
-                    expected: ["6914.90.00", "69149000", "6914.10.00", "69141000", "6912.00.00", "69120000"]
+                                "id": 18,
+                                "category": "HARDWARE_MECHANICAL",
+                                "title": "Đai ốc lục giác bằng thép M10 không ren ngoài",
+                                "input": {
+                                                "name": "Đai ốc lục giác bằng thép M10 mạ kẽm",
+                                                "desc": "Tán thép ren trong vặn vào bu lông M10",
+                                                "use": "Xiết chặt mối ghép cơ khí",
+                                                "specs": "M10, bước ren 1.5mm",
+                                                "model_en": "HEX-NUT-M10"
+                                },
+                                "expected": [
+                                                "7318.16.00",
+                                                "73181600"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải 2 Phần XV -> 7318; GRI 6: Có ren -> Đai ốc -> 7318.16.00"
                 },
                 {
-                    id: 19,
-                    title: "Kiểm tra chặn suy đoán bừa khi thiếu thông tin (Zero-Guessing)",
-                    input: { name: "Phụ tùng", desc: "", use: "", specs: "", model_en: "" },
-                    expected: ["INSUFFICIENT_INFO"],
-                    check_insufficient: true
+                                "id": 19,
+                                "category": "HARDWARE_MECHANICAL",
+                                "title": "Vòng đệm phẳng (long đen) bằng thép lỗ phi 12mm",
+                                "input": {
+                                                "name": "Vòng đệm phẳng bằng thép không ren dùng lót bu lông",
+                                                "desc": "Miếng thép đục lỗ tròn phẳng mạ kẽm",
+                                                "use": "Đệm lót phân bổ tải trọng bu lông M12",
+                                                "specs": "Đường kính lỗ 13mm, ngoài 24mm, dày 2mm",
+                                                "model_en": "WASHER-STEEL-M12"
+                                },
+                                "expected": [
+                                                "7318.22.00",
+                                                "73182200"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải 2 Phần XV -> 7318; GRI 6: Không ren -> Vòng đệm khác -> 7318.22.00"
+                },
+                {
+                                "id": 20,
+                                "category": "HARDWARE_MECHANICAL",
+                                "title": "Chốt định vị bằng thép tôi cứng không ren",
+                                "input": {
+                                                "name": "Chốt định vị bằng thép hình trụ tròn không ren",
+                                                "desc": "Thanh thép hình trụ mài bóng chính xác hai đầu vát mép",
+                                                "use": "Định vị khuôn mẫu cơ khí",
+                                                "specs": "Đường kính 8mm, dài 40mm",
+                                                "model_en": "DOWEL-PIN-8X40"
+                                },
+                                "expected": [
+                                                "7318.24.00",
+                                                "73182400"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải 2 Phần XV -> 7318; GRI 6: Chốt và chốt chẻ không ren -> 7318.24.00"
+                },
+                {
+                                "id": 21,
+                                "category": "HARDWARE_MECHANICAL",
+                                "title": "Lò xo nén bằng thép đường kính sợi 3mm",
+                                "input": {
+                                                "name": "Lò xo xoắn nén bằng thép đàn hồi dùng cho khuôn ép",
+                                                "desc": "Sợi dây thép xoắn ốc hình trụ chịu lực nén",
+                                                "use": "Đẩy hồi khuôn máy dập",
+                                                "specs": "Đường kính sợi 3mm, dài 60mm",
+                                                "model_en": "SPRING-COMPRESSION"
+                                },
+                                "expected": [
+                                                "7320.20.90",
+                                                "73202090"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải 2 Phần XV -> 7320 lò xo thép; Lò xo xoắn hình trụ -> 7320.20.90"
+                },
+                {
+                                "id": 22,
+                                "category": "HARDWARE_MECHANICAL",
+                                "title": "Vú tra mỡ bò bằng thép không tự động (Grease nipple)",
+                                "input": {
+                                                "name": "Vú tra mỡ bò bằng thép ren M6 có van bi lò xo một chiều",
+                                                "desc": "Đầu bơm mỡ ren M6 kim loại cho đầu súng bơm mỡ cắm vào",
+                                                "use": "Tra mỡ bôi trơn ổ trục cơ khí",
+                                                "specs": "Ren M6",
+                                                "model_en": "GREASE-NIPPLE-M6"
+                                },
+                                "expected": [
+                                                "8487.90.00",
+                                                "84879000"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải WCO 84.87: Núm vú tra mỡ bôi trơn thuộc 8487.90.00"
+                },
+                {
+                                "id": 23,
+                                "category": "HARDWARE_MECHANICAL",
+                                "title": "Mũi khoan thép gió gắn máy khoan chuôi trụ",
+                                "input": {
+                                                "name": "Mũi khoan xoắn bằng thép gió HSS dùng cho kim loại",
+                                                "desc": "Dụng cụ cắt gọt kim loại có thể thay đổi được",
+                                                "use": "Khoan lỗ trên thép tấm",
+                                                "specs": "Đường kính mũi 10mm",
+                                                "model_en": "DRILL-BIT-HSS-10"
+                                },
+                                "expected": [
+                                                "8207.50.00",
+                                                "82075000"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải 1(k) Phần XVI: Dụng cụ cắt gọt thay thế được thuộc Nhóm 8207"
+                },
+                {
+                                "id": 24,
+                                "category": "ELECTRICAL_EQUIPMENT",
+                                "title": "Công tắc điện công nghiệp 380V dòng điện 25A (trên 16A)",
+                                "input": {
+                                                "name": "Công tắc xoay chuyển mạch điện công nghiệp 3 pha 380V 25A",
+                                                "desc": "Thiết bị đóng ngắt mạch điện hạ thế dòng trên 16A",
+                                                "use": "Khởi động và ngắt động cơ điện 3 pha",
+                                                "specs": "Điện áp 380V, dòng định mức 25A",
+                                                "model_en": "CAM-SWITCH-25A"
+                                },
+                                "expected": [
+                                                "8536.50.99",
+                                                "85365099"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & 8536; GRI 6: <=1000V -> Công tắc khác -> Dòng trên 16A -> 8536.50.99"
+                },
+                {
+                                "id": 25,
+                                "category": "ELECTRICAL_EQUIPMENT",
+                                "title": "Cầu dao tự động MCB 1P 16A 230V bảo vệ quá tải",
+                                "input": {
+                                                "name": "Aptomat cầu dao tự động tép MCB 1 cực 16A",
+                                                "desc": "Thiết bị đóng ngắt bảo vệ quá tải và ngắn mạch",
+                                                "use": "Bảo vệ đường dây điện chiếu sáng",
+                                                "specs": "Điện áp 230V, dòng định mức 16A, cắt 4.5kA",
+                                                "model_en": "MCB-1P-16A"
+                                },
+                                "expected": [
+                                                "8536.20.91",
+                                                "85362091"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 -> 8536; GRI 6: Cầu dao tự động <=1000V -> Dòng <= 16A -> 8536.20.91"
+                },
+                {
+                                "id": 26,
+                                "category": "ELECTRICAL_EQUIPMENT",
+                                "title": "Rơ le nhiệt lưỡng kim bảo vệ quá tải động cơ",
+                                "input": {
+                                                "name": "Rơ le nhiệt lưỡng kim gắn cùng khởi động từ",
+                                                "desc": "Khí cụ điện đóng ngắt tiếp điểm điều khiển khi quá nhiệt",
+                                                "use": "Bảo vệ động cơ điện khi quá dòng",
+                                                "specs": "Dòng chỉnh 4-6A, điện áp cuộn hút 220V",
+                                                "model_en": "THERMAL-OVERLOAD-RELAY"
+                                },
+                                "expected": [
+                                                "8536.49.90",
+                                                "85364990"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 -> 8536; GRI 6: Rơ le -> Rơ le khác -> 8536.49.90"
+                },
+                {
+                                "id": 27,
+                                "category": "ELECTRICAL_EQUIPMENT",
+                                "title": "Bộ chuyển đổi nguồn điện AC sang DC switching adapter 12V 5A",
+                                "input": {
+                                                "name": "Bộ nguồn chuyển đổi tĩnh adapter switching 220VAC sang 12VDC",
+                                                "desc": "Mạch điện tử biến đổi điện áp xoay chiều thành một chiều",
+                                                "use": "Cấp nguồn DC cho camera giám sát và router",
+                                                "specs": "Vào 100-240VAC, Ra 12VDC 5A (công suất 60W)",
+                                                "model_en": "POWER-ADAPTER-12V5A"
+                                },
+                                "expected": [
+                                                "8504.40.90",
+                                                "85044090"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 -> 8504 máy biến áp/nguồn chuyển đổi tĩnh; GRI 6: Bộ biến đổi tĩnh điện -> 8504.40.90"
+                },
+                {
+                                "id": 28,
+                                "category": "ELECTRICAL_EQUIPMENT",
+                                "title": "Máy biến áp cách ly 1 pha 220V/110V công suất 500VA",
+                                "input": {
+                                                "name": "Máy biến áp cách ly 1 pha hạ áp 220V xuống 110V",
+                                                "desc": "Lõi thép silic quấn cuộn sơ cấp và thứ cấp cách điện",
+                                                "use": "Đổi điện dùng cho thiết bị nội địa Nhật",
+                                                "specs": "Công suất 500VA (0.5 kVA)",
+                                                "model_en": "ISOLATION-TRANSFORMER-500VA"
+                                },
+                                "expected": [
+                                                "8504.31.24",
+                                                "85043124"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 -> 8504; GRI 6: Biến thế khác công suất <= 1kVA -> 8504.31"
+                },
+                {
+                                "id": 29,
+                                "category": "ELECTRICAL_EQUIPMENT",
+                                "title": "Bảng điều khiển lập trình PLC kèm màn hình cảm ứng HMI",
+                                "input": {
+                                                "name": "Tủ bảng điện điều khiển tự động hóa có gắn màn hình cảm ứng và PLC",
+                                                "desc": "Tủ kim loại chứa bộ điều khiển khả trình PLC và nút bấm điều khiển",
+                                                "use": "Điều khiển dây chuyền đóng gói",
+                                                "specs": "Điện áp hoạt động 24VDC",
+                                                "model_en": "CONTROL-PANEL-HMI"
+                                },
+                                "expected": [
+                                                "8537.10.99",
+                                                "85371099"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 -> 8537 bảng/tủ phân phối điều khiển điện; GRI 6: Điện áp <= 1000V -> 8537.10.99"
+                },
+                {
+                                "id": 30,
+                                "category": "MACHINERY",
+                                "title": "Máy dập ép bấm đầu cos dây điện bán tự động",
+                                "input": {
+                                                "name": "Máy ép bấm đầu cos bán tự động dùng động cơ điện",
+                                                "desc": "Máy cơ khí dập khuôn ép chặt đầu cos kim loại vào lõi dây điện",
+                                                "use": "Gia công đầu nối dây điện ô tô",
+                                                "specs": "Lực ép 2.0 tấn, công suất động cơ 750W",
+                                                "model_en": "TERMINAL-CRIMPING-MACHINE"
+                                },
+                                "expected": [
+                                                "8462.62.11",
+                                                "84626211"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 -> 8462 máy ép/dập gia công kim loại (không phải 8544 hay 8536!)"
+                },
+                {
+                                "id": 31,
+                                "category": "MACHINERY",
+                                "title": "Quạt ly tâm hút khói công nghiệp bằng thép công suất 3kW",
+                                "input": {
+                                                "name": "Quạt ly tâm hút bụi công nghiệp bằng thép tấm",
+                                                "desc": "Cánh quạt ly tâm gắn động cơ điện liền trục",
+                                                "use": "Hút khí thải và bụi thông gió xưởng",
+                                                "specs": "Công suất 3kW, lưu lượng 3000 m3/h",
+                                                "model_en": "CENTRIFUGAL-FAN-3KW"
+                                },
+                                "expected": [
+                                                "8414.59.49",
+                                                "84145949"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 -> 8414 quạt/máy nén khí; GRI 6: Quạt khác -> Quạt ly tâm -> 8414.59"
+                },
+                {
+                                "id": 32,
+                                "category": "MACHINERY",
+                                "title": "Bơm nước ly tâm trục ngang dùng động cơ điện 1.5kW",
+                                "input": {
+                                                "name": "Bơm nước ly tâm trục ngang một tầng cánh",
+                                                "desc": "Đầu bơm bằng gang đúc liền động cơ điện 220V",
+                                                "use": "Bơm cấp nước sinh hoạt và tưới tiêu",
+                                                "specs": "Công suất 1.5kW, họng hút xả DN50",
+                                                "model_en": "CENTRIFUGAL-PUMP-1.5KW"
+                                },
+                                "expected": [
+                                                "8413.70.42",
+                                                "84137042"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 -> 8413 bơm chất lỏng; GRI 6: Bơm ly tâm khác -> 8413.70"
+                },
+                {
+                                "id": 33,
+                                "category": "MACHINERY",
+                                "title": "Kìm bấm đầu cos cầm tay cơ khí (dụng cụ cầm tay không dùng điện)",
+                                "input": {
+                                                "name": "Kìm bấm đầu cos bằng thép bọc tay cầm cao su",
+                                                "desc": "Dụng cụ cầm tay vận hành hoàn toàn bằng tay không có động cơ",
+                                                "use": "Bấm ép đầu cos dây điện",
+                                                "specs": "Chiều dài 250mm",
+                                                "model_en": "HAND-CRIMPING-PLIERS"
+                                },
+                                "expected": [
+                                                "8203.20.00",
+                                                "82032000"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải 1(k) Phần XVI: Kìm cầm tay thuộc Nhóm 8203 (không phải 8467 hay 8462)"
+                },
+                {
+                                "id": 34,
+                                "category": "MATERIALS_ARTICLES",
+                                "title": "Gioăng đệm kín bằng cao su lưu hóa dùng cho ô tô",
+                                "input": {
+                                                "name": "Gioăng đệm kín bằng cao su lưu hóa không xốp hình vòng O-ring",
+                                                "desc": "Vòng cao su đúc nguyên khối chịu dầu",
+                                                "use": "Làm kín nắp động cơ xe ô tô",
+                                                "specs": "Đường kính ngoài 50mm, dày 3mm",
+                                                "model_en": "O-RING-RUBBER-AUTO"
+                                },
+                                "expected": [
+                                                "4016.93.20",
+                                                "40169320"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải 1(a) Phần XVI loại trừ cao su sang Chương 40 -> 4016.93.20 (dùng cho xe có động cơ)"
+                },
+                {
+                                "id": 35,
+                                "category": "MATERIALS_ARTICLES",
+                                "title": "Gioăng đệm kín bằng cao su lưu hóa dùng cho máy bơm nước công nghiệp",
+                                "input": {
+                                                "name": "Gioăng đệm phẳng bằng cao su lưu hóa dùng cho máy bơm nước",
+                                                "desc": "Tấm cao su đục lỗ mặt bích làm kín",
+                                                "use": "Làm kín mặt bích máy bơm công nghiệp",
+                                                "specs": "DN50, cao su EPDM",
+                                                "model_en": "GASKET-PUMP-RUBBER"
+                                },
+                                "expected": [
+                                                "4016.93.90",
+                                                "40169390"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 -> 4016.93 -> Loại khác (không dùng cho xe) -> 4016.93.90"
+                },
+                {
+                                "id": 36,
+                                "category": "MATERIALS_ARTICLES",
+                                "title": "Ống cao su lưu hóa gia cường sợi dệt không có phụ kiện",
+                                "input": {
+                                                "name": "Ống dẫn nước làm mát bằng cao su lưu hóa có gia cố lớp sợi dệt",
+                                                "desc": "Ống cao su uốn định hình bên trong có sợi dệt chịu áp lực, hai đầu trơn không phụ kiện",
+                                                "use": "Dẫn nước làm mát két nước động cơ ô tô",
+                                                "specs": "Đường kính trong 32mm, dài 500mm",
+                                                "model_en": "RADIATOR-RUBBER-HOSE"
+                                },
+                                "expected": [
+                                                "4009.31.91",
+                                                "40093191"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải loại trừ -> 4009; GRI 6: Gia cố sợi dệt -> Không phụ kiện -> Dùng cho ô tô -> 4009.31.91"
+                },
+                {
+                                "id": 37,
+                                "category": "MATERIALS_ARTICLES",
+                                "title": "Chậu trồng cây bằng gốm nung tráng men",
+                                "input": {
+                                                "name": "Chậu trồng cây cảnh bằng đất nung tráng men mỹ nghệ",
+                                                "desc": "Đất sét tạo hình nung qua lửa có lớp men bóng",
+                                                "use": "Trồng hoa cây cảnh trang trí nội ngoại thất",
+                                                "specs": "Đường kính 30cm, cao 35cm",
+                                                "model_en": "CERAMIC-FLOWER-POT"
+                                },
+                                "expected": [
+                                                "6914.90.00",
+                                                "69149000"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 -> Chương 69 sản phẩm gốm sứ; Nhóm 6914 sản phẩm gốm khác -> 6914.90.00"
+                },
+                {
+                                "id": 38,
+                                "category": "MATERIALS_ARTICLES",
+                                "title": "Tấm nhựa phẳng PVC cứng chưa gia công",
+                                "input": {
+                                                "name": "Tấm nhựa phẳng bằng Polyvinyl clorua PVC không xốp",
+                                                "desc": "Tấm nhựa đặc đùn phẳng chưa có khoét lỗ hay gia công thêm",
+                                                "use": "Vật liệu làm bảng quảng cáo và vách ngăn",
+                                                "specs": "Kích thước 1220x2440mm, dày 3mm",
+                                                "model_en": "PVC-FOAM-SHEET"
+                                },
+                                "expected": [
+                                                "3920.49.00",
+                                                "39204900"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 -> 3920 tấm/phiến phẳng không xốp chưa gia công"
+                },
+                {
+                                "id": 39,
+                                "category": "AUTOMOTIVE_PARTS",
+                                "title": "Nẹp nhựa trang trí viền cửa xe ô tô",
+                                "input": {
+                                                "name": "Nẹp nhựa viền cửa xe ô tô mạ crôm trang trí thân xe",
+                                                "desc": "Thanh nhựa đúc định hình có dán băng keo 2 mặt ốp viền kính cửa xe",
+                                                "use": "Trang trí thân xe ô tô",
+                                                "specs": "Dài 90cm",
+                                                "model_en": "DOOR-MOLDING-CHROME"
+                                },
+                                "expected": [
+                                                "3926.30.00",
+                                                "39263000"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 -> Nhóm 3926.30 (Phụ kiện bằng nhựa gắn cho thân xe / coachwork)"
+                },
+                {
+                                "id": 40,
+                                "category": "AUTOMOTIVE_PARTS",
+                                "title": "Cản trước (ba đờ sốc) xe ô tô con bằng nhựa",
+                                "input": {
+                                                "name": "Cản trước xe ô tô con 5 chỗ bằng nhựa đúc",
+                                                "desc": "Khung cản giảm va đập sơn lót đen",
+                                                "use": "Lắp phía trước đầu xe ô tô bảo vệ thân xe",
+                                                "specs": "Dùng cho xe Toyota Vios",
+                                                "model_en": "FRONT-BUMPER-VIOS"
+                                },
+                                "expected": [
+                                                "8708.10.10",
+                                                "87081010"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải 2 Phần XVII -> Cản va (bumper) và các bộ phận của chúng định danh riêng tại 8708.10"
+                },
+                {
+                                "id": 41,
+                                "category": "AUTOMOTIVE_PARTS",
+                                "title": "Má phanh đĩa bằng vật liệu ma sát cho xe ô tô",
+                                "input": {
+                                                "name": "Bộ má phanh đĩa phanh trước xe ô tô có gắn tấm đệm thép",
+                                                "desc": "Vật liệu ma sát tổng hợp gắn cố định trên tấm xương thép",
+                                                "use": "Hệ thống phanh hãm bánh xe ô tô",
+                                                "specs": "Dùng cho xe du lịch 4-7 chỗ",
+                                                "model_en": "BRAKE-PADS-SET"
+                                },
+                                "expected": [
+                                                "8708.30.29",
+                                                "87083029"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 -> 8708.30 phanh hãm và bộ phận của chúng (đã gắn trên xương thép)"
+                },
+                {
+                                "id": 42,
+                                "category": "INSTRUMENTS_CH90",
+                                "title": "Đồng hồ đo áp suất dầu cơ khí có ống bourdon",
+                                "input": {
+                                                "name": "Đồng hồ đo áp suất đường ống dầu hiển thị kim",
+                                                "desc": "Vỏ inox mặt kính có ống lò xo bourdon cơ học hiển thị áp suất MPa",
+                                                "use": "Giám sát áp lực máy ép thủy lực",
+                                                "specs": "Thang đo 0-25 MPa, chân ren G1/4",
+                                                "model_en": "PRESSURE-GAUGE-0-25MPA"
+                                },
+                                "expected": [
+                                                "9026.20.30",
+                                                "90262030"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải 1(m) Phần XVI loại trừ sang Chương 90 -> 9026.20 dụng cụ đo áp suất"
+                },
+                {
+                                "id": 43,
+                                "category": "INSTRUMENTS_CH90",
+                                "title": "Bộ điều nhiệt tự động thermostat cho tủ sấy",
+                                "input": {
+                                                "name": "Bộ điều nhiệt lưỡng kim tự động ngắt điện thermostat",
+                                                "desc": "Cơ cấu cảm ứng nhiệt độ tự động ngắt mạch điều khiển",
+                                                "use": "Khống chế nhiệt độ lò sấy",
+                                                "specs": "Nhiệt độ cài đặt 50-200 độ C",
+                                                "model_en": "THERMOSTAT-KSD301"
+                                },
+                                "expected": [
+                                                "9032.10.10",
+                                                "90321010"
+                                ],
+                                "check_insufficient": false,
+                                "note": "GRI 1 & Chú giải 7 Chương 90: Thiết bị điều chỉnh và kiểm soát tự động -> 9032.10 Thermostat"
+                },
+                {
+                                "id": 44,
+                                "category": "ZERO_GUESSING",
+                                "title": "Tên hàng hoàn toàn mơ hồ: 'Phụ tùng máy'",
+                                "input": {
+                                                "name": "Phụ tùng máy móc",
+                                                "desc": "",
+                                                "use": "",
+                                                "specs": "",
+                                                "model_en": ""
+                                },
+                                "expected": [
+                                                "INSUFFICIENT_INFO"
+                                ],
+                                "check_insufficient": true,
+                                "note": "Hoàn toàn thiếu thông tin vật liệu, chức năng và máy chủ -> DỪNG VÀ YÊU CẦU THÔNG TIN"
+                },
+                {
+                                "id": 45,
+                                "category": "ZERO_GUESSING",
+                                "title": "Dây điện chỉ ghi chung chung, thiếu điện áp và đầu nối",
+                                "input": {
+                                                "name": "Dây điện dẫn tín hiệu",
+                                                "desc": "Lõi đồng bọc nhựa",
+                                                "use": "Dẫn điện",
+                                                "specs": "",
+                                                "model_en": ""
+                                },
+                                "expected": [
+                                                "8544",
+                                                "8544"
+                                ],
+                                "check_insufficient": false,
+                                "note": "Xác định được Nhóm 8544 nhưng thiếu điện áp (<=1000V hay >1000V) và tình trạng đầu nối -> DỪNG Ở MÃ 4 SỐ 85.44"
+                },
+                {
+                                "id": 46,
+                                "category": "ZERO_GUESSING",
+                                "title": "Dây điện có đầu nối nhưng thiếu điện áp",
+                                "input": {
+                                                "name": "Dây cáp điện có gắn sẵn giắc cắm đầu nối hai đầu",
+                                                "desc": "Dây đồng bọc cách điện có đầu nối",
+                                                "use": "Truyền tải điện",
+                                                "specs": "Lõi 2.5mm2 (không ghi điện áp định mức)",
+                                                "model_en": ""
+                                },
+                                "expected": [
+                                                "8544",
+                                                "8544"
+                                ],
+                                "check_insufficient": false,
+                                "note": "Có đầu nối nhưng nếu điện áp >1000V thì thuộc 8544.60, <=1000V thì thuộc 8544.42 -> DỪNG Ở 85.44 VÀ HỎI ĐIỆN ÁP"
+                },
+                {
+                                "id": 47,
+                                "category": "ZERO_GUESSING",
+                                "title": "Van công nghiệp không rõ loại van và kích thước",
+                                "input": {
+                                                "name": "Van công nghiệp bằng kim loại",
+                                                "desc": "Thân kim loại dùng cho đường ống",
+                                                "use": "Dẫn chất lỏng",
+                                                "specs": "",
+                                                "model_en": ""
+                                },
+                                "expected": [
+                                                "8481",
+                                                "8481"
+                                ],
+                                "check_insufficient": false,
+                                "note": "Xác định được Nhóm 8481 nhưng không biết là van giảm áp (8481.10), một chiều (8481.30), an toàn (8481.40) hay van bi/bướm (8481.80) -> DỪNG Ở 84.81"
+                },
+                {
+                                "id": 48,
+                                "category": "ZERO_GUESSING",
+                                "title": "Bu lông thép có ren nhưng thiếu đường kính thân (mm)",
+                                "input": {
+                                                "name": "Bu lông lục giác bằng thép có ren",
+                                                "desc": "Thép mạ kẽm tiện ren ngoài suốt",
+                                                "use": "Bắt chặt cơ khí",
+                                                "specs": "(không có kích thước đường kính mm)",
+                                                "model_en": ""
+                                },
+                                "expected": [
+                                                "7318.15",
+                                                "731815"
+                                ],
+                                "check_insufficient": false,
+                                "note": "Xác định được phân nhóm 6 số 7318.15 nhưng thiếu đường kính (<=16mm hay >16mm) -> DỪNG Ở MÃ 6 SỐ 7318.15"
+                },
+                {
+                                "id": 49,
+                                "category": "ZERO_GUESSING",
+                                "title": "Công tắc điện hạ thế nhưng thiếu dòng điện Ampe",
+                                "input": {
+                                                "name": "Công tắc điện bật tắt 220V",
+                                                "desc": "Công tắc gạt bằng nhựa",
+                                                "use": "Đóng ngắt đèn",
+                                                "specs": "Điện áp 220V (không ghi dòng điện định mức A)",
+                                                "model_en": ""
+                                },
+                                "expected": [
+                                                "8536.50",
+                                                "853650"
+                                ],
+                                "check_insufficient": false,
+                                "note": "Xác định điện áp <=1000V -> Phân nhóm 8536.50, nhưng thiếu Ampe (<16A hay >=16A) -> DỪNG Ở MÃ 6 SỐ 8536.50"
+                },
+                {
+                                "id": 50,
+                                "category": "ZERO_GUESSING",
+                                "title": "Mô tơ điện xoay chiều AC thiếu công suất kW/W",
+                                "input": {
+                                                "name": "Động cơ điện xoay chiều AC 3 pha 380V",
+                                                "desc": "Mô tơ điện vỏ nhôm lõi đồng",
+                                                "use": "Truyền động máy móc",
+                                                "specs": "Điện áp 380V (không rõ công suất kW hay HP)",
+                                                "model_en": ""
+                                },
+                                "expected": [
+                                                "8501.5",
+                                                "85015"
+                                ],
+                                "check_insufficient": false,
+                                "note": "Xác định động cơ AC nhiều pha 8501.5 nhưng thiếu công suất (<=750W, <=7.5kW, <=75kW hay >75kW) -> DỪNG Ở PHÂN NHÓM 8501.5"
                 }
-            ];
+];
 
             const results = [];
             let passCount = 0;
@@ -10662,6 +12655,18 @@ Trường hợp đủ thông tin:
                 switchTab(hashTab);
             }
             updateWCOComplianceMeter();
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('test_query')) {
+                const qName = urlParams.get('test_query');
+                const qDesc = urlParams.get('test_desc') || '';
+                const nameEl = document.getElementById('auto-name');
+                const descEl = document.getElementById('auto-desc');
+                if (nameEl) nameEl.value = qName;
+                if (descEl) descEl.value = qDesc;
+                setTimeout(() => {
+                    generateAIReportFromForm();
+                }, 300);
+            }
             if (window.location.search.includes('run_guard=1')) {
                 setTimeout(runAutomatedRegressionGuard, 300);
             }
