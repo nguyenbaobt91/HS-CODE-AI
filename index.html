@@ -5557,6 +5557,100 @@ Trường hợp đủ thông tin:
                 }
             }
 
+            // =========================================================================
+            // AA. UNIVERSAL GRI 6 STATUTORY FEATURE DISAMBIGUATOR (TOÀN BỘ 97 CHƯƠNG)
+            // Tự động phân định các cặp tiêu chí đối kháng loại trừ nhau cấp phân nhóm 8 số
+            // =========================================================================
+            let gri6ScoreAdj = 0;
+            const lineCombined = `${itemNorm} ${subNorm}`.toLowerCase();
+
+            // 1. NHÓM TIÊU CHÍ GIA CỐ / GIA CƯỜNG (REINFORCEMENT)
+            // Nhóm 40.10 (Băng tải/đai tải), 40.09 (Ống cao su), 39.17 (Ống nhựa), 39.20/39.21 (Tấm nhựa)
+            const qHasMetalReinf = /\b(?:gia\s+co\s+bang\s+kim\s+loai|gia\s+co\s+kim\s+loai|cot\s+thep|day\s+thep|soi\s+kim\s+loai|loi\s+thep|gia\s+cuong\s+kim\s+loai|reinforced\s+with\s+metal|metal\s+reinforced|steel\s+reinforced|steel\s+cord)\b/i.test(fullTextNorm);
+            const qHasTextileReinf = /\b(?:gia\s+co\s+bang\s+vat\s+lieu\s+det|gia\s+co\s+vat\s+lieu\s+det|soi\s+det|vat\s+lieu\s+det|vai\s+bo|bo\s+vai|gia\s+cuong\s+soi\s+det|reinforced\s+with\s+textile|textile\s+reinforced|fabric\s+reinforced)\b/i.test(fullTextNorm);
+            const qHasUnreinf = /\b(?:khong\s+gia\s+co|khong\s+gia\s+cuong|chua\s+gia\s+co|chua\s+gia\s+cuong|unreinforced|not\s+reinforced|without\s+reinforcement)\b/i.test(fullTextNorm);
+
+            const lineIsMetalReinf = /\b(?:gia\s+co\s+bang\s+kim\s+loai|reinforced\s+with\s+metal)\b/i.test(lineCombined);
+            const lineIsTextileReinf = /\b(?:gia\s+co\s+bang\s+vat\s+lieu\s+det|reinforced\s+with\s+textile)\b/i.test(lineCombined);
+            const lineIsUnreinf = /\b(?:chua\s+gia\s+co|khong\s+gia\s+co|chua\s+gia\s+cuong|khong\s+gia\s+cuong|chua\s+duoc\s+gia\s+co|chua\s+duoc\s+gia\s+cuong|unreinforced)\b/i.test(lineCombined);
+
+            if (qHasMetalReinf) {
+                if (lineIsMetalReinf) gri6ScoreAdj += 3000;
+                else if (lineIsTextileReinf || lineIsUnreinf) return { isDisqualified: true, penalty: -6000, reason: "Vi phạm GRI 6: Hàng gia cố kim loại loại trừ nhánh gia cố dệt hoặc không gia cố" };
+            } else if (qHasTextileReinf) {
+                if (lineIsTextileReinf) gri6ScoreAdj += 3000;
+                else if (lineIsMetalReinf || lineIsUnreinf) return { isDisqualified: true, penalty: -6000, reason: "Vi phạm GRI 6: Hàng gia cố dệt loại trừ nhánh gia cố kim loại hoặc không gia cố" };
+            } else if (qHasUnreinf) {
+                if (lineIsUnreinf) gri6ScoreAdj += 3000;
+                else if (lineIsMetalReinf || lineIsTextileReinf) return { isDisqualified: true, penalty: -6000, reason: "Vi phạm GRI 6: Hàng không gia cố loại trừ nhánh có gia cố" };
+            }
+
+            // 2. NHÓM TIÊU CHÍ PHỤ KIỆN GHÉP NỐI / ĐẦU NỐI (FITTINGS & CONNECTORS)
+            // Nhóm 40.09 (Ống cao su), 39.17 (Ống nhựa), 85.44 (Dây cáp điện)
+            const qHasFittings = /\b(?:da\s+gan\s+phu\s+kien|da\s+lap\s+phu\s+kien|co\s+phu\s+kien\s+noi|da\s+gan\s+dau\s+noi|co\s+dau\s+noi|with\s+fittings|fitted\s+with\s+fittings|fitted\s+with\s+connectors?|with\s+connectors?)\b/i.test(fullTextNorm);
+            const qHasNoFittings = /\b(?:chua\s+gan\s+phu\s+kien|chua\s+lap\s+phu\s+kien|khong\s+co\s+phu\s+kien|chua\s+gan\s+dau\s+noi|khong\s+co\s+dau\s+noi|chua\s+bam\s+cos|without\s+fittings|without\s+connectors?|khong\s+kem\s+phu\s+kien)\b/i.test(fullTextNorm);
+
+            const lineIsFitted = /\b(?:da\s+gan\s+phu\s+kien|da\s+lap\s+phu\s+kien|da\s+gan\s+dau\s+noi|with\s+fittings|fitted\s+with\s+connectors?)\b/i.test(lineCombined);
+            const lineIsUnfitted = /\b(?:chua\s+gan\s+phu\s+kien|khong\s+co\s+phu\s+kien|chua\s+gan\s+dau\s+noi|khong\s+co\s+dau\s+noi|without\s+fittings|without\s+connectors?)\b/i.test(lineCombined);
+
+            if (qHasFittings) {
+                if (lineIsFitted) gri6ScoreAdj += 3000;
+                else if (lineIsUnfitted) return { isDisqualified: true, penalty: -6000, reason: "Vi phạm GRI 6: Hàng đã gắn phụ kiện/đầu nối loại trừ nhánh chưa gắn" };
+            } else if (qHasNoFittings) {
+                if (lineIsUnfitted) gri6ScoreAdj += 3000;
+                else if (lineIsFitted) return { isDisqualified: true, penalty: -6000, reason: "Vi phạm GRI 6: Hàng chưa gắn phụ kiện loại trừ nhánh đã gắn phụ kiện" };
+            }
+
+            // 3. NHÓM TIÊU CHÍ CÓ REN VS KHÔNG CÓ REN (THREADED VS NON-THREADED)
+            // Nhóm 73.18 (Bu lông, ốc, vít), 73.07 (Phụ kiện ống sắt thép), 74.12 (Phụ kiện ống đồng), 76.09
+            const qIsThreaded = /\b(?:co\s+ren|co\s+buoc\s+ren|bu\s+long|oc\s+vit|dinh\s+vit|vit\s+cay|dai\s+oc|khop\s+noi\s+ren|threaded)\b/i.test(fullTextNorm) && !/\b(?:khong\s+co\s+ren|khong\s+ren|chua\s+co\s+ren|non-threaded|without\s+thread)\b/i.test(fullTextNorm);
+            const qIsNonThreaded = /\b(?:khong\s+co\s+ren|khong\s+ren|chua\s+co\s+ren|vong\s+dem|long\s+den|chot\s+dinh\s+vi|chot\s+tru|dinh\s+tan|non-threaded|without\s+thread)\b/i.test(fullTextNorm);
+
+            const lineIsThreaded = /\b(?:co\s+ren|threaded)\b/i.test(lineCombined);
+            const lineIsNonThreaded = /\b(?:khong\s+co\s+ren|non-threaded|chua\s+co\s+ren)\b/i.test(lineCombined);
+
+            if (qIsThreaded) {
+                if (lineIsThreaded) gri6ScoreAdj += 3000;
+                else if (lineIsNonThreaded) return { isDisqualified: true, penalty: -6000, reason: "Vi phạm GRI 6: Chi tiết có ren loại trừ nhánh không ren" };
+            } else if (qIsNonThreaded) {
+                if (lineIsNonThreaded) gri6ScoreAdj += 3000;
+                else if (lineIsThreaded) return { isDisqualified: true, penalty: -6000, reason: "Vi phạm GRI 6: Chi tiết không có ren loại trừ nhánh có ren" };
+            }
+
+            // 4. NHÓM TIÊU CHÍ DẠNG XỐP VS KHÔNG XỐP (CELLULAR VS NON-CELLULAR)
+            // Chương 39 (3920 vs 3921), Chương 40 (4008, 4016.10 vs 4016.9x)
+            const qIsCellular = /\b(?:dang\s+xop|cao\s+su\s+xop|nhua\s+xop|mut\s+xop|cellular|sponge|foam)\b/i.test(fullTextNorm);
+            const qIsNonCellular = /\b(?:khong\s+xop|dac|non-cellular|compact)\b/i.test(fullTextNorm);
+
+            const lineIsCellular = /\b(?:dang\s+xop|cellular)\b/i.test(lineCombined);
+            const lineIsNonCellular = /\b(?:chua\s+duoc\s+xop\s+hoa|khong\s+xop|non-cellular)\b/i.test(lineCombined);
+
+            if (qIsCellular) {
+                if (lineIsCellular) gri6ScoreAdj += 3000;
+                else if (lineIsNonCellular) return { isDisqualified: true, penalty: -6000, reason: "Vi phạm GRI 6: Dạng xốp loại trừ nhánh không xốp" };
+            } else if (qIsNonCellular) {
+                if (lineIsNonCellular) gri6ScoreAdj += 3000;
+                else if (lineIsCellular) return { isDisqualified: true, penalty: -6000, reason: "Vi phạm GRI 6: Không xốp loại trừ nhánh dạng xốp" };
+            }
+
+            // 5. NHÓM TIÊU CHÍ THÉP KHÔNG GỈ (STAINLESS STEEL / INOX VS OTHER STEELS)
+            // Nhóm 73.07 (Phụ kiện ống), 73.18, 73.20 (Lò xo), 73.04/73.06 (Ống thép)
+            const qIsStainless = /\b(?:thep\s+khong\s+gi|inox|sus\s*304|sus\s*316|stainless\s+steel)\b/i.test(fullTextNorm);
+            const lineIsStainless = /\b(?:thep\s+khong\s+gi|stainless\s+steel)\b/i.test(lineCombined);
+
+            if (qIsStainless) {
+                if (lineIsStainless) gri6ScoreAdj += 3000;
+                else if (/\b(?:bang\s+sat\s+hoac\s+thep\s+khac|thep\s+khac|loai\s+khac)\b/i.test(lineCombined) && ['7307', '7318', '7320'].includes(head)) {
+                    return { isDisqualified: true, penalty: -6000, reason: "Vi phạm GRI 6: Thép không gỉ loại trừ nhánh thép khác" };
+                }
+            } else if (['7307'].includes(head) && lineIsStainless && !qIsStainless) {
+                return { isDisqualified: true, penalty: -6000, reason: "Vi phạm GRI 6: Không phải thép không gỉ, loại trừ nhánh 7307.2x" };
+            }
+
+            if (gri6ScoreAdj !== 0) {
+                return { isDisqualified: false, penalty: gri6ScoreAdj, reason: "Khớp tiêu chí phân định phân nhóm GRI 6" };
+            }
+
             return { isDisqualified: false, penalty: 0, reason: "" };
         }
 
@@ -6083,6 +6177,7 @@ Trường hợp đủ thông tin:
             const attrs = extractAttributesStatutory(name, fullText);
             const hn = attrs.head_noun;
             const norm = attrs.norm_text;
+            const nameNorm = attrs.name_norm || cleanVietnameseStatutory(name);
 
             // BƯỚC 1: KIỂM TRA MỨC ĐỘ THIẾU THÔNG TIN MƠ HỒ (INSUFFICIENT GENERAL)
             if (attrs.is_insufficient_general) {
@@ -6160,6 +6255,79 @@ Trường hợp đủ thông tin:
                     missing_attributes: [],
                     assumptions: "Gioăng đệm bằng cao su lưu hóa",
                     reserve_code: isVehicle ? "4016.93.90" : "4016.93.20"
+                };
+            }
+
+            // 7b. BĂNG TẢI, ĐAI TẢI, BĂNG TRUYỀN, DÂY CU-ROA (Nhóm 4010)
+            if (/\b(?:dai\s+tai|bang\s+tai|conveyor\s+belt|bang\s+chuyen|day\s+curoa|day\s+cu-roa|curoa|cu-roa|transmission\s+belt|v-belt|timing\s+belt|dai\s+truyen|bang\s+truyen)\b/.test(hn) ||
+                (/\b(?:dai\s+tai|bang\s+tai|conveyor\s+belt|bang\s+chuyen|day\s+curoa|day\s+cu-roa|curoa|cu-roa|transmission\s+belt|v-belt|timing\s+belt|dai\s+truyen|bang\s+truyen)\b/.test(nameNorm) && (norm.includes('cao su') || attrs.material === 'rubber'))) {
+                
+                // 1. Phân nhóm Băng tải hoặc đai tải (Conveyor belts - 4010.1x)
+                if (/\b(?:dai\s+tai|bang\s+tai|conveyor\s+belt|bang\s+chuyen)\b/.test(norm)) {
+                    if (/\b(?:kim\s+loai|thep|metal|steel|wire|day\s+thep|soi\s+kim\s+loai)\b/.test(norm)) {
+                        return {
+                            code: "4010.11.00",
+                            level: 8,
+                            status: "EXACT_8_DIGIT",
+                            reasoning: "Áp dụng GRI 1, Chú giải 1(a) Phần XVI (loại trừ đai tải, băng tải bằng cao su lưu hóa khỏi Phần XVI máy móc đưa về Nhóm 40.10: Băng tải hoặc đai tải hoặc băng truyền hoặc đai truyền, bằng cao su lưu hóa). Áp dụng GRI 6: Cấp phân nhóm 1 gạch [- Băng tải hoặc đai tải:], cấp phân nhóm 2 gạch [-- Chỉ được gia cố bằng kim loại] xếp chính xác mã số 8 số 4010.11.00 (Thuế NK MFN 5%, VAT 8/10%).",
+                            missing_attributes: [],
+                            assumptions: "Đai tải/băng tải bằng cao su lưu hóa gia cố bằng kim loại",
+                            reserve_code: "4010.12.00"
+                        };
+                    }
+                    if (/\b(?:vat\s+lieu\s+det|soi\s+det|vai|det|textile|fabric|canvas|polyester|bo\s+vai)\b/.test(norm)) {
+                        return {
+                            code: "4010.12.00",
+                            level: 8,
+                            status: "EXACT_8_DIGIT",
+                            reasoning: "Áp dụng GRI 1, Chú giải 1(a) Phần XVI -> Nhóm 40.10. Áp dụng GRI 6: Cấp phân nhóm 1 gạch [- Băng tải hoặc đai tải:], cấp phân nhóm 2 gạch [-- Chỉ được gia cố bằng vật liệu dệt] xếp chính xác mã số 8 số 4010.12.00 (Thuế NK MFN 5%, VAT 8/10%).",
+                            missing_attributes: [],
+                            assumptions: "Đai tải/băng tải bằng cao su lưu hóa gia cố bằng vật liệu dệt",
+                            reserve_code: "4010.11.00"
+                        };
+                    }
+                    return {
+                        code: "4010.19.00",
+                        level: 8,
+                        status: "EXACT_8_DIGIT",
+                        reasoning: "Áp dụng GRI 1 -> Nhóm 40.10. Áp dụng GRI 6: Băng tải hoặc đai tải loại khác xếp mã số 4010.19.00.",
+                        missing_attributes: [],
+                        assumptions: "Đai tải/băng tải bằng cao su lưu hóa loại khác",
+                        reserve_code: "4010.11.00"
+                    };
+                }
+
+                // 2. Phân nhóm Băng truyền hoặc đai truyền (Transmission belts / Dây curoa - 4010.3x)
+                if (/\b(?:rang\s+cua|dong\s+bo|timing|synchronous)\b/.test(norm)) {
+                    return {
+                        code: "4010.35.00",
+                        level: 8,
+                        status: "EXACT_8_DIGIT",
+                        reasoning: "Áp dụng GRI 1 -> Nhóm 40.10. Áp dụng GRI 6: Băng truyền đồng bộ liên tục (có răng) chu vi ngoài không quá 150 cm xếp mã số 4010.35.00.",
+                        missing_attributes: [],
+                        assumptions: "Dây curoa đồng bộ có răng chu vi <= 150cm",
+                        reserve_code: "4010.36.00"
+                    };
+                }
+                if (/\b(?:chu\s+v|v-belt|hinh\s+thang)\b/.test(norm)) {
+                    return {
+                        code: "4010.31.00",
+                        level: 8,
+                        status: "EXACT_8_DIGIT",
+                        reasoning: "Áp dụng GRI 1 -> Nhóm 40.10. Áp dụng GRI 6: Băng truyền liên tục mặt cắt ngang hình thang (băng chữ V) xếp mã số 4010.31.00.",
+                        missing_attributes: [],
+                        assumptions: "Băng truyền hình thang chữ V chu vi 60cm - 180cm",
+                        reserve_code: "4010.32.00"
+                    };
+                }
+                return {
+                    code: "4010.39.00",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 -> Nhóm 40.10. Áp dụng GRI 6: Băng truyền hoặc đai truyền loại khác xếp mã số 4010.39.00.",
+                    missing_attributes: [],
+                    assumptions: "Dây đai truyền động cao su loại khác",
+                    reserve_code: "4010.35.00"
                 };
             }
 
@@ -6384,7 +6552,7 @@ Trường hợp đủ thông tin:
 
             // 12. THANH TRƯỢT & THÂN TRƯỢT (Nhóm 8482 vs 8483)
             if (/\b(?:than\s+truot|thanh\s+truot|ray\s+truot|linear\s+guide|slide\s+body)\b/.test(hn)) {
-                const hasNoBall = /\b(?:khong\s+o\s+bi|khong\s+co\s+bi|khong\s+lap\s+o\s+bi|without\s+ball)\b/.test(norm);
+                const hasNoBall = /\b(?:khong\s+(?:co\s+)?(?:o\s+|lap\s+o\s+|vien\s+)?(?:bi|vong\s+bi|dua)|khong\s+lap\s+(?:o\s+)?bi|without\s+(?:ball|bearing))\b/.test(norm);
                 const hasBall = /\b(?:co\s+o\s+bi|co\s+bi|lap\s+o\s+bi|ball\s+bearing)\b/.test(norm) && !hasNoBall;
 
                 if (hasBall) {
@@ -7635,6 +7803,15 @@ Trường hợp đủ thông tin:
                     }
                 } else if (head === '4010') {
                     itemScore += 400;
+                    if (['dai tai', 'bang tai', 'conveyor'].some(k => fullTextNorm.includes(k))) {
+                        if (['kim loai', 'thep', 'metal', 'steel', 'wire'].some(k => fullTextNorm.includes(k))) {
+                            if (code === '40101100') itemScore += 1200;
+                            else if (code === '40101200') itemScore -= 1000;
+                        } else if (['det', 'vai', 'textile', 'fabric'].some(k => fullTextNorm.includes(k))) {
+                            if (code === '40101200') itemScore += 1200;
+                            else if (code === '40101100') itemScore -= 1000;
+                        }
+                    }
                     if (['rang cua', 'dong bo', 'timing belt', 'rang'].some(k => fullTextNorm.includes(k))) {
                         if (code.startsWith('401035') || code.startsWith('401036') || code.startsWith('401039') || code === '40103900') {
                             itemScore += 500;
@@ -8775,6 +8952,19 @@ Trường hợp đủ thông tin:
                     res.clean_code = '85444913';
                     res.hs_code = '8544.49.13';
                 }
+            }
+
+            // Gatekeeper 4: Băng tải/đai tải gia cố kim loại bị bắt nhầm vào 4010.12 hoặc 4010.19
+            const isConveyor = /\b(?:dai\s+tai|bang\s+tai|conveyor\s+belt|bang\s+chuyen)\b/i.test(fullNorm);
+            const hasMetalReinforce = /\b(?:kim\s+loai|thep|metal|steel|wire|day\s+thep|soi\s+kim\s+loai)\b/i.test(fullNorm);
+            if (isConveyor && hasMetalReinforce && (cCode.startsWith('401012') || cCode.startsWith('401019') || cCode.startsWith('84'))) {
+                console.warn("[Post-Audit Gatekeeper] Auto-correcting 4010.1x -> 4010.11.00 (Metal Reinforced Conveyor Belt Guard)");
+                res.clean_code = '40101100';
+                res.hs_code = '4010.11.00';
+                res.item_description = '- - Chỉ được gia cố bằng kim loại';
+                res.mfn = '5%';
+                res.vat = '8/10';
+                res.gri6 = "Áp dụng Quy tắc 6 (GRI 6): Đai tải/băng tải bằng cao su lưu hóa được gia cố bằng kim loại thuộc nhóm 40.10, phân nhóm 1 gạch [- Băng tải hoặc đai tải:], phân nhóm 2 gạch [-- Chỉ được gia cố bằng kim loại] mã số chính xác là 4010.11.00 (Thuế NK MFN 5%). Loại trừ mã 4010.12.00 (Chỉ gia cố bằng vật liệu dệt).";
             }
 
             return res;
