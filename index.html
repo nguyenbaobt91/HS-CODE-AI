@@ -278,27 +278,13 @@
                         </div>
                     </div>
 
-                    <!-- Actions: Upload Word & Reset on Banner -->
+                    <!-- Actions: Reset on Banner -->
                     <div class="flex items-center gap-2 shrink-0 self-end sm:self-auto">
-                        <input type="file" id="docx-file-input" accept=".docx" class="hidden" onchange="uploadAndParseDocx(event)">
-                        
-                        <!-- Badge when file is loaded -->
-                        <div id="selected-doc-badge" class="hidden items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-emerald-500/30 text-white border border-emerald-300/50 text-xs font-bold backdrop-blur-md">
-                            <i class="fa-solid fa-check-circle text-emerald-300"></i>
-                            <span id="selected-doc-name" class="truncate max-w-[130px]">File.docx</span>
-                        </div>
-
-                        <button type="button" onclick="document.getElementById('docx-file-input').click()" 
-                                class="px-3.5 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer backdrop-blur-md shadow-sm">
-                            <i class="fa-solid fa-file-word text-amber-300 text-sm"></i>
-                            <span>Nạp File Word (.docx)</span>
-                        </button>
-
                         <button type="button" onclick="clearAllInputCriteria()" 
-                                class="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-300/40 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-md" 
+                                class="px-3.5 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-300/40 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-md shadow-sm" 
                                 title="Xóa toàn bộ nội dung đã nhập để nhập lại mặt hàng mới">
                             <i class="fa-solid fa-rotate-left"></i>
-                            <span class="hidden sm:inline">Nhập Mới</span>
+                            <span>Nhập Mới</span>
                         </button>
                     </div>
                 </div>
@@ -531,9 +517,18 @@
                                 </span>
                             </div>
                             <p class="text-emerald-100 text-xs mt-0.5 line-clamp-1">
-                                Tải file Excel lên, AI tự đối chiếu WCO 2022 và bổ sung 3 cột chuẩn Hải quan bảo toàn 100% dữ liệu gốc.
+                                Tải file Excel lên, AI tự đối chiếu WCO 2022 và bổ sung 4 cột chuẩn Hải quan bảo toàn 100% dữ liệu gốc.
                             </p>
                         </div>
+                    </div>
+                    <!-- Right: Download Sample Template Button -->
+                    <div class="shrink-0 self-end sm:self-auto">
+                        <button type="button" onclick="downloadSampleExcelTemplate()" 
+                                class="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white font-bold text-xs flex items-center gap-2 transition-all cursor-pointer backdrop-blur-md shadow-sm"
+                                title="Tải file Excel form mẫu chuẩn đã được tối ưu hóa theo hệ thống AI">
+                            <i class="fa-solid fa-file-arrow-down text-emerald-200 text-sm"></i>
+                            <span>Tải Mẫu Excel (.xlsx)</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -562,6 +557,12 @@
                                 <span id="excel-file-name-text">filename.xlsx</span>
                                 <span id="excel-file-size-text" class="text-[10px] text-slate-500 dark:text-slate-400 font-normal"></span>
                             </div>
+                        </div>
+                        <div class="mt-2 text-center text-xs text-slate-500 dark:text-slate-400">
+                            Chưa có file danh mục theo chuẩn? 
+                            <button type="button" onclick="downloadSampleExcelTemplate()" class="text-emerald-600 dark:text-emerald-400 font-bold hover:underline inline-flex items-center gap-1 ml-1 cursor-pointer">
+                                <i class="fa-solid fa-download"></i> Tải ngay file mẫu Excel chuẩn tại đây
+                            </button>
                         </div>
                     </div>
 
@@ -11020,6 +11021,72 @@ Trường hợp đủ thông tin:
         let selectedExcelFile = null;
         let currentBatchResult = null;
 
+        function downloadSampleExcelTemplate() {
+            const fileName = 'FORM_EXCEL.xlsx';
+            const link = document.createElement('a');
+            link.href = fileName;
+            link.download = fileName;
+
+            const triggerDynamicGeneration = () => {
+                if (!window.XLSX) {
+                    alert("Đang khởi tạo thư viện xử lý bảng tính Excel, vui lòng thử lại sau giây lát.");
+                    return;
+                }
+                const headers = [[
+                    "STT",
+                    "Mã hàng",
+                    "Tên hàng (mô tả chi tiết)\n[Tên hàng + Kích thước/thông số + Công dụng]",
+                    "Mã HS\n(Nếu có)",
+                    "Mã HS Code Ưu Tiên (8 số)\n(GRI 1 -> GRI 6)",
+                    "Mã HS Code Dự Phòng (8 số)\n(Theo Giả Định Định Thuế)",
+                    "Tên Hàng Sửa Đổi Phù Hợp HS Code\n(Chuẩn hóa theo WCO)",
+                    "Căn Cứ Pháp Lý WCO 2022\n(Trích dẫn Chú giải & Quy tắc GRI)"
+                ]];
+                const samples = [
+                    [1, "48A20029016", "Lưỡi cắt bằng thép hợp kim - KT 40x30x10mm (phụ tùng thay thế của máy cắt dập kim loại) hàng mới 100%", "82089000", "", "", "", ""],
+                    [2, "48AC80E506", "Thanh trượt bằng thép có ổ bi dẫn hướng - KT 30x10x250mm (phụ tùng máy dập kim loại) hàng mới 100%", "84821000", "", "", "", ""],
+                    [3, "HEX-M12-50", "Bu lông thép carbon lục giác có ren suốt, kích thước M12x50mm, cấp bền 8.8, dùng liên kết khung cơ khí, hàng mới 100%", "73181510", "", "", "", ""],
+                    [4, "PBS-10A", "Công tắc chuyển mạch điện 220V dòng điện 10A (< 16A), nút bấm điều khiển nguồn máy dập, hàng mới 100%", "85365096", "", "", "", ""],
+                    [5, "BV-DN25-BRASS", "Van bi tay gạt bằng đồng thau, đường kính danh định DN25 (1 inch), áp lực PN16, dùng đóng mở nước đường ống, hàng mới 100%", "84818061", "", "", "", ""]
+                ];
+                for (let i = 6; i <= 50; i++) {
+                    samples.push([i, "", "", "", "", "", "", ""]);
+                }
+                const wsData = [...headers, ...samples];
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+                ws['!cols'] = [
+                    { wch: 8 },
+                    { wch: 18 },
+                    { wch: 46 },
+                    { wch: 14 },
+                    { wch: 24 },
+                    { wch: 24 },
+                    { wch: 46 },
+                    { wch: 52 }
+                ];
+
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "DANH_MUC_HANG_HOA");
+                XLSX.writeFile(wb, fileName);
+            };
+
+            if (window.location.protocol === 'file:') {
+                triggerDynamicGeneration();
+            } else {
+                fetch(fileName, { method: 'HEAD' })
+                    .then(res => {
+                        if (res.ok) {
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        } else {
+                            triggerDynamicGeneration();
+                        }
+                    })
+                    .catch(() => triggerDynamicGeneration());
+            }
+        }
+
         function handleExcelFileSelected(event) {
             const file = event.target.files?.[0];
             if (!file) return;
@@ -11267,8 +11334,42 @@ Trường hợp đủ thông tin:
             const specsKws = ['quy cach', 'quy cách', 'thong so', 'thông số', 'specs', 'specification', 'kich thuoc', 'size', 'chat lieu', 'material'];
             const useKws = ['cong dung', 'chuc nang', 'ung dung', 'dung cho', 'function', 'purpose'];
 
+            // 2. Kiểm tra xem file đã có sẵn 4 cột kết quả chuẩn Hải quan hay chưa
+            let colHsPri = -1;
+            let colHsAlt = -1;
+            let colRevName = -1;
+            let colWco = -1;
+
+            for (let cIdx = 0; cIdx < headerRow.length; cIdx++) {
+                const cell = headerRow[cIdx];
+                if (cell === null || cell === undefined || String(cell).trim() === '') continue;
+                const norm = removeAccents(String(cell).toLowerCase());
+                if (norm.includes('uu tien') || (norm.includes('de xuat') && norm.includes('hs'))) colHsPri = cIdx;
+                else if (norm.includes('du phong')) colHsAlt = cIdx;
+                else if (norm.includes('sua doi') || norm.includes('chuan hoa') || (norm.includes('phu hop') && norm.includes('hs'))) colRevName = cIdx;
+                else if (norm.includes('can cu phap ly') || norm.includes('wco') || norm.includes('chu giai')) colWco = cIdx;
+            }
+
+            const hasExistingResultCols = (colHsPri !== -1);
+            if (!hasExistingResultCols) {
+                colHsPri = headerRow.length;
+                colHsAlt = headerRow.length + 1;
+                colRevName = headerRow.length + 2;
+                colWco = headerRow.length + 3;
+            } else {
+                if (colHsAlt === -1) colHsAlt = colHsPri + 1;
+                if (colRevName === -1) colRevName = colHsAlt + 1;
+                if (colWco === -1) colWco = colRevName + 1;
+            }
+
+            const resultColsSet = new Set([colHsPri, colHsAlt, colRevName, colWco]);
+
             const colRoles = {};
             for (let cIdx = 0; cIdx < headerRow.length; cIdx++) {
+                if (resultColsSet.has(cIdx)) {
+                    colRoles[cIdx] = 'ignore';
+                    continue;
+                }
                 const cell = headerRow[cIdx];
                 if (cell === null || cell === undefined || String(cell).trim() === '') continue;
                 const norm = removeAccents(String(cell).toLowerCase());
@@ -11288,7 +11389,7 @@ Trường hợp đủ thông tin:
                 let bestCol = -1;
                 let maxAvgLen = 0;
                 for (let cIdx = 0; cIdx < headerRow.length; cIdx++) {
-                    if (colRoles[cIdx] === 'ignore') continue;
+                    if (resultColsSet.has(cIdx) || colRoles[cIdx] === 'ignore') continue;
                     let totalLen = 0, count = 0;
                     for (let rIdx = headerRowIndex + 1; rIdx < Math.min(headerRowIndex + 10, rawData.length); rIdx++) {
                         const val = String(rawData[rIdx]?.[cIdx] || '').trim();
@@ -11303,8 +11404,8 @@ Trường hợp đủ thông tin:
                         bestCol = cIdx;
                     }
                 }
-                if (bestCol !== -1) colRoles[bestCol] = 'name_vn';
-                else if (headerRow.length > 0) colRoles[0] = 'name_vn';
+                if (bestCol !== -1 && !resultColsSet.has(bestCol)) colRoles[bestCol] = 'name_vn';
+                else if (headerRow.length > 0 && !resultColsSet.has(0)) colRoles[0] = 'name_vn';
             }
 
             if (progressLabel) progressLabel.innerText = "Đang áp dụng 6 Quy tắc GRI & Chú giải WCO 2022 cho từng dòng hàng...";
@@ -11324,14 +11425,23 @@ Trường hợp đủ thông tin:
                 updatedRows.push([...(rawData[i] || [])]);
             }
 
-            // Chèn 4 cột chuẩn Hải quan vào đúng dòng Header
-            updatedRows.push([
-                ...(rawData[headerRowIndex] || []),
-                "Mã HS Đề Xuất (8 số)",
-                "Mã HS Dự Phòng",
-                "Tên Hàng Chuẩn Hóa Theo HS",
-                "Căn Cứ Pháp Lý & Chú Giải WCO 2022"
-            ]);
+            // Dòng Header chuẩn Hải quan
+            if (hasExistingResultCols) {
+                const newHeader = [...headerRow];
+                newHeader[colHsPri] = "Mã HS Code Ưu Tiên (8 số)";
+                newHeader[colHsAlt] = "Mã HS Code Dự Phòng (8 số)";
+                newHeader[colRevName] = "Tên Hàng Sửa Đổi Phù Hợp HS Code";
+                newHeader[colWco] = "Căn Cứ Pháp Lý WCO 2022";
+                updatedRows.push(newHeader);
+            } else {
+                updatedRows.push([
+                    ...(rawData[headerRowIndex] || []),
+                    "Mã HS Code Ưu Tiên (8 số)",
+                    "Mã HS Code Dự Phòng (8 số)",
+                    "Tên Hàng Sửa Đổi Phù Hợp HS Code",
+                    "Căn Cứ Pháp Lý WCO 2022"
+                ]);
+            }
 
             // 3. Xử lý từng dòng dữ liệu thực tế
             for (let i = headerRowIndex + 1; i < rawData.length; i++) {
@@ -11345,13 +11455,18 @@ Trường hợp đủ thông tin:
 
                 // Bỏ qua dòng hướng dẫn / biểu mẫu / ghi chú
                 if (skipPhrases.some(phrase => rowNorm.includes(phrase))) {
-                    updatedRows.push([...r, "", "", "", ""]);
+                    if (hasExistingResultCols) {
+                        updatedRows.push([...r]);
+                    } else {
+                        updatedRows.push([...r, "", "", "", ""]);
+                    }
                     continue;
                 }
 
                 const vnNames = [], enNames = [], models = [], specsList = [], useList = [], descList = [];
 
                 for (let cIdx = 0; cIdx < r.length; cIdx++) {
+                    if (resultColsSet.has(cIdx)) continue;
                     const cell = r[cIdx];
                     if (cell === null || cell === undefined || String(cell).trim() === '') continue;
                     const role = colRoles[cIdx] || 'desc';
@@ -11382,8 +11497,12 @@ Trường hợp đủ thông tin:
                     combinedName = descList[0] || models[0] || '';
                 }
 
-                if (!combinedName || combinedName.length < 2) {
-                    updatedRows.push([...r, "", "", "", ""]);
+                if (!combinedName || combinedName.trim().length < 2 || /^\d+$/.test(combinedName.trim())) {
+                    if (hasExistingResultCols) {
+                        updatedRows.push([...r]);
+                    } else {
+                        updatedRows.push([...r, "", "", "", ""]);
+                    }
                     continue;
                 }
 
@@ -11486,13 +11605,24 @@ Trường hợp đủ thông tin:
                     }
                 }
 
-                updatedRows.push([
-                    ...r,
-                    priCode,
-                    altCode,
-                    revisedName,
-                    wcoCitation
-                ]);
+                if (hasExistingResultCols) {
+                    const targetLen = Math.max(r.length, colWco + 1);
+                    const newR = [...r];
+                    while (newR.length < targetLen) newR.push("");
+                    newR[colHsPri] = priCode;
+                    newR[colHsAlt] = altCode;
+                    newR[colRevName] = revisedName;
+                    newR[colWco] = wcoCitation;
+                    updatedRows.push(newR);
+                } else {
+                    updatedRows.push([
+                        ...r,
+                        priCode,
+                        altCode,
+                        revisedName,
+                        wcoCitation
+                    ]);
+                }
 
                 previewItems.push({
                     row: i + 1,
@@ -11508,6 +11638,16 @@ Trường hợp đủ thông tin:
             }
 
             const newWs = XLSX.utils.aoa_to_sheet(updatedRows);
+            newWs['!cols'] = [
+                { wch: 8 },
+                { wch: 18 },
+                { wch: 46 },
+                { wch: 14 },
+                { wch: 24 },
+                { wch: 24 },
+                { wch: 46 },
+                { wch: 52 }
+            ];
             const newWb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(newWb, newWs, "HS_Code_KetQua");
             
