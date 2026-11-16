@@ -4534,6 +4534,71 @@ Trường hợp đủ thông tin:
         ];
 
         const STATUTORY_CATEGORIES = [
+            // 0a. Optical & Proximity Sensors (8536, 8541, 9031) - High Precision Gate
+            {
+                name: 'optical_proximity_sensors',
+                pattern: /\b(?:cam\s+bien|sensor|photo\s+sensor|photo\s+micro|sensor\s+amplifier|sensor\s+head|cam\s+bien\s+quang|cam\s+bien\s+tiem\s+can|cam\s+bien\s+nhiet\s+do)\b/i,
+                target_headings: ['8536', '8541', '9031', '9025'],
+                forbidden_chapters: ['50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60', '61', '62', '63', '07', '21'],
+                bonus: 1600
+            },
+            // 0b. Pneumatic & Hydraulic Cylinders & Grippers (8412)
+            {
+                name: 'cylinders_pneumatic_grippers',
+                pattern: /\b(?:xi\s*lanh|xilanh|cylinder|pneumatic\s+gripper|cang\s+kep|tay\s+kep|ngam\s+kep|gripper\s+jaw|ben\s+hoi|ben\s+khi)\b/i,
+                target_headings: ['8412'],
+                forbidden_chapters: ['21', '29', '38', '98', '53'],
+                bonus: 1700
+            },
+            // 0c. Linear Slide Tables & Ball Screws (8483, 8482)
+            {
+                name: 'linear_slide_lead_screws',
+                pattern: /\b(?:vit\s+me|ball\s+screw|truc\s+vit\s+me|linear\s+slide|ban\s+truot|thanh\s+truot|linear\s+guide|linear\s+motion)\b/i,
+                target_headings: ['8483', '8482'],
+                forbidden_chapters: ['94', '53', '39', '73', '74', '83', '93'],
+                bonus: 1950
+            },
+            // 0c2. Electric Motors & Geared Motors (8501)
+            {
+                name: 'electric_motors',
+                pattern: /\b(?:dong\s+co\s+dien|motor|mo\s+to|dong\s+co\s+buoc|servo\s+motor|stepper\s+motor|geared\s+motor|motor\s+hop\s+so)\b/i,
+                target_headings: ['8501'],
+                forbidden_chapters: ['90', '87', '40', '8407', '8408', '73', '74'],
+                bonus: 2000
+            },
+            // 0d. Floating Joints & Shaft Couplings (8483)
+            {
+                name: 'floating_joints_couplings',
+                pattern: /\b(?:khop\s+noi|floating\s+joint|shaft\s+coupling)\b/i,
+                target_headings: ['8483'],
+                forbidden_chapters: ['86', '53'],
+                bonus: 1600
+            },
+            // 0e. Ionizing Fans & Industrial Blowers (8414)
+            {
+                name: 'fans_air_blowers',
+                pattern: /\b(?:quat(?:\s+ion|\s+khu\s+tinh\s+dien|\s+cong\s+nghiep)?|ionizing\s+air\s+blower|air\s+blower)\b/i,
+                target_headings: ['8414'],
+                forbidden_chapters: ['8409', '8431', '8708'],
+                bonus: 1600
+            },
+            // 0f. Conveyor & Transmission Belts (4010, 3926)
+            {
+                name: 'conveyor_timing_belts',
+                pattern: /\b(?:day\s+belt|conveyor\s+belt|day\s+dai\s+bang\s+tai|bang\s+tai\s+cao\s+su)\b/i,
+                target_headings: ['4010', '3926'],
+                forbidden_chapters: ['84', '85'],
+                bonus: 1600
+            },
+            // 0g. Vibratory Feeder Controllers (8537, 8479)
+            {
+                name: 'feeder_controllers',
+                pattern: /\b(?:bo\s+dieu\s+khien\s+cap\s+lieu|feeder\s+controller|bo\s+dieu\s+khien\s+rung)\b/i,
+                target_headings: ['8537', '8479'],
+                forbidden_chapters: ['8501'],
+                bonus: 1600
+            },
+
             // 1. Bearings (8482) - Note 2(a) Section XVI (vòng bi, bạc đạn, ổ bi, ổ lăn, thanh trượt có bi)
             {
                 name: 'ball_roller_bearings',
@@ -4687,7 +4752,7 @@ Trường hợp đủ thông tin:
             // 14d. Transmission / Conveyor Belts (4010, 3926, 5910) - Section XVI Note 1(a)
             {
                 name: 'transmission_conveyor_belts',
-                pattern: /\b(?:day\s+curoa|day\s+cu-roa|curoa|cu-roa|bang\s+tai|bang\s+chuyen|day\s+dai\s+truyen\s+dong|day\s+rang\s+dong\s+bo|timing\s+belt|transmission\s+belt|conveyor\s+belt|v-belt)\b/i,
+                pattern: /\b(?:day\s+curoa|day\s+cu-roa|curoa|cu-roa|day\s+bang\s+tai|day\s+bang\s+chuyen|bang\s+tai\s+(?:cao\s+su|nhua|pu)|day\s+belt|day\s+dai\s+truyen\s+dong|day\s+rang\s+dong\s+bo|timing\s+belt|transmission\s+belt|conveyor\s+belt|v-belt)\b/i,
                 target_headings: ['4010', '3926', '5910'],
                 forbidden_chapters: ['84', '85', '87', '88'],
                 bonus: 1400
@@ -5744,6 +5809,16 @@ Trường hợp đủ thông tin:
                 }
             }
 
+            // High-precision disambiguation guards
+            const isLeadScrewOrSlide = /\b(?:vit\s+me|ball\s+screw|truc\s+vit\s+me|linear\s+slide|ban\s+truot|thanh\s+truot)\b/i.test(fullTextNorm);
+            if (isLeadScrewOrSlide) {
+                activeCategories = activeCategories.filter(c => c.name !== 'general_use_fasteners' && c.name !== 'other_furniture');
+            }
+            const isMotor = /\b(?:motor|dong\s+co\s+dien|mo\s+to)\b/i.test(fullTextNorm);
+            if (isMotor) {
+                activeCategories = activeCategories.filter(c => c.name !== 'transmission_conveyor_belts');
+            }
+
             return {
                 subjectPart,
                 hostPart,
@@ -5832,9 +5907,8 @@ Trường hợp đủ thông tin:
                 const wcoItem = wcoMap[head];
                 if (wcoItem) {
                     if (!wcoItem._search_norm) {
-                        const secNote = (window.WCO_SECTIONS_DATA && wcoItem.section_id) ? (window.WCO_SECTIONS_DATA[`SEC_${wcoItem.section_id}`]?.legal_notes || '') : '';
-                        const chNote = (window.WCO_CHAPTERS_DATA && wcoItem.chapter) ? (window.WCO_CHAPTERS_DATA[`CH_${wcoItem.chapter}`]?.legal_notes || '') : '';
-                        wcoItem._search_norm = removeAccents(`${wcoItem.title || ''} ${wcoItem.official_vn || ''} ${wcoItem.summary || ''} ${wcoItem.official_note || ''} ${chNote} ${secNote}`).toLowerCase();
+                        // Clean WCO Heading Note ONLY (Strict isolation: Exclude Section & Chapter notes to prevent false positive contamination)
+                        wcoItem._search_norm = removeAccents(`${wcoItem.title || ''} ${wcoItem.official_vn || ''} ${wcoItem.summary || ''} ${wcoItem.official_note || ''}`).toLowerCase();
                     }
                     const wcoText = wcoItem._search_norm;
                     for (let bg of bigrams) {
@@ -9858,6 +9932,24 @@ Trường hợp đủ thông tin:
             }
         }
 
+        function extractCleanCustomsEntity(text) {
+            if (!text) return { name: '', specs: '', model: '' };
+            let str = String(text).trim();
+            str = str.replace(/^[#&•*\-\s]+/, '').replace(/#&[A-Z0-9]+$/, '');
+            
+            let name = '', specs = '', model = '';
+            const mName = str.match(/(?:TÊN|TEN|NAME)\s*:\s*([^\n\r]+)/i);
+            if (mName) name = mName[1].trim();
+
+            const mSpecs = str.match(/(?:KÍCH THƯỚC|KICH THUOC|KT|SIZE|SPECS)\s*:\s*([^\n\r]+)/i);
+            if (mSpecs) specs = mSpecs[1].trim();
+
+            const mModel = str.match(/(?:GIỐNG MÃ|GIONG MA|MÃ|MA|MODEL|REF)\s*:\s*([^\n\r]+)/i);
+            if (mModel) model = mModel[1].trim();
+
+            return { name: name || str, specs, model };
+        }
+
         async function processBatchExcelClientSide() {
             if (!window.XLSX || !selectedExcelFile || !selectedExcelFile.b64) {
                 throw new Error("Không thể xử lý tệp Excel: Thư viện XLSX chưa sẵn sàng hoặc tệp bị hỏng.");
@@ -9869,7 +9961,7 @@ Trường hợp đủ thông tin:
             const progressBox = document.getElementById('batch-progress-container');
             const btnRun = document.getElementById('btn-run-batch');
 
-            if (progressLabel) progressLabel.innerText = "Đang đọc cấu trúc bảng tính Excel...";
+            if (progressLabel) progressLabel.innerText = "Đang phân tích cấu trúc cột và dòng tiêu đề Excel...";
             if (progressBar) progressBar.style.width = '30%';
             if (progressPercent) progressPercent.innerText = '30%';
 
@@ -9887,40 +9979,175 @@ Trường hợp đủ thông tin:
                 throw new Error("Tệp Excel không chứa dữ liệu hoặc chỉ có dòng tiêu đề!");
             }
 
-            const headerRow = rawData[0];
-            const rows = rawData.slice(1);
-            const totalRows = rows.length;
+            // 1. Nhận diện dòng tiêu đề thực tế (Quét tối đa 20 dòng đầu tiên)
+            const headerKeywords = [
+                'stt', 'no', 'order', 'invoice', 'ma hang', 'mã hàng', 'part', 'part no', 'part number',
+                'ten hang', 'tên hàng', 'description', 'ten tieng anh', 'tên tiếng anh', 'ten tieng viet',
+                'tên tiếng việt', 'mo ta', 'mô tả', 'quy cach', 'quy cách', 'thong so', 'thông số',
+                'specs', 'specification', 'don gia', 'so luong', 'thanh tien', 'to khai', 'linh kien',
+                'nhom 1', 'nhom 2', 'chat lieu', 'dvt', 'unit', 'hs code'
+            ];
 
-            if (progressLabel) progressLabel.innerText = `Đang phân tích Chú giải WCO 2022 cho ${totalRows} dòng hàng...`;
+            let headerRowIndex = 0;
+            let maxHeaderMatches = 0;
+            for (let rIdx = 0; rIdx < Math.min(20, rawData.length); rIdx++) {
+                const r = rawData[rIdx];
+                if (!r || !r.length) continue;
+                let matches = 0;
+                for (let cell of r) {
+                    if (cell === null || cell === undefined) continue;
+                    const norm = removeAccents(String(cell).toLowerCase());
+                    for (let kw of headerKeywords) {
+                        if (norm.includes(kw)) { matches++; break; }
+                    }
+                }
+                if (matches > maxHeaderMatches) {
+                    maxHeaderMatches = matches;
+                    headerRowIndex = rIdx;
+                }
+            }
+            if (maxHeaderMatches < 2) headerRowIndex = 0;
+
+            const headerRow = rawData[headerRowIndex] || [];
+
+            // 2. Phân loại vai trò ngữ nghĩa của từng cột
+            const ignoreKws = ['stt', 'order', 'invoice', 'to khai', 'loai hinh', 'phan luong', 'so luong', 'qty', 'don gia', 'price', 'thanh tien', 'amount', 'dvt', 'unit', 'uom', 'pic', 'check', 'nguoi dat', 'hs code', 'ma hs', 'ngay', 'date'];
+            const nameEnKws = ['tieng anh', 'english', 'item name', 'goods description', '(en)', 'product name en'];
+            const descKws = ['xuat nhap khau', 'mo ta', 'mô tả', 'description', 'ghi chu', 'note', 'thong tin dac biet'];
+            const nameVnKws = ['ten tieng viet', 'tên tiếng việt', 'ten vat pham', 'tên vật phẩm', 'linh kien', 'phu tung', 'nhom 1', 'nhom 2', 'ten hang', 'tên hàng', 'ten sp', 'tên sản phẩm'];
+            const modelKws = ['ma hang', 'mã hàng', 'part no', 'part number', 'part_no', 'model', 'ky hieu', 'sku', 'code'];
+            const specsKws = ['quy cach', 'quy cách', 'thong so', 'thông số', 'specs', 'specification', 'kich thuoc', 'size', 'chat lieu', 'material'];
+            const useKws = ['cong dung', 'chuc nang', 'ung dung', 'dung cho', 'function', 'purpose'];
+
+            const colRoles = {};
+            for (let cIdx = 0; cIdx < headerRow.length; cIdx++) {
+                const cell = headerRow[cIdx];
+                if (cell === null || cell === undefined || String(cell).trim() === '') continue;
+                const norm = removeAccents(String(cell).toLowerCase());
+                if (ignoreKws.some(k => norm.includes(k))) colRoles[cIdx] = 'ignore';
+                else if (nameEnKws.some(k => norm.includes(k))) colRoles[cIdx] = 'name_en';
+                else if (descKws.some(k => norm.includes(k))) colRoles[cIdx] = 'desc';
+                else if (nameVnKws.some(k => norm.includes(k))) colRoles[cIdx] = 'name_vn';
+                else if (modelKws.some(k => norm.includes(k))) colRoles[cIdx] = 'model';
+                else if (specsKws.some(k => norm.includes(k))) colRoles[cIdx] = 'specs';
+                else if (useKws.some(k => norm.includes(k))) colRoles[cIdx] = 'use';
+                else colRoles[cIdx] = 'desc';
+            }
+
+            // Fallback nếu không khớp cột tên rõ ràng (ví dụ file Excel không có dòng tiêu đề chuẩn)
+            const hasExplicitNameCol = Object.values(colRoles).some(r => r === 'name_vn' || r === 'name_en');
+            if (!hasExplicitNameCol) {
+                let bestCol = -1;
+                let maxAvgLen = 0;
+                for (let cIdx = 0; cIdx < headerRow.length; cIdx++) {
+                    if (colRoles[cIdx] === 'ignore') continue;
+                    let totalLen = 0, count = 0;
+                    for (let rIdx = headerRowIndex + 1; rIdx < Math.min(headerRowIndex + 10, rawData.length); rIdx++) {
+                        const val = String(rawData[rIdx]?.[cIdx] || '').trim();
+                        if (val && !/^\d+$/.test(val)) {
+                            totalLen += val.length;
+                            count++;
+                        }
+                    }
+                    const avg = count ? totalLen / count : 0;
+                    if (avg > maxAvgLen) {
+                        maxAvgLen = avg;
+                        bestCol = cIdx;
+                    }
+                }
+                if (bestCol !== -1) colRoles[bestCol] = 'name_vn';
+                else if (headerRow.length > 0) colRoles[0] = 'name_vn';
+            }
+
+            if (progressLabel) progressLabel.innerText = "Đang áp dụng 6 Quy tắc GRI & Chú giải WCO 2022 cho từng dòng hàng...";
             if (progressBar) progressBar.style.width = '60%';
             if (progressPercent) progressPercent.innerText = '60%';
 
+            const skipPhrases = [
+                'may moc thiet bi nguyen bo', 'thiet bi neu co', 'vui long dien', 'huong dan',
+                'qui cach neu co', 'phan loai sau khi tham khao', 'luu y:', 'note:'
+            ];
+
             const previewItems = [];
-            const updatedRows = [[
-                ...headerRow,
+            const updatedRows = [];
+
+            // Giữ nguyên các dòng phía trên header (nếu có tiêu đề công ty / văn bản)
+            for (let i = 0; i < headerRowIndex; i++) {
+                updatedRows.push([...(rawData[i] || [])]);
+            }
+
+            // Chèn 4 cột chuẩn Hải quan vào đúng dòng Header
+            updatedRows.push([
+                ...(rawData[headerRowIndex] || []),
                 "Mã HS Đề Xuất (8 số)",
                 "Mã HS Dự Phòng",
                 "Tên Hàng Chuẩn Hóa Theo HS",
                 "Căn Cứ Pháp Lý & Chú Giải WCO 2022"
-            ]];
+            ]);
 
-            for (let i = 0; i < rows.length; i++) {
-                const r = rows[i];
+            // 3. Xử lý từng dòng dữ liệu thực tế
+            for (let i = headerRowIndex + 1; i < rawData.length; i++) {
+                const r = rawData[i];
                 if (!r || r.length === 0 || r.every(cell => cell === null || cell === undefined || String(cell).trim() === '')) {
                     continue;
                 }
 
                 const rowText = r.filter(c => c !== null && c !== undefined).map(String).join(' ');
-                const nameCandidate = String(r[1] || r[0] || 'Hàng hóa nhập khẩu');
-                const modelCandidate = String(r[2] || '');
-                const descCandidate = String(r[3] || rowText);
-                const useCandidate = String(r[4] || '');
-                const specsCandidate = String(r[5] || rowText);
+                const rowNorm = removeAccents(rowText.toLowerCase());
 
-                const bestItem = classifyProductClientSide(nameCandidate, descCandidate, useCandidate, specsCandidate, modelCandidate);
+                // Bỏ qua dòng hướng dẫn / biểu mẫu / ghi chú
+                if (skipPhrases.some(phrase => rowNorm.includes(phrase))) {
+                    updatedRows.push([...r, "", "", "", ""]);
+                    continue;
+                }
+
+                const vnNames = [], enNames = [], models = [], specsList = [], useList = [], descList = [];
+
+                for (let cIdx = 0; cIdx < r.length; cIdx++) {
+                    const cell = r[cIdx];
+                    if (cell === null || cell === undefined || String(cell).trim() === '') continue;
+                    const role = colRoles[cIdx] || 'desc';
+                    if (role === 'ignore') continue;
+
+                    const cleanEnt = extractCleanCustomsEntity(cell);
+                    if (cleanEnt.specs) specsList.push(cleanEnt.specs);
+                    if (cleanEnt.model) models.push(cleanEnt.model);
+
+                    if (role === 'name_vn') vnNames.push(cleanEnt.name);
+                    else if (role === 'name_en') enNames.push(cleanEnt.name);
+                    else if (role === 'model') models.push(cleanEnt.name);
+                    else if (role === 'specs') specsList.push(cleanEnt.name);
+                    else if (role === 'use') useList.push(cleanEnt.name);
+                    else descList.push(cleanEnt.name);
+                }
+
+                const priVn = vnNames[0] || '';
+                const priEn = enNames[0] || '';
+                let combinedName = '';
+                if (priVn && priEn && priVn.toLowerCase() !== priEn.toLowerCase()) {
+                    combinedName = `${priVn} (${priEn})`;
+                } else if (priVn) {
+                    combinedName = priVn;
+                } else if (priEn) {
+                    combinedName = priEn;
+                } else {
+                    combinedName = descList[0] || models[0] || '';
+                }
+
+                if (!combinedName || combinedName.length < 2) {
+                    updatedRows.push([...r, "", "", "", ""]);
+                    continue;
+                }
+
+                const modelStr = models[0] || '';
+                const specsStr = specsList.join(' ');
+                const useStr = useList.join(' ');
+                const descStr = descList.join(' ');
+
+                const bestItem = classifyProductClientSide(combinedName, descStr, useStr, specsStr, modelStr);
                 const cRaw = (bestItem.c || '82089000').replace(/\./g, '');
                 const priCode = `${cRaw.substring(0,4)}.${cRaw.substring(4,6)}.${cRaw.substring(6,8)}`;
-                
+
                 let altCode = 'Không có';
                 if (bestItem._competing && bestItem._competing.length > 0) {
                     const compRaw = (bestItem._competing[0].c || '').replace(/\./g, '');
@@ -9935,7 +10162,7 @@ Trường hợp đủ thông tin:
                 const chapTitle = chapTitles[chapter] || `Chương ${chapter}`;
                 const headDesc = (window.headMap && window.headMap[heading]) ? window.headMap[heading] : `Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)}`;
 
-                const revisedName = `${nameCandidate} (${bestItem.vn || 'Tiêu chuẩn'})`;
+                const revisedName = `${combinedName} (${bestItem.vn || 'Tiêu chuẩn'})`;
                 const wcoCitation = `Áp dụng GRI 1, Chú giải ${chapter} (${chapTitle}) & GRI 6 phân nhóm ${priCode}: ${bestItem.lin || headDesc}`;
 
                 updatedRows.push([
@@ -9946,19 +10173,17 @@ Trường hợp đủ thông tin:
                     wcoCitation
                 ]);
 
-                if (previewItems.length < 50) {
-                    previewItems.push({
-                        row: i + 1,
-                        raw_text: rowText.length > 120 ? rowText.substring(0, 117) + '...' : rowText,
-                        hs_code_pri: priCode,
-                        hs_code_alt: altCode,
-                        mfn: bestItem.mfn || '0%',
-                        vat: bestItem.vat || '8%',
-                        revised_name: revisedName,
-                        vn_desc: bestItem.vn || '',
-                        wco_citation: wcoCitation
-                    });
-                }
+                previewItems.push({
+                    row: i + 1,
+                    raw_text: combinedName.length > 120 ? combinedName.substring(0, 117) + '...' : combinedName,
+                    hs_code_pri: priCode,
+                    hs_code_alt: altCode,
+                    mfn: bestItem.mfn || '0%',
+                    vat: bestItem.vat || '8%',
+                    revised_name: revisedName,
+                    vn_desc: bestItem.vn || '',
+                    wco_citation: wcoCitation
+                });
             }
 
             const newWs = XLSX.utils.aoa_to_sheet(updatedRows);
