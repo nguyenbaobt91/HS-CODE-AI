@@ -4496,6 +4496,8 @@ Trường hợp đủ thông tin:
         }
 
         const HOST_MARKERS = [
+            /\bpttt\s+(?:của|cho)?\b/i,
+            /\bpttt\b/i,
             /\bphụ\s+tùng\s+(?:thay\s+thế\s+)?(?:của|cho)?\b/i,
             /\bphu\s+tung\s+(?:thay\s+the\s+)?(?:cua|cho)?\b/i,
             /\blinh\s+kiện\s+(?:thay\s+thế\s+)?(?:của|cho)?\b/i,
@@ -4534,6 +4536,70 @@ Trường hợp đủ thông tin:
         ];
 
         const STATUTORY_CATEGORIES = [
+            // Specialized High-Precision Gateways for Industrial Tooling & Parts
+            {
+                name: 'measuring_instruments_calipers',
+                pattern: /\b(?:thuoc\s+do|micro\s*meter|panme|thuoc\s+cap|caliper|dial\s+gauge)\b/i,
+                target_headings: ['9017'],
+                forbidden_chapters: ['85', '84', '73'],
+                bonus: 1950
+            },
+            {
+                name: 'aluminum_plates_articles',
+                pattern: /\b(?:mieng\s+nhom|tam\s+nhom|thanh\s+nhom|aluminum\s+plate)\b/i,
+                target_headings: ['7616'],
+                forbidden_chapters: ['85', '84', '73'],
+                bonus: 1950
+            },
+            {
+                name: 'machine_knives_cutting_blades',
+                pattern: /\b(?:luoi\s+cat(?!\s+kim\s+loai\s+cho)|dao\s+cat|cutting\s+blade|shear\s+blade|machine\s+knife)\b/i,
+                target_headings: ['8208'],
+                forbidden_chapters: ['84', '85', '73', '72'],
+                bonus: 1900
+            },
+            {
+                name: 'hand_tools_manual',
+                pattern: /\b(?:dung\s+cu\s+(?:thao|lap|cam\s+tay|su\s+dung\s+tay|hoat\s+dong\s+bang\s+tay)|hand\s+tool|extraction\s+tool|removal\s+tool|crimping\s+tool)\b/i,
+                target_headings: ['8205'],
+                forbidden_chapters: ['8547', '8536', '8544', '90', '84'],
+                bonus: 1900
+            },
+            {
+                name: 'measuring_checking_fixtures',
+                pattern: /\b(?:thiet\s+bi\s+do|may\s+do|dung\s+cu\s+do|do\s+do\s+thang|measuring|checking\s+fixture)\b/i,
+                target_headings: ['9031'],
+                forbidden_chapters: ['8544', '8536', '84'],
+                bonus: 1900
+            },
+            {
+                name: 'adhesive_tapes_sheets',
+                pattern: /\b(?:bang\s+keo|bang\s+dinh|adhesive\s+tape)\b/i,
+                target_headings: ['3919'],
+                forbidden_chapters: ['85', '84'],
+                bonus: 1900
+            },
+            {
+                name: 'insulated_wire_assemblies',
+                pattern: /\b(?:day\s+dan\s+truyen\s+tin\s+hieu|day\s+cap\s+dien|day\s+dien\s+co\s+gan\s+dau\s+noi|wire\s+harness|cable\s+assembly)\b/i,
+                target_headings: ['8544'],
+                forbidden_chapters: ['84', '86', '39', '73'],
+                bonus: 1950
+            },
+            {
+                name: 'plastic_brackets_fittings',
+                pattern: /\b(?:khung(?:\s+gan\s+dinh\s+vi)?\s+.*bang\s+nhua|khung\s+nhua|mieng\s+nhua|tru\s+nhua|de\s+nhua|plastic\s+bracket|plastic\s+frame|plastic\s+holder)\b/i,
+                target_headings: ['3926'],
+                forbidden_chapters: ['84', '85', '86', '73', '72', '90'],
+                bonus: 1950
+            },
+            {
+                name: 'crimping_fixtures_applicators',
+                pattern: /\b(?:ga\s+dap|khuon\s+dap|applicator|crimping\s+die|crimping\s+fixture)\b/i,
+                target_headings: ['8479', '8466'],
+                forbidden_chapters: ['8544', '8536'],
+                bonus: 1950
+            },
             // 0a. Optical & Proximity Sensors (8536, 8541, 9031) - High Precision Gate
             {
                 name: 'optical_proximity_sensors',
@@ -5817,6 +5883,10 @@ Trường hợp đủ thông tin:
             const isMotor = /\b(?:motor|dong\s+co\s+dien|mo\s+to)\b/i.test(fullTextNorm);
             if (isMotor) {
                 activeCategories = activeCategories.filter(c => c.name !== 'transmission_conveyor_belts');
+            }
+
+                        if (/\b(?:thanh\s+thep\s+giu|mieng\s+thep\s+(?:giu|co\s+dinh)|tam\s+thep\s+giu)\b/i.test(fullTextNorm)) {
+                activeCategories = activeCategories.filter(c => c.name !== 'machine_knives_cutting_blades');
             }
 
             return {
