@@ -5372,8 +5372,8 @@ Trường hợp đủ thông tin:
 
             // K. Dây dẫn & Cáp điện (8544)
             if (head === '8544') {
-                const hasConnector = ['co dau noi', 'da gan dau noi', 'gan phich cam', 'fitted with connectors', 'connector', 'co jack', 'co phich'].some(k => fullTextNorm.includes(k));
-                const noConnector = ['chua gan dau noi', 'khong co dau noi', 'without connectors', 'chua bam cos', 'chua co dau noi'].some(k => fullTextNorm.includes(k));
+                const hasConnector = ['co dau noi', 'co gan dau noi', 'da gan dau noi', 'gan dau noi', 'gan phich cam', 'fitted with connectors', 'fitted with connector', 'connector', 'co jack', 'co phich'].some(k => fullTextNorm.includes(k));
+                const noConnector = ['chua gan dau noi', 'khong co dau noi', 'without connectors', 'without connector', 'chua bam cos', 'chua co dau noi'].some(k => fullTextNorm.includes(k));
                 
                 // K1: Tiêu chí có đầu nối vs không có đầu nối
                 if (hasConnector && ['854449', '854411', '854419'].some(p => sub.startsWith(p))) {
@@ -6465,16 +6465,29 @@ Trường hợp đủ thông tin:
                                 }
                             } else {
                                 // Cáp đã gắn đầu nối (8544.42)
-                                if (code === '85444213') itemScore += 2500;
+                                if (code.startsWith('8544429')) itemScore += 3200;
+                                else if (code === '85444213') itemScore += 2500;
                                 else if (code === '85444211') itemScore += 1500;
+                                else if (code.startsWith('854442')) itemScore += 2000;
                             }
-                        } else if (['ha the', 'duoi 1000v', '0.6/1kv', 'dien ap khong qua 1000', '220v', '110v', '380v'].some(k => fullTextNorm.includes(k)) || (specsDict.v !== undefined && specsDict.v <= 1000)) {
+                        } else if (['ha the', 'duoi 1000v', '0.6/1kv', 'dien ap khong qua 1000', '220v', '110v', '380v', '12v', '24v'].some(k => fullTextNorm.includes(k)) || (specsDict.v !== undefined && specsDict.v <= 1000)) {
                             if (hasConnector) {
-                                if (code.startsWith('854442')) itemScore += 450;
+                                if (code.startsWith('854442')) {
+                                    itemScore += 2500;
+                                    if (code.startsWith('8544429')) itemScore += 800;
+                                    if (code === '85444299') itemScore += 400;
+                                } else if (code.startsWith('854449')) {
+                                    itemScore -= 4000;
+                                }
                             } else {
-                                if (code.startsWith('854449')) itemScore += 450;
+                                if (code.startsWith('854449')) itemScore += 1500;
+                                else if (code.startsWith('854442')) itemScore -= 4000;
                             }
                         }
+
+                        // Strict GRI 6 connector gate across all subheadings of 8544.4
+                        if (hasConnector && code.startsWith('854449')) itemScore -= 4000;
+                        if (!hasConnector && code.startsWith('854442')) itemScore -= 4000;
                     }
                 } else if (head === '8537') {
                     if (['hop dieu khien', 'tu dieu khien', 'bo dieu khien', 'mach dieu khien', 'bang dieu khien', 'control box', 'motor controller', 'controller'].some(k => fullTextNorm.includes(k))) {
@@ -10232,8 +10245,60 @@ Trường hợp đủ thông tin:
                 const chapTitle = chapTitles[chapter] || `Chương ${chapter}`;
                 const headDesc = (window.headMap && window.headMap[heading]) ? window.headMap[heading] : `Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)}`;
 
-                const revisedName = `${combinedName} (${bestItem.vn || 'Tiêu chuẩn'})`;
-                const wcoCitation = `Áp dụng GRI 1, Chú giải ${chapter} (${chapTitle}) & GRI 6 phân nhóm ${priCode}: ${bestItem.lin || headDesc}`;
+                // Formulate tax assumptions if parameters missing
+                const assumptions = [];
+                const fullCombined = `${combinedName} ${descStr} ${useStr} ${specsStr} ${modelStr}`.toLowerCase();
+                if (cRaw.startsWith('8536')) {
+                    const hasV = /\b\d+\s*v(?:dc|ac)?\b/i.test(fullCombined);
+                    const hasA = /\b\d+(?:\.\d+)?\s*a\b/i.test(fullCombined);
+                    if (!hasV && !hasA) assumptions.push("Điện áp ≤ 1.000V, dòng điện định mức < 16A");
+                    else if (!hasV) assumptions.push("Điện áp hoạt động định mức ≤ 1.000V");
+                    else if (!hasA) assumptions.push("Dòng điện định mức < 16A");
+                } else if (cRaw.startsWith('8501')) {
+                    if (!/\b\d+\s*(?:w|kw|hp)\b/i.test(fullCombined)) assumptions.push("Công suất đầu ra ≤ 37.5W, điện áp một chiều DC");
+                } else if (cRaw.startsWith('8544')) {
+                    if (!/\b\d+\s*v(?:dc|ac)?\b/i.test(fullCombined)) assumptions.push("Điện áp hoạt động định mức ≤ 1.000V (hạ thế)");
+                } else if (cRaw.startsWith('7318')) {
+                    if (!/\b(?:m\d+|d\d+|phi\s*\d+|\d+\s*mm)\b/i.test(fullCombined)) assumptions.push("Đường kính thân ren ≤ 12mm, thép carbon không gỉ");
+                } else if (cRaw.startsWith('8482')) {
+                    if (fullCombined.includes('thanh truot') || fullCombined.includes('con truot')) assumptions.push("Có tích hợp ổ bi lăn tuần hoàn dẫn hướng theo Chú giải 84.82");
+                } else if (cRaw.startsWith('3926')) {
+                    if (fullCombined.includes('thep') || fullCombined.includes('kim loai')) assumptions.push("Vật liệu chất dẻo (plastic) chiếm đặc trưng cơ bản theo GRI 3(b)");
+                } else if (cRaw.startsWith('8208')) {
+                    assumptions.push("Lưỡi cắt chuyên dùng cho máy dập/máy công cụ theo Chú giải 1(f) Phần XVI");
+                }
+
+                const assumptionStr = assumptions.length > 0 ? ` [Giả định định thuế: ${assumptions.join('; ')}]` : ` [Đầy đủ thông số định thuế]`;
+                const revisedName = `${combinedName} (${bestItem.vn || 'Tiêu chuẩn'})${assumptionStr}`;
+
+                // Formulate rigorous statutory legal reasoning (GRI 1-6, Exclusion Notes & Dash Level)
+                let exclusionText = "";
+                if (['3926', '3919'].includes(heading)) {
+                    exclusionText = "GRI 1: Áp dụng Chú giải 1(g) Phần XVI (loại trừ các mặt hàng bằng plastic thuộc Chương 39 ra khỏi Phần XVI máy móc). ";
+                } else if (heading.startsWith('82')) {
+                    exclusionText = "GRI 1: Áp dụng Chú giải 1(f) Phần XVI (loại trừ dao, lưỡi cắt và dụng cụ cầm tay thuộc Chương 82 khỏi Phần XVI). ";
+                } else if (['7318', '7320', '7326'].includes(heading)) {
+                    exclusionText = "GRI 1: Áp dụng Chú giải 2 Phần XV (bộ phận có công dụng chung bằng kim loại cơ bản giữ ở Chương 73 trong mọi trường hợp). ";
+                } else if (['9017', '9031'].includes(heading)) {
+                    exclusionText = "GRI 1: Áp dụng Chú giải 1(m) Phần XVI & Chú giải 1 Chương 90 (dụng cụ, thiết bị đo lường kiểm tra chính xác đưa về Chương 90). ";
+                } else if (['8481', '8482', '8483', '8501', '8536', '8537'].includes(heading)) {
+                    exclusionText = `GRI 1: Áp dụng Chú giải 2(a) Phần XVI (hàng hóa có nhóm định danh riêng ${heading} trong mọi trường hợp không phân loại theo máy chủ). `;
+                } else if (heading === '8544') {
+                    exclusionText = "GRI 1: Căn cứ danh mục Nhóm 85.44 (Dây điện, cáp điện có cách điện, đã hoặc chưa gắn với đầu nối). ";
+                } else {
+                    exclusionText = `GRI 1: Căn cứ nội dung Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)} (${headDesc}) và Chú giải ${chapter} (${chapTitle}). `;
+                }
+
+                let dashText = "";
+                if (heading === '8544' && cRaw.startsWith('854442')) {
+                    dashText = `GRI 6: So sánh cùng cấp độ gạch nối tại nhóm 85.44: Cấp 1 gạch [- Dây dẫn điện hạ thế ≤ 1.000V], cấp 2 gạch [-- 8544.42 ĐÃ LẮP ĐẦU NỐI ĐIỆN] (loại trừ phân nhánh chưa gắn đầu nối 8544.49), cấp 3/4 gạch áp mã 8 số ${priCode} (${bestItem.vn || ''}).`;
+                } else {
+                    const sub6 = cRaw.substring(0, 6);
+                    dashText = `GRI 6: So sánh phân nhóm cùng cấp độ gạch nối tại nhóm ${heading.substring(0,2)}.${heading.substring(2,4)}: Cấp 1 gạch [-] đối chiếu công năng chính, cấp 2 gạch [-- ${sub6.substring(0,4)}.${sub6.substring(4,6)}] xác định thông số kỹ thuật, cấp 3/4 gạch áp mã 8 số ${priCode} (${bestItem.vn || ''}).`;
+                }
+
+                const hypoText = assumptions.length > 0 ? ` Căn cứ giả định kỹ thuật (${assumptions.join('; ')}). Nếu thông số thực tế thay đổi, áp dụng mã dự phòng ${altCode}.` : ` Đầy đủ thông số định thuế; mã dự phòng đối chiếu: ${altCode}.`;
+                const wcoCitation = `${exclusionText}${dashText}${hypoText}`;
 
                 updatedRows.push([
                     ...r,
