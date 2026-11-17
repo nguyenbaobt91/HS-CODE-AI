@@ -129,6 +129,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+    <script>if (!window.ExcelJS) { document.write('<script src="exceljs.min.js"><\/script>'); }</script>
+
 
     <!-- Load Local Database -->
     <script src="hs_data.js"></script>
@@ -4263,7 +4266,8 @@ BẮT BUỘC TUÂN THỦ NGUYÊN TẮC PHÂN CẤP GẠCH NỐI (GRI 6) THEO CÂ
    - Nếu hàng hóa ghi rõ "DÙNG CHO VIỄN THÔNG" (hoặc truyền tín hiệu mạng Cat6/Cat5 UTP): BẮT BUỘC chọn dòng con thuộc nhánh 3 gạch "- - - Dùng cho viễn thông" (mã 8544.49.13). TUYỆT ĐỐI CẤM chọn dòng con thuộc nhánh "- - - Loại không dùng cho viễn thông" (như 8544.49.21)!
    - Nếu hàng hóa "KHÔNG CÓ LỚP BỌC CHỐNG NHIỄU" (UTP): TUYỆT ĐỐI CẤM chọn mã dây có vỏ bọc chống nhiễu 8544.49.21!
    - Nếu hàng hóa "KHÔNG CÓ Ổ BI": TUYỆT ĐỐI CẤM chọn nhóm 84.82 (ổ bi), bắt buộc chọn nhóm 84.83!
-   - Nếu hàng hóa "CHƯA GẮN ĐẦU NỐI": TUYỆT ĐỐI CẤM chọn phân nhóm đã gắn đầu nối (8544.42), bắt buộc thuộc 8544.49! (TWO-STAGE MANDATORY HS WORKFLOW):
+   - Nếu hàng hóa "CHƯA GẮN ĐẦU NỐI": TUYỆT ĐỐI CẤM chọn phân nhóm đã gắn đầu nối (8544.42), bắt buộc thuộc 8544.49!
+   - Nếu hàng hóa thuộc nhóm 84.24 (máy làm sạch linh kiện, máy rửa công nghiệp, thiết bị cơ khí phun xịt...) và ghi rõ "HOẠT ĐỘNG BẰNG ĐIỆN" (hoặc dùng động cơ điện, motor điện, cắm điện, có công suất điện W/kW, điện áp V): BẮT BUỘC chọn nhánh 3 gạch "- - - Hoạt động bằng điện" (mã 8424.89.50). TUYỆT ĐỐI CẤM chọn mã 8424.89.90 ("- - - - Không hoạt động bằng điện")! (TWO-STAGE MANDATORY HS WORKFLOW):
 - GIAI ĐOẠN 1: ÁP DỤNG QUY TẮC 1 (GRI 1) & RÀ SOÁT TOÀN BỘ NỘI DUNG CHÚ GIẢI HS 2022:
   + Rà soát toàn bộ Chú giải HS 2022 (Công văn 1810/TCHQ-TXNK & HQKV8), Chú giải bắt buộc của Phần và Chương.
   + Kiểm tra toàn diện các Chú giải loại trừ của các Chương liên quan (ví dụ Chú giải 2(a) Phần XVI, Chú giải 2 Phần XV, Chú giải loại trừ 1(g) Phần XVI, Chú giải loại trừ Nhóm 90.15, 84.81...).
@@ -5195,6 +5199,33 @@ Trường hợp đủ thông tin:
             if ([...activeTargetHeads].some(h => CHAPTER_82_TOOLS_HEADINGS.has(h))) {
                 if (NOTE_2B_PARTS_HEADINGS.has(head) || ['84', '85'].includes(head.substring(0, 2))) {
                     return { isDisqualified: true, penalty: -5000, reason: "Vi phạm Chú giải 1(k) Phần XVI: Dụng cụ Chương 82 loại trừ khỏi Phần XVI" };
+                }
+            }
+
+                        // D. Quy tắc 6 (GRI 6): Phân nhánh cơ chế vận hành theo gạch nối (Hoạt động bằng điện vs Không hoạt động bằng điện)
+            const isElectricQuery = (
+                /\b(?:hoat\s+dong\s+bang\s+dien|chay\s+bang\s+dien|chay\s+dien|bang\s+dien|electrically\s+operated|electric|motor\s+driven)\b/i.test(fullTextNorm) ||
+                /\b(?:\d+\s*(?:v|vac|vdc|w|kw|hp|kva|ampe|a)\b)/i.test(fullTextNorm)
+            ) && !/\b(?:khong\s+(?:hoat\s+dong\s+bang\s+)?dien|khong\s+chay\s+dien|khong\s+dung\s+dien|bang\s+tay|thu\s+cong|manual|not\s+electrically)\b/i.test(fullTextNorm);
+
+            const isNonElectricQuery = /\b(?:khong\s+(?:hoat\s+dong\s+bang\s+)?dien|khong\s+chay\s+dien|khong\s+dung\s+dien|bang\s+tay|thu\s+cong|manual|hand\s+operated|not\s+electrically)\b/i.test(fullTextNorm);
+
+            const isElectricTariffLine = /\b(?:hoat\s+dong\s+bang\s+dien|electrically\s+operated)\b/i.test(itemNorm) && !/\b(?:khong\s+hoat\s+dong\s+bang\s+dien|not\s+electrically\s+operated)\b/i.test(itemNorm);
+            const isNonElectricTariffLine = /\b(?:khong\s+hoat\s+dong\s+bang\s+dien|not\s+electrically\s+operated)\b/i.test(itemNorm);
+
+            if (isElectricQuery) {
+                if (isNonElectricTariffLine) {
+                    return { isDisqualified: true, penalty: -9000, reason: "Vi phạm GRI 6: Hàng hóa hoạt động bằng điện, loại trừ phân nhánh không hoạt động bằng điện" };
+                }
+                if (isElectricTariffLine) {
+                    return { isDisqualified: false, penalty: 3000, reason: "Khớp cấp độ gạch nối GRI 6: Hoạt động bằng điện" };
+                }
+            } else if (isNonElectricQuery) {
+                if (isElectricTariffLine) {
+                    return { isDisqualified: true, penalty: -9000, reason: "Vi phạm GRI 6: Hàng hóa không hoạt động bằng điện, loại trừ phân nhánh hoạt động bằng điện" };
+                }
+                if (isNonElectricTariffLine) {
+                    return { isDisqualified: false, penalty: 3000, reason: "Khớp cấp độ gạch nối GRI 6: Không hoạt động bằng điện" };
                 }
             }
 
@@ -6173,6 +6204,181 @@ Trường hợp đủ thông tin:
                 };
             }
 
+            // ========================================================
+            // BƯỚC 2A: QUY TẮC PHÁP LÝ ĐỊNH DANH ĐẶC BIỆT (BUPI / CÔNG NGHIỆP / THIẾT BỊ)
+            // ========================================================
+            // 2. LÒ XO KHÍ / GIẢM CHẤN KHÍ NÉN / PHUỘC HƠI (Nhóm 8412 / 8412.31.00)
+            if (/\b(?:giam\s+chan\s+khi\s+nen|phuoc\s+hoi|lo\s+xo\s+khi|gas\s+spring|gas\s+strut|gas\s+pressure\s+shock|gas\s+shock)\b/.test(norm) ||
+                (/\b(?:giam\s+chan|phuoc|lo\s+xo)\b/.test(hn) && /\b(?:khi\s+nen|gas\s+pressure|gas)\b/.test(norm))) {
+                return {
+                    code: "8412.31.00",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1: Lò xo khí nén (xi lanh khí nén chuyển động tịnh tiến trợ lực nắp máy) thuộc Nhóm 84.12. Áp dụng GRI 6: Phân nhóm 8412.31 mã số 8412.31.00 (Thuế NK MFN 0%, VAT 8%).",
+                    missing_attributes: [],
+                    assumptions: "Lò xo khí tịnh tiến dùng nâng đỡ nắp máy móc công nghiệp",
+                    reserve_code: "8487.90.90"
+                };
+            }
+
+            // 3. CẢM BIẾN BÁO MỨC CHẤT LỎNG / CÔNG TẮC MỨC / LIQUIPHANT (Nhóm 9026 / 9026.10.90)
+            if (/\b(?:cam\s+bien\s+(?:bao\s+)?muc|cong\s+tac\s+muc|bao\s+muc\s+chat\s+long|liquiphant|level\s+switch|level\s+limit\s+switch|level\s+sensor)\b/.test(norm) ||
+                (/\b(?:cam\s+bien|cong\s+tac)\b/.test(hn) && /\b(?:muc\s+chat\s+long|level|liquiphant)\b/.test(norm))) {
+                return {
+                    code: "9026.10.90",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 1(m) Phần XVI: Thiết bị đo hoặc kiểm tra mức chất lỏng (công tắc mức dạng rung) thuộc Nhóm 90.26. Áp dụng GRI 6: Phân nhóm 9026.10 mã số 9026.10.90 (Thuế NK MFN 0%, VAT 8%).",
+                    missing_attributes: [],
+                    assumptions: "Thiết bị kiểm tra mức chất lỏng kiểu rung hoạt động bằng điện",
+                    reserve_code: "8536.50.99"
+                };
+            }
+
+            // 4. VAN XIÊN / VAN GÓC ĐIỀU KHIỂN BẰNG KHÍ NÉN (Nhóm 8481 / 8481.80.82)
+            if (/\b(?:van\s+xien|van\s+goc|angle\s+seat\s+valve)\b/.test(norm) ||
+                (/\b(?:van|valve)\b/.test(hn) && /\b(?:xien|goc|angle\s+seat)\b/.test(norm))) {
+                return {
+                    code: "8481.80.82",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI: Van xiên/van góc điều khiển dòng chảy thuộc Nhóm 84.81. Áp dụng GRI 6: Phân nhóm 8481.80 mã số 8481.80.82 (Thuế NK MFN 3%, VAT 8%).",
+                    missing_attributes: [],
+                    assumptions: "Van góc điều khiển bằng khí nén thân bằng thép không gỉ",
+                    reserve_code: "8481.80.79"
+                };
+            }
+
+            // 5. TÚI LỌC CHẤT LỎNG BẰNG VẢI DỆT KỸ THUẬT (Nhóm 5911 / 5911.90.90)
+            if (/\b(?:tui\s+loc\s+chat\s+long|tui\s+loc|filter\s+bag|liquid\s+filter\s+bag)\b/.test(norm) ||
+                (/\b(?:tui\s+loc|filter\s+bag)\b/.test(hn))) {
+                return {
+                    code: "5911.90.90",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 1(e) Phần XVI (loại trừ vật phẩm dệt kỹ thuật sang Chương 59) & Chú giải 8 Chương 59: Túi lọc chất lỏng bằng vải dệt monofilament nylon thuộc Nhóm 59.11. Áp dụng GRI 6: Mã số 5911.90.90 (Thuế NK MFN 0%, VAT 8%).",
+                    missing_attributes: [],
+                    assumptions: "Túi lọc chất lỏng bằng vải dệt kỹ thuật sợi nylon dùng cho máy công nghiệp",
+                    reserve_code: "8421.99.99"
+                };
+            }
+
+            // 6. BỘ PHỚT CƠ KHÍ / MECHANICAL SEAL (Nhóm 8484 / 8484.20.00)
+            if (/\b(?:phot\s+co\s+khi|bo\s+phot\s+co\s+khi|bo\s+lam\s+kin\s+co\s+khi|mechanical\s+seal(?:\s+kit)?)\b/.test(norm) ||
+                (/\b(?:phot|seal)\b/.test(hn) && /\b(?:co\s+khi|mechanical)\b/.test(norm))) {
+                return {
+                    code: "8484.20.00",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1: Bộ làm kín kiểu cơ khí (phớt cơ khí / mechanical seals) có phân nhóm định danh riêng tại Nhóm 84.84. Áp dụng GRI 6: Mã số 8484.20.00 (Thuế NK MFN 3%, VAT 8%).",
+                    missing_attributes: [],
+                    assumptions: "Bộ phớt cơ khí dùng làm kín trục bơm chất lỏng",
+                    reserve_code: "8487.90.90"
+                };
+            }
+
+            // 7. THANH ĐIỆN TRỞ GIA NHIỆT / BỘ SƯỞI ĐIỆN / QUE NHIỆT (Nhóm 8516 / 8516.10.30 & 8516.80.80)
+            if (/\b(?:dien\s+tro\s+gia\s+nhiet|thanh\s+dien\s+tro|bo\s+suoi\s+dien|thanh\s+nhiet|que\s+nhiet|electric\s+radiator|heating\s+element|immersion\s+heater)\b/.test(norm) ||
+                (/\b(?:dien\s+tro|thanh\s+nhiet|bo\s+suoi)\b/.test(hn) && /\b(?:gia\s+nhiet|electric|radiator|heater)\b/.test(norm))) {
+                const isImmersion = /\b(?:nhung|dun\s+nuoc|dun\s+chua|immersion|tank|be\s+rua|radiator)\b/.test(norm);
+                return {
+                    code: isImmersion ? "8516.10.30" : "8516.80.80",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: `Áp dụng GRI 1: Thiết bị và điện trở gia nhiệt điện thuộc Nhóm 85.16. Áp dụng GRI 6: ${isImmersion ? 'Bộ gia nhiệt điện kiểu nhúng mã 8516.10.30' : 'Điện trở gia nhiệt loại khác mã 8516.80.80'} (Thuế NK MFN 20%, VAT 8%).`,
+                    missing_attributes: [],
+                    assumptions: "Thanh điện trở gia nhiệt đun nóng dung dịch kiểu nhúng",
+                    reserve_code: isImmersion ? "8516.80.80" : "8516.10.30"
+                };
+            }
+
+            // 8. PHỚT CHẮN DẦU TRỤC / PHỚT TRỤC (Nhóm 4016 / 4016.93.90)
+            if (/\b(?:phot\s+chan\s+dau|phot\s+dau|phot\s+truc|shaft\s+seal|oil\s+seal|vong\s+chan\s+dau)\b/.test(norm) ||
+                (/\b(?:phot|seal)\b/.test(hn) && /\b(?:chan\s+dau|dau\s+truc|shaft)\b/.test(norm))) {
+                return {
+                    code: "4016.93.90",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 1(a) Phần XVI (loại trừ cao su sang Chương 40): Vòng đệm/phớt chắn dầu bằng cao su lưu hóa thuộc Nhóm 40.16. Áp dụng GRI 6: Phân nhóm 4016.93 mã số 4016.93.90 (Thuế NK MFN 3%, VAT 8%).",
+                    missing_attributes: [],
+                    assumptions: "Phớt chắn dầu trục bằng cao su lưu hóa có hoặc không có lõi kim loại",
+                    reserve_code: "8487.90.90"
+                };
+            }
+
+            // 9. MÀNG TRƯỢT / TẤM LÓT TRƯỢT NHỰA IGLIDUR (Nhóm 3920 / 3926)
+            if (/\b(?:sliding\s+film|mang\s+truot|tam\s+lot\s+truot)\b/.test(norm) && /\b(?:iglidur|plastic|nhua)\b/.test(norm)) {
+                return {
+                    code: "3920.99.90",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 1(g) Phần XVI loại trừ plastic sang Chương 39: Tấm/màng trượt bằng plastic iglidur chưa xốp hóa thuộc Nhóm 39.20. Áp dụng GRI 6: Mã số 3920.99.90 (Thuế NK MFN 6%, VAT 8%).",
+                    missing_attributes: [],
+                    assumptions: "Màng trượt bằng plastic iglidur J dạng tấm/dải phẳng chưa xốp hóa",
+                    reserve_code: "3926.90.99"
+                };
+            }
+
+            // 10. BẠC ĐẠN CHÀ / Ổ TRƯỢT CHẶN IGLIDUR (Nhóm 8483)
+            if (/\b(?:bac\s+dan\s+cha|o\s+truot\s+chan|thrust\s+bearing)\b/.test(norm)) {
+                const isIglidurOrPlain = /\b(?:iglidur|o\s+truot|bac\s+truot|plain|khong\s+(?:co\s+)?(?:bi|con\s+lan))\b/.test(norm);
+                return {
+                    code: isIglidurOrPlain ? "8483.30.90" : "8482.10.00",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: `Áp dụng GRI 1 & Chú giải 2(a) Phần XVI: ${isIglidurOrPlain ? 'Ổ trượt chặn không có con lăn thuộc Nhóm 84.83 mã 8483.30.90' : 'Ổ bi chặn (bạc đạn chà có bi) thuộc Nhóm 84.82 mã 8482.10.00'} (Thuế NK MFN 0%, VAT 8%).`,
+                    missing_attributes: [],
+                    assumptions: isIglidurOrPlain ? "Ổ trượt chặn bằng plastic iglidur không dùng bi lăn" : "Vòng bi chặn trục có ổ bi",
+                    reserve_code: isIglidurOrPlain ? "8482.10.00" : "8483.30.90"
+                };
+            }
+
+            // 11. CỤM TRỤC TRUYỀN ĐỘNG BÁNH RĂNG / ĐỘNG CƠ GIẢM TỐC (Nhóm 8501 / 8483)
+            if (/\b(?:shaft\s+gear\s+drive|gear\s+motor|cum\s+truc\s+truyen\s+dong\s+banh\s+rang|dong\s+co\s+giam\s+toc)\b/.test(norm)) {
+                const hasMotor = /\b(?:motor|dong\s+co|dien|w|kw|v|volt|drive)\b/.test(norm);
+                return {
+                    code: hasMotor ? "8501.51.19" : "8483.10.90",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: `Áp dụng GRI 1 & Chú giải 2(a) Phần XVI: ${hasMotor ? 'Động cơ điện xoay chiều gắn hộp số giảm tốc thuộc Nhóm 85.01 mã 8501.51.19' : 'Trục truyền động bánh răng cơ khí thuộc Nhóm 84.83 mã 8483.10.90'} (Thuế NK MFN ${hasMotor ? '15%' : '0%'}, VAT 8%).`,
+                    missing_attributes: [],
+                    assumptions: hasMotor ? "Động cơ điện gắn liền hộp giảm tốc và trục truyền động công suất ≤ 750W" : "Trục truyền động bánh răng",
+                    reserve_code: hasMotor ? "8483.10.90" : "8501.51.19"
+                };
+            }
+
+            // 12. THANH GIOĂNG CAO SU XỐP ĐỊNH HÌNH (Nhóm 4008)
+            if (/\b(?:cao\s+su\s+xop\s+dinh\s+hinh|foam\s+rubber\s+profile|thanh\s+gioang\s+cao\s+su\s+xop)\b/.test(norm) ||
+                (/\b(?:thanh\s+gioang|gioang|profile)\b/.test(hn) && /\b(?:cao\s+su\s+xop|foam\s+rubber)\b/.test(norm))) {
+                return {
+                    code: "4008.19.00",
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 1(a) Phần XVI loại trừ cao su sang Chương 40: Dải định hình bằng cao su xốp lưu hóa thuộc Nhóm 40.08. Áp dụng GRI 6: Phân nhóm 4008.19 mã số 4008.19.00 (Thuế NK MFN 3%, VAT 8%).",
+                    missing_attributes: [],
+                    assumptions: "Thanh gioăng định hình bằng cao su xốp lưu hóa",
+                    reserve_code: "4016.93.90"
+                };
+            }
+
+            // 1. MÁY LÀM SẠCH / MÁY RỬA CÔNG NGHIỆP / HỆ THỐNG LÀM SẠCH LINH KIỆN (Nhóm 8424 / 8424.89.50 & 8424.89.90)
+            if (/\b(?:may\s+rua\s+(?:cong\s+nghiep|linh\s+kien|co\s+khi|sieu\s+am|phun)|may\s+lam\s+sach\s+(?:linh\s+kien|co\s+khi|cong\s+nghiep)?|he\s+thong\s+lam\s+sach|cleaning\s+system|parts\s+washer|part\s+washer|bupi(?:\s+cleaner)?)\b/.test(norm) ||
+                (/\b(?:may\s+rua|may\s+lam\s+sach|cleaning|washer)\b/.test(hn) && /\b(?:cong\s+nghiep|linh\s+kien|top\s+loader|bupi|ap\s+luc|phun|co\s+khi)\b/.test(norm))) {
+                const isElectric = /\b(?:hoat\s+dong\s+bang\s+dien|chay\s+dien|bang\s+dien|electric|dien|v|kw|w)\b/.test(norm) && !/\b(?:khong\s+hoat\s+dong\s+bang\s+dien|khong\s+dung\s+dien|bang\s+tay|thu\s+cong)\b/.test(norm);
+                const code = isElectric ? "8424.89.50" : "8424.89.90";
+                const resCode = isElectric ? "8424.89.90" : "8424.89.50";
+                return {
+                    code: code,
+                    level: 8,
+                    status: "EXACT_8_DIGIT",
+                    reasoning: `Áp dụng GRI 1: Thiết bị cơ khí phun chất lỏng làm sạch linh kiện công nghiệp thuộc Nhóm 84.24. Áp dụng GRI 6 (So sánh cùng cấp độ gạch nối): Phân nhóm 8424.89, cấp 3 gạch [- - - ${isElectric ? 'Loại khác, hoạt động bằng điện' : 'Loại khác, không hoạt động bằng điện'}] mã số ${code} (Thuế NK MFN 0%, VAT 8%).`,
+                    missing_attributes: [],
+                    assumptions: isElectric ? "Máy làm sạch/rửa linh kiện cơ khí công nghiệp hoạt động bằng điện" : "Máy làm sạch linh kiện không hoạt động bằng điện",
+                    reserve_code: resCode
+                };
+            }
+
+            
             // BƯỚC 2: PHÂN LOẠI THEO DANH TỪ TRUNG TÂM (HEAD NOUN - GRI 1)
             // 1. BĂNG KEO TỰ DÍNH (Nhóm 3919)
             if (/\b(?:bang\s+keo|bang\s+dinh|adhesive\s+tape)\b/.test(hn)) {
@@ -8948,6 +9154,29 @@ Trường hợp đủ thông tin:
                 res.gri6 = "Áp dụng Quy tắc 6 (GRI 6): Đai tải/băng tải bằng cao su lưu hóa được gia cố bằng kim loại thuộc nhóm 40.10, phân nhóm 1 gạch [- Băng tải hoặc đai tải:], phân nhóm 2 gạch [-- Chỉ được gia cố bằng kim loại] mã số chính xác là 4010.11.00 (Thuế NK MFN 5%). Loại trừ mã 4010.12.00 (Chỉ gia cố bằng vật liệu dệt).";
             }
 
+            // Gatekeeper 5: Thiết bị nhóm 84.24 (máy rửa/làm sạch, phun xịt) hoạt động bằng điện
+            const isElectricMachine = /\b(?:hoat\s+dong\s+bang\s+dien|chay\s+dien|dung\s+dien|dong\s+co\s+dien|motor\s+dien|dien\s+ap|\d+\s*(?:v|kw|w|kva|hz))\b/i.test(fullNorm);
+            const isNonElectricMachine = /\b(?:khong\s+hoat\s+dong\s+bang\s+dien|khong\s+dung\s+dien|chay\s+co|chay\s+bang\s+tay|khi\s+nen|dong\s+co\s+xang|dong\s+co\s+diesel)\b/i.test(fullNorm);
+            if (cCode.startsWith('842489')) {
+                if (isElectricMachine && !isNonElectricMachine && cCode === '84248990') {
+                    console.warn("[Post-Audit Gatekeeper] Auto-correcting 8424.89.90 -> 8424.89.50 (Electric Operated Machine Guard)");
+                    res.clean_code = '84248950';
+                    res.hs_code = '8424.89.50';
+                    res.item_description = '- - - Hoạt động bằng điện';
+                    res.mfn = '0%';
+                    res.vat = '8/10';
+                    res.gri6 = "Áp dụng Quy tắc 6 (GRI 6): Thiết bị thuộc nhóm 84.24, phân nhóm 8424.89, cấp độ 3 gạch [- - - Hoạt động bằng điện] có mã số định danh cụ thể là 8424.89.50 (Thuế NK MFN 0%). Loại trừ tuyệt đối mã 8424.89.90 (dành cho loại không hoạt động bằng điện).";
+                    res.exclusions = "Loại trừ mã 8424.89.90: Do hàng hóa sử dụng động cơ/máy bơm hoạt động bằng điện, đáp ứng đích danh tiêu chí phân nhánh tại phân nhóm 3 gạch 8424.89.50.";
+                } else if (isNonElectricMachine && cCode === '84248950') {
+                    console.warn("[Post-Audit Gatekeeper] Auto-correcting 8424.89.50 -> 8424.89.90 (Non-Electric Machine Guard)");
+                    res.clean_code = '84248990';
+                    res.hs_code = '8424.89.90';
+                    res.item_description = '- - - - Không hoạt động bằng điện';
+                    res.mfn = '0%';
+                    res.vat = '8/10';
+                }
+            }
+
             return res;
         }
 
@@ -11193,69 +11422,7 @@ Trường hợp đủ thông tin:
         let currentBatchResult = null;
 
         function downloadSampleExcelTemplate() {
-            const fileName = 'FORM_EXCEL.xlsx';
-            const link = document.createElement('a');
-            link.href = fileName;
-            link.download = fileName;
-
-            const triggerDynamicGeneration = () => {
-                if (!window.XLSX) {
-                    alert("Đang khởi tạo thư viện xử lý bảng tính Excel, vui lòng thử lại sau giây lát.");
-                    return;
-                }
-                const headers = [[
-                    "STT",
-                    "Mã hàng",
-                    "Tên hàng (mô tả chi tiết)\n[Tên hàng + Kích thước/thông số + Công dụng]",
-                    "Mã HS\n(Nếu có)",
-                    "Mã HS Code Ưu Tiên (8 số)\n(GRI 1 -> GRI 6)",
-                    "Mã HS Code Dự Phòng (8 số)\n(Theo Giả Định Định Thuế)",
-                    "Tên Hàng Sửa Đổi Phù Hợp HS Code\n(Chuẩn hóa theo WCO)",
-                    "Căn Cứ Pháp Lý WCO 2022\n(Trích dẫn Chú giải & Quy tắc GRI)"
-                ]];
-                const samples = [
-                    [1, "48A20029016", "Lưỡi cắt bằng thép hợp kim - KT 40x30x10mm (phụ tùng thay thế của máy cắt dập kim loại) hàng mới 100%", "82089000", "", "", "", ""],
-                    [2, "48AC80E506", "Thanh trượt bằng thép có ổ bi dẫn hướng - KT 30x10x250mm (phụ tùng máy dập kim loại) hàng mới 100%", "84821000", "", "", "", ""],
-                    [3, "HEX-M12-50", "Bu lông thép carbon lục giác có ren suốt, kích thước M12x50mm, cấp bền 8.8, dùng liên kết khung cơ khí, hàng mới 100%", "73181510", "", "", "", ""],
-                    [4, "PBS-10A", "Công tắc chuyển mạch điện 220V dòng điện 10A (< 16A), nút bấm điều khiển nguồn máy dập, hàng mới 100%", "85365096", "", "", "", ""],
-                    [5, "BV-DN25-BRASS", "Van bi tay gạt bằng đồng thau, đường kính danh định DN25 (1 inch), áp lực PN16, dùng đóng mở nước đường ống, hàng mới 100%", "84818061", "", "", "", ""]
-                ];
-                for (let i = 6; i <= 50; i++) {
-                    samples.push([i, "", "", "", "", "", "", ""]);
-                }
-                const wsData = [...headers, ...samples];
-                const ws = XLSX.utils.aoa_to_sheet(wsData);
-                ws['!cols'] = [
-                    { wch: 8 },
-                    { wch: 18 },
-                    { wch: 46 },
-                    { wch: 14 },
-                    { wch: 24 },
-                    { wch: 24 },
-                    { wch: 46 },
-                    { wch: 52 }
-                ];
-
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "DANH_MUC_HANG_HOA");
-                XLSX.writeFile(wb, fileName);
-            };
-
-            if (window.location.protocol === 'file:') {
-                triggerDynamicGeneration();
-            } else {
-                fetch(fileName, { method: 'HEAD' })
-                    .then(res => {
-                        if (res.ok) {
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                        } else {
-                            triggerDynamicGeneration();
-                        }
-                    })
-                    .catch(() => triggerDynamicGeneration());
-            }
+            downloadExcelTemplate();
         }
 
         function handleExcelFileSelected(event) {
@@ -11436,6 +11603,127 @@ Trường hợp đủ thông tin:
             return { name: name || str, specs, model };
         }
 
+        // =========================================================================
+        // EXCELJS STYLED WORKBOOK ENGINE (100% MATCHING FORM EXCEL.xlsx)
+        // =========================================================================
+        async function buildStyledExcelJSWorkbook(items, sheetTitle = "DANH_MUC_HANG_HOA") {
+            const headers = [
+                "STT",
+                "Mã hàng",
+                "Tên hàng (mô tả chi tiết)\n[Tên hàng + Kích thước/thông số + Công dụng]",
+                "Mã HS\n(Nếu có)",
+                "Mã HS Code Ưu Tiên (8 số)\n(GRI 1 -> GRI 6)",
+                "Mã HS Code Dự Phòng (8 số)\n(Theo Giả Định Định Thuế)",
+                "Tên Hàng Sửa Đổi Phù Hợp HS Code\n(Chuẩn hóa theo WCO)",
+                "Căn Cứ Pháp Lý WCO 2022\n(Trích dẫn Chú giải & Quy tắc GRI)"
+            ];
+
+            const colWidths = [8.0, 18.0, 46.0, 14.0, 24.0, 24.0, 46.0, 52.0];
+
+            if (window.ExcelJS) {
+                const workbook = new ExcelJS.Workbook();
+                workbook.creator = "HSCoder AI";
+                workbook.created = new Date();
+
+                const worksheet = workbook.addWorksheet(sheetTitle, {
+                    views: [{ showGridLines: true }]
+                });
+
+                worksheet.columns = colWidths.map((w, idx) => ({ key: 'col_' + (idx + 1), width: w }));
+
+                const headerRow = worksheet.getRow(1);
+                headerRow.height = 42.0;
+
+                headers.forEach((hText, idx) => {
+                    const colIdx = idx + 1;
+                    const cell = headerRow.getCell(colIdx);
+                    cell.value = hText;
+                    cell.font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FFFFFFFF' } };
+                    cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: colIdx <= 4 ? 'FF1E40AF' : 'FF047857' }
+                    };
+                    cell.border = {
+                        top: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+                        left: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+                        bottom: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+                        right: { style: 'thin', color: { argb: 'FFCBD5E1' } }
+                    };
+                });
+
+                items.forEach((item, rIdx) => {
+                    const rowData = {
+                        col_1: item.stt !== undefined && item.stt !== null ? item.stt : (rIdx + 1),
+                        col_2: item.part_no || '',
+                        col_3: item.name || '',
+                        col_4: item.orig_hs || '',
+                        col_5: item.hs_pri || '',
+                        col_6: item.hs_alt || '',
+                        col_7: item.revised_name || '',
+                        col_8: item.wco_reason || ''
+                    };
+                    const row = worksheet.addRow(rowData);
+                    row.height = 32.0;
+
+                    for (let c = 1; c <= 8; c++) {
+                        const cell = row.getCell(c);
+                        cell.border = {
+                            top: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+                            left: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+                            bottom: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+                            right: { style: 'thin', color: { argb: 'FFCBD5E1' } }
+                        };
+
+                        if (c === 1 || c === 2 || c === 4 || c === 6) {
+                            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                            cell.font = { name: 'Calibri', size: 11 };
+                        } else if (c === 5) {
+                            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                            cell.font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FF047857' } };
+                        } else {
+                            cell.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
+                            cell.font = { name: 'Calibri', size: 11 };
+                        }
+                    }
+                });
+
+                const buffer = await workbook.xlsx.writeBuffer();
+                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+                let binary = '';
+                const bytes = new Uint8Array(buffer);
+                for (let i = 0; i < bytes.byteLength; i++) {
+                    binary += String.fromCharCode(bytes[i]);
+                }
+                const b64 = window.btoa(binary);
+
+                return { buffer, blob, b64 };
+            }
+
+            // Fallback nếu chưa tải xong ExcelJS
+            const aoa = [headers];
+            items.forEach((item, rIdx) => {
+                aoa.push([
+                    item.stt !== undefined && item.stt !== null ? item.stt : (rIdx + 1),
+                    item.part_no || '',
+                    item.name || '',
+                    item.orig_hs || '',
+                    item.hs_pri || '',
+                    item.hs_alt || '',
+                    item.revised_name || '',
+                    item.wco_reason || ''
+                ]);
+            });
+            const ws = XLSX.utils.aoa_to_sheet(aoa);
+            ws['!cols'] = colWidths.map(w => ({ wch: w }));
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, sheetTitle);
+            const b64 = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
+            return { b64, blob: null };
+        }
+
         async function processBatchExcelClientSide() {
             if (!window.XLSX || !selectedExcelFile || !selectedExcelFile.b64) {
                 throw new Error("Không thể xử lý tệp Excel: Thư viện XLSX chưa sẵn sàng hoặc tệp bị hỏng.");
@@ -11447,9 +11735,9 @@ Trường hợp đủ thông tin:
             const progressBox = document.getElementById('batch-progress-container');
             const btnRun = document.getElementById('btn-run-batch');
 
-            if (progressLabel) progressLabel.innerText = "Đang phân tích cấu trúc cột và dòng tiêu đề Excel...";
-            if (progressBar) progressBar.style.width = '30%';
-            if (progressPercent) progressPercent.innerText = '30%';
+            if (progressLabel) progressLabel.innerText = "Đang phân tích cấu trúc cột và nhận diện tiêu đề tệp Excel...";
+            if (progressBar) progressBar.style.width = '10%';
+            if (progressPercent) progressPercent.innerText = '10%';
 
             const binary = atob(selectedExcelFile.b64);
             const bytes = new Uint8Array(binary.length);
@@ -11465,183 +11753,127 @@ Trường hợp đủ thông tin:
                 throw new Error("Tệp Excel không chứa dữ liệu hoặc chỉ có dòng tiêu đề!");
             }
 
-            // 1. Nhận diện dòng tiêu đề thực tế (Quét tối đa 20 dòng đầu tiên)
+            // 1. Nhận diện dòng tiêu đề thực tế (Quét tối đa 10 dòng đầu, ưu tiên dòng có độ dài ô ngắn < 40 ký tự)
             const headerKeywords = [
                 'stt', 'no', 'order', 'invoice', 'ma hang', 'mã hàng', 'part', 'part no', 'part number',
-                'ten hang', 'tên hàng', 'description', 'ten tieng anh', 'tên tiếng anh', 'ten tieng viet',
-                'tên tiếng việt', 'mo ta', 'mô tả', 'quy cach', 'quy cách', 'thong so', 'thông số',
+                'ten hang', 'tên hàng', 'description', 'description of goods', 'ten tieng anh', 'tên tiếng anh',
+                'ten tieng viet', 'tên tiếng việt', 'mo ta', 'mô tả', 'quy cach', 'quy cách', 'thong so', 'thông số',
                 'specs', 'specification', 'don gia', 'so luong', 'thanh tien', 'to khai', 'linh kien',
-                'nhom 1', 'nhom 2', 'chat lieu', 'dvt', 'unit', 'hs code'
+                'nhom 1', 'nhom 2', 'chat lieu', 'dvt', 'unit', 'hs code', 'hs code supplier', 'supplier hs'
             ];
 
             let headerRowIndex = 0;
-            let maxHeaderMatches = 0;
-            for (let rIdx = 0; rIdx < Math.min(20, rawData.length); rIdx++) {
+            for (let rIdx = 0; rIdx < Math.min(10, rawData.length); rIdx++) {
                 const r = rawData[rIdx];
                 if (!r || !r.length) continue;
+                const nonEmpty = r.filter(c => c !== null && c !== undefined && String(c).trim() !== '').map(String);
+                if (nonEmpty.length === 0) continue;
+                const avgLen = nonEmpty.reduce((sum, s) => sum + s.length, 0) / nonEmpty.length;
                 let matches = 0;
-                for (let cell of r) {
-                    if (cell === null || cell === undefined) continue;
-                    const norm = removeAccents(String(cell).toLowerCase());
+                for (let cell of nonEmpty) {
+                    const norm = removeAccents(cell.toLowerCase());
                     for (let kw of headerKeywords) {
                         if (norm.includes(kw)) { matches++; break; }
                     }
                 }
-                if (matches > maxHeaderMatches) {
-                    maxHeaderMatches = matches;
+                if (matches >= 2 && avgLen < 40) {
                     headerRowIndex = rIdx;
+                    break;
                 }
             }
-            if (maxHeaderMatches < 2) headerRowIndex = 0;
 
             const headerRow = rawData[headerRowIndex] || [];
 
-            // 2. Phân loại vai trò ngữ nghĩa của từng cột
-            const ignoreKws = ['stt', 'order', 'invoice', 'to khai', 'loai hinh', 'phan luong', 'so luong', 'qty', 'don gia', 'price', 'thanh tien', 'amount', 'dvt', 'unit', 'uom', 'pic', 'check', 'nguoi dat', 'hs code', 'ma hs', 'ngay', 'date'];
-            const nameEnKws = ['tieng anh', 'english', 'item name', 'goods description', '(en)', 'product name en'];
-            const descKws = ['xuat nhap khau', 'mo ta', 'mô tả', 'description', 'ghi chu', 'note', 'thong tin dac biet'];
-            const nameVnKws = ['ten tieng viet', 'tên tiếng việt', 'ten vat pham', 'tên vật phẩm', 'linh kien', 'phu tung', 'nhom 1', 'nhom 2', 'ten hang', 'tên hàng', 'ten sp', 'tên sản phẩm'];
-            const modelKws = ['ma hang', 'mã hàng', 'part no', 'part number', 'part_no', 'model', 'ky hieu', 'sku', 'code'];
-            const specsKws = ['quy cach', 'quy cách', 'thong so', 'thông số', 'specs', 'specification', 'kich thuoc', 'size', 'chat lieu', 'material'];
-            const useKws = ['cong dung', 'chuc nang', 'ung dung', 'dung cho', 'function', 'purpose'];
-
-            // 2. Kiểm tra xem file đã có sẵn 4 cột kết quả chuẩn Hải quan hay chưa
-            let colHsPri = -1;
-            let colHsAlt = -1;
-            let colRevName = -1;
-            let colWco = -1;
-
-            for (let cIdx = 0; cIdx < headerRow.length; cIdx++) {
-                const cell = headerRow[cIdx];
-                if (cell === null || cell === undefined || String(cell).trim() === '') continue;
-                const norm = removeAccents(String(cell).toLowerCase());
-                if (norm.includes('uu tien') || (norm.includes('de xuat') && norm.includes('hs'))) colHsPri = cIdx;
-                else if (norm.includes('du phong')) colHsAlt = cIdx;
-                else if (norm.includes('sua doi') || norm.includes('chuan hoa') || (norm.includes('phu hop') && norm.includes('hs'))) colRevName = cIdx;
-                else if (norm.includes('can cu phap ly') || norm.includes('wco') || norm.includes('chu giai')) colWco = cIdx;
-            }
-
-            const hasExistingResultCols = (colHsPri !== -1);
-            if (!hasExistingResultCols) {
-                colHsPri = headerRow.length;
-                colHsAlt = headerRow.length + 1;
-                colRevName = headerRow.length + 2;
-                colWco = headerRow.length + 3;
-            } else {
-                if (colHsAlt === -1) colHsAlt = colHsPri + 1;
-                if (colRevName === -1) colRevName = colHsAlt + 1;
-                if (colWco === -1) colWco = colRevName + 1;
-            }
-
-            const resultColsSet = new Set([colHsPri, colHsAlt, colRevName, colWco]);
-
+            // 2. Map vai trò của từng cột
+            let sttCol = null;
+            let partCol = null;
+            let nameVnCol = null;
+            let nameEnCol = null;
+            let hsCol = null;
             const colRoles = {};
+
             for (let cIdx = 0; cIdx < headerRow.length; cIdx++) {
-                if (resultColsSet.has(cIdx)) {
-                    colRoles[cIdx] = 'ignore';
-                    continue;
-                }
                 const cell = headerRow[cIdx];
                 if (cell === null || cell === undefined || String(cell).trim() === '') continue;
-                const norm = removeAccents(String(cell).toLowerCase());
-                if (ignoreKws.some(k => norm.includes(k))) colRoles[cIdx] = 'ignore';
-                else if (nameEnKws.some(k => norm.includes(k))) colRoles[cIdx] = 'name_en';
-                else if (descKws.some(k => norm.includes(k))) colRoles[cIdx] = 'desc';
-                else if (nameVnKws.some(k => norm.includes(k))) colRoles[cIdx] = 'name_vn';
-                else if (modelKws.some(k => norm.includes(k))) colRoles[cIdx] = 'model';
-                else if (specsKws.some(k => norm.includes(k))) colRoles[cIdx] = 'specs';
-                else if (useKws.some(k => norm.includes(k))) colRoles[cIdx] = 'use';
-                else colRoles[cIdx] = 'desc';
-            }
+                const val = removeAccents(String(cell).toLowerCase().trim());
 
-            // Fallback nếu không khớp cột tên rõ ràng (ví dụ file Excel không có dòng tiêu đề chuẩn)
-            const hasExplicitNameCol = Object.values(colRoles).some(r => r === 'name_vn' || r === 'name_en');
-            if (!hasExplicitNameCol) {
-                let bestCol = -1;
-                let maxAvgLen = 0;
-                for (let cIdx = 0; cIdx < headerRow.length; cIdx++) {
-                    if (resultColsSet.has(cIdx) || colRoles[cIdx] === 'ignore') continue;
-                    let totalLen = 0, count = 0;
-                    for (let rIdx = headerRowIndex + 1; rIdx < Math.min(headerRowIndex + 10, rawData.length); rIdx++) {
-                        const val = String(rawData[rIdx]?.[cIdx] || '').trim();
-                        if (val && !/^\d+$/.test(val)) {
-                            totalLen += val.length;
-                            count++;
-                        }
-                    }
-                    const avg = count ? totalLen / count : 0;
-                    if (avg > maxAvgLen) {
-                        maxAvgLen = avg;
-                        bestCol = cIdx;
-                    }
+                if (val.includes('de xuat') || val.includes('chuan hoa') || val.includes('sua doi') || val.includes('can cu') || val.includes('wco') || val.includes('chu giai') || val.includes('mfn') || val.includes('vat') || val.includes('evfta') || val.includes('acfta') || val.includes('vjepa') || val.includes('chinh sach') || val.includes('ghi chu')) {
+                    colRoles[cIdx] = 'ignore';
+                } else if (val.includes('hs code supplier') || val.includes('supplier hs') || val.includes('ma hs') || val.includes('hs code') || val.includes('hs goc')) {
+                    colRoles[cIdx] = 'supplier_hs';
+                    if (hsCol === null) hsCol = cIdx;
+                } else if (val === 'stt' || val === 'no' || val === 'no.' || val.includes('order')) {
+                    colRoles[cIdx] = 'stt';
+                    if (sttCol === null) sttCol = cIdx;
+                } else if (val.includes('ma hang') || val.includes('part no') || val.includes('part number') || val.includes('model') || val.includes('sku') || val.includes('item code')) {
+                    colRoles[cIdx] = 'part_no';
+                    if (partCol === null) partCol = cIdx;
+                } else if (val.includes('description of goods') || val.includes('goods description') || val.includes('ten tieng anh') || val.includes('english') || val.includes('item name')) {
+                    colRoles[cIdx] = 'name_en';
+                    if (nameEnCol === null) nameEnCol = cIdx;
+                } else if (val.includes('ten tieng viet') || val.includes('ten vat pham') || val.includes('ten hang') || val.includes('ten sp')) {
+                    colRoles[cIdx] = 'name_vn';
+                    if (nameVnCol === null) nameVnCol = cIdx;
+                } else if (val.includes('quy cach') || val.includes('thong so') || val.includes('specs') || val.includes('kich thuoc') || val.includes('chat lieu')) {
+                    colRoles[cIdx] = 'specs';
+                } else if (val.includes('cong dung') || val.includes('chuc nang') || val.includes('ung dung') || val.includes('dung cho')) {
+                    colRoles[cIdx] = 'use';
+                } else if (val.includes('mo ta') || val.includes('description')) {
+                    colRoles[cIdx] = 'desc';
                 }
-                if (bestCol !== -1 && !resultColsSet.has(bestCol)) colRoles[bestCol] = 'name_vn';
-                else if (headerRow.length > 0 && !resultColsSet.has(0)) colRoles[0] = 'name_vn';
             }
 
-            if (progressLabel) progressLabel.innerText = "Đang áp dụng 6 Quy tắc GRI & Chú giải WCO 2022 cho từng dòng hàng...";
-            if (progressBar) progressBar.style.width = '60%';
-            if (progressPercent) progressPercent.innerText = '60%';
+            // Fallback cho file FORM EXCEL chuẩn (4 cột: STT, Mã hàng, Tên hàng, Mã HS)
+            if (headerRow.length >= 4 && sttCol === null && partCol === null && nameVnCol === null) {
+                sttCol = 0;
+                partCol = 1;
+                nameVnCol = 2;
+                hsCol = 3;
+            }
 
             const skipPhrases = [
                 'may moc thiet bi nguyen bo', 'thiet bi neu co', 'vui long dien', 'huong dan',
                 'qui cach neu co', 'phan loai sau khi tham khao', 'luu y:', 'note:'
             ];
 
-            const previewItems = [];
-            const updatedRows = [];
-
-            // Giữ nguyên các dòng phía trên header (nếu có tiêu đề công ty / văn bản)
-            for (let i = 0; i < headerRowIndex; i++) {
-                updatedRows.push([...(rawData[i] || [])]);
-            }
-
-            // Dòng Header chuẩn Hải quan
-            if (hasExistingResultCols) {
-                const newHeader = [...headerRow];
-                newHeader[colHsPri] = "Mã HS Code Ưu Tiên (8 số)";
-                newHeader[colHsAlt] = "Mã HS Code Dự Phòng (8 số)";
-                newHeader[colRevName] = "Tên Hàng Sửa Đổi Phù Hợp HS Code";
-                newHeader[colWco] = "Căn Cứ Pháp Lý WCO 2022";
-                updatedRows.push(newHeader);
-            } else {
-                updatedRows.push([
-                    ...(rawData[headerRowIndex] || []),
-                    "Mã HS Code Ưu Tiên (8 số)",
-                    "Mã HS Code Dự Phòng (8 số)",
-                    "Tên Hàng Sửa Đổi Phù Hợp HS Code",
-                    "Căn Cứ Pháp Lý WCO 2022"
-                ]);
-            }
-
-            // 3. Xử lý từng dòng dữ liệu thực tế
+            // Đếm trước tổng số dòng hợp lệ để tính tiến trình %
+            const validDataRows = [];
             for (let i = headerRowIndex + 1; i < rawData.length; i++) {
                 const r = rawData[i];
                 if (!r || r.length === 0 || r.every(cell => cell === null || cell === undefined || String(cell).trim() === '')) {
                     continue;
                 }
-
                 const rowText = r.filter(c => c !== null && c !== undefined).map(String).join(' ');
                 const rowNorm = removeAccents(rowText.toLowerCase());
-
-                // Bỏ qua dòng hướng dẫn / biểu mẫu / ghi chú
                 if (skipPhrases.some(phrase => rowNorm.includes(phrase))) {
-                    if (hasExistingResultCols) {
-                        updatedRows.push([...r]);
-                    } else {
-                        updatedRows.push([...r, "", "", "", ""]);
-                    }
                     continue;
                 }
+                validDataRows.push(r);
+            }
+
+            const totalRows = validDataRows.length;
+            const previewItems = [];
+            const resultItems = [];
+
+            const activeKey = getActiveApiKey();
+            const hasGeminiKey = Boolean(activeKey && activeKey.length > 15);
+
+            // 3. Xử lý từng dòng dữ liệu bằng AI AGENT tuần tự
+            for (let idx = 0; idx < totalRows; idx++) {
+                const r = validDataRows[idx];
+                const rowSeq = idx + 1;
+
+                const sttVal = (sttCol !== null && r[sttCol] !== undefined && r[sttCol] !== null && String(r[sttCol]).trim() !== '') ? String(r[sttCol]).trim() : String(rowSeq);
+                let partNoVal = (partCol !== null && r[partCol] !== undefined && r[partCol] !== null) ? String(r[partCol]).trim() : '';
+                const origHsVal = (hsCol !== null && r[hsCol] !== undefined && r[hsCol] !== null) ? String(r[hsCol]).trim() : '';
 
                 const vnNames = [], enNames = [], models = [], specsList = [], useList = [], descList = [];
 
                 for (let cIdx = 0; cIdx < r.length; cIdx++) {
-                    if (resultColsSet.has(cIdx)) continue;
                     const cell = r[cIdx];
                     if (cell === null || cell === undefined || String(cell).trim() === '') continue;
                     const role = colRoles[cIdx] || 'desc';
-                    if (role === 'ignore') continue;
+                    if (role === 'ignore' || role === 'stt' || role === 'supplier_hs') continue;
 
                     const cleanEnt = extractCleanCustomsEntity(cell);
                     if (cleanEnt.specs) specsList.push(cleanEnt.specs);
@@ -11649,7 +11881,7 @@ Trường hợp đủ thông tin:
 
                     if (role === 'name_vn') vnNames.push(cleanEnt.name);
                     else if (role === 'name_en') enNames.push(cleanEnt.name);
-                    else if (role === 'model') models.push(cleanEnt.name);
+                    else if (role === 'part_no') models.push(cleanEnt.name);
                     else if (role === 'specs') specsList.push(cleanEnt.name);
                     else if (role === 'use') useList.push(cleanEnt.name);
                     else descList.push(cleanEnt.name);
@@ -11669,160 +11901,186 @@ Trường hợp đủ thông tin:
                 }
 
                 if (!combinedName || combinedName.trim().length < 2 || /^\d+$/.test(combinedName.trim())) {
-                    if (hasExistingResultCols) {
-                        updatedRows.push([...r]);
-                    } else {
-                        updatedRows.push([...r, "", "", "", ""]);
-                    }
                     continue;
                 }
 
-                const modelStr = models[0] || '';
+                if (!partNoVal && models.length > 0) {
+                    partNoVal = models[0];
+                }
+
+                const modelStr = partNoVal || (models[0] || '');
                 const specsStr = specsList.join(' ');
                 const useStr = useList.join(' ');
                 const descStr = descList.join(' ');
 
-                const bestItem = classifyProductClientSide(combinedName, descStr, useStr, specsStr, modelStr);
+                // Cập nhật giao diện tiến trình trực quan theo thời gian thực
+                const currentPct = Math.round((rowSeq / totalRows) * 100);
+                if (progressBar) progressBar.style.width = `${currentPct}%`;
+                if (progressPercent) progressPercent.innerText = `${currentPct}%`;
+                if (progressLabel) {
+                    progressLabel.innerHTML = `[${rowSeq}/${totalRows}] <span class="text-amber-300 font-bold">${hasGeminiKey ? 'Gemini AI' : 'AI Agent'}</span> đang phân tích 6 Quy tắc GRI: <em>${combinedName.substring(0, 36)}...</em>`;
+                }
+
+                // Tạm dừng ngắn để trình duyệt render thanh tiến trình mượt mà
+                await new Promise(resolve => setTimeout(resolve, hasGeminiKey ? 120 : 60));
 
                 let priCode = '';
                 let altCode = 'Không có';
                 let revisedName = '';
                 let wcoCitation = '';
+                let mfnRate = '0%';
+                let vatRate = '8%';
+                let itemVnDesc = '';
 
-                if (bestItem && bestItem._insufficient_info) {
-                    priCode = "CHƯA ĐỦ THÔNG TIN";
-                    altCode = "N/A";
-                    const missingStr = (bestItem._missing_fields || []).join(', ');
-                    revisedName = `${combinedName} [Cần bổ sung: ${missingStr}]`;
-                    wcoCitation = bestItem._reasoning || bestItem._statutory_reasoning || "Chưa đủ cơ sở pháp lý định danh theo GRI 1 (Zero-Guessing).";
-                } else if (bestItem && bestItem._is_stopped) {
-                    priCode = bestItem.c || 'CHƯA RÕ';
-                    altCode = bestItem._reserve_code || 'Không có';
-                    const missingStr = (bestItem._missing_fields || []).join(', ');
-                    revisedName = `${combinedName} [Thiếu thông số: ${missingStr}]`;
-                    wcoCitation = bestItem._statutory_reasoning || `Dừng ở phân nhóm ${priCode} theo nguyên tắc Không đoán mò (Zero-Guessing).`;
-                } else {
-                    const cRaw = (bestItem.c || '82089000').replace(/\./g, '');
-                    priCode = cRaw.length === 8 ? `${cRaw.substring(0,4)}.${cRaw.substring(4,6)}.${cRaw.substring(6,8)}` : (bestItem.c || cRaw);
-
-                    if (bestItem._competing && bestItem._competing.length > 0) {
-                        const compRaw = (bestItem._competing[0].c || '').replace(/\./g, '');
-                        if (compRaw && compRaw !== cRaw) {
-                            altCode = `${compRaw.substring(0,4)}.${compRaw.substring(4,6)}.${compRaw.substring(6,8)}`;
+                // BƯỚC 3A: NẾU CÓ GEMINI API KEY -> GỌI TRỰC TIẾP GEMINI AI AGENT
+                let gemRes = null;
+                if (hasGeminiKey) {
+                    try {
+                        gemRes = await callGeminiAIClassification(combinedName, descStr, useStr, specsStr, modelStr);
+                        if (gemRes && typeof auditAndSanitizeProposedHS === 'function') {
+                            gemRes = auditAndSanitizeProposedHS(gemRes, { name: combinedName, desc: descStr, use: useStr, specs: specsStr, model_en: modelStr });
                         }
+                    } catch (eGem) {
+                        console.warn(`Dòng ${rowSeq} Gemini AI chuyển sang Bộ Não Cục Bộ:`, eGem);
+                        gemRes = null;
                     }
+                }
 
-                    const heading = cRaw.substring(0, 4);
-                    const chapter = cRaw.substring(0, 2);
-                    const chapTitles = window.CHAPTER_TITLES || {};
-                    const chapTitle = chapTitles[chapter] || `Chương ${chapter}`;
-                    const headDesc = (window.headMap && window.headMap[heading]) ? window.headMap[heading] : `Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)}`;
-
-                    const assumptions = [];
-                    const fullCombined = `${combinedName} ${descStr} ${useStr} ${specsStr} ${modelStr}`.toLowerCase();
-                    if (cRaw.startsWith('8536')) {
-                        const hasV = /\b\d+\s*v(?:dc|ac)?\b/i.test(fullCombined);
-                        const hasA = /\b\d+(?:\.\d+)?\s*a\b/i.test(fullCombined);
-                        if (!hasV && !hasA) assumptions.push("Điện áp ≤ 1.000V, dòng điện định mức < 16A");
-                        else if (!hasV) assumptions.push("Điện áp hoạt động định mức ≤ 1.000V");
-                        else if (!hasA) assumptions.push("Dòng điện định mức < 16A");
-                    } else if (cRaw.startsWith('8501')) {
-                        if (!/\b\d+\s*(?:w|kw|hp)\b/i.test(fullCombined)) assumptions.push("Công suất đầu ra ≤ 37.5W, điện áp một chiều DC");
-                    } else if (cRaw.startsWith('8544')) {
-                        if (!/\b\d+\s*v(?:dc|ac)?\b/i.test(fullCombined)) assumptions.push("Điện áp hoạt động định mức ≤ 1.000V (hạ thế)");
-                    } else if (cRaw.startsWith('7318')) {
-                        if (!/\b(?:m\d+|d\d+|phi\s*\d+|\d+\s*mm)\b/i.test(fullCombined)) assumptions.push("Đường kính thân ren ≤ 12mm, thép carbon không gỉ");
-                    } else if (cRaw.startsWith('8482')) {
-                        if (fullCombined.includes('thanh truot') || fullCombined.includes('con truot')) assumptions.push("Có tích hợp ổ bi lăn tuần hoàn dẫn hướng theo Chú giải 84.82");
-                    } else if (cRaw.startsWith('3926')) {
-                        if (fullCombined.includes('thep') || fullCombined.includes('kim loai')) assumptions.push("Vật liệu chất dẻo (plastic) chiếm đặc trưng cơ bản theo GRI 3(b)");
-                    } else if (cRaw.startsWith('8208')) {
-                        assumptions.push("Lưỡi cắt chuyên dùng cho máy dập/máy công cụ theo Chú giải 1(f) Phần XVI");
+                if (gemRes && (gemRes.hs_code || gemRes.clean_code) && !gemRes.is_insufficient_info) {
+                    const cCode = (gemRes.clean_code || gemRes.hs_code || '').replace(/\./g, '');
+                    priCode = formatHSCode(cCode);
+                    if (gemRes.candidates && gemRes.candidates.length > 0) {
+                        const altRaw = (gemRes.candidates[0].clean_code || gemRes.candidates[0].hs_code || '').replace(/\./g, '');
+                        if (altRaw && altRaw !== cCode) altCode = formatHSCode(altRaw);
                     }
+                    revisedName = gemRes.decl_name || `${combinedName} (${gemRes.item_description || 'Chuẩn WCO'})`;
+                    wcoCitation = gemRes.gri_analysis?.gri1 ? `GRI 1: ${gemRes.gri_analysis.gri1}. GRI 6: ${gemRes.gri_analysis.gri6 || ''}. Chú giải: ${gemRes.explanatory_notes || ''}` : (gemRes.explanatory_notes || 'Phân loại theo quy chuẩn WCO 2022');
+                    mfnRate = gemRes.mfn || '0%';
+                    vatRate = gemRes.vat || '8%';
+                    itemVnDesc = gemRes.item_description || '';
+                } else {
+                    // BƯỚC 3B: BỘ NÃO PHÂN TÍCH CHUYÊN SÂU ĐA LỚP (STATUTORY TREE WALKER + 6 GRI RULES)
+                    const bestItem = classifyProductClientSide(combinedName, descStr, useStr, specsStr, modelStr);
+                    mfnRate = bestItem.mfn || '0%';
+                    vatRate = bestItem.vat || '8%';
+                    itemVnDesc = bestItem.vn || '';
 
-                    const assumptionStr = assumptions.length > 0 ? ` [Giả định định thuế: ${assumptions.join('; ')}]` : ` [Đầy đủ thông số định thuế]`;
-                    revisedName = `${combinedName} (${bestItem.vn || 'Tiêu chuẩn'})${assumptionStr}`;
-
-                    if (bestItem._statutory_reasoning) {
-                        wcoCitation = bestItem._statutory_reasoning;
+                    if (bestItem && bestItem._insufficient_info) {
+                        priCode = "CHƯA ĐỦ THÔNG TIN";
+                        altCode = "N/A";
+                        const missingStr = (bestItem._missing_fields || []).join(', ');
+                        revisedName = `${combinedName} [Cần bổ sung: ${missingStr}]`;
+                        wcoCitation = bestItem._reasoning || bestItem._statutory_reasoning || "Chưa đủ cơ sở pháp lý định danh theo GRI 1 (Zero-Guessing).";
+                    } else if (bestItem && bestItem._is_stopped) {
+                        priCode = bestItem.c || 'CHƯA RÕ';
+                        altCode = bestItem._reserve_code || 'Không có';
+                        const missingStr = (bestItem._missing_fields || []).join(', ');
+                        revisedName = `${combinedName} [Thiếu thông số: ${missingStr}]`;
+                        wcoCitation = bestItem._statutory_reasoning || `Dừng ở phân nhóm ${priCode} theo nguyên tắc Không đoán mò (Zero-Guessing).`;
                     } else {
-                        let exclusionText = "";
-                        if (['3926', '3919'].includes(heading)) {
-                            exclusionText = "GRI 1: Áp dụng Chú giải 1(g) Phần XVI (loại trừ các mặt hàng bằng plastic thuộc Chương 39 ra khỏi Phần XVI máy móc). ";
-                        } else if (heading.startsWith('82')) {
-                            exclusionText = "GRI 1: Áp dụng Chú giải 1(f) Phần XVI (loại trừ dao, lưỡi cắt và dụng cụ cầm tay thuộc Chương 82 khỏi Phần XVI). ";
-                        } else if (['7318', '7320', '7326'].includes(heading)) {
-                            exclusionText = "GRI 1: Áp dụng Chú giải 2 Phần XV (bộ phận có công dụng chung bằng kim loại cơ bản giữ ở Chương 73 trong mọi trường hợp). ";
-                        } else if (['9017', '9031'].includes(heading)) {
-                            exclusionText = "GRI 1: Áp dụng Chú giải 1(m) Phần XVI & Chú giải 1 Chương 90 (dụng cụ, thiết bị đo lường kiểm tra chính xác đưa về Chương 90). ";
-                        } else if (['8481', '8482', '8483', '8501', '8536', '8537'].includes(heading)) {
-                            exclusionText = `GRI 1: Áp dụng Chú giải 2(a) Phần XVI (hàng hóa có nhóm định danh riêng ${heading} trong mọi trường hợp không phân loại theo máy chủ). `;
-                        } else if (heading === '8544') {
-                            exclusionText = "GRI 1: Căn cứ danh mục Nhóm 85.44 (Dây điện, cáp điện có cách điện, đã hoặc chưa gắn với đầu nối). ";
-                        } else {
-                            exclusionText = `GRI 1: Căn cứ nội dung Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)} (${headDesc}) và Chú giải ${chapter} (${chapTitle}). `;
+                        const cRaw = (bestItem.c || '82089000').replace(/\./g, '');
+                        priCode = cRaw.length === 8 ? `${cRaw.substring(0,4)}.${cRaw.substring(4,6)}.${cRaw.substring(6,8)}` : (bestItem.c || cRaw);
+
+                        if (bestItem._competing && bestItem._competing.length > 0) {
+                            const compRaw = (bestItem._competing[0].c || '').replace(/\./g, '');
+                            if (compRaw && compRaw !== cRaw) {
+                                altCode = `${compRaw.substring(0,4)}.${compRaw.substring(4,6)}.${compRaw.substring(6,8)}`;
+                            }
                         }
 
-                        let dashText = "";
-                        if (heading === '8544' && cRaw.startsWith('854442')) {
-                            dashText = `GRI 6: So sánh cùng cấp độ gạch nối tại nhóm 85.44: Cấp 1 gạch [- Dây dẫn điện hạ thế ≤ 1.000V], cấp 2 gạch [-- 8544.42 ĐÃ LẮP ĐẦU NỐI ĐIỆN] (loại trừ phân nhánh chưa gắn đầu nối 8544.49), cấp 3/4 gạch áp mã 8 số ${priCode} (${bestItem.vn || ''}).`;
-                        } else {
-                            const sub6 = cRaw.substring(0, 6);
-                            dashText = `GRI 6: So sánh phân nhóm cùng cấp độ gạch nối tại nhóm ${heading.substring(0,2)}.${heading.substring(2,4)}: Cấp 1 gạch [-] đối chiếu công năng chính, cấp 2 gạch [-- ${sub6.substring(0,4)}.${sub6.substring(4,6)}] xác định thông số kỹ thuật, cấp 3/4 gạch áp mã 8 số ${priCode} (${bestItem.vn || ''}).`;
+                        const heading = cRaw.substring(0, 4);
+                        const chapter = cRaw.substring(0, 2);
+                        const chapTitles = window.CHAPTER_TITLES || {};
+                        const chapTitle = chapTitles[chapter] || `Chương ${chapter}`;
+                        const headDesc = (window.headMap && window.headMap[heading]) ? window.headMap[heading] : `Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)}`;
+
+                        const assumptions = [];
+                        const fullCombined = `${combinedName} ${descStr} ${useStr} ${specsStr} ${modelStr}`.toLowerCase();
+                        if (cRaw.startsWith('8536')) {
+                            const hasV = /\b\d+\s*v(?:dc|ac)?\b/i.test(fullCombined);
+                            const hasA = /\b\d+(?:\.\d+)?\s*a\b/i.test(fullCombined);
+                            if (!hasV && !hasA) assumptions.push("Điện áp ≤ 1.000V, dòng điện định mức < 16A");
+                            else if (!hasV) assumptions.push("Điện áp hoạt động định mức ≤ 1.000V");
+                            else if (!hasA) assumptions.push("Dòng điện định mức < 16A");
+                        } else if (cRaw.startsWith('8501')) {
+                            if (!/\b\d+\s*(?:w|kw|hp)\b/i.test(fullCombined)) assumptions.push("Công suất đầu ra ≤ 37.5W, điện áp một chiều DC");
+                        } else if (cRaw.startsWith('8544')) {
+                            if (!/\b\d+\s*v(?:dc|ac)?\b/i.test(fullCombined)) assumptions.push("Điện áp hoạt động định mức ≤ 1.000V (hạ thế)");
+                        } else if (cRaw.startsWith('7318')) {
+                            if (!/\b(?:m\d+|d\d+|phi\s*\d+|\d+\s*mm)\b/i.test(fullCombined)) assumptions.push("Đường kính thân ren ≤ 12mm, thép carbon không gỉ");
+                        } else if (cRaw.startsWith('8482')) {
+                            if (fullCombined.includes('thanh truot') || fullCombined.includes('con truot')) assumptions.push("Có tích hợp ổ bi lăn tuần hoàn dẫn hướng theo Chú giải 84.82");
+                        } else if (cRaw.startsWith('3926')) {
+                            if (fullCombined.includes('thep') || fullCombined.includes('kim loai')) assumptions.push("Vật liệu chất dẻo (plastic) chiếm đặc trưng cơ bản theo GRI 3(b)");
+                        } else if (cRaw.startsWith('8208')) {
+                            assumptions.push("Lưỡi cắt chuyên dùng cho máy dập/máy công cụ theo Chú giải 1(f) Phần XVI");
                         }
 
-                        const hypoText = assumptions.length > 0 ? ` Căn cứ giả định kỹ thuật (${assumptions.join('; ')}). Nếu thông số thực tế thay đổi, áp dụng mã dự phòng ${altCode}.` : ` Đầy đủ thông số định thuế; mã dự phòng đối chiếu: ${altCode}.`;
-                        wcoCitation = `${exclusionText}${dashText}${hypoText}`;
+                        const assumptionStr = assumptions.length > 0 ? ` [Giả định định thuế: ${assumptions.join('; ')}]` : ` [Đầy đủ thông số định thuế]`;
+                        revisedName = `${combinedName} (${bestItem.vn || 'Tiêu chuẩn'})${assumptionStr}`;
+
+                        if (bestItem._statutory_reasoning) {
+                            wcoCitation = bestItem._statutory_reasoning;
+                        } else {
+                            let exclusionText = "";
+                            if (['3926', '3919'].includes(heading)) {
+                                exclusionText = "GRI 1: Áp dụng Chú giải 1(g) Phần XVI (loại trừ các mặt hàng bằng plastic thuộc Chương 39 ra khỏi Phần XVI máy móc). ";
+                            } else if (heading.startsWith('82')) {
+                                exclusionText = "GRI 1: Áp dụng Chú giải 1(f) Phần XVI (loại trừ dao, lưỡi cắt và dụng cụ cầm tay thuộc Chương 82 khỏi Phần XVI). ";
+                            } else if (['7318', '7320', '7326'].includes(heading)) {
+                                exclusionText = "GRI 1: Áp dụng Chú giải 2 Phần XV (bộ phận có công dụng chung bằng kim loại cơ bản giữ ở Chương 73 trong mọi trường hợp). ";
+                            } else if (['9017', '9031'].includes(heading)) {
+                                exclusionText = "GRI 1: Áp dụng Chú giải 1(m) Phần XVI & Chú giải 1 Chương 90 (dụng cụ, thiết bị đo lường kiểm tra chính xác đưa về Chương 90). ";
+                            } else if (['8481', '8482', '8483', '8501', '8536', '8537'].includes(heading)) {
+                                exclusionText = `GRI 1: Áp dụng Chú giải 2(a) Phần XVI (hàng hóa có nhóm định danh riêng ${heading} trong mọi trường hợp không phân loại theo máy chủ). `;
+                            } else if (heading === '8544') {
+                                exclusionText = "GRI 1: Căn cứ danh mục Nhóm 85.44 (Dây điện, cáp điện có cách điện, đã hoặc chưa gắn với đầu nối). ";
+                            } else {
+                                exclusionText = `GRI 1: Căn cứ nội dung Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)} (${headDesc}) và Chú giải ${chapter} (${chapTitle}). `;
+                            }
+
+                            let dashText = "";
+                            if (heading === '8544' && cRaw.startsWith('854442')) {
+                                dashText = `GRI 6: So sánh cùng cấp độ gạch nối tại nhóm 85.44: Cấp 1 gạch [- Dây dẫn điện hạ thế ≤ 1.000V], cấp 2 gạch [-- 8544.42 ĐÃ LẮP ĐẦU NỐI ĐIỆN] (loại trừ phân nhánh chưa gắn đầu nối 8544.49), cấp 3/4 gạch áp mã 8 số ${priCode} (${bestItem.vn || ''}).`;
+                            } else {
+                                const sub6 = cRaw.substring(0, 6);
+                                dashText = `GRI 6: So sánh phân nhóm cùng cấp độ gạch nối tại nhóm ${heading.substring(0,2)}.${heading.substring(2,4)}: Cấp 1 gạch [-] đối chiếu công năng chính, cấp 2 gạch [-- ${sub6.substring(0,4)}.${sub6.substring(4,6)}] xác định thông số kỹ thuật, cấp 3/4 gạch áp mã 8 số ${priCode} (${bestItem.vn || ''}).`;
+                            }
+
+                            const hypoText = assumptions.length > 0 ? ` Căn cứ giả định kỹ thuật (${assumptions.join('; ')}). Nếu thông số thực tế thay đổi, áp dụng mã dự phòng ${altCode}.` : ` Đầy đủ thông số định thuế; mã dự phòng đối chiếu: ${altCode}.`;
+                            wcoCitation = `${exclusionText}${dashText}${hypoText}`;
+                        }
                     }
                 }
 
-                if (hasExistingResultCols) {
-                    const targetLen = Math.max(r.length, colWco + 1);
-                    const newR = [...r];
-                    while (newR.length < targetLen) newR.push("");
-                    newR[colHsPri] = priCode;
-                    newR[colHsAlt] = altCode;
-                    newR[colRevName] = revisedName;
-                    newR[colWco] = wcoCitation;
-                    updatedRows.push(newR);
-                } else {
-                    updatedRows.push([
-                        ...r,
-                        priCode,
-                        altCode,
-                        revisedName,
-                        wcoCitation
-                    ]);
-                }
+                resultItems.push({
+                    stt: sttVal,
+                    part_no: partNoVal,
+                    name: combinedName,
+                    orig_hs: origHsVal,
+                    hs_pri: priCode,
+                    hs_alt: altCode,
+                    revised_name: revisedName,
+                    wco_reason: wcoCitation
+                });
 
                 previewItems.push({
-                    row: i + 1,
+                    row: rowSeq,
                     raw_text: combinedName.length > 120 ? combinedName.substring(0, 117) + '...' : combinedName,
                     hs_code_pri: priCode,
                     hs_code_alt: altCode,
-                    mfn: bestItem.mfn || '0%',
-                    vat: bestItem.vat || '8%',
+                    mfn: mfnRate,
+                    vat: vatRate,
                     revised_name: revisedName,
-                    vn_desc: bestItem.vn || '',
+                    vn_desc: itemVnDesc,
                     wco_citation: wcoCitation
                 });
             }
 
-            const newWs = XLSX.utils.aoa_to_sheet(updatedRows);
-            newWs['!cols'] = [
-                { wch: 8 },
-                { wch: 18 },
-                { wch: 46 },
-                { wch: 14 },
-                { wch: 24 },
-                { wch: 24 },
-                { wch: 46 },
-                { wch: 52 }
-            ];
-            const newWb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(newWb, newWs, "HS_Code_KetQua");
-            
-            const wbout = XLSX.write(newWb, { bookType: 'xlsx', type: 'base64' });
+            if (progressLabel) progressLabel.innerText = "Đang áp dụng giao diện ExcelJS chuyên nghiệp và đóng gói tệp kết quả...";
+
+            // Tạo file Excel chuẩn giao diện FORM EXCEL.xlsx bằng ExcelJS
+            const styledResult = await buildStyledExcelJSWorkbook(resultItems, "DANH_MUC_HANG_HOA");
 
             const outFilename = selectedExcelFile.name.replace(/\.[^/.]+$/, "") + "_HS_Code_KetQua.xlsx";
             const batchResult = {
@@ -11830,7 +12088,8 @@ Trường hợp đủ thông tin:
                 filename: outFilename,
                 total_rows: previewItems.length,
                 preview_items: previewItems,
-                file_b64: wbout
+                blob: styledResult.blob,
+                file_b64: styledResult.b64
             };
 
             currentBatchResult = batchResult;
@@ -11848,43 +12107,42 @@ Trường hợp đủ thông tin:
             }, 300);
         }
 
-        function downloadExcelTemplate(event) {
+
+        async function downloadExcelTemplate(event) {
             if (event) event.preventDefault();
 
-            // Client-side SheetJS template download (Instant & 100% Netlify compatible)
-            if (window.XLSX) {
-                try {
-                    const headers = ["STT", "Tên Hàng Hóa / Mô Tả Kỹ Thuật (Bắt buộc)", "Model / Ký Hiệu", "Chất Liệu / Cấu Tạo", "Công Dụng / Mục Đích Sử Dụng", "Thông Số Kỹ Thuật Định Lượng"];
-                    const sampleRows = [
-                        [1, "Công tắc điện dùng trong nhà/công nghiệp", "SWITCH-220V-10A", "Nhựa PC/ABS, tiếp điểm hợp kim đồng", "Dùng để bật/tắt thiết bị điện sinh hoạt và công nghiệp", "Điện áp 220V, dòng định mức 10A (dưới 16A), tần số 50/60Hz"],
-                        [2, "Thanh trượt dẫn hướng cơ học có lắp ổ bi", "SSR25XW", "Thép hợp kim tôi cứng, có rãnh bi tuần hoàn", "Dẫn hướng chuyển động tịnh tiến cho cụm trục máy CNC", "Chiều dài ray 500mm, cơ cấu bi trượt tuyến tính"],
-                        [3, "Van điện từ đóng mở khí nén 24VDC", "VT307-5DZ-02", "Thân hợp kim nhôm, gioăng cao su NBR", "Điều khiển lưu lượng khí nén đóng mở xi lanh", "Điện áp cuộn coil 24V DC, áp suất làm việc 0.1 - 0.9 MPa"],
-                        [4, "Tấm đệm cao su giảm chấn giảm rung", "PAD-RUB-80", "Cao su lưu hóa kết hợp sợi dệt", "Lót chân đế máy tiện, máy dập giảm rung", "Kích thước 150x150x20mm, độ cứng 70 Shore A"],
-                        [5, "Bu lông lục giác chìm bằng inox", "M8X30-SUS304", "Thép không gỉ austenit (Inox SUS304)", "Liên kết bu-lông đai ốc cố định khung máy", "Đường kính ren M8, chiều dài thân 30mm"]
-                    ];
-                    
-                    const ws = XLSX.utils.aoa_to_sheet([headers, ...sampleRows]);
-                    ws['!cols'] = [
-                        { wch: 6 },
-                        { wch: 45 },
-                        { wch: 20 },
-                        { wch: 35 },
-                        { wch: 40 },
-                        { wch: 40 }
-                    ];
+            // Tải mẫu FORM EXCEL chuẩn đẹp 8 cột
+            const sampleRows = [
+                { stt: 1, part_no: "48A20029016", name: "Lưỡi cắt bằng thép hợp kim - KT 40x30x10mm (phụ tùng thay thế của máy cắt dập kim loại) hàng mới 100%", orig_hs: "82089000", hs_pri: "", hs_alt: "", revised_name: "", wco_reason: "" },
+                { stt: 2, part_no: "48AC80E506", name: "Thanh trượt bằng thép có ổ bi dẫn hướng - KT 30x10x250mm (phụ tùng máy dập kim loại) hàng mới 100%", orig_hs: "84821000", hs_pri: "", hs_alt: "", revised_name: "", wco_reason: "" },
+                { stt: 3, part_no: "HEX-M12-50", name: "Bu lông thép carbon lục giác có ren suốt, kích thước M12x50mm, cấp bền 8.8, dùng liên kết khung cơ khí, hàng mới 100%", orig_hs: "73181510", hs_pri: "", hs_alt: "", revised_name: "", wco_reason: "" },
+                { stt: 4, part_no: "PBS-10A", name: "Công tắc chuyển mạch điện 220V dòng điện 10A (< 16A), nút bấm điều khiển nguồn máy dập, hàng mới 100%", orig_hs: "85365096", hs_pri: "", hs_alt: "", revised_name: "", wco_reason: "" },
+                { stt: 5, part_no: "BV-DN25-BRASS", name: "Van bi tay gạt bằng đồng thau, đường kính danh định DN25 (1 inch), áp lực PN16, dùng đóng mở nước đường ống, hàng mới 100%", orig_hs: "84818061", hs_pri: "", hs_alt: "", revised_name: "", wco_reason: "" }
+            ];
 
-                    const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, "Mau_Nhap_HS_Code");
-                    XLSX.writeFile(wb, "Mau_Nhap_Lieu_HS_Code.xlsx");
-                    return;
-                } catch (e) {
-                    console.warn("Client-side template generation fallback:", e);
-                }
+            for (let i = 6; i <= 50; i++) {
+                sampleRows.push({ stt: i, part_no: "", name: "", orig_hs: "", hs_pri: "", hs_alt: "", revised_name: "", wco_reason: "" });
             }
 
-            const isFileProto = window.location.protocol === 'file:';
-            const apiBase = isFileProto ? 'http://127.0.0.1:8080' : '';
-            window.location.href = `${apiBase}/api/download_excel_template`;
+            try {
+                const res = await buildStyledExcelJSWorkbook(sampleRows, "DANH_MUC_HANG_HOA");
+                const blob = res.blob || new Blob([atob(res.b64)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = "FORM_EXCEL_MAU_TRA_CUU_HS_CODE.xlsx";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (err) {
+                console.warn("Client-side template generation fallback to static file:", err);
+                const isFileProto = window.location.protocol === 'file:';
+                const apiBase = isFileProto ? 'http://127.0.0.1:8080' : '';
+                window.location.href = `${apiBase}/FORM_EXCEL.xlsx`;
+            }
+        }
+
+        async function downloadSampleExcelTemplate() {
+            await downloadExcelTemplate();
         }
 
         function renderBatchResults(data) {

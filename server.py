@@ -885,7 +885,29 @@ def audit_statutory_constraints(code, head, item_desc, sub_desc, decomp, full_te
         if head in NOTE_2B_PARTS_HEADINGS or head[:2] in ['84', '85']:
             return True, -5000, f"Vi phạm Chú giải 1(k) Phần XVI: Dụng cụ và lưỡi cắt thuộc Chương 82 loại trừ khỏi Phần XVI"
 
-    # C2. Luật phân tầng Chú giải 1(g) Phần XVI (Sản phẩm plastic loại trừ khỏi Phần XVI)
+        # D. Quy tắc 6 (GRI 6): Phân nhánh cơ chế vận hành theo gạch nối (Hoạt động bằng điện vs Không hoạt động bằng điện)
+    is_electric_query = (
+        bool(re.search(r'\b(?:hoat\s+dong\s+bang\s+dien|chay\s+bang\s+dien|chay\s+dien|bang\s+dien|electrically\s+operated|electric|motor\s+driven)\b', full_text_norm)) or
+        bool(re.search(r'\b(?:\d+\s*(?:v|vac|vdc|w|kw|hp|kva|ampe|a)\b)', full_text_norm))
+    ) and not bool(re.search(r'\b(?:khong\s+(?:hoat\s+dong\s+bang\s+)?dien|khong\s+chay\s+dien|khong\s+dung\s+dien|bang\s+tay|thu\s+cong|manual|not\s+electrically)\b', full_text_norm))
+
+    is_non_electric_query = bool(re.search(r'\b(?:khong\s+(?:hoat\s+dong\s+bang\s+)?dien|khong\s+chay\s+dien|khong\s+dung\s+dien|bang\s+tay|thu\s+cong|manual|hand\s+operated|not\s+electrically)\b', full_text_norm))
+
+    is_electric_line = bool(re.search(r'\b(?:hoat\s+dong\s+bang\s+dien|electrically\s+operated)\b', item_norm)) and not bool(re.search(r'\b(?:khong\s+hoat\s+dong\s+bang\s+dien|not\s+electrically\s+operated)\b', item_norm))
+    is_non_electric_line = bool(re.search(r'\b(?:khong\s+hoat\s+dong\s+bang\s+dien|not\s+electrically\s+operated)\b', item_norm))
+
+    if is_electric_query:
+        if is_non_electric_line:
+            return True, -9000, "Vi phạm GRI 6: Hàng hóa hoạt động bằng điện, loại trừ phân nhánh không hoạt động bằng điện"
+        if is_electric_line:
+            return False, 3000, "Khớp cấp độ gạch nối GRI 6: Hoạt động bằng điện"
+    elif is_non_electric_query:
+        if is_electric_line:
+            return True, -9000, "Vi phạm GRI 6: Hàng hóa không hoạt động bằng điện, loại trừ phân nhánh hoạt động bằng điện"
+        if is_non_electric_line:
+            return False, 3000, "Khớp cấp độ gạch nối GRI 6: Không hoạt động bằng điện"
+
+# C2. Luật phân tầng Chú giải 1(g) Phần XVI (Sản phẩm plastic loại trừ khỏi Phần XVI)
     is_plastic = any(m[0] == 'plastic' for m in decomp.get('materials', []))
     if is_plastic and (head in NOTE_2B_PARTS_HEADINGS or head in ['8466', '8487'] or (head[:2] in ['84', '85'] and head not in NOTE_2A_HEADINGS)):
         return True, -5000, "Vi phạm Chú giải 1(g) Phần XVI: Sản phẩm cấu tạo từ plastic (nhựa) thuộc Chương 39 (Nhóm 39.26), loại trừ khỏi nhóm bộ phận máy móc Phần XVI"
@@ -2425,7 +2447,9 @@ BẮT BUỘC TUÂN THỦ NGUYÊN TẮC PHÁP LÝ HẢI QUAN THEO 6 QUY TẮC GRI
 8. QUY TẮC PHÂN LOẠI VÚ TRA MỠ / VÚ BƠM MỠ BÒ (GREASING NIPPLES / GREASE FITTINGS / ZERK FITTINGS):
    - Căn cứ Chú giải chi tiết WCO Nhóm 84.87 (HQKV8 Trang 214194) và Chú giải loại trừ Nhóm 84.81 (HQKV8 Trang 212255), vú tra mỡ / vú bơm mỡ bò không tự động là bộ phận cơ khí máy móc BẮT BUỘC phân loại vào Nhóm 84.87, mã số chi tiết 8487.90.00 (Thuế MFN: 0%, VAT: 8%).
    - TUYỆT ĐỐI KHÔNG phân loại vào Nhóm 73.18 (bu lông ốc vít), 73.07 (phụ kiện nối ống), 73.26 hay 84.81 (van).
-9. QUY TẮC RÀNG BUỘC MÃ TỪ BIỂU THUẾ VIỆT NAM 2026:
+9. QUY TẮC PHÂN LOẠI THIẾT BỊ PHUN/RỬA/LÀM SẠCH (NHÓM 84.24 - GRI 6 GẠCH NỐI):
+   - Thiết bị thuộc nhóm 84.24 (máy rửa công nghiệp, máy làm sạch linh kiện, thiết bị phun xịt...) hoạt động bằng điện (dùng động cơ điện, motor điện, cắm điện, có công suất điện W/kW, điện áp V) BẮT BUỘC chọn nhánh 3 gạch "- - - Hoạt động bằng điện", mã 8424.89.50. TUYỆT ĐỐI CẤM chọn mã 8424.89.90 ("- - - - Không hoạt động bằng điện")!
+10. QUY TẮC RÀNG BUỘC MÃ TỪ BIỂU THUẾ VIỆT NAM 2026:
    - BẮT BUỘC CHỌN 01 MÃ HS 8 CHỮ SỐ TRONG DANH SÁCH ỨNG VIÊN ĐÃ ĐƯỢC RÀ SOÁT TỪ BIỂU THUẾ VIỆT NAM 2026 TRÊN ĐÂY (trừ khi có căn cứ pháp lý chỉ ra mã khác chính xác hơn). TUYỆT ĐỐI KHÔNG TỰ BỊA MÃ 8 SỐ KHÔNG TỒN TẠI TRONG BIỂU THUẾ VIỆT NAM.
    - Trong mục "explanatory_notes": Trích dẫn trung thực các đoạn văn Chú giải HS 2022 WCO ở trên kèm trang tham chiếu.
    - Trong mục "exclusions": Bắt buộc giải thích rõ lý do pháp lý loại trừ từng mã ứng viên đối thủ còn lại.
@@ -2715,6 +2739,18 @@ def run_automation_workflow(name, desc, use, specs="", model_en="", image_b64=No
                 if matched:
                     best_item = matched
                     print(f"Gemini proposed statutory code {matched.get('c')} ({matched.get('vn')}) verified & adopted.")
+                
+                # Post-Audit Gatekeeper for 8424.89
+                full_text_check = f"{name} {desc} {use} {specs} {model_en}".lower()
+                is_elec = bool(re.search(r'\b(?:hoat\s+dong\s+bang\s+dien|chay\s+dien|dung\s+dien|dong\s+co\s+dien|motor\s+dien|dien\s+ap|\d+\s*(?:v|kw|w|kva|hz))\b', full_text_check))
+                is_non_elec = bool(re.search(r'\b(?:khong\s+hoat\s+dong\s+bang\s+dien|khong\s+dung\s+dien|chay\s+co|chay\s+bang\s+tay|khi\s+nen|dong\s+co\s+xang|dong\s+co\s+diesel)\b', full_text_check))
+                b_code = best_item.get('c', '').replace('.', '')
+                if b_code.startswith('842489'):
+                    if is_elec and not is_non_elec and b_code == '84248990':
+                        best_item = next((item for item in HS_DATABASE if item.get('c', '').replace('.', '') == '84248950'), best_item)
+                        print("Post-Audit Gatekeeper auto-corrected 8424.89.90 -> 8424.89.50")
+                    elif is_non_elec and b_code == '84248950':
+                        best_item = next((item for item in HS_DATABASE if item.get('c', '').replace('.', '') == '84248990'), best_item)
         except Exception as e:
             print("Gemini integration fallback:", e)
 
@@ -3173,117 +3209,112 @@ def process_excel_batch(file_bytes, filename="danh_sach_hang.xlsx", target_col_i
         import xlrd
         wb_old = xlrd.open_workbook(file_contents=file_bytes)
         ws_old = wb_old.sheet_by_index(0)
-        wb = openpyxl.Workbook()
-        ws = wb.active
-        ws.title = ws_old.name
+        in_rows = []
         for r_idx in range(ws_old.nrows):
-            for c_idx in range(ws_old.ncols):
-                ws.cell(row=r_idx + 1, column=c_idx + 1, value=ws_old.cell_value(r_idx, c_idx))
+            in_rows.append([ws_old.cell_value(r_idx, c_idx) for c_idx in range(ws_old.ncols)])
     else:
-        wb = openpyxl.load_workbook(io.BytesIO(file_bytes))
-        ws = wb.active
-    
-    max_col = ws.max_column
-    max_row = ws.max_row
-    
-    # 1. Detect header row across first 20 rows
+        wb_in = openpyxl.load_workbook(io.BytesIO(file_bytes), data_only=True)
+        ws_in = wb_in.active
+        in_rows = []
+        for r in range(1, ws_in.max_row + 1):
+            in_rows.append([ws_in.cell(row=r, column=c).value for c in range(1, ws_in.max_column + 1)])
+
+    if not in_rows or len(in_rows) <= 1:
+        raise ValueError("Tệp Excel không chứa dữ liệu hoặc chỉ có dòng tiêu đề!")
+
+    # 1. Nhận diện dòng header
     header_keywords = [
         'stt', 'no', 'order', 'invoice', 'ma hang', 'mã hàng', 'part', 'part no', 'part number',
-        'ten hang', 'tên hàng', 'description', 'ten tieng anh', 'tên tiếng anh', 'ten tieng viet',
-        'tên tiếng việt', 'mo ta', 'mô tả', 'quy cach', 'quy cách', 'thong so', 'thông số',
+        'ten hang', 'tên hàng', 'description', 'description of goods', 'ten tieng anh', 'tên tiếng anh',
+        'ten tieng viet', 'tên tiếng việt', 'mo ta', 'mô tả', 'quy cach', 'quy cách', 'thong so', 'thông số',
         'specs', 'specification', 'don gia', 'so luong', 'thanh tien', 'to khai', 'linh kien',
-        'nhom 1', 'nhom 2', 'chat lieu', 'dvt', 'unit', 'hs code'
+        'nhom 1', 'nhom 2', 'chat lieu', 'dvt', 'unit', 'hs code', 'hs code supplier', 'supplier hs'
     ]
-    
-    header_row = 1
-    max_matches = 0
-    for r in range(1, min(max_row + 1, 21)):
-        matches = 0
-        for c in range(1, max_col + 1):
-            val = remove_accents(str(ws.cell(row=r, column=c).value or '').lower())
-            if any(k in val for k in header_keywords):
-                matches += 1
-        if matches > max_matches:
-            max_matches = matches
-            header_row = r
-            
-    if max_matches < 2:
-        header_row = 1
 
-    # 2. Map column roles
-    ignore_kws = ['stt', 'order', 'invoice', 'to khai', 'loai hinh', 'phan luong', 'so luong', 'qty', 'don gia', 'price', 'thanh tien', 'amount', 'dvt', 'unit', 'uom', 'pic', 'check', 'nguoi dat', 'hs code', 'ma hs', 'ngay', 'date']
-    name_en_kws = ['tieng anh', 'english', 'item name', 'goods description', '(en)', 'product name en']
-    desc_kws = ['xuat nhap khau', 'mo ta', 'mô tả', 'description', 'ghi chu', 'note', 'thong tin dac biet']
-    name_vn_kws = ['ten tieng viet', 'tên tiếng việt', 'ten vat pham', 'tên vật phẩm', 'linh kien', 'phu tung', 'nhom 1', 'nhom 2', 'ten hang', 'tên hàng', 'ten sp', 'tên sản phẩm']
-    model_kws = ['ma hang', 'mã hàng', 'part no', 'part number', 'part_no', 'model', 'ky hieu', 'sku', 'code']
-    specs_kws = ['quy cach', 'quy cách', 'thong so', 'thông số', 'specs', 'specification', 'kich thuoc', 'size', 'chat lieu', 'material']
-    use_kws = ['cong dung', 'chuc nang', 'ung dung', 'dung cho', 'function', 'purpose']
+    header_row_idx = 0
+    for r_idx in range(min(len(in_rows), 10)):
+        row = in_rows[r_idx]
+        if not row or not any(row): continue
+        non_empty = [str(c).strip() for c in row if c is not None and str(c).strip()]
+        if not non_empty: continue
+        avg_len = sum(len(c) for c in non_empty) / len(non_empty)
+        matches = sum(1 for cell in non_empty if any(k in remove_accents(cell.lower()) for k in header_keywords))
+        if matches >= 2 and avg_len < 40:
+            header_row_idx = r_idx
+            break
 
-    # 2. Check if the 4 standard result columns already exist
-    col_hs_pri = None
-    col_hs_alt = None
-    col_rev_name = None
-    col_wco = None
+    header_row = in_rows[header_row_idx] if header_row_idx < len(in_rows) else in_rows[0]
 
-    for c in range(1, max_col + 1):
-        val_norm = remove_accents(str(ws.cell(row=header_row, column=c).value or '').lower())
-        if 'uu tien' in val_norm or ('de xuat' in val_norm and 'hs' in val_norm):
-            col_hs_pri = c
-        elif 'du phong' in val_norm:
-            col_hs_alt = c
-        elif 'sua doi' in val_norm or 'chuan hoa' in val_norm or ('phu hop' in val_norm and 'hs' in val_norm):
-            col_rev_name = c
-        elif 'can cu phap ly' in val_norm or 'wco' in val_norm or 'chu giai' in val_norm:
-            col_wco = c
-
-    has_existing_result_cols = (col_hs_pri is not None)
-    if not has_existing_result_cols:
-        col_hs_pri = max_col + 1
-        col_hs_alt = max_col + 2
-        col_rev_name = max_col + 3
-        col_wco = max_col + 4
-    else:
-        if not col_hs_alt: col_hs_alt = col_hs_pri + 1
-        if not col_rev_name: col_rev_name = col_hs_alt + 1
-        if not col_wco: col_wco = col_rev_name + 1
-
-    result_cols = {col_hs_pri, col_hs_alt, col_rev_name, col_wco}
-
+    # 2. Map vai trò của từng cột
     col_roles = {}
-    for c in range(1, max_col + 1):
-        if c in result_cols:
-            col_roles[c] = 'ignore'
-            continue
-        val = remove_accents(str(ws.cell(row=header_row, column=c).value or '').lower().strip())
-        if not val: continue
-        if any(k in val for k in ignore_kws): col_roles[c] = 'ignore'
-        elif any(k in val for k in name_en_kws): col_roles[c] = 'name_en'
-        elif any(k in val for k in desc_kws): col_roles[c] = 'desc'
-        elif any(k in val for k in name_vn_kws): col_roles[c] = 'name_vn'
-        elif any(k in val for k in model_kws): col_roles[c] = 'model'
-        elif any(k in val for k in specs_kws): col_roles[c] = 'specs'
-        elif any(k in val for k in use_kws): col_roles[c] = 'use'
-        else: col_roles[c] = 'desc'
+    stt_col = None
+    part_col = None
+    hs_col = None
+    name_vn_col = None
+    name_en_col = None
 
-    # Fallback if no explicit name col among input columns
-    if not any(r in ['name_vn', 'name_en'] for r in col_roles.values()):
-        best_c = 1
-        max_avg_len = 0
-        for c in range(1, max_col + 1):
-            if c in result_cols or col_roles.get(c) == 'ignore': continue
-            lens = [len(str(ws.cell(row=r, column=c).value or '').strip()) for r in range(header_row + 1, min(max_row + 1, header_row + 10))]
-            avg_l = sum(lens) / len(lens) if lens else 0
-            if avg_l > max_avg_len:
-                max_avg_len = avg_l
-                best_c = c
-        if best_c not in result_cols:
-            col_roles[best_c] = 'name_vn'
+    for c_idx, cell in enumerate(header_row):
+        val = remove_accents(str(cell or '').lower().strip())
+        if not val:
+            continue
+        if any(k in val for k in ['hs code supplier', 'supplier hs', 'ma hs', 'hs code', 'hs goc']):
+            col_roles[c_idx] = 'supplier_hs'
+            if hs_col is None: hs_col = c_idx
+        elif any(k in val for k in ['stt', 'no.', 'order']) or val == 'no':
+            col_roles[c_idx] = 'stt'
+            if stt_col is None: stt_col = c_idx
+        elif any(k in val for k in ['ma hang', 'mã hàng', 'part no', 'part number', 'part_no', 'model', 'sku', 'item code']):
+            col_roles[c_idx] = 'part_no'
+            if part_col is None: part_col = c_idx
+        elif any(k in val for k in ['description of goods', 'goods description', 'ten tieng anh', 'english', 'item name']):
+            col_roles[c_idx] = 'name_en'
+            if name_en_col is None: name_en_col = c_idx
+        elif any(k in val for k in ['ten tieng viet', 'tên tiếng việt', 'ten vat pham', 'ten hang', 'tên hàng', 'ten sp', 'tên sản phẩm']):
+            col_roles[c_idx] = 'name_vn'
+            if name_vn_col is None: name_vn_col = c_idx
+        elif any(k in val for k in ['quy cach', 'quy cách', 'thong so', 'thông số', 'specs', 'specification', 'kich thuoc', 'chat lieu']):
+            col_roles[c_idx] = 'specs'
+        elif any(k in val for k in ['cong dung', 'chuc nang', 'ung dung', 'dung cho', 'function', 'purpose']):
+            col_roles[c_idx] = 'use'
+        elif any(k in val for k in ['mo ta', 'mô tả', 'description', 'ghi chu', 'note']):
+            col_roles[c_idx] = 'desc'
+
+    # Fallback cho file FORM EXCEL tiêu chuẩn (4 cột đầu: STT, Mã hàng, Tên hàng, Mã HS)
+    if len(header_row) >= 4 and stt_col is None and part_col is None and name_vn_col is None:
+        stt_col = 0
+        part_col = 1
+        name_vn_col = 2
+        hs_col = 3
+
+    # 3. Tạo Workbook chuẩn FORM EXCEL.xlsx
+    out_wb = openpyxl.Workbook()
+    out_ws = out_wb.active
+    out_ws.title = "DANH_MUC_HANG_HOA"
+    out_ws.views.sheetView[0].showGridLines = True
+
+    headers = [
+        "STT",
+        "Mã hàng",
+        "Tên hàng (mô tả chi tiết)\n[Tên hàng + Kích thước/thông số + Công dụng]",
+        "Mã HS\n(Nếu có)",
+        "Mã HS Code Ưu Tiên (8 số)\n(GRI 1 -> GRI 6)",
+        "Mã HS Code Dự Phòng (8 số)\n(Theo Giả Định Định Thuế)",
+        "Tên Hàng Sửa Đổi Phù Hợp HS Code\n(Chuẩn hóa theo WCO)",
+        "Căn Cứ Pháp Lý WCO 2022\n(Trích dẫn Chú giải & Quy tắc GRI)"
+    ]
+
+    col_widths = [8, 18, 46, 14, 24, 24, 46, 52]
+    for idx, w in enumerate(col_widths, 1):
+        col_letter = get_column_letter(idx)
+        out_ws.column_dimensions[col_letter].width = w
+
+    out_ws.row_dimensions[1].height = 42.0
 
     header_blue_fill = PatternFill(start_color="1E40AF", end_color="1E40AF", fill_type="solid")
     header_green_fill = PatternFill(start_color="047857", end_color="047857", fill_type="solid")
     header_font = Font(name="Calibri", size=11, bold=True, color="FFFFFF")
     header_align = Alignment(horizontal="center", vertical="center", wrap_text=True)
-    
+
     thin_border = Border(
         left=Side(style='thin', color='CBD5E1'),
         right=Side(style='thin', color='CBD5E1'),
@@ -3291,48 +3322,39 @@ def process_excel_batch(file_bytes, filename="danh_sach_hang.xlsx", target_col_i
         bottom=Side(style='thin', color='CBD5E1')
     )
 
-    # Style input columns header with blue fill
-    for c in range(1, max_col + 1):
-        if c not in result_cols:
-            c_hdr = ws.cell(row=header_row, column=c)
-            c_hdr.fill = header_blue_fill
-            c_hdr.font = header_font
-            c_hdr.alignment = header_align
-            c_hdr.border = thin_border
-
-    c1 = ws.cell(row=header_row, column=col_hs_pri, value="Mã HS Code Ưu Tiên (8 số)")
-    c2 = ws.cell(row=header_row, column=col_hs_alt, value="Mã HS Code Dự Phòng (8 số)")
-    c3 = ws.cell(row=header_row, column=col_rev_name, value="Tên Hàng Sửa Đổi Phù Hợp HS Code")
-    c4 = ws.cell(row=header_row, column=col_wco, value="Căn Cứ Pháp Lý WCO 2022")
-
-    for c_cell in [c1, c2, c3, c4]:
-        c_cell.fill = header_green_fill
+    for c_idx, h_text in enumerate(headers, 1):
+        c_cell = out_ws.cell(row=1, column=c_idx, value=h_text)
         c_cell.font = header_font
         c_cell.alignment = header_align
+        c_cell.fill = header_blue_fill if c_idx <= 4 else header_green_fill
         c_cell.border = thin_border
-
-    hs_pri_font = Font(name="Calibri", size=11, bold=True, color="047857")
-    hs_alt_font = Font(name="Calibri", size=11, bold=True, color="B45309")
-    hs_align = Alignment(horizontal="center", vertical="center")
-    text_align = Alignment(horizontal="left", vertical="center", wrap_text=True)
 
     preview_items = []
     processed_count = 0
     skip_phrases = ['may moc thiet bi nguyen bo', 'thiet bi neu co', 'vui long dien', 'huong dan', 'qui cach neu co', 'note:']
 
-    for r in range(header_row + 1, max_row + 1):
-        row_vals = [ws.cell(row=r, column=c).value for c in range(1, max_col + 1)]
-        if not any(row_vals): continue
-        row_str = ' '.join(str(v) for v in row_vals if v is not None)
+    out_row_idx = 2
+    for r_idx in range(header_row_idx + 1, len(in_rows)):
+        row = in_rows[r_idx]
+        if not row or not any(row):
+            continue
+
+        row_str = ' '.join(str(v) for v in row if v is not None)
         row_norm = remove_accents(row_str.lower())
-        if any(p in row_norm for p in skip_phrases): continue
+        if any(p in row_norm for p in skip_phrases):
+            continue
+
+        stt_val = str(row[stt_col]).strip() if stt_col is not None and stt_col < len(row) and row[stt_col] is not None else str(out_row_idx - 1)
+        part_no_val = str(row[part_col]).strip() if part_col is not None and part_col < len(row) and row[part_col] is not None else ""
+        orig_hs_val = str(row[hs_col]).strip() if hs_col is not None and hs_col < len(row) and row[hs_col] is not None else ""
 
         vn_names, en_names, models, specs_list, use_list, desc_list = [], [], [], [], [], []
-        for c in range(1, max_col + 1):
-            val = ws.cell(row=r, column=c).value
-            if val is None or str(val).strip() == '': continue
-            role = col_roles.get(c, 'desc')
-            if role == 'ignore': continue
+        for c_idx, val in enumerate(row):
+            if val is None or str(val).strip() == '':
+                continue
+            role = col_roles.get(c_idx, 'desc')
+            if role in ['stt', 'supplier_hs']:
+                continue
 
             ent = clean_customs_entity_py(val)
             if ent['specs']: specs_list.append(ent['specs'])
@@ -3340,7 +3362,7 @@ def process_excel_batch(file_bytes, filename="danh_sach_hang.xlsx", target_col_i
 
             if role == 'name_vn': vn_names.append(ent['name'])
             elif role == 'name_en': en_names.append(ent['name'])
-            elif role == 'model': models.append(ent['name'])
+            elif role == 'part_no': models.append(ent['name'])
             elif role == 'specs': specs_list.append(ent['name'])
             elif role == 'use': use_list.append(ent['name'])
             else: desc_list.append(ent['name'])
@@ -3356,11 +3378,13 @@ def process_excel_batch(file_bytes, filename="danh_sach_hang.xlsx", target_col_i
         if not combined_name or len(combined_name.strip()) < 2 or combined_name.strip().isdigit():
             continue
 
-        model_str = models[0] if models else ''
+        if not part_no_val and models:
+            part_no_val = models[0]
+
+        model_str = part_no_val or (models[0] if models else '')
         specs_str = ' '.join(specs_list)
         use_str = ' '.join(use_list)
         desc_str = ' '.join(desc_list)
-        full_query = f"{combined_name} {desc_str} {use_str} {specs_str} {model_str}".strip()
 
         best_item, comp, top, decomp = classify_product_python(combined_name, desc=desc_str, use=use_str, specs=specs_str, model_en=model_str)
 
@@ -3395,24 +3419,38 @@ def process_excel_batch(file_bytes, filename="danh_sach_hang.xlsx", target_col_i
             revised_name = f"{combined_name} ({item_vn})" if item_vn and item_vn.lower() not in combined_name.lower() else combined_name
             wco_citation = best_item.get('_statutory_reasoning') or f"Áp dụng GRI 1, Chú giải {chapter} ({chap_title}) & GRI 6 phân nhóm {code_fmt}: {best_item.get('lin', head_desc)}"
 
-        ws.cell(row=r, column=col_hs_pri, value=code_fmt).font = hs_pri_font
-        ws.cell(row=r, column=col_hs_pri).alignment = hs_align
-        ws.cell(row=r, column=col_hs_pri).border = thin_border
+        # Ghi vào out_ws theo đúng 8 cột chuẩn
+        out_ws.row_dimensions[out_row_idx].height = 32.0
+        row_cells = [
+            (1, stt_val),
+            (2, part_no_val),
+            (3, combined_name),
+            (4, orig_hs_val),
+            (5, code_fmt),
+            (6, alt_fmt),
+            (7, revised_name),
+            (8, wco_citation)
+        ]
 
-        ws.cell(row=r, column=col_hs_alt, value=alt_fmt).font = hs_alt_font
-        ws.cell(row=r, column=col_hs_alt).alignment = hs_align
-        ws.cell(row=r, column=col_hs_alt).border = thin_border
-
-        ws.cell(row=r, column=col_rev_name, value=revised_name).alignment = text_align
-        ws.cell(row=r, column=col_rev_name).border = thin_border
-
-        ws.cell(row=r, column=col_wco, value=wco_citation).alignment = text_align
-        ws.cell(row=r, column=col_wco).border = thin_border
+        for col_i, val_i in row_cells:
+            cell = out_ws.cell(row=out_row_idx, column=col_i, value=val_i)
+            cell.border = thin_border
+            if col_i in (1, 2, 4, 6):
+                cell.alignment = Alignment(horizontal='center', vertical='center')
+                cell.font = Font(name='Calibri', size=11)
+            elif col_i == 5:
+                cell.alignment = Alignment(horizontal='center', vertical='center')
+                cell.font = Font(name='Calibri', size=11, bold=True, color='047857')
+            else:
+                cell.alignment = Alignment(horizontal='left', vertical='center', wrap_text=True)
+                cell.font = Font(name='Calibri', size=11)
 
         processed_count += 1
+        out_row_idx += 1
+
         if len(preview_items) < 50:
             preview_items.append({
-                "row": r,
+                "row": out_row_idx - 1,
                 "raw_text": combined_name[:120],
                 "hs_code_pri": code_fmt,
                 "hs_code_alt": alt_fmt,
@@ -3423,13 +3461,8 @@ def process_excel_batch(file_bytes, filename="danh_sach_hang.xlsx", target_col_i
                 "wco_citation": wco_citation
             })
 
-    ws.column_dimensions[get_column_letter(col_hs_pri)].width = 20
-    ws.column_dimensions[get_column_letter(col_hs_alt)].width = 20
-    ws.column_dimensions[get_column_letter(col_rev_name)].width = 45
-    ws.column_dimensions[get_column_letter(col_wco)].width = 50
-
     output_stream = io.BytesIO()
-    wb.save(output_stream)
+    out_wb.save(output_stream)
     output_stream.seek(0)
     out_b64 = base64.b64encode(output_stream.read()).decode('utf-8')
 
@@ -3442,6 +3475,7 @@ def process_excel_batch(file_bytes, filename="danh_sach_hang.xlsx", target_col_i
         "preview_items": preview_items,
         "file_b64": out_b64
     }
+
 
 class HSCoderHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
