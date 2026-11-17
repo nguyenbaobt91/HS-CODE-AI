@@ -170,40 +170,35 @@
 
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen">
-    <!-- Floating Quick-Access Tab 1: Hóa Chất (Mép Trái) -->
-    <a href="./hoa-chat/" style="top: 130px !important; z-index: 9999 !important;" class="fixed left-0 z-[9999] flex items-center gap-2 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-300 hover:from-amber-500 hover:to-orange-500 text-amber-950 font-black text-xs px-3 py-2.5 rounded-r-2xl shadow-xl border-y border-r border-amber-400 transition-all duration-200 hover:pl-4 group cursor-pointer" title="Mở Cổng Nghiệp Vụ Hóa Chất 2026 & Quét Phân Tích MSDS Tự Động">
-        <i class="fa-solid fa-flask-vial text-rose-600 text-base group-hover:rotate-12 transition-transform"></i>
-        <div class="flex flex-col text-left leading-tight">
+    <!-- Floating Quick-Access Tab 1: Hóa Chất (Mép Trái - Thông minh: Thu gọn icon trên laptop, bung chữ khi hover) -->
+    <a href="./hoa-chat/" style="top: 130px !important; z-index: 9999 !important;" class="fixed left-0 z-[9999] flex items-center gap-2 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-300 hover:from-amber-500 hover:to-orange-500 text-amber-950 font-black text-xs px-2.5 sm:px-3 py-2 rounded-r-2xl shadow-xl border-y border-r border-amber-400 transition-all duration-300 -translate-x-[calc(100%-42px)] 2xl:translate-x-0 hover:translate-x-0 group cursor-pointer" title="Mở Cổng Nghiệp Vụ Hóa Chất 2026 & Quét Phân Tích MSDS Tự Động (Rê chuột để mở rộng)">
+        <i class="fa-solid fa-flask-vial text-rose-600 text-base group-hover:rotate-12 transition-transform shrink-0 w-5 text-center"></i>
+        <div class="flex flex-col text-left leading-tight whitespace-nowrap">
             <span class="text-[10px] text-amber-900/80 font-bold uppercase tracking-wider">Cổng Tra Cứu</span>
             <span class="text-xs font-black">Hóa Chất &amp; MSDS</span>
         </div>
-        <span class="inline-flex items-center px-1.5 py-0.5 text-[8.5px] font-black uppercase rounded-full bg-rose-600 text-white animate-pulse ml-0.5">MỚI</span>
+        <span class="inline-flex items-center px-1.5 py-0.5 text-[8.5px] font-black uppercase rounded-full bg-rose-600 text-white animate-pulse ml-0.5 shrink-0">MỚI</span>
     </a>
 
-    <!-- Floating Quick-Access Tab 2: KTCN 2026 (Mép Trái - Thể hiện y chang Hóa chất, cách nhau sạch sẽ) -->
-    <a href="./chuyen-nganh/" style="top: 210px !important; z-index: 9999 !important;" class="fixed left-0 z-[9999] flex items-center gap-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-xs px-3 py-2.5 rounded-r-2xl shadow-xl border-y border-r border-blue-400/60 transition-all duration-200 hover:pl-4 group cursor-pointer" title="Mở Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026 (Nghị định 37/2026/NĐ-CP)">
-        <i class="fa-solid fa-table-columns text-yellow-300 text-base group-hover:rotate-12 transition-transform"></i>
-        <div class="flex flex-col text-left leading-tight">
+    <!-- Floating Quick-Access Tab 2: KTCN 2026 (Mép Trái - Thông minh: Thu gọn icon trên laptop, bung chữ khi hover) -->
+    <a href="./chuyen-nganh/" style="top: 195px !important; z-index: 9999 !important;" class="fixed left-0 z-[9999] flex items-center gap-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-xs px-2.5 sm:px-3 py-2 rounded-r-2xl shadow-xl border-y border-r border-blue-400/60 transition-all duration-300 -translate-x-[calc(100%-42px)] 2xl:translate-x-0 hover:translate-x-0 group cursor-pointer" title="Mở Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026 (Nghị định 37/2026/NĐ-CP - Rê chuột để mở rộng)">
+        <i class="fa-solid fa-table-columns text-yellow-300 text-base group-hover:rotate-12 transition-transform shrink-0 w-5 text-center"></i>
+        <div class="flex flex-col text-left leading-tight whitespace-nowrap">
             <span class="text-[10px] text-blue-200 font-bold uppercase tracking-wider">Cổng Tra Cứu</span>
             <span class="text-xs font-black">KTCN 4 Bộ 2026</span>
         </div>
-        <span class="inline-flex items-center px-1.5 py-0.5 text-[8.5px] font-black uppercase rounded-full bg-emerald-400 text-emerald-950 animate-pulse ml-0.5">2026</span>
+        <span class="inline-flex items-center px-1.5 py-0.5 text-[8.5px] font-black uppercase rounded-full bg-emerald-400 text-emerald-950 animate-pulse ml-0.5 shrink-0">2026</span>
     </a>
 
     <!-- Header / Navbar (Đã xóa tab Cổng Hóa Chất ở trên, giữ nguyên vẹn bố cục chuẩn) -->
     <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/90 dark:border-slate-800 shadow-sm w-full">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
-            <!-- Brand Logo -->
-            <div class="flex items-center space-x-2.5 cursor-pointer shrink-0" onclick="switchTab('propose')">
-                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-500/25">
-                    <i class="fa-solid fa-robot text-lg sm:text-xl"></i>
+            <!-- Brand Logo (Siêu Tinh Gọn: HSCoder AI) -->
+            <div class="flex items-center space-x-2 cursor-pointer shrink-0" onclick="switchTab('propose')">
+                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-500/25">
+                    <i class="fa-solid fa-robot text-base sm:text-lg"></i>
                 </div>
-                <div class="hidden sm:block">
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-lg sm:text-xl font-black bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">HSCoder AI</span>
-                        <span class="text-[10px] px-2.5 py-0.5 rounded-full font-black bg-gradient-to-r from-emerald-500 via-teal-600 to-sky-600 text-white shadow-sm uppercase tracking-wider">Bản C • AI Hybrid Toàn Năng</span>
-                    </div>
-                </div>
+                <span class="text-base sm:text-lg font-black bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent whitespace-nowrap">HSCoder AI</span>
             </div>
 
             <!-- Segmented Navigation Bar: 5 Tab Chuẩn Đẹp Của HS Code -->
@@ -230,8 +225,16 @@
                 </button>
             </nav>
 
-            <!-- Actions: Multi-Theme Switcher & AI Key Modal -->
+            <!-- Actions: Guide Modal, Multi-Theme Switcher & AI Key Modal -->
             <div class="flex items-center space-x-2 shrink-0">
+                <!-- Quick User Guide Button -->
+                <button type="button" onclick="openUserGuideModal()" 
+                        class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50 border border-amber-300 dark:border-amber-500/40 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer shrink-0" 
+                        title="Xem cẩm nang hướng dẫn sử dụng & nguyên tắc vàng điền mô tả">
+                    <i class="fa-solid fa-circle-question text-amber-500 text-sm"></i>
+                    <span class="hidden md:inline">Hướng Dẫn</span>
+                </button>
+
                 <!-- Light / Dark Mode Toggle Button -->
                 <button type="button" id="btn-theme-toggle" onclick="toggleDarkMode()" 
                         class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-amber-300 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center transition-all cursor-pointer border border-slate-200 dark:border-slate-700 shadow-sm" 
@@ -242,7 +245,7 @@
                 <button id="btn-gemini-settings" onclick="openApiKeyModal()" class="px-3 py-1.5 rounded-xl bg-purple-100 dark:bg-purple-900/40 border border-purple-300 dark:border-purple-500/50 text-purple-800 dark:text-purple-300 hover:border-purple-500 text-xs font-semibold transition-colors duration-150 flex items-center space-x-1.5 shadow-sm cursor-pointer shrink-0" title="Google Gemini AI đang hoạt động và áp dụng cho mọi phân tích (Bấm để đổi Key)">
                     <span id="gemini-status-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                     <i class="fa-solid fa-brain text-purple-600 dark:text-purple-300"></i>
-                    <span id="gemini-status-label" class="hidden sm:inline">Gemini AI: Đã Kích Hoạt</span>
+                    <span id="gemini-status-label" class="hidden lg:inline">Gemini AI</span>
                     <i class="fa-solid fa-gear text-[10px] ml-0.5 text-slate-400"></i>
                 </button>
             </div>
@@ -255,39 +258,28 @@
         <!-- TAB: AI Propose Form (Skill /hs_code_automation workflow) -->
         <div id="tab-propose" class="space-y-4">
             <!-- Build: Version C Hybrid 2026-11-10 -->
-    <!-- Executive Slim Hero Banner (Compact & High Impact) -->
-            <div class="relative overflow-hidden rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-700 text-white shadow-md shadow-blue-500/10">
-                <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div class="flex items-center gap-3">
-                        <span class="w-9 h-9 rounded-xl bg-white/20 text-white flex items-center justify-center font-bold text-base backdrop-blur-sm shrink-0 shadow-sm">
-                            <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
-                        </span>
-                        <div>
-                            <div class="flex flex-wrap items-center gap-2">
-                                <h1 class="text-base sm:text-lg font-black tracking-tight leading-snug">
-                                    Đề Xuất Mã HS Code &amp; Lập Luận Chuyên Sâu Tự Động
-                                </h1>
-                                <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/15 border border-white/20 text-white">
-                                    SOP 6 Quy Tắc GRI
-                                </span>
-                            </div>
-                            <p class="text-sky-100 text-xs mt-0.5 line-clamp-1">
-                                Tự động đối chiếu 6 Quy tắc GRI, tra cứu 1.269 Chú giải WCO 2022 và kết xuất báo cáo pháp lý chuẩn xác.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Actions: Reset on Banner -->
-                    <div class="flex items-center gap-2 shrink-0 self-end sm:self-auto">
-                        <button type="button" onclick="clearAllInputCriteria()" 
-                                class="px-3.5 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-300/40 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-md shadow-sm" 
-                                title="Xóa toàn bộ nội dung đã nhập để nhập lại mặt hàng mới">
-                            <i class="fa-solid fa-rotate-left"></i>
-                            <span>Nhập Mới</span>
-                        </button>
-                    </div>
+    <!-- Floating Dual-Tab Pills: Left Title Tab + Right Reset Action -->
+            <div class="flex items-center justify-between gap-3">
+                <!-- Left: Title Tab Pill (Góc trái riêng biệt) -->
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-700 text-white shadow-md shadow-blue-500/15">
+                    <span class="w-6 h-6 rounded-lg bg-white/20 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+                    </span>
+                    <h1 class="text-sm font-black tracking-tight leading-none">
+                        Đề Xuất Mã HS Code
+                    </h1>
+                    <span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-white/20 border border-white/25 text-white font-mono">
+                        SOP 6 Quy Tắc GRI
+                    </span>
                 </div>
+
+                <!-- Right: Nhập Mới Standalone Action Pill (Góc phải riêng biệt) -->
+                <button type="button" onclick="clearAllInputCriteria()" 
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-700 dark:text-slate-200 hover:text-rose-600 dark:hover:text-rose-400 border border-slate-200 dark:border-slate-800 hover:border-rose-300 dark:hover:border-rose-700 text-xs font-bold transition-all shadow-sm cursor-pointer group" 
+                        title="Xóa toàn bộ nội dung đã nhập để nhập lại mặt hàng mới">
+                    <i class="fa-solid fa-rotate-left text-slate-400 group-hover:text-rose-500 group-hover:-rotate-90 transition-all duration-300"></i>
+                    <span>Nhập Mới</span>
+                </button>
             </div>
 
             <!-- Standalone Executive Workspace Card -->
@@ -470,20 +462,27 @@
                         </div>
                     </div>
 
-                    <!-- Submit Action Area -->
-                    <div class="pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4">
-                        <div class="text-xs text-slate-500 dark:text-slate-400 flex items-center">
-                            <i class="fa-solid fa-shield-halved text-amber-500 mr-2 text-sm"></i>
-                            <span>Đã tích hợp đầy đủ 6 phần phân tích theo chuẩn tài liệu Docling & Biểu thuế 2026.</span>
+                    <!-- Submit Action Area: Tối Ưu Hóa Tâm Điểm Thị Giác Số 1 -->
+                    <div class="pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                        <div class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span>HSCoder AI • Chuẩn hóa 6 Quy tắc GRI, Chú giải WCO 2022 & Biểu thuế 2026</span>
                         </div>
-                        <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-                            <button type="button" onclick="clearAllInputCriteria()" class="w-full sm:w-auto px-5 py-3.5 rounded-xl bg-slate-100 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/50 text-slate-700 hover:text-rose-600 dark:text-slate-300 dark:hover:text-rose-400 border border-slate-300 dark:border-slate-700 hover:border-rose-300 font-bold text-sm transition-all flex items-center justify-center space-x-2 cursor-pointer shadow-sm" title="Xóa toàn bộ nội dung đã nhập để nhập lại mặt hàng mới">
-                                <i class="fa-solid fa-trash-can text-rose-500"></i>
-                                <span>Xóa Toàn Bộ & Nhập Mới</span>
+                        <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+                            <!-- Nút phụ: Xóa Form (nổi bật vừa phải) -->
+                            <button type="button" onclick="clearAllInputCriteria()"
+                                    class="px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-rose-500 dark:hover:bg-rose-600 text-rose-600 hover:text-white dark:text-rose-400 dark:hover:text-white border-2 border-rose-300 hover:border-rose-500 dark:border-rose-500/50 text-xs font-extrabold transition-all flex items-center gap-1.5 cursor-pointer shadow-md shadow-rose-500/10 hover:shadow-rose-500/30 shrink-0"
+                                    title="Xóa trắng các ô để nhập mặt hàng khác">
+                                <i class="fa-solid fa-trash-can text-sm"></i>
+                                <span>Xóa Form</span>
                             </button>
-                            <button id="btn-run-automation" onclick="generateAIReportFromForm()" class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-700 hover:from-sky-500 hover:to-indigo-600 text-white font-extrabold text-sm shadow-xl shadow-blue-500/25 hover:shadow-blue-500/40 transition-all flex items-center justify-center space-x-2.5 cursor-pointer">
-                                <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
-                                <span>Tự Động Phân Tích & Xuất Báo Cáo HS Code</span>
+
+                            <!-- Nút chính: Phân tích (gọn, sang) -->
+                            <button id="btn-run-automation" onclick="generateAIReportFromForm()"
+                                    class="group relative flex-1 sm:flex-initial px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-700 hover:from-sky-500 hover:via-blue-500 hover:to-indigo-600 text-white font-extrabold text-xs sm:text-[13px] flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer overflow-hidden border border-white/25 shadow-md shadow-blue-500/30 hover:shadow-lg hover:shadow-blue-500/40 active:scale-[0.98]">
+                                <span class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out pointer-events-none"></span>
+                                <i class="fa-solid fa-wand-magic-sparkles text-amber-300 text-sm group-hover:rotate-12 transition-transform"></i>
+                                <span class="whitespace-nowrap">Tự Động Phân Tích &amp; Xuất Báo Cáo HS Code</span>
                             </button>
                         </div>
                     </div>
@@ -499,38 +498,28 @@
         <!-- TAB: Batch Excel Processing -->
         <div id="tab-batch" class="hidden space-y-4">
             <!-- Build: Version C Hybrid 2026-11-10 -->
-    <!-- Executive Slim Hero Banner (Compact & Modern) -->
-            <div class="relative overflow-hidden rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 text-white shadow-md shadow-emerald-500/10">
-                <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div class="flex items-center gap-3">
-                        <span class="w-9 h-9 rounded-xl bg-white/20 text-white flex items-center justify-center font-bold text-base backdrop-blur-sm shrink-0 shadow-sm">
-                            <i class="fa-solid fa-file-excel text-emerald-200"></i>
-                        </span>
-                        <div>
-                            <div class="flex flex-wrap items-center gap-2">
-                                <h1 class="text-base sm:text-lg font-black tracking-tight leading-snug">
-                                    Tra Cứu &amp; Tự Động Điền Mã HS Code Vào File Excel
-                                </h1>
-                                <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/15 border border-white/20 text-white">
-                                    Xử Lý Hàng Loạt
-                                </span>
-                            </div>
-                            <p class="text-emerald-100 text-xs mt-0.5 line-clamp-1">
-                                Tải file Excel lên, AI tự đối chiếu WCO 2022 và bổ sung 4 cột chuẩn Hải quan bảo toàn 100% dữ liệu gốc.
-                            </p>
-                        </div>
-                    </div>
-                    <!-- Right: Download Sample Template Button -->
-                    <div class="shrink-0 self-end sm:self-auto">
-                        <button type="button" onclick="downloadSampleExcelTemplate()" 
-                                class="px-4 py-2 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white font-bold text-xs flex items-center gap-2 transition-all cursor-pointer backdrop-blur-md shadow-sm"
-                                title="Tải file Excel form mẫu chuẩn đã được tối ưu hóa theo hệ thống AI">
-                            <i class="fa-solid fa-file-arrow-down text-emerald-200 text-sm"></i>
-                            <span>Tải Mẫu Excel (.xlsx)</span>
-                        </button>
-                    </div>
+    <!-- Floating Dual-Tab Pills: Excel Hàng Loạt -->
+            <div class="flex items-center justify-between gap-3">
+                <!-- Left: Title Tab Pill -->
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 text-white shadow-md shadow-emerald-500/15">
+                    <span class="w-6 h-6 rounded-lg bg-white/20 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                        <i class="fa-solid fa-file-excel text-emerald-200"></i>
+                    </span>
+                    <h1 class="text-sm font-black tracking-tight leading-none">
+                        Điền Mã HS Vào File Excel
+                    </h1>
+                    <span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-white/20 border border-white/25 text-white font-mono">
+                        Xử Lý Hàng Loạt
+                    </span>
                 </div>
+
+                <!-- Right: Download Sample Template Button -->
+                <button type="button" onclick="downloadSampleExcelTemplate()" 
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-slate-700 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 border border-slate-200 dark:border-slate-800 hover:border-emerald-300 dark:hover:border-emerald-700 text-xs font-bold transition-all shadow-sm cursor-pointer group"
+                        title="Tải file Excel form mẫu chuẩn">
+                    <i class="fa-solid fa-file-arrow-down text-emerald-500 group-hover:translate-y-0.5 transition-transform"></i>
+                    <span>Tải Mẫu Excel</span>
+                </button>
             </div>
 
             <!-- Main Batch Workspace Card -->
@@ -701,60 +690,51 @@
         <!-- TAB 2: Tariff Tree Explorer -->
         <div id="tab-tree" class="hidden space-y-4">
             <!-- Build: Version C Hybrid 2026-11-10 -->
-    <!-- Executive Slim Hero Banner (Compact & Modern) -->
-            <div class="relative overflow-hidden rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-700 text-white shadow-md shadow-blue-500/10">
-                <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="relative z-10 space-y-2.5">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                        <div class="flex items-center gap-3">
-                            <span class="w-9 h-9 rounded-xl bg-white/20 text-white flex items-center justify-center font-bold text-base backdrop-blur-sm shrink-0 shadow-sm">
-                                <i class="fa-solid fa-sitemap text-sky-200"></i>
-                            </span>
-                            <div>
-                                <div class="flex flex-wrap items-center gap-2">
-                                    <h2 class="text-base sm:text-lg font-black tracking-tight leading-snug">
-                                        Cây Danh Mục Biểu Thuế &amp; Mã Số HS 98 Chương
-                                    </h2>
-                                    <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/15 border border-white/20 text-white">
-                                        19.800+ Dòng Hàng
-                                    </span>
-                                </div>
-                                <p class="text-sky-100 text-xs mt-0.5 line-clamp-1">
-                                    Khám phá 98 Chương, 1.227 Nhóm hàng (4 số), phân nhóm (6 số) và mức thuế suất 2026.
-                                </p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-1.5 self-start sm:self-auto shrink-0">
-                            <button onclick="expandAllTree()" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold transition-all border border-white/25 shadow-sm cursor-pointer">
-                                <i class="fa-solid fa-folder-open mr-1"></i>Mở hết
-                            </button>
-                            <button onclick="collapseAllTree()" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold transition-all border border-white/25 shadow-sm cursor-pointer">
-                                <i class="fa-solid fa-folder mr-1"></i>Thu gọn
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Filter / Search Tree -->
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
-                        <div class="relative flex-1 w-full">
-                            <input type="text" id="tree-search-input" onkeyup="handleTreeSearchInput()" placeholder="Nhập số Chương (VD: 84, 85, 39), số Nhóm (8481, 7318) hoặc từ khóa tên hàng..." 
-                                   class="w-full pl-9 pr-3 py-2 rounded-xl bg-white/15 border border-white/25 text-white placeholder-sky-200 focus:outline-none focus:ring-2 focus:ring-white text-xs sm:text-sm backdrop-blur-md transition-all">
-                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-white/70 text-sm"></i>
-                        </div>
-                    </div>
-
-                    <!-- Quick Chapter Filter Chips -->
-                    <div class="flex flex-wrap items-center gap-1.5 pt-0.5 text-xs">
-                        <span class="text-white/80 font-bold text-[11px] flex items-center mr-1">
-                            <i class="fa-solid fa-bolt text-amber-300 mr-1"></i>Lọc nhanh:
+    <!-- Floating Dual-Tab Pills: Biểu Thuế 98 Chương -->
+            <div class="space-y-3">
+                <div class="flex items-center justify-between gap-3">
+                    <!-- Left: Title Tab Pill -->
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-700 text-white shadow-md shadow-blue-500/15">
+                        <span class="w-6 h-6 rounded-lg bg-white/20 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                            <i class="fa-solid fa-sitemap text-sky-200"></i>
                         </span>
-                        <button type="button" onclick="quickFilterTree('')" class="px-2 py-0.5 rounded-lg bg-white/20 hover:bg-white/30 text-white font-bold transition-all text-[11px] cursor-pointer">Tất cả</button>
-                        <button type="button" onclick="quickFilterTree('84')" class="px-2 py-0.5 rounded-lg bg-white/20 hover:bg-white/30 text-white font-bold transition-all text-[11px] cursor-pointer">Ch.84: Máy móc</button>
-                        <button type="button" onclick="quickFilterTree('85')" class="px-2 py-0.5 rounded-lg bg-white/20 hover:bg-white/30 text-white font-bold transition-all text-[11px] cursor-pointer">Ch.85: Điện tử</button>
-                        <button type="button" onclick="quickFilterTree('39')" class="px-2 py-0.5 rounded-lg bg-white/20 hover:bg-white/30 text-white font-bold transition-all text-[11px] cursor-pointer">Ch.39: Nhựa</button>
-                        <button type="button" onclick="quickFilterTree('73')" class="px-2 py-0.5 rounded-lg bg-white/20 hover:bg-white/30 text-white font-bold transition-all text-[11px] cursor-pointer">Ch.73: Sắt thép</button>
-                        <button type="button" onclick="quickFilterTree('90')" class="px-2 py-0.5 rounded-lg bg-white/20 hover:bg-white/30 text-white font-bold transition-all text-[11px] cursor-pointer">Ch.90: Đo lường</button>
-                        <button type="button" onclick="quickFilterTree('87')" class="px-2 py-0.5 rounded-lg bg-white/20 hover:bg-white/30 text-white font-bold transition-all text-[11px] cursor-pointer">Ch.87: Xe cộ</button>
+                        <h2 class="text-sm font-black tracking-tight leading-none">
+                            Biểu Thuế 98 Chương
+                        </h2>
+                        <span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-white/20 border border-white/25 text-white font-mono">
+                            19.800+ Dòng Hàng
+                        </span>
+                    </div>
+
+                    <!-- Right: Tree Expand / Collapse Pills -->
+                    <div class="inline-flex items-center gap-1.5">
+                        <button type="button" onclick="expandAllTree()" class="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-sky-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-sky-600 dark:hover:text-sky-400 text-xs font-bold transition-all border border-slate-200 dark:border-slate-800 hover:border-sky-300 shadow-sm cursor-pointer">
+                            <i class="fa-solid fa-folder-open text-sky-500 mr-1"></i>Mở hết
+                        </button>
+                        <button type="button" onclick="collapseAllTree()" class="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition-all border border-slate-200 dark:border-slate-800 shadow-sm cursor-pointer">
+                            <i class="fa-solid fa-folder text-slate-400 mr-1"></i>Thu gọn
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Clean Search & Chapter Filter Chips Row -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <div class="relative flex-1">
+                        <input type="text" id="tree-search-input" onkeyup="handleTreeSearchInput()" placeholder="Nhập số Chương (VD: 84, 85, 39), số Nhóm (8481, 7318) hoặc từ khóa tên hàng..." 
+                               class="w-full pl-8 pr-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 text-xs shadow-sm transition-all">
+                        <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-slate-400 text-xs"></i>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-1 text-[11px] shrink-0">
+                        <span class="text-slate-500 dark:text-slate-400 font-bold text-[10px] hidden sm:inline-flex items-center mr-0.5">
+                            <i class="fa-solid fa-bolt text-amber-500 mr-1"></i>Lọc nhanh:
+                        </span>
+                        <button type="button" onclick="quickFilterTree('')" class="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold transition-all cursor-pointer shadow-sm">Tất cả</button>
+                        <button type="button" onclick="quickFilterTree('84')" class="px-2 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/50 dark:hover:bg-sky-900/50 text-sky-700 dark:text-sky-300 font-bold transition-all cursor-pointer border border-sky-200 dark:border-sky-800/40 shadow-sm">Ch.84: Máy móc</button>
+                        <button type="button" onclick="quickFilterTree('85')" class="px-2 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/50 dark:hover:bg-sky-900/50 text-sky-700 dark:text-sky-300 font-bold transition-all cursor-pointer border border-sky-200 dark:border-sky-800/40 shadow-sm">Ch.85: Điện tử</button>
+                        <button type="button" onclick="quickFilterTree('39')" class="px-2 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/50 dark:hover:bg-sky-900/50 text-sky-700 dark:text-sky-300 font-bold transition-all cursor-pointer border border-sky-200 dark:border-sky-800/40 shadow-sm">Ch.39: Nhựa</button>
+                        <button type="button" onclick="quickFilterTree('73')" class="px-2 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/50 dark:hover:bg-sky-900/50 text-sky-700 dark:text-sky-300 font-bold transition-all cursor-pointer border border-sky-200 dark:border-sky-800/40 shadow-sm">Ch.73: Sắt thép</button>
+                        <button type="button" onclick="quickFilterTree('90')" class="px-2 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/50 dark:hover:bg-sky-900/50 text-sky-700 dark:text-sky-300 font-bold transition-all cursor-pointer border border-sky-200 dark:border-sky-800/40 shadow-sm">Ch.90: Đo lường</button>
+                        <button type="button" onclick="quickFilterTree('87')" class="px-2 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/50 dark:hover:bg-sky-900/50 text-sky-700 dark:text-sky-300 font-bold transition-all cursor-pointer border border-sky-200 dark:border-sky-800/40 shadow-sm">Ch.87: Xe cộ</button>
                     </div>
                 </div>
             </div>
@@ -778,48 +758,34 @@
         <!-- TAB 3: 6 General Rules (GRI) -->
         <div id="tab-rules" class="hidden space-y-4">
             <!-- Build: Version C Hybrid 2026-11-10 -->
-    <!-- Executive Slim Hero Banner (Compact & Modern) -->
-            <div class="relative overflow-hidden rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-indigo-700 via-blue-600 to-sky-700 text-white shadow-md shadow-indigo-500/10">
-                <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div class="flex items-center gap-3">
-                        <span class="w-9 h-9 rounded-xl bg-white/20 text-white flex items-center justify-center font-bold text-base backdrop-blur-sm shrink-0 shadow-sm">
-                            <i class="fa-solid fa-scale-balanced text-indigo-200"></i>
-                        </span>
-                        <div>
-                            <div class="flex flex-wrap items-center gap-2">
-                                <h2 class="text-base sm:text-lg font-black tracking-tight leading-snug">
-                                    Quy Trình 6 Bước Đề Xuất Mã HS Chuẩn 6 Quy Tắc GRI
-                                </h2>
-                                <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/15 border border-white/20 text-white">
-                                    TT 31/2022/TT-BTC
-                                </span>
-                            </div>
-                            <p class="text-sky-100 text-xs mt-0.5 line-clamp-1">
-                                Chuẩn hóa phân loại từ GRI 1-6: Chú giải bắt buộc, cùng cấp gạch nối và 7 tình huống phân loại thực tế mẫu.
-                            </p>
-                        </div>
-                    </div>
+    <!-- Floating Dual-Tab Pills: 6 Quy Tắc GRI (Sticky) -->
+            <div class="sticky top-18 z-20 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 py-1 backdrop-blur-md">
+                <!-- Left: Title Tab Pill -->
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-700 via-blue-600 to-sky-700 text-white shadow-md shadow-indigo-500/15 shrink-0 self-start sm:self-auto">
+                    <span class="w-6 h-6 rounded-lg bg-white/20 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                        <i class="fa-solid fa-scale-balanced text-indigo-100"></i>
+                    </span>
+                    <h2 class="text-sm font-black tracking-tight leading-none">
+                        6 Quy Tắc Phân Loại GRI
+                    </h2>
+                    <span class="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-white/20 border border-white/25 text-white font-mono">
+                        TT 31/2022/TT-BTC
+                    </span>
                 </div>
-            </div>
 
-            <!-- Sticky Quick-Nav Jump Bar for Tab 3 -->
-            <div class="sticky top-18 z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md flex flex-wrap items-center justify-between gap-2">
-                <span class="text-xs font-black uppercase text-slate-500 dark:text-slate-400 px-2 flex items-center gap-1.5">
-                    <i class="fa-solid fa-compass text-indigo-500"></i>Điều hướng nhanh:
-                </span>
-                <div class="flex flex-wrap items-center gap-1.5">
-                    <button type="button" onclick="document.getElementById('section-gri-pipeline').scrollIntoView({ behavior: 'smooth' })" class="px-3 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm">
+                <!-- Right: Quick Navigation Pills Cluster -->
+                <div class="inline-flex items-center gap-1.5 p-1 rounded-xl bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-md shrink-0 flex-wrap sm:flex-nowrap">
+                    <button type="button" onclick="document.getElementById('section-gri-pipeline').scrollIntoView({ behavior: 'smooth' })" class="px-2.5 py-1 rounded-lg bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 shadow-sm">
                         <i class="fa-solid fa-diagram-project text-sky-500"></i>
-                        <span>1. SOP 6 Bước (GRI 1-6)</span>
+                        <span>1. SOP 6 Bước</span>
                     </button>
-                    <button type="button" onclick="document.getElementById('section-gri-matrix').scrollIntoView({ behavior: 'smooth' })" class="px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 hover:bg-purple-100 dark:hover:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm">
+                    <button type="button" onclick="document.getElementById('section-gri-matrix').scrollIntoView({ behavior: 'smooth' })" class="px-2.5 py-1 rounded-lg bg-purple-50 dark:bg-purple-950/60 hover:bg-purple-100 dark:hover:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 shadow-sm">
                         <i class="fa-solid fa-network-wired text-purple-500"></i>
-                        <span>2. Ma Trận Ưu Tiên Luật</span>
+                        <span>2. Ma Trận Luật</span>
                     </button>
-                    <button type="button" onclick="document.getElementById('section-gri-cases').scrollIntoView({ behavior: 'smooth' })" class="px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm">
+                    <button type="button" onclick="document.getElementById('section-gri-cases').scrollIntoView({ behavior: 'smooth' })" class="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 shadow-sm">
                         <i class="fa-solid fa-flask-vial text-emerald-500"></i>
-                        <span>3. 7 Tình Huống Thực Tế</span>
+                        <span>3. 7 Tình Huống</span>
                     </button>
                 </div>
             </div>
@@ -1161,73 +1127,61 @@
         </div>
 
         <!-- TAB: Detailed HS 2022 Explanatory Notes (CV 1810 & HQKV8) -->
-        <div id="tab-notes" class="hidden space-y-4">
-            <!-- Build: Version C Hybrid 2026-11-10 -->
-    <!-- Executive Slim Hero Banner (Compact & Modern) -->
-            <div class="relative overflow-hidden rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-amber-600 via-orange-600 to-indigo-700 text-white shadow-md shadow-amber-500/10">
-                <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="relative z-10 space-y-2.5">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                        <div class="flex items-center gap-3">
-                            <span class="w-9 h-9 rounded-xl bg-white/20 text-white flex items-center justify-center font-bold text-base backdrop-blur-sm shrink-0 shadow-sm">
-                                <i class="fa-solid fa-book-open text-amber-200"></i>
+        <div id="tab-notes" class="hidden">
+            <!-- Main Reader Layout: 2 Columns Starting Level at Top (Ngang hàng nhau) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                
+                <!-- Left Sidebar: Search & Headings Navigation (Thu nhỏ góc trái) -->
+                <div class="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-20 bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-lg space-y-3">
+                    
+                    <!-- Sidebar Header: Title & Badges -->
+                    <div class="flex items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
+                                <i class="fa-solid fa-book-open"></i>
                             </span>
                             <div>
-                                <div class="flex flex-wrap items-center gap-2">
-                                    <h1 class="text-base sm:text-lg font-black tracking-tight leading-snug">
-                                        Bộ Chú Giải HS 2022 Chi Tiết
-                                    </h1>
-                                    <span class="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/15 border border-white/20 text-white">
-                                        CV 1810 &amp; HQKV8
-                                    </span>
-                                </div>
-                                <p class="text-amber-100 text-xs mt-0.5 line-clamp-1">
-                                    Tra cứu 1.227 Nhóm hàng thuộc 98 Chương theo CV 1810/TCHQ-TXNK kết hợp ấn bản toàn tập "Chú giải HS 2022 (HQKV8)".
-                                </p>
+                                <h2 class="text-sm font-black text-slate-900 dark:text-white leading-tight">
+                                    Chú Giải HS 2022
+                                </h2>
+                                <span class="text-[10px] text-amber-600 dark:text-amber-400 font-semibold font-mono">
+                                    CV 1810 &amp; HQKV8
+                                </span>
                             </div>
                         </div>
-                        <a href="pdf_docs/hqkv8.pdf" target="_blank" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-amber-50 text-amber-900 font-bold text-xs shadow-md flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap self-start sm:self-auto shrink-0">
-                            <i class="fa-solid fa-book-open text-rose-600 text-xs"></i>
-                            <span>Mở Toàn Bộ Chú Giải (2.409 Trang)</span>
-                        </a>
-                    </div>
-
-                    <!-- Search & Filter Controls Bar (Slim & Fast) -->
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
-                        <div class="relative flex-1 w-full">
-                            <input type="text" id="wco-search-input" onkeyup="handleWcoSearchInput()" placeholder="Nhập số Nhóm (VD: 8481, 84.81, 3917), từ khóa hoặc tên hàng hóa..." 
-                                   class="w-full pl-9 pr-3 py-2 rounded-xl bg-white/15 border border-white/25 text-white placeholder-amber-100 focus:outline-none focus:ring-2 focus:ring-white text-xs sm:text-sm backdrop-blur-md transition-all">
-                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-white/70 text-sm"></i>
-                        </div>
-                        <select id="wco-chapter-filter" onchange="filterWCONotes()" class="w-full sm:w-48 px-3 py-2 rounded-xl bg-white/20 border border-white/30 text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-white [&>option]:text-slate-900 [&>option]:bg-white cursor-pointer">
-                            <option value="all">Tất cả 98 Chương</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Reader Layout: 2 Columns (Sidebar list + Detail Content View) -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                
-                <!-- Left Sidebar: Headings Navigation List -->
-                <div class="lg:col-span-4 lg:sticky lg:top-20 bg-white dark:bg-slate-900 rounded-3xl p-5 border border-slate-200 dark:border-slate-800 shadow-xl space-y-3">
-                    <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-                        <span class="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                            <i class="fa-solid fa-list-ul text-amber-500"></i>
-                            <span>Danh Sách Nhóm HS</span>
+                        <span id="wco-count-badge" class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 font-mono">
+                            0 Nhóm
                         </span>
-                        <span id="wco-count-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 font-mono">0 Nhóm</span>
+                    </div>
+
+                    <!-- Search Input & Chapter Filter (Thu nhỏ gọn gàng trong góc trái) -->
+                    <div class="space-y-2">
+                        <div class="relative w-full">
+                            <input type="text" id="wco-search-input" onkeyup="handleWcoSearchInput()" 
+                                   placeholder="Nhập số Nhóm (8481, 3917), từ khóa..." 
+                                   class="w-full pl-8 pr-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all">
+                            <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-slate-400 text-xs"></i>
+                        </div>
+                        <div class="relative w-full">
+                            <select id="wco-chapter-filter" onchange="filterWCONotes()" 
+                                    class="w-full px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-amber-500 cursor-pointer">
+                                <option value="all">Tất cả 98 Chương</option>
+                            </select>
+                        </div>
                     </div>
 
                     <!-- Scrollable Headings List -->
-                    <div id="wco-headings-list" class="space-y-2 max-h-[650px] overflow-y-auto custom-scrollbar pr-1">
+                    <div id="wco-headings-list" class="space-y-1.5 max-h-[calc(100vh-270px)] min-h-[420px] overflow-y-auto custom-scrollbar pr-1 pt-1">
                         <!-- Rendered by JS -->
                     </div>
                 </div>
 
-                <!-- Right Main Panel: Detailed Explanatory Note View -->
-                <div class="lg:col-span-8 bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-xl min-h-[650px] space-y-6" id="wco-detail-panel">
-                    <!-- Rendered by JS upon selecting a heading -->
+                <!-- Right Main Panel: Detailed Explanatory Note View (Nâng ngang bằng với đỉnh cột trái) -->
+                <div class="lg:col-span-8 xl:col-span-9 space-y-2">
+                    <!-- Detailed Content Container (Ultra-Compact Padding) -->
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-2.5 sm:p-3 border border-slate-200 dark:border-slate-800 shadow-md min-h-[600px] space-y-2" id="wco-detail-panel">
+                        <!-- Rendered by JS upon selecting a heading -->
+                    </div>
                 </div>
 
             </div>
@@ -1238,6 +1192,28 @@
     <!-- Global Footer: Legal Disclaimer & Internal Use Notice -->
     <footer class="mt-16 border-t border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/60 backdrop-blur-sm py-8 px-4 sm:px-6">
         <div class="max-w-7xl mx-auto space-y-4">
+            <!-- Brand Badge & Trust Declaration -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-slate-800/80">
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-black bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">HSCoder AI</span>
+                    <span class="text-xs text-slate-500 dark:text-slate-400">• Nền Tảng Hỗ Trợ Nghiệp Vụ Phân Loại Hải Quan</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 text-xs">
+                    <span class="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-200 dark:border-emerald-800/60 flex items-center gap-1 shadow-sm">
+                        <i class="fa-solid fa-gift text-emerald-500"></i>
+                        <span>Sử Dụng Hoàn Toàn Miễn Phí</span>
+                    </span>
+                    <span class="px-2.5 py-1 rounded-full bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 font-bold border border-sky-200 dark:border-sky-800/60 flex items-center gap-1 shadow-sm">
+                        <i class="fa-solid fa-database text-sky-500"></i>
+                        <span>Biểu Thuế &amp; WCO 2026</span>
+                    </span>
+                    <span class="px-2.5 py-1 rounded-full bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 font-bold border border-purple-200 dark:border-purple-800/60 flex items-center gap-1 shadow-sm">
+                        <i class="fa-solid fa-shield-halved text-purple-500"></i>
+                        <span>Bảo Mật Nội Bộ</span>
+                    </span>
+                </div>
+            </div>
+
             <div class="p-4 sm:p-5 rounded-2xl bg-amber-500/5 dark:bg-amber-400/5 border border-amber-500/20 dark:border-amber-400/20">
                 <div class="flex items-center gap-2 text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider mb-2">
                     <i class="fa-solid fa-shield-halved text-sm"></i>
@@ -1364,7 +1340,7 @@
             const badge = document.getElementById('btn-gemini-settings');
 
             if (key && key.length > 15) {
-                if (label && label.innerText !== 'Gemini AI: Đã Kích Hoạt') label.innerText = 'Gemini AI: Đã Kích Hoạt';
+                if (label && label.innerText !== 'Gemini AI') label.innerText = 'Gemini AI';
                 if (dot && dot.className !== 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse') dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
                 if (badge && !badge.classList.contains('bg-purple-100')) {
                     badge.className = 'px-3 py-1.5 rounded-xl bg-purple-100 dark:bg-purple-900/40 border border-purple-300 dark:border-purple-500/50 text-purple-800 dark:text-purple-300 hover:border-purple-500 text-xs font-semibold transition-colors duration-150 flex items-center space-x-1.5 shadow-sm cursor-pointer shrink-0';
@@ -3870,15 +3846,14 @@
 
                 cardsHtml += `
                     <div id="wco-card-${key}" onclick="selectWCOHeading('${key}')" 
-                         class="p-3.5 rounded-2xl cursor-pointer border transition-all duration-200 ${isSelected ? 'bg-sky-50 dark:bg-sky-500/20 border-sky-500 shadow-md shadow-sky-500/10' : 'bg-slate-50 hover:bg-sky-50/60 dark:bg-slate-900/60 dark:hover:bg-slate-800/80 border-slate-200 dark:border-slate-800 hover:border-sky-300 dark:hover:border-slate-700'}">
+                         class="p-2.5 rounded-xl cursor-pointer border transition-all duration-200 ${isSelected ? 'bg-sky-50 dark:bg-sky-500/20 border-sky-500 shadow-md shadow-sky-500/10' : 'bg-slate-50 hover:bg-sky-50/60 dark:bg-slate-900/60 dark:hover:bg-slate-800/80 border-slate-200 dark:border-slate-800 hover:border-sky-300 dark:hover:border-slate-700'}">
                         <div class="flex items-start justify-between">
                             <div>
                                 <div class="flex flex-wrap items-center gap-1.5">
                                     <span class="px-2 py-0.5 rounded-md bg-sky-100 dark:bg-sky-500/20 text-sky-700 dark:text-sky-400 font-mono font-bold text-xs">
                                         Nhóm ${key.substring(0,2)}.${key.substring(2,4)}
                                     </span>
-                                    ${page1810 ? `<span class="text-[10px] text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-500/10 px-1.5 py-0.5 rounded font-mono border border-sky-200 dark:border-sky-500/20">CV 1810: Tr.${page1810}</span>` : ''}
-                                    ${pageHQ ? `<span class="text-[10px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-400/10 px-1.5 py-0.5 rounded font-mono border border-amber-200 dark:border-amber-400/20">HQKV8: Tr.${pageHQ}</span>` : ''}
+
                                 </div>
                                 <h4 class="text-xs font-bold text-slate-900 dark:text-slate-100 mt-1 line-clamp-1">${item.title || 'Chú giải phân loại nhóm ' + key}</h4>
                             </div>
@@ -3924,9 +3899,9 @@
             // Instant class toggle using ID instead of scanning all children
             document.querySelectorAll('#wco-headings-list > div[id^="wco-card-"]').forEach(card => {
                 if (card.id === `wco-card-${key}`) {
-                    card.className = 'p-3.5 rounded-2xl cursor-pointer border transition-all duration-200 bg-sky-50 dark:bg-sky-500/20 border-sky-500 shadow-md shadow-sky-500/10';
+                    card.className = 'p-2.5 rounded-xl cursor-pointer border transition-all duration-200 bg-sky-50 dark:bg-sky-500/20 border-sky-500 shadow-md shadow-sky-500/10';
                 } else {
-                    card.className = 'p-3.5 rounded-2xl cursor-pointer border transition-all duration-200 bg-slate-50 hover:bg-sky-50/60 dark:bg-slate-900/60 dark:hover:bg-slate-800/80 border-slate-200 dark:border-slate-800 hover:border-sky-300 dark:hover:border-slate-700';
+                    card.className = 'p-2.5 rounded-xl cursor-pointer border transition-all duration-200 bg-slate-50 hover:bg-sky-50/60 dark:bg-slate-900/60 dark:hover:bg-slate-800/80 border-slate-200 dark:border-slate-800 hover:border-sky-300 dark:hover:border-slate-700';
                 }
             });
 
@@ -3948,66 +3923,72 @@
             const rightContainer = document.getElementById('wco-detail-panel');
             if (rightContainer) {
                 rightContainer.innerHTML = `
-                    <div class="space-y-4 animate-fade-in">
-                        <!-- Top Header & Action Controls (Full Width, No Squashing) -->
-                        <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-sky-500/30 shadow-sm space-y-4">
-                            <!-- Row 1: Badges & Heading Info (Full Width) -->
-                            <div class="space-y-2">
-                                <div class="flex flex-wrap items-center gap-2">
-                                    <span class="px-3 py-1 rounded-xl bg-sky-600 text-white font-mono font-extrabold text-sm shadow-sm">
+                    <div class="space-y-2 animate-fade-in">
+                        <!-- Ultra-Compact Sticky/Slim Header -->
+                        <div class="px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-sky-500/30 shadow-sm space-y-1.5">
+                            <!-- Row 1: Title + Action Buttons on the same line -->
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <span class="px-2 py-0.5 rounded-lg bg-sky-600 text-white font-mono font-extrabold text-xs shrink-0 shadow-sm">
                                         Nhóm ${formattedHead}
                                     </span>
-                                    <span class="px-2.5 py-1 rounded-xl bg-sky-100 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 font-mono text-xs font-semibold border border-sky-200 dark:border-sky-500/30">
-                                        <i class="fa-solid fa-file-pdf mr-1"></i>CV 1810: Trang ${pageNum1810}
-                                    </span>
-                                    <span class="px-2.5 py-1 rounded-xl bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 font-mono text-xs font-semibold border border-amber-200 dark:border-amber-500/30">
-                                        <i class="fa-solid fa-file-pdf mr-1"></i>HQKV8: Trang ${pageNumHQKV8}
-                                    </span>
-                                    <span class="px-2.5 py-1 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 font-mono text-xs font-semibold border border-emerald-200 dark:border-emerald-500/30">
-                                        <i class="fa-solid fa-bolt mr-1 text-emerald-600"></i>Chương ${chapterNum} (Trang nội bộ: ${relChapterPage})
-                                    </span>
+                                    <h3 class="text-sm font-bold text-slate-900 dark:text-white truncate" title="${item.title || ''}">
+                                        ${item.title || 'Chú giải HS 2022 Nhóm ' + formattedHead}
+                                    </h3>
                                 </div>
-                                <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white leading-snug">
-                                    ${item.title || 'Chú giải HS 2022 Nhóm ' + formattedHead}
-                                </h3>
-                                ${item.section_id ? `
-                                <div class="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400 pt-1">
-                                    <span class="px-2.5 py-0.5 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 font-medium border border-purple-200 dark:border-purple-800/40">
-                                        <i class="fa-solid fa-layer-group mr-1"></i>Phần ${item.section_id}: ${item.section_title || ''}
-                                    </span>
-                                    <span class="px-2.5 py-0.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 font-medium border border-emerald-200 dark:border-emerald-800/40">
-                                        <i class="fa-solid fa-book-bookmark mr-1"></i>Chương ${item.chapter}: ${item.chapter_title || ''}
-                                    </span>
+                                <!-- Compact Action Pills -->
+                                <div class="flex items-center gap-1.5 shrink-0 flex-wrap sm:flex-nowrap">
+                                    <a href="pdf_docs/hqkv8.pdf#page=${pageNumHQKV8}" target="_blank" 
+                                       class="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px] flex items-center gap-1 shadow-sm transition-all whitespace-nowrap cursor-pointer"
+                                       title="Mở toàn văn ấn bản 2.409 trang đến đúng trang ${pageNumHQKV8}">
+                                        <i class="fa-solid fa-book-open text-[10px]"></i>
+                                        <span>Đến Trang ${pageNumHQKV8}</span>
+                                    </a>
+                                    <a href="${chapterOpenUrl}" target="_blank" 
+                                       class="px-2.5 py-1 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold text-[11px] flex items-center gap-1 shadow-sm transition-all whitespace-nowrap cursor-pointer"
+                                       title="Mở riêng file PDF Chương ${chapterNum}">
+                                        <i class="fa-solid fa-bolt text-yellow-300 text-[10px]"></i>
+                                        <span>Mở Chương ${chapterNum}</span>
+                                    </a>
+                                    <a href="pdf_docs/hqkv8.pdf" target="_blank" 
+                                       class="px-2 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-semibold text-[11px] border border-amber-500/30 flex items-center gap-1 transition-all whitespace-nowrap cursor-pointer"
+                                       title="Mở toàn bộ tài liệu 2.409 trang">
+                                        <i class="fa-solid fa-file-pdf text-[10px] text-rose-500"></i>
+                                        <span>2.409 Trang</span>
+                                    </a>
+                                    <button onclick="copyWCOCitation('${key}')" 
+                                            class="px-2 py-1 rounded-lg bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold transition-all flex items-center gap-1 cursor-pointer" 
+                                            title="Sao chép trích dẫn căn cứ pháp lý">
+                                        <i class="fa-solid fa-copy text-[10px]"></i>
+                                        <span>Copy</span>
+                                    </button>
                                 </div>
-                                ` : ''}
                             </div>
 
-                            <!-- Row 2: Action Buttons Bar (Full Width, Clean Wrap) -->
-                            <div class="flex flex-wrap items-center gap-2.5 pt-3 border-t border-slate-200 dark:border-slate-800">
-                                <a href="pdf_docs/hqkv8.pdf#page=${pageNumHQKV8}" target="_blank" 
-                                   class="py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition-all cursor-pointer">
-                                    <i class="fa-solid fa-book-open text-base"></i>
-                                    <span>Mở Toàn Bộ Chú Giải 2022 (Đến Đúng Trang ${pageNumHQKV8})</span>
-                                </a>
-                                <a href="${chapterOpenUrl}" target="_blank" 
-                                   class="py-2.5 px-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-sky-600/20 transition-all cursor-pointer">
-                                    <i class="fa-solid fa-bolt text-yellow-200"></i>
-                                    <span>Mở Riêng Chương ${chapterNum} (Tải Tức Thì)</span>
-                                </a>
-                                <button onclick="copyWCOCitation('${key}')" 
-                                        class="py-2.5 px-3 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer" 
-                                        title="Sao chép trích dẫn căn cứ pháp lý">
-                                    <i class="fa-solid fa-copy"></i>
-                                    <span>Sao chép trích dẫn</span>
-                                </button>
+                            <!-- Row 2: Metadata Badges (Single sleek row) -->
+                            <div class="flex flex-wrap items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 pt-0.5 border-t border-slate-200/60 dark:border-slate-800/60">
+
+                                <span class="px-1.5 py-0.2 rounded bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-mono text-[10px] border border-emerald-200 dark:border-emerald-500/20">
+                                    Chương ${chapterNum} (Tr.${relChapterPage})
+                                </span>
+                                ${item.section_id ? `
+                                <span class="text-purple-600 dark:text-purple-400 truncate max-w-[200px]" title="Phần ${item.section_id}: ${item.section_title || ''}">
+                                    • Phần ${item.section_id}
+                                </span>
+                                ` : ''}
+                                ${item.chapter_title ? `
+                                <span class="text-slate-500 dark:text-slate-400 truncate max-w-[280px]" title="Chương ${item.chapter}: ${item.chapter_title}">
+                                    • ${item.chapter_title}
+                                </span>
+                                ` : ''}
                             </div>
                         </div>
 
                         <!-- Direct Full-Height Official PDF Viewer (Ultra-fast Chapter PDF) -->
-                        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-2 sm:p-3 shadow-md space-y-2">
-                            <div class="flex items-center justify-between px-2 pt-1 pb-1">
-                                <div class="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
-                                    <i class="fa-solid fa-file-pdf text-amber-500 text-sm"></i>
+                        <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-1.5 sm:p-2 shadow-sm space-y-1.5">
+                            <div class="flex items-center justify-between px-2 py-0.5">
+                                <div class="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                                    <i class="fa-solid fa-file-pdf text-amber-500 text-xs"></i>
                                     <span>Văn bản gốc Chú giải WCO 2022 (Chương ${chapterNum} - Trang gốc ${pageNumHQKV8})</span>
                                 </div>
                                 <span class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
@@ -4018,7 +3999,7 @@
                             <div id="inline-pdf-container" class="relative w-full">
                                 <iframe 
                                     src="${chapterPdfUrl}" 
-                                    class="w-full h-[780px] sm:h-[840px] rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-inner" 
+                                    class="w-full h-[calc(100vh-210px)] min-h-[720px] rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-inner" 
                                     title="HQKV8 Chapter PDF Viewer"
                                     loading="lazy">
                                 </iframe>
@@ -13001,6 +12982,139 @@ Trường hợp đủ thông tin:
                 setTimeout(runAutomatedRegressionGuard, 300);
             }
         });
+    
+        function openUserGuideModal() {
+            const m = document.getElementById('user-guide-modal');
+            if (m) m.classList.remove('hidden');
+        }
+        function closeUserGuideModal() {
+            const m = document.getElementById('user-guide-modal');
+            if (m) m.classList.add('hidden');
+        }
+
     </script>
+
+    <!-- Modal: Cẩm Nang Hướng Dẫn Sử Dụng Web AI (HSCoder AI) -->
+    <div id="user-guide-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-fade-in">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden my-6">
+            <!-- Modal Header -->
+            <div class="px-5 py-4 bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-700 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-xl bg-white/20 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+                        <i class="fa-solid fa-book-open-reader text-amber-300"></i>
+                    </span>
+                    <div>
+                        <h3 class="text-sm sm:text-base font-black tracking-tight leading-tight">Hướng Dẫn Sử Dụng HSCoder AI</h3>
+                        <p class="text-[11px] text-sky-100">Đơn giản • Dễ hiểu • Đề xuất mã sát thông tin cung cấp</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-400 text-emerald-950">MIỄN PHÍ 100%</span>
+                    <button type="button" onclick="closeUserGuideModal()" class="w-8 h-8 rounded-xl bg-white/15 hover:bg-white/25 text-white flex items-center justify-center text-sm transition-all cursor-pointer">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-5 sm:p-6 space-y-4 max-h-[75vh] overflow-y-auto custom-scrollbar text-xs leading-relaxed text-slate-700 dark:text-slate-300">
+                
+                <!-- Card 1: Nguyên Tắc Vàng -->
+                <div class="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 space-y-2">
+                    <div class="flex items-center gap-2 font-black text-amber-800 dark:text-amber-300 text-xs uppercase tracking-wide">
+                        <i class="fa-solid fa-lightbulb text-amber-500 text-sm"></i>
+                        <span>Nguyên Tắc Vàng: Điền Mô Tả Để AI Đề Xuất Mã Sát Nhất</span>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-400 text-[11.5px]">
+                        AI không đoán mò mà phân tích đối chiếu theo <strong>6 Quy tắc GRI</strong> và <strong>Chú giải WCO 2022</strong>. Hãy điền theo công thức 3 ô chuẩn:
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 font-mono text-[11px]">
+                        <div class="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-amber-200/80 dark:border-amber-800/60 space-y-1">
+                            <span class="text-sky-600 dark:text-sky-400 font-bold block">Ô 1: Tên & Vật Liệu</span>
+                            <span class="text-slate-500 dark:text-slate-400 block text-[10px]">[Tên hàng] + [Chất liệu chế tạo chính]</span>
+                            <span class="text-slate-700 dark:text-slate-300 block text-[10.5px]">VD: Bu lông lục giác bằng thép, Van một chiều bằng đồng...</span>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-amber-200/80 dark:border-amber-800/60 space-y-1">
+                            <span class="text-emerald-600 dark:text-emerald-400 font-bold block">Ô 2: Cấu Tạo & Kích Thước</span>
+                            <span class="text-slate-500 dark:text-slate-400 block text-[10px]">Tiêu chí định thuế GRI 6</span>
+                            <span class="text-slate-700 dark:text-slate-300 block text-[10.5px]">VD: Ren M12, phi 50mm, điện áp 220V, dòng 10A...</span>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-amber-200/80 dark:border-amber-800/60 space-y-1">
+                            <span class="text-purple-600 dark:text-purple-400 font-bold block">Ô 3: Công Năng & Thiết Bị</span>
+                            <span class="text-slate-500 dark:text-slate-400 block text-[10px]">Dùng làm gì + Cho máy nào</span>
+                            <span class="text-slate-700 dark:text-slate-300 block text-[10.5px]">VD: Dùng liên kết khung trong máy ép nhựa...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: 5 Tính Năng Toàn Năng -->
+                <div class="space-y-2">
+                    <h4 class="font-black text-slate-900 dark:text-white uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                        <i class="fa-solid fa-layer-group text-sky-500"></i>
+                        <span>5 Công Cụ Nghiệp Vụ Tích Hợp Sẵn</span>
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11.5px]">
+                        <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-0.5">
+                            <span class="font-bold text-sky-600 dark:text-sky-400"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i>1. AI Đề Xuất HS Code:</span>
+                            <p class="text-slate-600 dark:text-slate-400">Rà soát 6 bước GRI, xuất báo cáo lập luận pháp lý & PDF chính thức.</p>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-0.5">
+                            <span class="font-bold text-emerald-600 dark:text-emerald-400"><i class="fa-solid fa-file-excel mr-1"></i>2. Excel Hàng Loạt:</span>
+                            <p class="text-slate-600 dark:text-slate-400">Tải tệp Excel lên, tự động điền mã HS và thuế suất bảo toàn dữ liệu gốc.</p>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-0.5">
+                            <span class="font-bold text-blue-600 dark:text-blue-400"><i class="fa-solid fa-sitemap mr-1"></i>3. Cây Biểu Thuế 98 Chương:</span>
+                            <p class="text-slate-600 dark:text-slate-400">Tra cứu 19.800+ dòng hàng, rẽ nhánh từ Chương &rarr; Nhóm &rarr; Phân nhóm 8 số.</p>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-0.5">
+                            <span class="font-bold text-indigo-600 dark:text-indigo-400"><i class="fa-solid fa-scale-balanced mr-1"></i>4. Quy Trình 6 Bước GRI:</span>
+                            <p class="text-slate-600 dark:text-slate-400">Chuẩn hóa phân loại tuần tự từ GRI 1 &rarr; GRI 6 theo Thông tư 31/2022/TT-BTC.</p>
+                        </div>
+                    </div>
+                    <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-0.5 text-[11.5px]">
+                        <span class="font-bold text-amber-600 dark:text-amber-400"><i class="fa-solid fa-book-open mr-1"></i>5. Chú Giải WCO 2022 Chi Tiết:</span>
+                        <p class="text-slate-600 dark:text-slate-400">Đọc trực tiếp văn bản gốc 1.227 nhóm hàng kết hợp CV 1810 và ấn bản HQKV8, tải tức thì theo từng chương PDF siêu nhẹ.</p>
+                    </div>
+                </div>
+
+                <!-- Card 3: 2 Cổng Chuyên Sâu Tích Hợp (Hóa Chất & KTCN) -->
+                <div class="p-3.5 rounded-2xl bg-gradient-to-r from-sky-500/10 via-indigo-500/10 to-purple-500/10 border border-sky-500/20 space-y-2">
+                    <div class="flex items-center gap-2 font-black text-sky-700 dark:text-sky-300 text-xs uppercase">
+                        <i class="fa-solid fa-network-wired text-sky-500"></i>
+                        <span>Hệ Sinh Thái Tích Hợp Chuyên Sâu (Nút Treo Mép Trái)</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                        <div class="flex items-start gap-2">
+                            <i class="fa-solid fa-flask-vial text-rose-500 mt-0.5"></i>
+                            <div>
+                                <strong class="text-slate-800 dark:text-white">Cổng Hóa Chất & MSDS:</strong>
+                                <span class="text-slate-600 dark:text-slate-400 block">Quét tự động phiếu MSDS, tra cứu danh mục Tiền chất, Bảng 1-2-3, Nghị định 113/2017 & Luật Hóa chất.</span>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <i class="fa-solid fa-table-columns text-yellow-500 mt-0.5"></i>
+                            <div>
+                                <strong class="text-slate-800 dark:text-white">Cổng KTCN 4 Bộ 2026:</strong>
+                                <span class="text-slate-600 dark:text-slate-400 block">Tra cứu danh mục kiểm tra chuyên ngành Bộ Công Thương, GTVT, NN&PTNT, KH&CN theo Nghị định 37/2026/NĐ-CP.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-5 py-3 bg-slate-50 dark:bg-slate-950/60 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                    <i class="fa-solid fa-heart text-rose-500"></i>
+                    <span>Phục vụ công tác nghiệp vụ nội bộ • Miễn phí 100%</span>
+                </span>
+                <button type="button" onclick="closeUserGuideModal()" class="px-4 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs transition-all cursor-pointer shadow-sm">
+                    Đã Hiểu & Bắt Đầu
+                </button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
