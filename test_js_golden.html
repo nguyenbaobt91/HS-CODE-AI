@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><title>JS golden test</title></head>
+<body style="font-family:monospace;white-space:pre">
+<div id="out">Dang chay...</div>
+<iframe id="app" src="index.html" style="width:10px;height:10px;border:0"></iframe>
+<script>
+(async function () {
+  const out = document.getElementById('out');
+  const fr = document.getElementById('app');
+  await new Promise(r => fr.addEventListener('load', r));
+  // cho du lieu nap xong
+  for (let i = 0; i < 100 && !(fr.contentWindow.UniversalEngine && fr.contentWindow.HS_DATABASE && fr.contentWindow.TARIFF_ENGINE); i++) await new Promise(r => setTimeout(r, 200));
+  const W = fr.contentWindow;
+  const cases = await (await fetch('golden_cases.json')).json();
+  const lines = []; let ok = 0, total = 0;
+  for (const c of cases.engine) {
+    const qi = W.UniversalEngine.extractQuery(c.query);
+    let good = true, why = [];
+    for (const k of c.keep) { const r = W.UniversalEngine.evaluate(k, qi); if (r[0]) { good = false; why.push(k + ' BI LOAI SAI'); } }
+    for (const d of c.drop) { const r = W.UniversalEngine.evaluate(d, qi); if (!r[0]) { good = false; why.push(d + ' PHAI BI LOAI'); } }
+    total++; if (good) ok++;
+    lines.push((good ? 'PASS ' : 'FAIL ') + '[engine] ' + c.name + ' ' + why.join('; '));
+  }
+  for (const c of cases.pipeline) {
+    let got = '';
+    try {
+      const i = c.info;
+      const r = W.classifyProductClientSide(i.name, i.desc || '', i.use || '', i.specs || '', '');
+      got = r._insufficient_info ? 'INSUFFICIENT' : ((r.c || '').replace(/\./g, ''));
+    } catch (e) { got = 'ERR ' + e.message; }
+    const good = got.startsWith(c.expected);
+    total++; if (good) ok++;
+    lines.push((good ? 'PASS ' : 'FAIL ') + '[pipeline] ' + c.name + ' got=' + got + ' expected=' + c.expected);
+  }
+  for (const c of (cases.correction || [])) {
+    let got = '';
+    try {
+      const r = W.UniversalEngine.reroute(c.wrong, W.UniversalEngine.norm(c.text));
+      got = r ? r.code.replace(/\./g, '') : 'NONE';
+    } catch (e) { got = 'ERR ' + e.message; }
+    const good = got.indexOf(c.expected) === 0;
+    total++; if (good) ok++;
+    lines.push((good ? 'PASS ' : 'FAIL ') + '[correction] ' + c.name + ' got=' + got + ' expected=' + c.expected);
+  }
+  // Kiem tra ham thuc te cua web: AI de xuat ma SAI -> auditAndSanitizeProposedHS phai sua
+  const AI = [
+    ['[web-audit] AI sai 8544.49.21 cho cap Cat6', '85444921', {name: 'Cáp mạng Cat6 UTP 4 đôi', desc: 'Vỏ PVC, chưa gắn đầu nối, không có lớp bọc chống nhiễu', use: 'Truyền tín hiệu mạng LAN viễn thông', specs: 'Điện áp tín hiệu 5V'}, '85444913'],
+    ['[web-audit] AI sai 4010.12 cho bang tai loi thep', '40101200', {name: 'Băng tải (đai tải) cao su gia cố bằng lõi thép', desc: '', use: 'băng chuyền công nghiệp', specs: ''}, '40101100'],
+    ['[web-audit] AI dung 8424.89.50 giu nguyen', '84248950', {name: 'Máy rửa công nghiệp hoạt động bằng điện', desc: '', use: '', specs: ''}, '84248950'],
+  ];
+  for (const [name, wrong, raw, expected] of AI) {
+    let got = '';
+    try {
+      const res = {clean_code: wrong, hs_code: wrong, item_description: '', mfn: '0%', vat: '8%', gri6: '', exclusions: ''};
+      const out = W.auditAndSanitizeProposedHS(res, raw);
+      got = out.is_insufficient_info ? 'INSUFFICIENT' : (out.clean_code || '').replace(/\./g, '');
+    } catch (e) { got = 'ERR ' + e.message; }
+    const good = got.indexOf(expected) === 0;
+    total++; if (good) ok++;
+    lines.push((good ? 'PASS ' : 'FAIL ') + name + ' got=' + got + ' expected=' + expected);
+  }
+  lines.push('TONG JS: ' + ok + '/' + total);
+  out.textContent = lines.join('\n');
+  document.title = 'JS ' + ok + '/' + total;
+})();
+</script></body></html>

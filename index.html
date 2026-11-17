@@ -137,6 +137,8 @@
     <script src="hs_data.js"></script>
     <script src="wco_data.js"></script>
     <script src="rulings_data.js"></script>
+    <script src="tariff_engine.js"></script>
+    <script src="universal_engine.js"></script>
 
     <style id="print-styles">
         @media print {
@@ -4356,6 +4358,12 @@ MA TRẬN CHÚ GIẢI PHÁP LÝ BẮT BUỘC TOÀN DIỆN (21 PHẦN & 97 CHƯƠ
    - Cáp truyền tín hiệu viễn thông, cáp mạng dữ liệu (Cat5, Cat6, Cat6A, Cat7, UTP, FTP, STP, mạng LAN, tín hiệu viễn thông...) điện áp tín hiệu <= 80V, chưa gắn đầu nối: BẮT BUỘC thuộc phân nhánh 3 gạch: "- - - Dùng cho viễn thông, điện áp không quá 80 V:" (Phân nhóm 8544.49.1x). Vỏ bọc plastic/PVC -> BẮT BUỘC MÃ 8544.49.13 (- - - - Loại khác, cách điện bằng cao su, plastic hoặc giấy). Thuế MFN: 0%.
    - TUYỆT ĐỐI KHÔNG xếp cáp viễn thông / mạng LAN vào phân nhánh "- - - Loại không dùng cho viễn thông" (8544.49.2x hoặc 8544.49.4x), đặc biệt TUYỆT ĐỐI KHÔNG phân loại vào mã 8544.49.21 ("Dây đơn có vỏ bọc (chống nhiễu) dùng trong sản xuất bó dây dẫn điện của ô tô", MFN 10%) vì cáp viễn thông Cat6 UTP không phải là dây đơn, không dùng cho ô tô, và là cáp UTP không có lớp bọc chống nhiễu!
 
+BẢNG SO SÁNH ĐỐI KHÁNG CÁC NHÁNH CÙNG CẤP GẠCH NỐI (BẮT BUỘC TRƯỚC KHI CHỐT MÃ 8 SỐ):
+- Trong trường "gri6", TRƯỚC KHI nêu mã cuối cùng, phải lập bảng theo từng cấp gạch nối, đi từ cấp "-" xuống cấp sâu nhất. Mỗi cấp liệt kê TẤT CẢ các nhánh anh em cùng cấp trong Cây biểu thuế đã cung cấp, ghi rõ: [Nhánh] | [ĐẠT/LOẠI] | [Lý do đối chiếu với dữ kiện hàng hóa].
+- Với cặp nhánh đối lập (có X / không X, hoạt động bằng điện / không hoạt động bằng điện, đã gắn / chưa gắn đầu nối...): hàng có X thì LOẠI nhánh "không X" và ngược lại.
+- Với nhánh có ngưỡng số (không quá / dưới / trên ... V, A, W, kVA): đổi về cùng đơn vị rồi so sánh với số liệu thực tế; nhánh không thỏa phải ghi LOẠI. Giá trị bằng đúng ngưỡng "dưới X" thì KHÔNG thỏa "dưới X".
+- Mã 8 số cuối cùng CHỈ được lấy từ nhánh còn ĐẠT ở cấp sâu nhất. Nếu thiếu dữ kiện để loại hết nhánh còn lại, trả is_insufficient_info = true thay vì đoán.
+
 YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON (không kèm văn bản nào ngoài JSON):
 Trường hợp thiếu thông tin:
 {
@@ -5167,6 +5175,21 @@ Trường hợp đủ thông tin:
         ]);
 
         function auditStatutoryConstraintsClientSide(code, head, itemDesc, subDesc, decomp, fullTextNorm) {
+            // (1) Universal GRI-6 Engine: cây gạch nối + phủ định + ngưỡng số -> (2) Chú giải Phần/Chương
+            let bonus = 0;
+            if (window.UniversalEngine) {
+                try {
+                    const r = UniversalEngine.evaluate(code, UniversalEngine.extractQuery(fullTextNorm));
+                    if (r[0]) return { isDisqualified: true, penalty: -9000, reason: 'Vi phạm GRI 6 (Universal Engine): ' + r[1] };
+                    bonus = r[2] || 0;
+                } catch (e) { console.warn('UniversalEngine error', e); }
+            }
+            const lg = _auditNotesLegacyClientSide(code, head, itemDesc, subDesc, decomp, fullTextNorm);
+            if (lg && lg.isDisqualified) return lg;
+            return { isDisqualified: false, penalty: ((lg && lg.penalty) || 0) + bonus, reason: (lg && lg.reason) || '' };
+        }
+
+        function _auditNotesLegacyClientSide(code, head, itemDesc, subDesc, decomp, fullTextNorm) {
             const cRaw = code.replace(/\./g, '');
             const sub = cRaw.substring(0, 6);
             const itemNorm = removeAccents(itemDesc || '');
@@ -5202,32 +5225,7 @@ Trường hợp đủ thông tin:
                 }
             }
 
-                        // D. Quy tắc 6 (GRI 6): Phân nhánh cơ chế vận hành theo gạch nối (Hoạt động bằng điện vs Không hoạt động bằng điện)
-            const isElectricQuery = (
-                /\b(?:hoat\s+dong\s+bang\s+dien|chay\s+bang\s+dien|chay\s+dien|bang\s+dien|electrically\s+operated|electric|motor\s+driven)\b/i.test(fullTextNorm) ||
-                /\b(?:\d+\s*(?:v|vac|vdc|w|kw|hp|kva|ampe|a)\b)/i.test(fullTextNorm)
-            ) && !/\b(?:khong\s+(?:hoat\s+dong\s+bang\s+)?dien|khong\s+chay\s+dien|khong\s+dung\s+dien|bang\s+tay|thu\s+cong|manual|not\s+electrically)\b/i.test(fullTextNorm);
-
-            const isNonElectricQuery = /\b(?:khong\s+(?:hoat\s+dong\s+bang\s+)?dien|khong\s+chay\s+dien|khong\s+dung\s+dien|bang\s+tay|thu\s+cong|manual|hand\s+operated|not\s+electrically)\b/i.test(fullTextNorm);
-
-            const isElectricTariffLine = /\b(?:hoat\s+dong\s+bang\s+dien|electrically\s+operated)\b/i.test(itemNorm) && !/\b(?:khong\s+hoat\s+dong\s+bang\s+dien|not\s+electrically\s+operated)\b/i.test(itemNorm);
-            const isNonElectricTariffLine = /\b(?:khong\s+hoat\s+dong\s+bang\s+dien|not\s+electrically\s+operated)\b/i.test(itemNorm);
-
-            if (isElectricQuery) {
-                if (isNonElectricTariffLine) {
-                    return { isDisqualified: true, penalty: -9000, reason: "Vi phạm GRI 6: Hàng hóa hoạt động bằng điện, loại trừ phân nhánh không hoạt động bằng điện" };
-                }
-                if (isElectricTariffLine) {
-                    return { isDisqualified: false, penalty: 3000, reason: "Khớp cấp độ gạch nối GRI 6: Hoạt động bằng điện" };
-                }
-            } else if (isNonElectricQuery) {
-                if (isElectricTariffLine) {
-                    return { isDisqualified: true, penalty: -9000, reason: "Vi phạm GRI 6: Hàng hóa không hoạt động bằng điện, loại trừ phân nhánh hoạt động bằng điện" };
-                }
-                if (isNonElectricTariffLine) {
-                    return { isDisqualified: false, penalty: 3000, reason: "Khớp cấp độ gạch nối GRI 6: Không hoạt động bằng điện" };
-                }
-            }
+            // D. (Chuyển sang Universal GRI-6 Engine: Sibling Tree + Polarity + Quantitative)
 
             // C2. Chú giải 1(g) Phần XVI (Sản phẩm plastic loại trừ khỏi Phần XVI)
             const matNames = (decomp.materials || []).map(m => m.name || m[0]);
@@ -7248,13 +7246,50 @@ Trường hợp đủ thông tin:
             };
         }
 
+        function engineValidateWalkerClient(statRes, item) {
+            if (!window.UniversalEngine || !statRes) return statRes;
+            try {
+                const fullText = [item.name, item.desc, item.use, item.specs, item.model_en].join(' ').trim();
+                const fullNorm = UniversalEngine.norm(fullText);
+                const code = (statRes.code || '').replace(/\./g, '');
+                let need = false, whyTxt = '';
+                if (statRes.status === 'INSUFFICIENT_INFO' || statRes.status === 'UNRESOLVED') need = true;
+                else if (/^\d{4,}$/.test(code)) {
+                    const ev = UniversalEngine.evaluate(code, UniversalEngine.extractQuery(fullNorm));
+                    if (ev[0]) { need = true; whyTxt = ev[1]; }
+                }
+                if (!need) return statRes;
+                const hn = UniversalEngine.norm(extractHeadNounStatutory(item.name || ''));
+                let rs = UniversalEngine.genericResolve(hn, fullNorm);
+                if (!rs && statRes.status !== 'INSUFFICIENT_INFO' && statRes.status !== 'UNRESOLVED' && /^\d{4,}$/.test(code)) rs = UniversalEngine.reroute(code, fullNorm);
+                if (rs) {
+                    return {
+                        code: rs.code, level: rs.level, status: rs.status,
+                        reasoning: "Áp dụng GRI 1: cụm danh từ chính '" + rs.phrase + "' khớp cây biểu thuế. Áp dụng GRI 6 (Universal Engine - so sánh các nhánh cùng cấp gạch nối, điều kiện phủ định và ngưỡng số): đã loại các nhánh không thỏa: " + (rs.dropped || 'không có') + '.',
+                        missing_attributes: rs.status === 'EXACT_8_DIGIT' ? [] : ['8_digit_discriminator'],
+                        assumptions: 'Phân loại bằng Universal GRI-6 Engine',
+                        reserve_code: statRes.reserve_code || 'N/A'
+                    };
+                }
+                if (statRes.status !== 'INSUFFICIENT_INFO' && statRes.status !== 'UNRESOLVED') {
+                    return {
+                        code: 'INSUFFICIENT_INFO', level: 0, status: 'INSUFFICIENT_INFO',
+                        reasoning: 'Mã ' + statRes.code + ' bị loại bởi cổng GRI 6: ' + whyTxt + '. Chưa đủ dữ kiện để chọn mã thay thế chính xác.',
+                        missing_attributes: ['technical_specs'], assumptions: 'N/A', reserve_code: 'N/A'
+                    };
+                }
+            } catch (e) { console.warn('engineValidateWalkerClient error', e); }
+            return statRes;
+        }
+
         function classifyProductClientSide(name, desc = '', use = '', specs = '', model_en = '') {
             buildContextIndex();
             const db = window.HS_DATABASE || [];
             if (!db.length) return { c: '84818099', vn: 'Van và các thiết bị tương tự', mfn: '0%', vat: '8%', evfta: '0%', acfta: '0%' };
 
             // 0. DETERMINISTIC STATUTORY TREE WALKER (GRI 1-6, Head Noun Isolation, Zero-Guessing)
-            const statRes = classifyStatutoryTreeClientSide({ name, desc, use, specs, model_en });
+            let statRes = classifyStatutoryTreeClientSide({ name, desc, use, specs, model_en });
+            statRes = engineValidateWalkerClient(statRes, { name, desc, use, specs, model_en });
             if (statRes && statRes.status && statRes.status !== 'UNRESOLVED') {
                 if (statRes.status === 'INSUFFICIENT_INFO') {
                     return {
@@ -9109,73 +9144,33 @@ Trường hợp đủ thông tin:
             const isUnshielded = /\b(?:khong\s+(?:co\s+)?(?:lop\s+boc\s+)?chong\s+nhieu|khong\s+boc\s+kim|utp|unshielded)\b/i.test(fullNorm);
             const isNoConnector = /\b(?:chua\s+gan\s+dau\s+noi|khong\s+co\s+dau\s+noi|without\s+connectors?|chua\s+bam\s+cos)\b/i.test(fullNorm);
 
-            // Gatekeeper 1: Cáp viễn thông bị bắt nhầm vào nhánh không dùng cho viễn thông (8544.49.2x)
-            if (isTelecom && ['85444921', '85444922', '85444923', '85444924', '85444929'].includes(cCode)) {
-                console.warn("[Post-Audit Gatekeeper] Auto-correcting 8544.49.2x -> 8544.49.13 (Telecom Branch Guard)");
-                res.clean_code = '85444913';
-                res.hs_code = '8544.49.13';
-                res.item_description = '- - - - Loại khác, cách điện bằng cao su, plastic hoặc giấy';
-                res.mfn = '0%';
-                res.vat = '8/10';
-                res.gri6 = "Áp dụng Quy tắc 6 (GRI 6): Cáp truyền tín hiệu dùng cho viễn thông mạng LAN (Cat6 UTP) điện áp tín hiệu <= 80V, chưa gắn đầu nối, có lớp cách điện bằng nhựa PVC thuộc phân nhóm 8544.49, phân nhánh 3 gạch '- - - Dùng cho viễn thông, điện áp không quá 80 V:', dòng 4 gạch '- - - - Loại khác, cách điện bằng cao su, plastic hoặc giấy', mã số chính xác là 8544.49.13 (Thuế NK MFN 0%). Loại trừ tuyệt đối mã 8544.49.21 (Dây đơn có vỏ bọc chống nhiễu dùng cho ô tô, thuế 10%).";
-                res.exclusions = "Loại trừ mã 8544.49.21: Do mặt hàng dùng cho viễn thông (không thuộc nhánh không dùng cho viễn thông), là cáp nhiều lõi xoắn đôi (không phải dây đơn), là cáp UTP không có lớp bọc chống nhiễu, và không dùng cho sản xuất bó dây điện ô tô.";
-            }
-
-            // Gatekeeper 2: Hàng không có ổ bi bị bắt nhầm vào Nhóm 84.82 (Ổ bi)
-            const hasNoBearing = /\b(?:khong\s+(?:co\s+|lap\s+)?(?:o\s+bi|bi\b|vong\s+bi)|without\s+bearings?)\b/i.test(fullNorm);
-            if (hasNoBearing && cCode.startsWith('8482')) {
-                console.warn("[Post-Audit Gatekeeper] Auto-correcting 8482 -> 8483.30.90 (Negative Bearing Guard)");
-                res.clean_code = '84833090';
-                res.hs_code = '8483.30.90';
-                res.item_description = '- - Thân ổ không có ổ bi hoặc ổ đũa; gối đỡ trục loại khác';
-                res.mfn = '0%';
-                res.vat = '8/10';
-            }
-
-            // Gatekeeper 3: Dây cáp chưa gắn đầu nối bị bắt nhầm vào 8544.42 (Đã gắn đầu nối)
-            if (isNoConnector && cCode.startsWith('854442')) {
-                console.warn("[Post-Audit Gatekeeper] Auto-correcting 8544.42 -> 8544.49 (No Connector Guard)");
-                if (isTelecom) {
-                    res.clean_code = '85444913';
-                    res.hs_code = '8544.49.13';
+            // Universal GRI-6 Engine: kiểm tra chéo mã do AI đề xuất (thay thế các Gatekeeper vá riêng lẻ)
+            try {
+                if (window.UniversalEngine && cCode.length >= 4) {
+                    const qi = UniversalEngine.extractQuery(fullNorm);
+                    const ev = UniversalEngine.evaluate(cCode, qi);
+                    if (ev[0]) {
+                        const hn = (typeof extractHeadNounStatutory === 'function') ? UniversalEngine.norm(extractHeadNounStatutory(rawInput.name || '')) : '';
+                        let rs = UniversalEngine.genericResolve(hn, fullNorm);
+                        if (!rs) rs = UniversalEngine.reroute(cCode, fullNorm);
+                        console.warn('[GRI6 Engine] AI code ' + cCode + ' bị loại: ' + ev[1]);
+                        if (rs) {
+                            const raw = rs.code.replace(/\./g, '');
+                            const dbi = (window.HS_DATABASE || []).find(it => (it.c || '').replace(/\./g, '') === raw);
+                            res.clean_code = raw;
+                            res.hs_code = rs.code;
+                            res.is_six_digit_proposed = raw.length === 6;
+                            if (dbi) { res.item_description = dbi.vn; res.mfn = dbi.mfn ? dbi.mfn + '%' : res.mfn; res.vat = dbi.vat || res.vat; }
+                            res.gri6 = 'Áp dụng GRI 6 (Universal Engine): đã loại mã AI đề xuất ' + cCode + ' vì ' + ev[1] + '. Các nhánh cùng cấp bị loại: ' + (rs.dropped || 'không có') + '.';
+                            res.exclusions = 'Loại trừ mã ' + cCode + ': ' + ev[1];
+                        } else {
+                            res.is_insufficient_info = true;
+                            res.warning_title = 'Mã AI đề xuất bị cổng GRI 6 loại, cần bổ sung thông tin';
+                            res.warning_message = 'Mã ' + cCode + ' không thỏa điều kiện cùng cấp gạch nối: ' + ev[1] + '. Chưa đủ dữ kiện để chọn mã thay thế chính xác.';
+                        }
+                    }
                 }
-            }
-
-            // Gatekeeper 4: Băng tải/đai tải gia cố kim loại bị bắt nhầm vào 4010.12 hoặc 4010.19
-            const isConveyor = /\b(?:dai\s+tai|bang\s+tai|conveyor\s+belt|bang\s+chuyen)\b/i.test(fullNorm);
-            const hasMetalReinforce = /\b(?:kim\s+loai|thep|metal|steel|wire|day\s+thep|soi\s+kim\s+loai)\b/i.test(fullNorm);
-            if (isConveyor && hasMetalReinforce && (cCode.startsWith('401012') || cCode.startsWith('401019') || cCode.startsWith('84'))) {
-                console.warn("[Post-Audit Gatekeeper] Auto-correcting 4010.1x -> 4010.11.00 (Metal Reinforced Conveyor Belt Guard)");
-                res.clean_code = '40101100';
-                res.hs_code = '4010.11.00';
-                res.item_description = '- - Chỉ được gia cố bằng kim loại';
-                res.mfn = '5%';
-                res.vat = '8/10';
-                res.gri6 = "Áp dụng Quy tắc 6 (GRI 6): Đai tải/băng tải bằng cao su lưu hóa được gia cố bằng kim loại thuộc nhóm 40.10, phân nhóm 1 gạch [- Băng tải hoặc đai tải:], phân nhóm 2 gạch [-- Chỉ được gia cố bằng kim loại] mã số chính xác là 4010.11.00 (Thuế NK MFN 5%). Loại trừ mã 4010.12.00 (Chỉ gia cố bằng vật liệu dệt).";
-            }
-
-            // Gatekeeper 5: Thiết bị nhóm 84.24 (máy rửa/làm sạch, phun xịt) hoạt động bằng điện
-            const isElectricMachine = /\b(?:hoat\s+dong\s+bang\s+dien|chay\s+dien|dung\s+dien|dong\s+co\s+dien|motor\s+dien|dien\s+ap|\d+\s*(?:v|kw|w|kva|hz))\b/i.test(fullNorm);
-            const isNonElectricMachine = /\b(?:khong\s+hoat\s+dong\s+bang\s+dien|khong\s+dung\s+dien|chay\s+co|chay\s+bang\s+tay|khi\s+nen|dong\s+co\s+xang|dong\s+co\s+diesel)\b/i.test(fullNorm);
-            if (cCode.startsWith('842489')) {
-                if (isElectricMachine && !isNonElectricMachine && cCode === '84248990') {
-                    console.warn("[Post-Audit Gatekeeper] Auto-correcting 8424.89.90 -> 8424.89.50 (Electric Operated Machine Guard)");
-                    res.clean_code = '84248950';
-                    res.hs_code = '8424.89.50';
-                    res.item_description = '- - - Hoạt động bằng điện';
-                    res.mfn = '0%';
-                    res.vat = '8/10';
-                    res.gri6 = "Áp dụng Quy tắc 6 (GRI 6): Thiết bị thuộc nhóm 84.24, phân nhóm 8424.89, cấp độ 3 gạch [- - - Hoạt động bằng điện] có mã số định danh cụ thể là 8424.89.50 (Thuế NK MFN 0%). Loại trừ tuyệt đối mã 8424.89.90 (dành cho loại không hoạt động bằng điện).";
-                    res.exclusions = "Loại trừ mã 8424.89.90: Do hàng hóa sử dụng động cơ/máy bơm hoạt động bằng điện, đáp ứng đích danh tiêu chí phân nhánh tại phân nhóm 3 gạch 8424.89.50.";
-                } else if (isNonElectricMachine && cCode === '84248950') {
-                    console.warn("[Post-Audit Gatekeeper] Auto-correcting 8424.89.50 -> 8424.89.90 (Non-Electric Machine Guard)");
-                    res.clean_code = '84248990';
-                    res.hs_code = '8424.89.90';
-                    res.item_description = '- - - - Không hoạt động bằng điện';
-                    res.mfn = '0%';
-                    res.vat = '8/10';
-                }
-            }
+            } catch (eEng) { console.warn('UniversalEngine post-audit error', eEng); }
 
             return res;
         }

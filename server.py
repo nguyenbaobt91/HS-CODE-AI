@@ -847,7 +847,7 @@ CHAPTER_82_TOOLS_HEADINGS = {
     '8207', '8208', '8209', '8202', '8203', '8204', '8205'
 }
 
-def audit_statutory_constraints(code, head, item_desc, sub_desc, decomp, full_text_norm):
+def _audit_notes_legacy(code, head, item_desc, sub_desc, decomp, full_text_norm):
     """
     Hệ thống kiểm toán pháp lý tự động đa chiều:
     - Kiểm tra Chú giải Phần / Chương (Section/Chapter Notes)
@@ -885,27 +885,7 @@ def audit_statutory_constraints(code, head, item_desc, sub_desc, decomp, full_te
         if head in NOTE_2B_PARTS_HEADINGS or head[:2] in ['84', '85']:
             return True, -5000, f"Vi phạm Chú giải 1(k) Phần XVI: Dụng cụ và lưỡi cắt thuộc Chương 82 loại trừ khỏi Phần XVI"
 
-        # D. Quy tắc 6 (GRI 6): Phân nhánh cơ chế vận hành theo gạch nối (Hoạt động bằng điện vs Không hoạt động bằng điện)
-    is_electric_query = (
-        bool(re.search(r'\b(?:hoat\s+dong\s+bang\s+dien|chay\s+bang\s+dien|chay\s+dien|bang\s+dien|electrically\s+operated|electric|motor\s+driven)\b', full_text_norm)) or
-        bool(re.search(r'\b(?:\d+\s*(?:v|vac|vdc|w|kw|hp|kva|ampe|a)\b)', full_text_norm))
-    ) and not bool(re.search(r'\b(?:khong\s+(?:hoat\s+dong\s+bang\s+)?dien|khong\s+chay\s+dien|khong\s+dung\s+dien|bang\s+tay|thu\s+cong|manual|not\s+electrically)\b', full_text_norm))
-
-    is_non_electric_query = bool(re.search(r'\b(?:khong\s+(?:hoat\s+dong\s+bang\s+)?dien|khong\s+chay\s+dien|khong\s+dung\s+dien|bang\s+tay|thu\s+cong|manual|hand\s+operated|not\s+electrically)\b', full_text_norm))
-
-    is_electric_line = bool(re.search(r'\b(?:hoat\s+dong\s+bang\s+dien|electrically\s+operated)\b', item_norm)) and not bool(re.search(r'\b(?:khong\s+hoat\s+dong\s+bang\s+dien|not\s+electrically\s+operated)\b', item_norm))
-    is_non_electric_line = bool(re.search(r'\b(?:khong\s+hoat\s+dong\s+bang\s+dien|not\s+electrically\s+operated)\b', item_norm))
-
-    if is_electric_query:
-        if is_non_electric_line:
-            return True, -9000, "Vi phạm GRI 6: Hàng hóa hoạt động bằng điện, loại trừ phân nhánh không hoạt động bằng điện"
-        if is_electric_line:
-            return False, 3000, "Khớp cấp độ gạch nối GRI 6: Hoạt động bằng điện"
-    elif is_non_electric_query:
-        if is_electric_line:
-            return True, -9000, "Vi phạm GRI 6: Hàng hóa không hoạt động bằng điện, loại trừ phân nhánh hoạt động bằng điện"
-        if is_non_electric_line:
-            return False, 3000, "Khớp cấp độ gạch nối GRI 6: Không hoạt động bằng điện"
+    # D. (Da chuyen sang Universal GRI-6 Engine: Sibling Tree + Polarity + Quantitative)
 
 # C2. Luật phân tầng Chú giải 1(g) Phần XVI (Sản phẩm plastic loại trừ khỏi Phần XVI)
     is_plastic = any(m[0] == 'plastic' for m in decomp.get('materials', []))
@@ -1128,6 +1108,32 @@ def audit_statutory_constraints(code, head, item_desc, sub_desc, decomp, full_te
         return True, -5000, "Vi phạm Chú giải 2(a) Phần XVI: Quạt công nghiệp và máy thổi khí định danh tại Nhóm 84.14, ưu tiên tuyệt đối hơn nhóm lò nung 85.14 hoặc thiết bị nhiệt 84.19"
 
     return False, 0, ""
+
+
+try:
+    import universal_engine as _ue
+except Exception as _e_ue:
+    print("Warning: universal_engine not loaded:", _e_ue)
+    _ue = None
+
+
+def audit_statutory_constraints(code, head, item_desc, sub_desc, decomp, full_text_norm):
+    """Cong kiem toan phap ly: (1) Universal GRI-6 Engine (cay gach noi, phu dinh, nguong so)
+    -> (2) Chu giai Phan/Chuong (legacy notes)."""
+    bonus = 0
+    if _ue is not None:
+        try:
+            dq, why, bonus = _ue.evaluate(code, _ue.extract_query(full_text_norm))
+            if dq:
+                return True, -9000, "Vi phạm GRI 6 (Universal Engine): " + why
+        except Exception as _e:
+            print("universal_engine error:", _e)
+            bonus = 0
+    is_dq, pen, reason = _audit_notes_legacy(code, head, item_desc, sub_desc, decomp, full_text_norm)
+    if is_dq:
+        return is_dq, pen, reason
+    return False, pen + bonus, reason
+
 
 def decompose_query(query_text, desc="", use="", specs="", model_en=""):
     text = (query_text or '').strip()
@@ -1402,6 +1408,55 @@ except Exception as eWalker:
     print("Warning: Could not load StatutoryTreeWalker:", eWalker)
     statutory_walker = None
 
+
+def engine_validate_walker(stat_res, item_input, full_text):
+    """Kiem tra cheo ket qua cua StatutoryTreeWalker bang Universal GRI-6 Engine.
+    - Ma bi engine loai (sai nguong so / sai phu dinh / sai nhom 4 so theo dieu kien) -> thu giai quyet lai bang generic_resolve.
+    - Walker bao thieu du kien -> thu generic_resolve (chi chap nhan khi ket qua khong nhap nhang)."""
+    if _ue is None or not isinstance(stat_res, dict):
+        return stat_res
+    try:
+        status = stat_res.get("status")
+        code = (stat_res.get("code") or "").replace('.', '')
+        qi = _ue.extract_query(remove_accents(full_text))
+        need = False
+        why_txt = ""
+        if status == "INSUFFICIENT_INFO":
+            need = True
+        elif code.isdigit() and len(code) >= 4:
+            dq, why, _ = _ue.evaluate(code, qi)
+            if dq:
+                need = True
+                why_txt = why
+        if not need:
+            return stat_res
+        head_noun = ""
+        try:
+            head_noun = statutory_walker.extract_attributes(item_input.get("name", ""), full_text).get("head_noun", "")
+        except Exception:
+            pass
+        res = _ue.generic_resolve(head_noun, remove_accents(full_text))
+        if not res and status != "INSUFFICIENT_INFO" and code.isdigit():
+            res = _ue.reroute(code, remove_accents(full_text))
+        if res:
+            return {
+                "code": res["code"], "level": res["level"], "status": res["status"],
+                "reasoning": f"Áp dụng GRI 1: cụm danh từ chính '{res['phrase']}' khớp cây biểu thuế. Áp dụng GRI 6 (Universal Engine - so sánh các nhánh cùng cấp gạch nối, điều kiện phủ định và ngưỡng số): đã loại các nhánh không thỏa: {res['dropped'] or 'không có'}.",
+                "missing_attributes": [] if res["status"] == "EXACT_8_DIGIT" else ["8_digit_discriminator"],
+                "assumptions": "Phân loại bằng Universal GRI-6 Engine",
+                "reserve_code": stat_res.get("reserve_code", "N/A"),
+            }
+        if status != "INSUFFICIENT_INFO":
+            # Ma cua walker bi engine loai nhung khong tim duoc ma thay the -> khong xuat ma sai
+            return {
+                "code": "INSUFFICIENT_INFO", "level": 0, "status": "INSUFFICIENT_INFO",
+                "reasoning": f"Mã {stat_res.get('code')} bị loại bởi cổng GRI 6: {why_txt}. Chưa đủ dữ kiện để chọn mã thay thế chính xác.",
+                "missing_attributes": ["technical_specs"], "assumptions": "N/A", "reserve_code": "N/A",
+            }
+    except Exception as e:
+        print("engine_validate_walker error:", e)
+    return stat_res
+
 def classify_product_python(name, desc="", use="", specs="", model_en=""):
     full_text = f"{name} {desc} {use} {specs} {model_en}".strip()
     full_text_norm = remove_accents(full_text)
@@ -1417,6 +1472,7 @@ def classify_product_python(name, desc="", use="", specs="", model_en=""):
             "model_en": model_en
         }
         stat_res = statutory_walker.classify(item_input)
+        stat_res = engine_validate_walker(stat_res, item_input, full_text)
         if stat_res.get("status") in ["INSUFFICIENT_INFO", "STOP_4_DIGIT", "STOP_6_DIGIT", "EXACT_8_DIGIT"]:
             c_code = stat_res.get("code", "")
             clean_code = c_code.replace('.', '')
@@ -2454,6 +2510,12 @@ BẮT BUỘC TUÂN THỦ NGUYÊN TẮC PHÁP LÝ HẢI QUAN THEO 6 QUY TẮC GRI
    - Trong mục "explanatory_notes": Trích dẫn trung thực các đoạn văn Chú giải HS 2022 WCO ở trên kèm trang tham chiếu.
    - Trong mục "exclusions": Bắt buộc giải thích rõ lý do pháp lý loại trừ từng mã ứng viên đối thủ còn lại.
 
+BẢNG SO SÁNH ĐỐI KHÁNG CÁC NHÁNH CÙNG CẤP GẠCH NỐI (BẮT BUỘC TRƯỚC KHI CHỐT MÃ 8 SỐ):
+- Trong trường "gri6", TRƯỚC KHI nêu mã cuối cùng, phải lập bảng theo từng cấp gạch nối, đi từ cấp "-" xuống cấp sâu nhất. Mỗi cấp liệt kê TẤT CẢ các nhánh anh em cùng cấp trong danh sách ứng viên, ghi rõ: [Nhánh] | [ĐẠT/LOẠI] | [Lý do đối chiếu với dữ kiện hàng hóa].
+- Với cặp nhánh đối lập (có X / không X, hoạt động bằng điện / không hoạt động bằng điện, đã gắn / chưa gắn đầu nối...): hàng có X thì LOẠI nhánh "không X" và ngược lại.
+- Với nhánh có ngưỡng số (không quá / dưới / trên ... V, A, W, kVA): đổi về cùng đơn vị rồi so sánh với số liệu thực tế; nhánh không thỏa phải ghi LOẠI. Giá trị bằng đúng ngưỡng "dưới X" thì KHÔNG thỏa "dưới X".
+- Mã 8 số cuối cùng CHỈ được lấy từ nhánh còn ĐẠT ở cấp sâu nhất.
+
 YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì ngoài JSON):
 {{
   "step1_tech_review": {{
@@ -2738,19 +2800,22 @@ def run_automation_workflow(name, desc, use, specs="", model_en="", image_b64=No
                     matched = next((item for item in HS_DATABASE if item.get('c', '').replace('.', '').startswith(g_code[:6])), None)
                 if matched:
                     best_item = matched
+                    # Kiem tra cheo ma do AI de xuat bang Universal GRI-6 Engine
+                    try:
+                        _ft = remove_accents(f"{name} {desc} {use} {specs} {model_en}")
+                        _gc = matched.get('c', '').replace('.', '')
+                        if _ue is not None and len(_gc) == 8 and _ue.evaluate(_gc, _ue.extract_query(_ft))[0]:
+                            _rr = _ue.reroute(_gc, _ft)
+                            if _rr and _rr['status'] == 'EXACT_8_DIGIT':
+                                _rc = _rr['code'].replace('.', '')
+                                _alt = next((it for it in HS_DATABASE if it.get('c', '').replace('.', '') == _rc), None)
+                                if _alt:
+                                    print(f"GRI6 Engine: AI code {_gc} bi loai ({_rr['dropped']}) -> {_rc}")
+                                    best_item = _alt
+                    except Exception as _eg:
+                        print("GRI6 engine post-check error:", _eg)
                     print(f"Gemini proposed statutory code {matched.get('c')} ({matched.get('vn')}) verified & adopted.")
                 
-                # Post-Audit Gatekeeper for 8424.89
-                full_text_check = f"{name} {desc} {use} {specs} {model_en}".lower()
-                is_elec = bool(re.search(r'\b(?:hoat\s+dong\s+bang\s+dien|chay\s+dien|dung\s+dien|dong\s+co\s+dien|motor\s+dien|dien\s+ap|\d+\s*(?:v|kw|w|kva|hz))\b', full_text_check))
-                is_non_elec = bool(re.search(r'\b(?:khong\s+hoat\s+dong\s+bang\s+dien|khong\s+dung\s+dien|chay\s+co|chay\s+bang\s+tay|khi\s+nen|dong\s+co\s+xang|dong\s+co\s+diesel)\b', full_text_check))
-                b_code = best_item.get('c', '').replace('.', '')
-                if b_code.startswith('842489'):
-                    if is_elec and not is_non_elec and b_code == '84248990':
-                        best_item = next((item for item in HS_DATABASE if item.get('c', '').replace('.', '') == '84248950'), best_item)
-                        print("Post-Audit Gatekeeper auto-corrected 8424.89.90 -> 8424.89.50")
-                    elif is_non_elec and b_code == '84248950':
-                        best_item = next((item for item in HS_DATABASE if item.get('c', '').replace('.', '') == '84248990'), best_item)
         except Exception as e:
             print("Gemini integration fallback:", e)
 

@@ -1,0 +1,417 @@
+{
+ "engine": [
+  {
+   "name": "Cong tac 220V 10A",
+   "query": "Công tắc chuyển mạch điện 220V 10A",
+   "keep": [
+    "85365096"
+   ],
+   "drop": [
+    "85365099",
+    "85351000"
+   ]
+  },
+  {
+   "name": "Cong tac 25A",
+   "query": "Công tắc điện công nghiệp 380V 25A",
+   "keep": [
+    "85365099"
+   ],
+   "drop": [
+    "85365096"
+   ]
+  },
+  {
+   "name": "Bien 15,9A",
+   "query": "Công tắc điện 220V 15.9A",
+   "keep": [
+    "85365096"
+   ],
+   "drop": [
+    "85365099"
+   ]
+  },
+  {
+   "name": "Bien 16A (khong duoi 16)",
+   "query": "Công tắc điện 220V 16A",
+   "keep": [
+    "85365099"
+   ],
+   "drop": [
+    "85365096"
+   ]
+  },
+  {
+   "name": "Bien 16,1A",
+   "query": "Công tắc điện 220V 16.1A",
+   "keep": [
+    "85365099"
+   ],
+   "drop": [
+    "85365096"
+   ]
+  },
+  {
+   "name": "Nguoi dung viet \"duoi 16A\"",
+   "query": "Công tắc điện 220V, dòng điện dưới 16A",
+   "keep": [
+    "85365096"
+   ],
+   "drop": [
+    "85365099"
+   ]
+  },
+  {
+   "name": "Nguoi dung viet \"tren 16A\"",
+   "query": "Công tắc điện 220V, dòng điện trên 16A",
+   "keep": [
+    "85365099"
+   ],
+   "drop": [
+    "85365096"
+   ]
+  },
+  {
+   "name": "Ha the 1000V -> 8536",
+   "query": "Cầu dao đóng ngắt 1000V",
+   "keep": [
+    "85365099"
+   ],
+   "drop": [
+    "85352190",
+    "85351000"
+   ]
+  },
+  {
+   "name": "Trung the 1001V -> 8535",
+   "query": "Cầu dao cách ly 1001V",
+   "keep": [
+    "85352190"
+   ],
+   "drop": [
+    "85365099"
+   ]
+  },
+  {
+   "name": "Cau dao 24kV 630A -> 8535",
+   "query": "Cầu dao cách ly trung thế 24kV 630A",
+   "keep": [
+    "85353019"
+   ],
+   "drop": [
+    "85365099",
+    "85365096",
+    "85353020"
+   ]
+  },
+  {
+   "name": "Hoat dong bang dien",
+   "query": "Máy làm sạch linh kiện hoạt động bằng điện",
+   "keep": [
+    "84248950"
+   ],
+   "drop": [
+    "84248990"
+   ]
+  },
+  {
+   "name": "Khong hoat dong bang dien",
+   "query": "Thiết bị phun rửa không hoạt động bằng điện, thao tác thủ công",
+   "keep": [
+    "84248990"
+   ],
+   "drop": [
+    "84248950"
+   ]
+  },
+  {
+   "name": "Cap mang Cat6 UTP (vien thong, <=80V)",
+   "query": "Cáp mạng Cat6 UTP 4 đôi vỏ PVC chưa gắn đầu nối, điện áp tín hiệu 5V, dùng cho mạng LAN",
+   "keep": [
+    "85444913"
+   ],
+   "drop": [
+    "85444921",
+    "85444922",
+    "85444923",
+    "85444924",
+    "85444929"
+   ]
+  },
+  {
+   "name": "Cap vien thong 220V (>80V)",
+   "query": "Cáp viễn thông điện thoại vỏ plastic điện áp 220V",
+   "keep": [
+    "85444932"
+   ],
+   "drop": [
+    "85444913",
+    "85444922"
+   ]
+  },
+  {
+   "name": "Day o to 12V khong vien thong",
+   "query": "Dây đơn có vỏ bọc chống nhiễu dùng sản xuất bó dây ô tô, 12V, chưa gắn đầu nối",
+   "keep": [
+    "85444921"
+   ],
+   "drop": [
+    "85444932"
+   ]
+  },
+  {
+   "name": "Bang tai gia co kim loai",
+   "query": "Đai tải băng tải cao su gia cố bằng lõi thép",
+   "keep": [
+    "40101100"
+   ],
+   "drop": [
+    "40101200",
+    "40101900"
+   ]
+  },
+  {
+   "name": "Bang tai gia co vat lieu det",
+   "query": "Băng tải cao su gia cố bằng sợi vải dệt",
+   "keep": [
+    "40101200"
+   ],
+   "drop": [
+    "40101100",
+    "40101900"
+   ]
+  },
+  {
+   "name": "Co o bi",
+   "query": "Thanh trượt thép có ổ bi",
+   "keep": [
+    "84821000"
+   ],
+   "drop": []
+  }
+ ],
+ "pipeline": [
+  {
+   "name": "Cong tac 10A",
+   "info": {
+    "name": "Công tắc chuyển mạch điện 220V 10A",
+    "desc": "Vỏ nhựa PC/ABS, tiếp điểm đồng",
+    "use": "Đóng ngắt mạch điện hạ thế",
+    "specs": "Điện áp 220V, dòng điện định mức 10A"
+   },
+   "expected": "85365096"
+  },
+  {
+   "name": "Cong tac 25A",
+   "info": {
+    "name": "Công tắc điện công nghiệp 380V 25A",
+    "desc": "Vỏ nhựa",
+    "use": "Đóng ngắt mạch điện",
+    "specs": "Điện áp 380V, dòng điện 25A"
+   },
+   "expected": "85365099"
+  },
+  {
+   "name": "May rua dien",
+   "info": {
+    "name": "Máy làm sạch linh kiện cơ khí (máy rửa công nghiệp) hoạt động bằng điện",
+    "desc": "Sử dụng thiết bị bơm ly tâm với cánh bơm dạng mở",
+    "use": "dùng để rửa linh kiện cơ khí",
+    "specs": ""
+   },
+   "expected": "84248950"
+  },
+  {
+   "name": "Cau dao 24kV",
+   "info": {
+    "name": "Cầu dao cách ly trung thế 24kV 630A",
+    "desc": "Cầu dao đóng ngắt mạch điện cao thế ngoài trời",
+    "use": "Đóng cắt và bảo vệ lưới điện truyền tải",
+    "specs": "Điện áp định mức 24kV, dòng định mức 630A"
+   },
+   "expected": "853530"
+  },
+  {
+   "name": "[CHUYEN GIA] Cleaning system Top loader TL 80 MV2A (B",
+   "info": {
+    "name": "Cleaning system Top loader TL 80 MV2A (BUPI-GOLSER, Austria, 3x400V, 6,8 kW, 2026)",
+    "desc": "Hệ thống làm sạch (máy rửa công nghiệp) nạp liệu từ trên xuống, có giỏ quay, công suất 6.8 kW",
+    "use": "",
+    "specs": ""
+   },
+   "expected": "84248950"
+  },
+  {
+   "name": "[CHUYEN GIA] FZGMG 72013 Shaft gear drive TL complete",
+   "info": {
+    "name": "FZGMG 72013 Shaft gear drive TL complete",
+    "desc": "Cụm trục truyền động bánh răng hoàn chỉnh cho dòng TL, động cơ giảm tốc",
+    "use": "",
+    "specs": ""
+   },
+   "expected": "85015119"
+  },
+  {
+   "name": "[CHUYEN GIA] FZGMK 59553 Gas pressure shock absorber ",
+   "info": {
+    "name": "FZGMK 59553 Gas pressure shock absorber 250N",
+    "desc": "Giảm chấn khí nén (phuộc hơi) lực 250N, mã FZGMK 59553",
+    "use": "",
+    "specs": ""
+   },
+   "expected": "84123100"
+  },
+  {
+   "name": "[CHUYEN GIA] FZGMK 59552 Gas pressure shock absorber ",
+   "info": {
+    "name": "FZGMK 59552 Gas pressure shock absorber 500N",
+    "desc": "Giảm chấn khí nén (phuộc hơi) lực 500N dùng cho máy TL80",
+    "use": "",
+    "specs": ""
+   },
+   "expected": "84123100"
+  },
+  {
+   "name": "[CHUYEN GIA] FZGEL 85348 Liquiphant FTL31-13E0/0 24V ",
+   "info": {
+    "name": "FZGEL 85348 Liquiphant FTL31-13E0/0 24V DC",
+    "desc": "Cảm biến báo mức chất lỏng (công tắc mức dạng rung) Liquiphant FTL31",
+    "use": "",
+    "specs": ""
+   },
+   "expected": "90261090"
+  },
+  {
+   "name": "[CHUYEN GIA] FZGMK 85149 Angle Seat Valve (Schubert &",
+   "info": {
+    "name": "FZGMK 85149 Angle Seat Valve (Schubert & Salzer)",
+    "desc": "Van xiên (van góc) DN015-1/2 inch kèm van điều khiển 1/8 inch",
+    "use": "",
+    "specs": ""
+   },
+   "expected": "84818082"
+  },
+  {
+   "name": "[CHUYEN GIA] FZEZB 76488 Filter bag NMO 50 P04S 50S",
+   "info": {
+    "name": "FZEZB 76488 Filter bag NMO 50 P04S 50S",
+    "desc": "Túi lọc chất lỏng (lưới nylon NMO 50 micron), model P04S 50S",
+    "use": "",
+    "specs": ""
+   },
+   "expected": "59119090"
+  },
+  {
+   "name": "[CHUYEN GIA] FZGDT 80230 Mechanical Seal Kit (Grundfo",
+   "info": {
+    "name": "FZGDT 80230 Mechanical Seal Kit (Grundfos)",
+    "desc": "Bộ phớt cơ khí và bộ gioăng làm kín dùng cho bơm Grundfos",
+    "use": "",
+    "specs": ""
+   },
+   "expected": "84842000"
+  },
+  {
+   "name": "[CHUYEN GIA] FZGEL 52424 Electric Radiator",
+   "info": {
+    "name": "FZGEL 52424 Electric Radiator",
+    "desc": "Thanh điện trở gia nhiệt (bộ sưởi điện) dùng cho máy TL80",
+    "use": "",
+    "specs": ""
+   },
+   "expected": "85161030"
+  },
+  {
+   "name": "[CHUYEN GIA] HZGGK 80687 Foam rubber profile 12 x 12 ",
+   "info": {
+    "name": "HZGGK 80687 Foam rubber profile 12 x 12 mm",
+    "desc": "Thanh gioăng cao su xốp định hình kích thước 12 x 12 mm",
+    "use": "",
+    "specs": ""
+   },
+   "expected": "40081900"
+  },
+  {
+   "name": "[CHUYEN GIA] FZGLG 72947 Thrust bearing TL80/100 (igl",
+   "info": {
+    "name": "FZGLG 72947 Thrust bearing TL80/100 (iglidur)",
+    "desc": "Bạc đạn chà (vòng bi chặn trục / ổ trượt chặn) dùng cho máy TL80/100",
+    "use": "",
+    "specs": ""
+   },
+   "expected": "84833090"
+  },
+  {
+   "name": "[CHUYEN GIA] FZGLG 74907 iglidur J sliding film",
+   "info": {
+    "name": "FZGLG 74907 iglidur J sliding film",
+    "desc": "Tấm lót trượt (bạc lót / màng trượt) vật liệu nhựa Iglidur J, dài 57mm",
+    "use": "",
+    "specs": ""
+   },
+   "expected": "39209990"
+  },
+  {
+   "name": "[CHUYEN GIA] FZGLG 72794 Shaft seal WDR 25/35/7 SL",
+   "info": {
+    "name": "FZGLG 72794 Shaft seal WDR 25/35/7 SL",
+    "desc": "Phớt chắn dầu trục (phớt trục) kích thước 25/35/7 mm",
+    "use": "",
+    "specs": ""
+   },
+   "expected": "40169390"
+  },
+  {
+   "name": "Bang tai kim loai",
+   "info": {
+    "name": "Băng tải (đai tải) cao su gia cố bằng lõi thép",
+    "desc": "Cao su lưu hóa, lõi thép",
+    "use": "Dùng cho băng chuyền công nghiệp",
+    "specs": ""
+   },
+   "expected": "40101100"
+  },
+  {
+   "name": "Bang tai vai det",
+   "info": {
+    "name": "Băng tải (đai tải) cao su gia cố bằng vải dệt",
+    "desc": "Cao su lưu hóa, lớp vải dệt",
+    "use": "Dùng cho băng chuyền công nghiệp",
+    "specs": ""
+   },
+   "expected": "40101200"
+  }
+ ],
+ "correction": [
+  {
+   "name": "AI sai 8544.49.21 cho cap Cat6",
+   "wrong": "85444921",
+   "text": "Cáp mạng Cat6 UTP 4 đôi vỏ PVC, chưa gắn đầu nối, không có lớp bọc chống nhiễu, điện áp tín hiệu 5V, mạng LAN viễn thông",
+   "expected": "85444913"
+  },
+  {
+   "name": "AI sai 4010.12 cho bang tai loi thep",
+   "wrong": "40101200",
+   "text": "Băng tải (đai tải) cao su gia cố bằng lõi thép dùng cho băng chuyền công nghiệp",
+   "expected": "40101100"
+  },
+  {
+   "name": "AI sai 4010.11 cho bang tai vai det",
+   "wrong": "40101100",
+   "text": "Băng tải (đai tải) cao su gia cố bằng vải dệt dùng cho băng chuyền công nghiệp",
+   "expected": "40101200"
+  },
+  {
+   "name": "AI sai 8536.50.96 cho cong tac 25A",
+   "wrong": "85365096",
+   "text": "Công tắc điện 380V 25A",
+   "expected": "853650"
+  },
+  {
+   "name": "AI sai 8424.89.90 cho may rua dien",
+   "wrong": "84248990",
+   "text": "Máy rửa công nghiệp hoạt động bằng điện 3x400V",
+   "expected": "84248950"
+  }
+ ]
+}
