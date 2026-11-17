@@ -294,6 +294,156 @@ main {
   gap: 12px;
 }
 
+/* Tab Thư viện văn bản: đầu thẻ + thanh công cụ gọn 1 hàng */
+#tab-library .card {
+  padding: 14px 18px;
+}
+#tab-library .lib-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--gray-200, #e2e8f0);
+}
+#tab-library .lib-title {
+  display: flex;
+  align-items: baseline;
+  gap: 4px 10px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+#tab-library .lib-title .card-title {
+  margin: 0;
+  font-size: 15px;
+}
+#tab-library .lib-sub {
+  font-size: 11.5px;
+  color: var(--gray-500);
+}
+#tab-library .lib-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+}
+#tab-library .lib-toolbar .search-box-container {
+  margin: 0;
+}
+#tab-library .search-input-wrapper {
+  flex: 0 0 240px;
+  width: 240px;
+  max-width: 100%;
+}
+#tab-library .search-input {
+  padding: 6px 12px 6px 32px;
+  font-size: 12.5px;
+  border-radius: 999px;
+}
+#tab-library .search-icon {
+  left: 11px;
+  font-size: 12px;
+}
+#tab-library .lib-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+#tab-library .filter-btn {
+  padding: 4px 11px;
+  font-size: 12px;
+}
+html.dark #tab-library .lib-head {
+  border-bottom-color: #334155;
+}
+
+/* Tab Biểu mẫu: ô tìm kiếm thu nhỏ, tối giản, chip lọc cùng hàng */
+#tab-forms .search-box-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 12px;
+}
+#tab-forms .search-input-wrapper {
+  flex: 0 0 240px;
+  max-width: 100%;
+}
+#tab-forms .search-input {
+  padding: 6px 12px 6px 32px;
+  font-size: 12.5px;
+  border-radius: 999px;
+}
+#tab-forms .search-icon {
+  left: 11px;
+  font-size: 12px;
+}
+#tab-forms .filter-btn-group {
+  margin-top: 0;
+  gap: 6px;
+}
+#tab-forms .filter-btn {
+  padding: 4px 11px;
+  font-size: 12px;
+}
+
+/* Thanh 4 tab hướng dẫn chuyên đề: gọn, sang */
+.guide-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 14px;
+  width: fit-content;
+  max-width: 100%;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+.guide-nav .guide-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #475569;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.guide-nav .guide-nav-btn:hover {
+  background: #ffffff;
+  color: #0284c7;
+}
+.guide-nav .guide-nav-btn.active {
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+  color: #ffffff;
+  box-shadow: 0 3px 8px rgba(2, 132, 199, 0.3);
+}
+html.dark .guide-nav {
+  background: #1e293b;
+  border-color: #334155;
+}
+html.dark .guide-nav .guide-nav-btn {
+  color: #cbd5e1;
+}
+html.dark .guide-nav .guide-nav-btn:hover {
+  background: #334155;
+  color: #ffffff;
+}
+html.dark .guide-nav .guide-nav-btn.active {
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+  color: #ffffff;
+}
+
 /* Callouts */
 .callout {
   padding: 16px 20px;
@@ -1148,10 +1298,6 @@ html.dark strong {
   <!-- TAB 1: TỔNG QUAN PHÁP LÝ -->
   <div id="tab-overview" class="tab-pane active">
     
-    <div class="callout callout-info">
-      <strong>Khung Pháp chế Hóa chất Đồng bộ 2026:</strong> Toàn bộ hoạt động xuất nhập khẩu, sản xuất, kinh doanh và sử dụng hóa chất tại Việt Nam từ năm 2026 được điều chỉnh bởi Luật Hóa chất số 69/2025/QH15, hệ thống 04 Nghị định (24, 25, 26, 28/2026/NĐ-CP), 02 Thông tư (01, 02/2026/TT-BCT) và Nghị quyết số 19/2026/NQ-CP về đơn giản hóa thủ tục hành chính.
-    </div>
-
     <!-- Phân cấp Thẩm quyền 1040 -->
     <div class="card">
       <div class="card-header-clean">
@@ -1247,42 +1393,39 @@ html.dark strong {
   <div id="tab-cas" class="tab-pane">
 
     <!-- PHÂN HỆ QUÉT & THẨM ĐỊNH MSDS / SDS TỰ ĐỘNG (PHƯƠNG ÁN 2) -->
-    <div class="card" style="margin-bottom: 24px; border: 2px solid #38bdf8; background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%); box-shadow: 0 4px 18px rgba(2, 132, 199, 0.08);">
-      <div class="card-header-clean" style="border-bottom: 1px solid #e0f2fe; padding-bottom: 12px; margin-bottom: 14px;">
-        <div>
-          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-            <span style="font-size: 24px;">📑</span>
-            <div class="card-title" style="margin: 0; font-size: 19px; color: var(--navy); font-weight: 800;">Công Cụ Quét MSDS / SDS &amp; Thẩm Định Hải Quan Tự Động</div>
-            <span class="pill pill-success" style="font-size: 11px;">NGHỊ QUYẾT 19/2026/NQ-CP</span>
-            <span class="pill pill-primary" style="font-size: 11px;">100% CLIENT-SIDE BẢO MẬT</span>
-          </div>
-          <div style="font-size: 13px; color: var(--gray-600); margin-top: 6px; line-height: 1.55;">
-            Kéo thả tệp <strong>PDF Phiếu an toàn hóa chất (MSDS/SDS)</strong> hoặc dán nội dung <strong>Mục 3 (Composition)</strong>. Hệ thống tự động bóc tách mã CAS, hàm lượng % nồng độ và đối soát tức thì với <strong>1.382 hóa chất kiểm soát</strong> để đưa ra phán quyết hải quan!
-          </div>
+    <div class="card" style="margin-bottom: 14px; padding: 12px 16px; border: 1px solid #38bdf8; background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%); box-shadow: 0 2px 10px rgba(2, 132, 199, 0.07);">
+      <!-- Tiêu đề + chế độ nhập: gộp 1 hàng gọn -->
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; margin-bottom: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0;">
+          <span style="font-size: 18px;">📑</span>
+          <div class="card-title" style="margin: 0; font-size: 15px; color: var(--navy); font-weight: 800;">Quét MSDS / SDS &amp; Thẩm Định Hải Quan Tự Động</div>
+          <span class="pill pill-success" style="font-size: 10px;">NQ 19/2026/NQ-CP</span>
+          <span class="pill pill-primary" style="font-size: 10px;">100% BẢO MẬT</span>
         </div>
-      </div>
-
-      <!-- Mode Selector Tabs -->
-      <div style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
-        <button id="msds-tab-pdf" class="btn btn-primary" style="padding: 7px 16px; font-size: 13px; font-weight: 700;" onclick="switchMsdsInputMode('pdf')">📂 1. Tệp PDF &amp; Ảnh Scan (Có OCR Tự Động)</button>
-        <button id="msds-tab-text" class="btn btn-outline" style="padding: 7px 16px; font-size: 13px; font-weight: 700;" onclick="switchMsdsInputMode('text')">📝 2. Dán Nội Dung Mục 3 / Danh Sách CAS</button>
+        <!-- Mode Selector Tabs -->
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <button id="msds-tab-pdf" class="btn btn-primary" style="padding: 5px 12px; font-size: 12px; font-weight: 700;" onclick="switchMsdsInputMode('pdf')">📂 Tệp PDF &amp; Ảnh Scan (OCR)</button>
+          <button id="msds-tab-text" class="btn btn-outline" style="padding: 5px 12px; font-size: 12px; font-weight: 700;" onclick="switchMsdsInputMode('text')">📝 Dán Mục 3 / Danh Sách CAS</button>
+        </div>
       </div>
 
       <!-- PDF & Scanned Image Drag & Drop Zone (With Hybrid Text + OCR) -->
       <div id="msds-zone-pdf" style="display: block;">
-        <div id="msds-drop-area" style="border: 2px dashed #0284c7; border-radius: var(--radius-md); padding: 30px 20px; text-align: center; background: #ffffff; cursor: pointer; transition: all 0.25s ease;"
+        <div id="msds-drop-area" style="border: 2px dashed #0284c7; border-radius: var(--radius-md); padding: 10px 16px; display: flex; align-items: center; gap: 14px; text-align: left; background: #ffffff; cursor: pointer; transition: all 0.25s ease;"
              onclick="document.getElementById('msds-file-input').click()"
              ondragover="handleMsdsDragOver(event)"
              ondragleave="handleMsdsDragLeave(event)"
              ondrop="handleMsdsDrop(event)">
           <input type="file" id="msds-file-input" accept=".pdf,image/png,image/jpeg,image/webp,image/jpg" style="display: none;" onchange="handleMsdsFileSelect(event)">
-          <div style="font-size: 42px; margin-bottom: 6px;">📥</div>
-          <div style="font-size: 15.5px; font-weight: 700; color: var(--navy); margin-bottom: 4px;">
-            Kéo &amp; Thả tệp PDF hoặc Hình Ảnh Scan MSDS/SDS vào đây, hoặc <span style="color: var(--primary); text-decoration: underline;">nhấp để duyệt tệp</span>
-          </div>
-          <div style="font-size: 12.5px; color: var(--gray-500); line-height: 1.6;">
-            <span style="display: inline-block; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 4px; font-weight: 700; margin-right: 4px;">🚀 Hybrid Text + OCR</span>
-            Tự động phát hiện: Đọc siêu tốc từ <strong>PDF văn bản số hóa</strong> và tự động kích hoạt <strong>OCR quang học</strong> khi gặp <strong>PDF bản scan ảnh hoặc file ảnh (PNG, JPG)</strong>. Quét 100% tại máy tính của bạn, bảo mật tuyệt đối.
+          <div style="font-size: 28px; flex-shrink: 0;">📥</div>
+          <div style="min-width: 0;">
+            <div style="font-size: 13.5px; font-weight: 700; color: var(--navy);">
+              Kéo &amp; thả PDF / ảnh scan MSDS-SDS vào đây, hoặc <span style="color: var(--primary); text-decoration: underline;">nhấp để duyệt tệp</span>
+            </div>
+            <div style="font-size: 11.5px; color: var(--gray-500); line-height: 1.45; margin-top: 2px;">
+              <span style="display: inline-block; background: #e0f2fe; color: #0369a1; padding: 1px 7px; border-radius: 4px; font-weight: 700; margin-right: 4px;">🚀 Hybrid Text + OCR</span>
+              Tự động đọc PDF số hóa hoặc scan, bóc tách mã CAS &amp; hàm lượng %, đối soát <strong>1.382 hóa chất kiểm soát</strong>. Quét 100% tại máy tính của bạn.
+            </div>
           </div>
         </div>
       </div>
@@ -1363,11 +1506,11 @@ html.dark strong {
 
   <!-- TAB 3: HƯỚNG DẪN CHUYÊN ĐỀ -->
   <div id="tab-guides" class="tab-pane">
-    <div class="grid-4" style="margin-bottom: 24px;">
-      <button class="btn btn-outline guide-nav-btn active" style="padding: 12px;" onclick="switchGuide('guide-vnsw', this)">🌐 1. Khai báo VNSW</button>
-      <button class="btn btn-outline guide-nav-btn" style="padding: 12px;" onclick="switchGuide('guide-chemicaldata', this)">📊 2. CSDL ChemicalData</button>
-      <button class="btn btn-outline guide-nav-btn" style="padding: 12px;" onclick="switchGuide('guide-giayphep', this)">📝 3. Giấy phép Cấp Tỉnh</button>
-      <button class="btn btn-outline guide-nav-btn" style="padding: 12px;" onclick="switchGuide('guide-troubleshoot', this)">🚨 4. Xử lý Sự cố Cửa khẩu</button>
+    <div class="guide-nav">
+      <button class="guide-nav-btn active" onclick="switchGuide('guide-vnsw', this)">🌐 1. Khai báo VNSW</button>
+      <button class="guide-nav-btn" onclick="switchGuide('guide-chemicaldata', this)">📊 2. CSDL ChemicalData</button>
+      <button class="guide-nav-btn" onclick="switchGuide('guide-giayphep', this)">📝 3. Giấy phép Cấp Tỉnh</button>
+      <button class="guide-nav-btn" onclick="switchGuide('guide-troubleshoot', this)">🚨 4. Xử lý Sự cố Cửa khẩu</button>
     </div>
 
     <!-- GUIDE 1: VNSW -->
@@ -1506,15 +1649,22 @@ html.dark strong {
   <!-- TAB 4: THƯ VIỆN VĂN BẢN GỐC -->
   <div id="tab-library" class="tab-pane">
     <div class="card">
-      <div class="card-header-clean">
-        <div>
-          <div class="card-title">🏛️ Thư viện Văn bản Pháp quy Gốc 2026 và Kho Tài liệu Nghiệp vụ</div>
-          <div style="font-size: 13px; color: var(--gray-500); margin-top: 4px;">Dữ liệu tự động đồng bộ từ thư mục TÀI LIỆU và DL - Toàn bộ tệp chuẩn PDF &amp; Excel</div>
+      <div class="lib-head">
+        <div class="lib-title">
+          <span class="card-title">🏛️ Thư viện Văn bản Pháp quy Gốc 2026 &amp; Kho Tài liệu Nghiệp vụ</span>
+          <span class="lib-sub">Tự động đồng bộ từ thư mục TÀI LIỆU và DL</span>
         </div>
         <span class="pill pill-success" id="lib-count-pill">43 Văn bản có sẵn</span>
       </div>
 
-              <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
+      <div class="lib-toolbar">
+        <div class="search-box-container">
+          <div class="search-input-wrapper">
+            <span class="search-icon">🔎</span>
+            <input type="text" id="doc-search-input" class="search-input" placeholder="Tìm văn bản (số hiệu, tên, từ khóa...)" oninput="filterLegalDocs()">
+          </div>
+        </div>
+        <div class="lib-chips">
           <button class="filter-btn active" onclick="setDocCategoryFilter('all', this)">Tất cả (43)</button>
           <button class="filter-btn" onclick="setDocCategoryFilter('SOP & Hướng dẫn', this)">SOP & Hướng dẫn (8)</button>
           <button class="filter-btn" onclick="setDocCategoryFilter('Luật & Nghị quyết', this)">Luật & Nghị quyết (4)</button>
@@ -1523,13 +1673,7 @@ html.dark strong {
           <button class="filter-btn" onclick="setDocCategoryFilter('Công văn & Thực tiễn', this)">Công văn & Thực tiễn (9)</button>
           <button class="filter-btn" onclick="setDocCategoryFilter('Dữ liệu Excel', this)">Dữ liệu Excel (1)</button>
         </div>
-
-        <div class="search-box-container">
-          <div class="search-input-wrapper">
-            <span class="search-icon">🔎</span>
-            <input type="text" id="doc-search-input" class="search-input" placeholder="Tìm kiếm văn bản theo số hiệu, tên luật, nghị định, thông tư, công văn hoặc từ khóa..." oninput="filterLegalDocs()">
-          </div>
-        </div>
+      </div>
 
       <div class="table-responsive">
         <table>
@@ -1646,23 +1790,11 @@ html.dark strong {
 
   <!-- TAB 6: BIỂU MẪU HÀNH CHÍNH (DOCX) -->
   <div id="tab-forms" class="tab-pane">
-    <div class="card" style="background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%); border: 1.5px solid #bfdbfe; margin-bottom: 20px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-        <div>
-          <span class="pill pill-primary" style="font-size: 12px; margin-bottom: 6px;">BỘ BIỂU MẪU CHUẨN QUỐC GIA 2026 • FILE WORD (DOCX)</span>
-          <h2 style="margin: 4px 0 6px 0; color: var(--navy); font-size: 20px;">📋 Hệ Thống 23 Biểu Mẫu Hành Chính Lĩnh Vực Hóa Chất</h2>
-          <div style="font-size: 13.5px; color: var(--gray-600); line-height: 1.5;">
-            Đầy đủ các mẫu văn bản đề nghị cấp Giấy phép (Mẫu 02, 03, 06, 07), Giấy chứng nhận đủ điều kiện (Mẫu 10, 11), Đăng ký hóa chất mới (Mẫu 12) và Khai báo Một cửa Quốc gia (Mẫu 13).
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div class="card">
       <div class="search-box-container">
         <div class="search-input-wrapper">
           <span class="search-icon">🔎</span>
-          <input type="text" id="form-search-input" class="search-input" placeholder="Tìm kiếm biểu mẫu theo tên mẫu (Mẫu 07a, Mẫu 10a, Mẫu 13a...), từ khóa hoặc mục đích..." oninput="filterForms()">
+          <input type="text" id="form-search-input" class="search-input" placeholder="Tìm mẫu (07a, 10a, 13a...)" oninput="filterForms()">
         </div>
         <div class="filter-btn-group">
           <button class="filter-btn form-filter-btn active" onclick="setFormFilter('ALL', this)">Tất cả (23)</button>
