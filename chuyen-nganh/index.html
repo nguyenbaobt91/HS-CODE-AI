@@ -187,65 +187,60 @@
     <!-- MAIN BODY -->
     <main class="max-w-[1380px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-2.5 flex-1 flex flex-col space-y-2.5">
 
-        <!-- SEARCH BAR & FILTER ROW (GỌN GÀNG, ĐẬM CHẤT OPS) -->
-        <div class="bg-white/90 dark:bg-slate-900/85 backdrop-blur-xl rounded-xl border border-white/80 dark:border-slate-800 shadow-md p-2.5 space-y-2 shrink-0">
-            <!-- Search Input -->
-            <div class="relative flex items-center">
-                <div class="absolute left-3.5 text-slate-400 text-base pointer-events-none">
+        <!-- SEARCH BAR & FILTER ROW (TRONG SUỐT, TỰ NHIÊN, KHÔNG NỀN KÉO DÀI) -->
+        <div class="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar shrink-0 py-0.5" id="filter-bar">
+            <!-- 1. Ô Tìm Kiếm Ngắn Gọn (Nền trắng riêng biệt, bo góc đổ bóng nhẹ) -->
+            <div class="relative flex items-center w-52 sm:w-60 lg:w-64 shrink-0">
+                <div class="absolute left-2.5 text-slate-400 text-xs pointer-events-none">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </div>
                 <input 
                     type="text" 
                     id="search-input" 
-                    class="w-full pl-11 pr-24 py-2 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 text-sm sm:text-base font-medium focus:outline-none focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition"
-                    placeholder="Gõ mã HS (8428.40, 8427, 8402, 8507...) hoặc Tên hàng (thang cuốn, xe nâng, nồi hơi, sắt thép, dệt may...)"
+                    class="w-full pl-7 pr-12 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 text-xs font-medium shadow-xs focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition"
+                    placeholder="Tìm mã HS, tên hàng..."
                     autofocus
                 >
-                <div class="absolute right-3 flex items-center space-x-2">
-                    <button id="clear-btn" onclick="clearSearch()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hidden text-xs font-semibold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800">
+                <div class="absolute right-2 flex items-center space-x-1">
+                    <button id="clear-btn" onclick="clearSearch()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hidden text-[10px] font-semibold px-1 py-0.2 rounded bg-slate-100 dark:bg-slate-800">
                         Xóa
                     </button>
-                    <span class="hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                    <span class="hidden sm:inline-block px-1.5 py-0.2 rounded text-[10px] font-mono text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
                         /
                     </span>
                 </div>
             </div>
 
-            <!-- Bộ lọc 4 Bộ & Mức độ Rủi ro (Pills) -->
-            <div class="flex items-center justify-between flex-wrap gap-2 text-xs">
-                <!-- BỘ LỌC TINH GỌN 1 HÀNG DUY NHẤT (PHƯƠNG ÁN 1) -->
-            <div class="flex items-center justify-between flex-wrap gap-2 pt-1" id="filter-bar">
-                <!-- Cụm Phân Loại Nghiệp Vụ Chính (Pills) -->
-                <div class="flex items-center flex-wrap gap-1.5" id="category-pills">
-                    <button onclick="setFilterMode('ALL')" data-mode="ALL" class="pill-mode px-3 py-1.5 rounded-lg font-bold bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs text-xs sm:text-sm transition">
-                        Tất Cả (648)
-                    </button>
-                    <button onclick="setFilterMode('RISK_HIGH')" data-mode="RISK_HIGH" class="pill-mode px-3 py-1.5 rounded-lg font-semibold text-rose-700 dark:text-rose-400 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-950/80 border border-rose-200 dark:border-rose-900/60 text-xs sm:text-sm transition">
-                        <i class="fa-solid fa-shield-halved mr-1 text-rose-600"></i>Rủi Ro Cao (212)
-                    </button>
-                    <button onclick="setFilterMode('RISK_MEDIUM')" data-mode="RISK_MEDIUM" class="pill-mode px-3 py-1.5 rounded-lg font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:hover:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-900/60 text-xs sm:text-sm transition">
-                        <i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i>Thông Quan Ngay (375)
-                    </button>
-                    <button onclick="setFilterMode('MEPS')" data-mode="MEPS" class="pill-mode px-3 py-1.5 rounded-lg font-semibold text-purple-700 dark:text-purple-300 bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/40 dark:hover:bg-purple-950/80 border border-purple-200 dark:border-purple-800 text-xs sm:text-sm transition">
-                        <i class="fa-solid fa-bolt mr-1 text-purple-500"></i>Dán Nhãn NL (20)
-                    </button>
-                    <button onclick="setFilterMode('MAY_CU')" data-mode="MAY_CU" class="pill-mode px-3 py-1.5 rounded-lg font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:hover:bg-amber-950/80 border border-amber-200 dark:border-amber-800 text-xs sm:text-sm transition">
-                        <i class="fa-solid fa-gear mr-1 text-amber-500"></i>Máy Cũ (41)
-                    </button>
-                </div>
+            <!-- 2. Cụm 5 Nút Lọc Trạng Thái (Thẳng hàng) -->
+            <div class="flex items-center gap-1 shrink-0 whitespace-nowrap" id="category-pills">
+                <button onclick="setFilterMode('ALL')" data-mode="ALL" class="pill-mode px-2.5 py-1.5 rounded-lg font-bold bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs text-xs transition">
+                    Tất Cả (648)
+                </button>
+                <button onclick="setFilterMode('RISK_HIGH')" data-mode="RISK_HIGH" class="pill-mode px-2.5 py-1.5 rounded-lg font-semibold text-rose-700 dark:text-rose-400 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 shadow-xs text-xs transition">
+                    <i class="fa-solid fa-shield-halved mr-1 text-rose-600 text-[11px]"></i>Rủi Ro Cao (212)
+                </button>
+                <button onclick="setFilterMode('RISK_MEDIUM')" data-mode="RISK_MEDIUM" class="pill-mode px-2.5 py-1.5 rounded-lg font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 shadow-xs text-xs transition">
+                    <i class="fa-solid fa-circle-check mr-1 text-emerald-600 text-[11px]"></i>Thông Quan Ngay (375)
+                </button>
+                <button onclick="setFilterMode('MEPS')" data-mode="MEPS" class="pill-mode px-2.5 py-1.5 rounded-lg font-semibold text-purple-700 dark:text-purple-300 bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 shadow-xs text-xs transition">
+                    <i class="fa-solid fa-bolt mr-1 text-purple-500 text-[11px]"></i>Dán Nhãn NL (20)
+                </button>
+                <button onclick="setFilterMode('MAY_CU')" data-mode="MAY_CU" class="pill-mode px-2.5 py-1.5 rounded-lg font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 shadow-xs text-xs transition">
+                    <i class="fa-solid fa-gear mr-1 text-amber-500 text-[11px]"></i>Máy Cũ (41)
+                </button>
+            </div>
 
-                <!-- Dropdown Chọn Bộ Quản Lý Tinh Gọn -->
-                <div class="relative">
-                    <select id="select-ministry" onchange="onMinistryChange(this.value)" class="appearance-none pl-2.5 pr-7 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-slate-400 dark:hover:border-slate-500 shadow-xs cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
-                        <option value="ALL">🏛️ Tất Cả 4 Bộ Quản Lý</option>
-                        <option value="Bộ Công Thương">🏛️ Bộ Công Thương (102)</option>
-                        <option value="Bộ Khoa học và Công nghệ">🏛️ Bộ Khoa học & CN (418)</option>
-                        <option value="Bộ Xây dựng">🏛️ Bộ Xây Dựng (72)</option>
-                        <option value="Bộ Nội vụ">🏛️ Bộ Nội Vụ / ATVSLĐ (56)</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
-                        <i class="fa-solid fa-chevron-down text-[10px]"></i>
-                    </div>
+            <!-- 3. Dropdown Chọn Bộ Quản Lý Tinh Gọn (Nền trắng riêng biệt, bo góc đổ bóng nhẹ) -->
+            <div class="relative shrink-0">
+                <select id="select-ministry" onchange="onMinistryChange(this.value)" class="appearance-none pl-2.5 pr-6 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 text-slate-700 dark:text-slate-200 hover:border-slate-400 dark:hover:border-slate-500 shadow-xs cursor-pointer focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                    <option value="ALL">🏛️ Tất Cả 4 Bộ Quản Lý</option>
+                    <option value="Bộ Công Thương">🏛️ Bộ Công Thương (102)</option>
+                    <option value="Bộ Khoa học và Công nghệ">🏛️ Bộ Khoa học & CN (418)</option>
+                    <option value="Bộ Xây dựng">🏛️ Bộ Xây Dựng (72)</option>
+                    <option value="Bộ Nội vụ">🏛️ Bộ Nội Vụ / ATVSLĐ (56)</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
+                    <i class="fa-solid fa-chevron-down text-[9px]"></i>
                 </div>
             </div>
         </div>
@@ -10811,7 +10806,7 @@ const KTCN_DATA = [
             currentFilterMode = mode;
             document.querySelectorAll('#category-pills .pill-mode').forEach(btn => {
                 if (btn.getAttribute('data-mode') === mode) {
-                    btn.className = "pill-mode px-3 py-1.5 rounded-lg font-bold bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs text-xs sm:text-sm transition";
+                    btn.className = "pill-mode px-2.5 py-1 rounded-lg font-bold bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs text-xs transition";
                 } else {
                     let borderClass = "border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800";
                     if (btn.getAttribute('data-mode') === 'RISK_HIGH') {
@@ -10823,7 +10818,7 @@ const KTCN_DATA = [
                     } else if (btn.getAttribute('data-mode') === 'MAY_CU') {
                         borderClass = "border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40";
                     }
-                    btn.className = `pill-mode px-3 py-1.5 rounded-xl font-semibold text-xs transition ${borderClass}`;
+                    btn.className = `pill-mode px-2.5 py-1 rounded-lg font-semibold text-xs transition ${borderClass}`;
                 }
             });
             selectedItemIndex = 0;
