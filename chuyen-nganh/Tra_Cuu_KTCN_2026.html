@@ -98,10 +98,9 @@
 <body id="app-body" class="bg-custom-port text-slate-800 dark:text-slate-100 min-h-screen flex flex-col antialiased transition-colors duration-200">
 
         <style>
-    /* Tab treo mép trái: màn hình hẹp (<1536px) gập thành biểu tượng tròn nhỏ sát mép, rê chuột để trượt ra */
+    /* Tab treo mép trái: luôn gập thành biểu tượng nhỏ sát mép (mọi kích thước màn hình), rê chuột để trượt ra */
     .hsc-dock{position:fixed;left:0;z-index:9999;display:flex;align-items:center;gap:8px;min-height:34px;max-width:34px;padding:0;overflow:hidden;border-radius:0 17px 17px 0;color:#fff;text-decoration:none;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;white-space:nowrap;cursor:pointer;box-shadow:0 6px 16px rgba(15,23,42,.28);border:1px solid rgba(255,255,255,.28);border-left:0;transition:max-width .35s cubic-bezier(.4,0,.2,1),padding .35s ease,box-shadow .2s ease,filter .2s ease}
     .hsc-dock:hover,.hsc-dock:focus-visible{max-width:380px;padding-right:12px;box-shadow:0 12px 26px rgba(15,23,42,.38);filter:brightness(1.06)}
-    @media (min-width:1536px){.hsc-dock{max-width:380px;padding-right:12px}}
     .hsc-dock .hsc-ico{width:32px;min-height:32px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;line-height:1;transition:transform .3s ease}
     .hsc-dock:hover .hsc-ico{transform:rotate(12deg)}
     .hsc-dock .hsc-txt{display:flex;flex-direction:column;text-align:left;line-height:1.2;opacity:0;transition:opacity .2s ease .08s}
@@ -109,7 +108,6 @@
     .hsc-dock .hsc-main{font-size:12px;font-weight:900}
     .hsc-dock .hsc-badge{font-size:8.5px;font-weight:900;text-transform:uppercase;padding:2px 6px;border-radius:999px;flex-shrink:0;opacity:0;transition:opacity .2s ease .08s}
     .hsc-dock:hover .hsc-txt,.hsc-dock:hover .hsc-badge,.hsc-dock:focus-visible .hsc-txt,.hsc-dock:focus-visible .hsc-badge{opacity:1}
-    @media (min-width:1536px){.hsc-dock .hsc-txt,.hsc-dock .hsc-badge{opacity:1}}
     </style>
 
     <!-- Tab treo mép trái (thông minh: gập icon, hover trượt ra) -->

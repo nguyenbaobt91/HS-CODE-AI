@@ -175,24 +175,37 @@
 
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen">
-    <!-- Floating Quick-Access Tab 1: Hóa Chất (Mép Trái - Thông minh: Thu gọn icon trên laptop, bung chữ khi hover) -->
-    <a href="./hoa-chat/" style="top: 130px !important; z-index: 9999 !important;" class="fixed left-0 z-[9999] flex items-center gap-2 bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-300 hover:from-amber-500 hover:to-orange-500 text-amber-950 font-black text-xs px-2.5 sm:px-3 py-2 rounded-r-2xl shadow-xl border-y border-r border-amber-400 transition-all duration-300 -translate-x-[calc(100%-42px)] 2xl:translate-x-0 hover:translate-x-0 group cursor-pointer" title="Mở Cổng Nghiệp Vụ Hóa Chất 2026 & Quét Phân Tích MSDS Tự Động (Rê chuột để mở rộng)">
-        <i class="fa-solid fa-flask-vial text-rose-600 text-base group-hover:rotate-12 transition-transform shrink-0 w-5 text-center"></i>
-        <div class="flex flex-col text-left leading-tight whitespace-nowrap">
-            <span class="text-[10px] text-amber-900/80 font-bold uppercase tracking-wider">Cổng Tra Cứu</span>
-            <span class="text-xs font-black">Hóa Chất &amp; MSDS</span>
+    <style>
+    /* Tab treo mép trái: luôn gập thành biểu tượng nhỏ sát mép (mọi kích thước màn hình), rê chuột để trượt ra */
+    .hsc-dock{position:fixed;left:0;z-index:9999;display:flex;align-items:center;gap:8px;min-height:34px;max-width:34px;padding:0;overflow:hidden;border-radius:0 17px 17px 0;color:#fff;text-decoration:none;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;white-space:nowrap;cursor:pointer;box-shadow:0 6px 16px rgba(15,23,42,.28);border:1px solid rgba(255,255,255,.28);border-left:0;transition:max-width .35s cubic-bezier(.4,0,.2,1),padding .35s ease,box-shadow .2s ease,filter .2s ease}
+    .hsc-dock:hover,.hsc-dock:focus-visible{max-width:380px;padding-right:12px;box-shadow:0 12px 26px rgba(15,23,42,.38);filter:brightness(1.06)}
+    .hsc-dock .hsc-ico{width:32px;min-height:32px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;line-height:1;transition:transform .3s ease}
+    .hsc-dock:hover .hsc-ico{transform:rotate(12deg)}
+    .hsc-dock .hsc-txt{display:flex;flex-direction:column;text-align:left;line-height:1.2;opacity:0;transition:opacity .2s ease .08s}
+    .hsc-dock .hsc-sub{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+    .hsc-dock .hsc-main{font-size:12px;font-weight:900}
+    .hsc-dock .hsc-badge{font-size:8.5px;font-weight:900;text-transform:uppercase;padding:2px 6px;border-radius:999px;flex-shrink:0;opacity:0;transition:opacity .2s ease .08s}
+    .hsc-dock:hover .hsc-txt,.hsc-dock:hover .hsc-badge,.hsc-dock:focus-visible .hsc-txt,.hsc-dock:focus-visible .hsc-badge{opacity:1}
+    </style>
+
+    <!-- Tab treo mép trái 1: Hóa Chất (luôn gập icon, hover trượt ra) -->
+    <a class="hsc-dock" href="./hoa-chat/" style="top:130px;background:linear-gradient(135deg,#fbbf24,#fcd34d 50%,#fde047);color:#451a03" title="Mở Cổng Nghiệp Vụ Hóa Chất 2026 &amp; Quét Phân Tích MSDS Tự Động (rê chuột để mở rộng)">
+        <span class="hsc-ico"><i class="fa-solid fa-flask-vial" style="color:#e11d48"></i></span>
+        <div class="hsc-txt">
+            <span class="hsc-sub" style="color:rgba(120,53,15,.8)">Cổng Tra Cứu</span>
+            <span class="hsc-main">Hóa Chất &amp; MSDS</span>
         </div>
-        <span class="inline-flex items-center px-1.5 py-0.5 text-[8.5px] font-black uppercase rounded-full bg-rose-600 text-white animate-pulse ml-0.5 shrink-0">MỚI</span>
+        <span class="hsc-badge" style="background:#e11d48;color:#fff">MỚI</span>
     </a>
 
-    <!-- Floating Quick-Access Tab 2: KTCN 2026 (Mép Trái - Thông minh: Thu gọn icon trên laptop, bung chữ khi hover) -->
-    <a href="./chuyen-nganh/" style="top: 195px !important; z-index: 9999 !important;" class="fixed left-0 z-[9999] flex items-center gap-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-xs px-2.5 sm:px-3 py-2 rounded-r-2xl shadow-xl border-y border-r border-blue-400/60 transition-all duration-300 -translate-x-[calc(100%-42px)] 2xl:translate-x-0 hover:translate-x-0 group cursor-pointer" title="Mở Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026 (Nghị định 37/2026/NĐ-CP - Rê chuột để mở rộng)">
-        <i class="fa-solid fa-table-columns text-yellow-300 text-base group-hover:rotate-12 transition-transform shrink-0 w-5 text-center"></i>
-        <div class="flex flex-col text-left leading-tight whitespace-nowrap">
-            <span class="text-[10px] text-blue-200 font-bold uppercase tracking-wider">Cổng Tra Cứu</span>
-            <span class="text-xs font-black">KTCN 4 Bộ 2026</span>
+    <!-- Tab treo mép trái 2: KTCN 2026 (luôn gập icon, hover trượt ra) -->
+    <a class="hsc-dock" href="./chuyen-nganh/" style="top:195px;background:linear-gradient(135deg,#2563eb,#4f46e5 50%,#0ea5e9);color:#fff" title="Mở Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026 (Nghị định 37/2026/NĐ-CP - rê chuột để mở rộng)">
+        <span class="hsc-ico"><i class="fa-solid fa-table-columns" style="color:#fde047"></i></span>
+        <div class="hsc-txt">
+            <span class="hsc-sub" style="color:#bfdbfe">Cổng Tra Cứu</span>
+            <span class="hsc-main">KTCN 4 Bộ 2026</span>
         </div>
-        <span class="inline-flex items-center px-1.5 py-0.5 text-[8.5px] font-black uppercase rounded-full bg-emerald-400 text-emerald-950 animate-pulse ml-0.5 shrink-0">2026</span>
+        <span class="hsc-badge" style="background:#34d399;color:#022c22">2026</span>
     </a>
 
     <!-- Header / Navbar (Đã xóa tab Cổng Hóa Chất ở trên, giữ nguyên vẹn bố cục chuẩn) -->
