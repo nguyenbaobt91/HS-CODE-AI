@@ -1399,7 +1399,11 @@ STOP_WORDS = {
     'gan', 'lap', 'dat', 'dinh'
 }
 
-sys.path.insert(0, WORKSPACE_DIR)
+# Luon nap ban walker DUY NHAT trong thu muc web (truoc day insert WORKSPACE_DIR len dau
+# khien server nap nham ban sao cu o thu muc cha -> sua code web nhung server khong doi).
+sys.path.insert(0, BASE_DIR)
+if WORKSPACE_DIR not in sys.path:
+    sys.path.append(WORKSPACE_DIR)
 try:
     from statutory_tree_walker import StatutoryTreeWalker, extract_head_noun, clean_vietnamese
     statutory_walker = StatutoryTreeWalker()
@@ -1414,6 +1418,8 @@ def engine_validate_walker(stat_res, item_input, full_text):
     - Ma bi engine loai (sai nguong so / sai phu dinh / sai nhom 4 so theo dieu kien) -> thu giai quyet lai bang generic_resolve.
     - Walker bao thieu du kien -> thu generic_resolve (chi chap nhan khi ket qua khong nhap nhang)."""
     if _ue is None or not isinstance(stat_res, dict):
+        return stat_res
+    if stat_res.get("rule_id") and (stat_res.get("candidates") or stat_res.get("status") == "INSUFFICIENT_INFO"):
         return stat_res
     try:
         status = stat_res.get("status")
@@ -1498,8 +1504,14 @@ def classify_product_python(name, desc="", use="", specs="", model_en=""):
 
             if stat_res.get("status") == "INSUFFICIENT_INFO":
                 matched_item["_insufficient_info"] = True
+                matched_item["_disambiguation_question"] = stat_res.get("disambiguation_question", "")
+                matched_item["_candidates"] = stat_res.get("candidates", [])
+                matched_item["_legal_basis"] = stat_res.get("legal_basis", "")
             elif stat_res.get("status") in ["STOP_4_DIGIT", "STOP_6_DIGIT"]:
                 matched_item["_is_stopped"] = True
+                matched_item["_disambiguation_question"] = stat_res.get("disambiguation_question", "")
+                matched_item["_candidates"] = stat_res.get("candidates", [])
+                matched_item["_legal_basis"] = stat_res.get("legal_basis", "")
 
             reserve_code_clean = (stat_res.get("reserve_code") or "").replace('.', '')
             comp_item = next((it for it in HS_DATABASE if it.get('c', '').replace('.', '') == reserve_code_clean), None)
@@ -2789,6 +2801,8 @@ def run_automation_workflow(name, desc, use, specs="", model_en="", image_b64=No
     # Optional Google Gemini AI integration if API key is provided
     gemini_api_key = get_system_gemini_api_key(gemini_api_key)
     gemini_res = None
+    # Ket qua tu StatutoryTreeWalker (quy tac co can cu Chu giai) duoc uu tien hon de xuat cua Gemini.
+    _walker_item = best_item if (best_item.get('_statutory') and best_item.get('_level', 8) == 8) else None
     if gemini_api_key:
         try:
             all_cands = [best_item] + competing_items
@@ -2815,6 +2829,13 @@ def run_automation_workflow(name, desc, use, specs="", model_en="", image_b64=No
                     except Exception as _eg:
                         print("GRI6 engine post-check error:", _eg)
                     print(f"Gemini proposed statutory code {matched.get('c')} ({matched.get('vn')}) verified & adopted.")
+                    if _walker_item is not None:
+                        _wc = _walker_item.get('c', '').replace('.', '')
+                        if _wc and _wc != best_item.get('c', '').replace('.', ''):
+                            print(f"StatutoryTreeWalker override: AI {best_item.get('c')} -> walker {_walker_item.get('c')}")
+                            _walker_item = dict(_walker_item)
+                            _walker_item['_ai_rejected_code'] = best_item.get('c')
+                            best_item = _walker_item
                 
         except Exception as e:
             print("Gemini integration fallback:", e)

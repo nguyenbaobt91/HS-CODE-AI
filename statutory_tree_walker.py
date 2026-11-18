@@ -193,6 +193,16 @@ class StatutoryTreeWalker:
             }
 
         # -------------------------------------------------------------
+        # BƯỚC 1B: QUY TẮC PHÁP LÝ DÙNG CHUNG (statutory_rules.json)
+        # -------------------------------------------------------------
+        try:
+            from statutory_rules_engine import match_statutory_rule
+            _shared_res = match_statutory_rule(hn, norm)
+            if _shared_res is not None:
+                return _shared_res
+        except Exception as _e_sr:
+            print("Shared statutory_rules_engine warning:", _e_sr)
+
         # =============================================================
         # BƯỚC 2A: QUY TẮC ĐỊNH DANH ĐẶC BIỆT (MÁY RỬA BUPI / THIẾT BỊ CÔNG NGHIỆP)
         # =============================================================
@@ -206,7 +216,7 @@ class StatutoryTreeWalker:
                 "reasoning": "Áp dụng GRI 1: Lò xo khí nén (xi lanh khí nén chuyển động tịnh tiến trợ lực nắp máy) thuộc Nhóm 84.12. Áp dụng GRI 6: Phân nhóm 8412.31 mã số 8412.31.00 (Thuế NK MFN 0%, VAT 8%).",
                 "missing_attributes": [],
                 "assumptions": "Lò xo khí tịnh tiến dùng nâng đỡ nắp máy móc công nghiệp",
-                "reserve_code": "8487.90.90"
+                "reserve_code": "7320.90.90"
             }
 
         # 3. CẢM BIẾN BÁO MỨC CHẤT LỎNG / CÔNG TẮC MỨC / LIQUIPHANT (9026.10.90)
@@ -258,46 +268,66 @@ class StatutoryTreeWalker:
                 "reasoning": "Áp dụng GRI 1: Bộ làm kín kiểu cơ khí (phớt cơ khí / mechanical seals) có phân nhóm định danh riêng tại Nhóm 84.84. Áp dụng GRI 6: Mã số 8484.20.00 (Thuế NK MFN 3%, VAT 8%).",
                 "missing_attributes": [],
                 "assumptions": "Bộ phớt cơ khí dùng làm kín trục bơm chất lỏng",
-                "reserve_code": "8487.90.90"
+                "reserve_code": "8484.90.00"
             }
 
-        # 7. THANH ĐIỆN TRỞ GIA NHIỆT / BỘ SƯỞI ĐIỆN / QUE NHIỆT (8516.10.30 & 8516.80.80)
+        # 7. THANH ĐIỆN TRỞ GIA NHIỆT / BỘ SƯỞI ĐIỆN / QUE NHIỆT (8516.10.30 & 8516.80.90)
         if re.search(r'\b(?:dien\s+tro\s+gia\s+nhiet|thanh\s+dien\s+tro|bo\s+suoi\s+dien|thanh\s+nhiet|que\s+nhiet|electric\s+radiator|heating\s+element|immersion\s+heater)\b', norm) or \
            (re.search(r'\b(?:dien\s+tro|thanh\s+nhiet|bo\s+suoi)\b', hn) and re.search(r'\b(?:gia\s+nhiet|electric|radiator|heater)\b', norm)):
             is_immersion = bool(re.search(r'\b(?:nhung|dun\s+nuoc|dun\s+chua|immersion|tank|be\s+rua|radiator)\b', norm))
             return {
-                "code": "8516.10.30" if is_immersion else "8516.80.80",
+                "code": "8516.10.30" if is_immersion else "8516.80.90",
                 "level": 8,
                 "status": "EXACT_8_DIGIT",
-                "reasoning": f"Áp dụng GRI 1: Thiết bị và điện trở gia nhiệt điện thuộc Nhóm 85.16. Áp dụng GRI 6: {'Bộ gia nhiệt điện kiểu nhúng mã 8516.10.30' if is_immersion else 'Điện trở gia nhiệt loại khác mã 8516.80.80'} (Thuế NK MFN 20%, VAT 8%).",
+                "reasoning": f"Áp dụng GRI 1: Thiết bị và điện trở gia nhiệt điện thuộc Nhóm 85.16. Áp dụng GRI 6: {'Bộ gia nhiệt điện kiểu nhúng mã 8516.10.30' if is_immersion else 'Điện trở gia nhiệt loại khác mã 8516.80.90'} (Thuế NK MFN {'20%' if is_immersion else '10%'}, VAT 8%).",
                 "missing_attributes": [],
                 "assumptions": "Thanh điện trở gia nhiệt đun nóng dung dịch kiểu nhúng",
-                "reserve_code": "8516.80.80" if is_immersion else "8516.10.30"
+                "reserve_code": "8516.80.90" if is_immersion else "8516.10.30"
             }
 
-        # 8. PHỚT CHẮN DẦU TRỤC / PHỚT TRỤC (4016.93.90)
-        if re.search(r'\b(?:phot\s+chan\s+dau|phot\s+dau|phot\s+truc|shaft\s+seal|oil\s+seal|vong\s+chan\s+dau)\b', norm) or \
+        # 8. PHỚT CHẮN DẦU TRỤC (CGCT 84.87: cao su + cốt kim loại -> 8487.90.00; hoàn toàn cao su -> 4016.93.90)
+        if re.search(r'\b(?:phot\s+chan\s+dau|phot\s+dau|phot\s+truc|shaft\s+seal|oil\s+seal|vong\s+chan\s+dau|vong\s+lam\s+kin\s+dau|vong\s+bit\s+dau|radial\s+shaft\s+seal|wdr)\b', norm) or \
            (re.search(r'\b(?:phot|seal)\b', hn) and re.search(r'\b(?:chan\s+dau|dau\s+truc|shaft)\b', norm)):
+            if re.search(r'\b(?:hoan\s+toan\s+bang\s+cao\s+su|toan\s+bo\s+bang\s+cao\s+su|100\s*%\s*cao\s+su|khong\s+(?:co\s+)?(?:cot|loi|khung|vong)\s+(?:kim\s+loai|thep)|all[\s-]+rubber|without\s+metal)\b', norm):
+                return {
+                    "code": "4016.93.90",
+                    "level": 8,
+                    "status": "EXACT_8_DIGIT",
+                    "reasoning": "Phớt hoàn toàn bằng cao su lưu hóa, không có cốt kim loại: Chú giải 1(a) Phần XVI loại trừ sang Nhóm 40.16. Áp dụng GRI 6: Phân nhóm 4016.93 mã 4016.93.90 (Thuế NK MFN 3%, VAT 8%).",
+                    "missing_attributes": [],
+                    "assumptions": "Phớt chắn dầu hoàn toàn bằng cao su lưu hóa, không có cốt kim loại",
+                    "reserve_code": "8487.90.00"
+                }
             return {
-                "code": "4016.93.90",
+                "code": "8487.90.00",
                 "level": 8,
                 "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 & Chú giải 1(a) Phần XVI (loại trừ cao su sang Chương 40): Vòng đệm/phớt chắn dầu bằng cao su lưu hóa thuộc Nhóm 40.16. Áp dụng GRI 6: Phân nhóm 4016.93 mã số 4016.93.90 (Thuế NK MFN 3%, VAT 8%).",
+                "reasoning": "Căn cứ Chú giải chi tiết WCO Nhóm 84.87 (HQKV8 tr. 1969): nhóm này gồm các vòng làm kín dầu có cấu trúc đơn giản (vòng cao su co giãn và cốt kim loại gia cố bằng lưu hóa), không có bộ phận di động; Chú giải chi tiết 84.84 loại trừ (c) vòng bịt dầu sang 84.87. Áp dụng GRI 6: mã 8487.90.00 (Thuế NK MFN 0%, VAT 8%).",
                 "missing_attributes": [],
-                "assumptions": "Phớt chắn dầu trục bằng cao su lưu hóa có hoặc không có lõi kim loại",
-                "reserve_code": "8487.90.90"
+                "assumptions": "Phớt chắn dầu kiểu tiêu chuẩn (môi cao su lưu hóa liền cốt kim loại). Nếu phớt hoàn toàn bằng cao su, không có cốt kim loại thì dùng 4016.93.90",
+                "reserve_code": "4016.93.90"
             }
 
-        # 9. MÀNG TRƯỢT / TẤM LÓT TRƯỢT NHỰA IGLIDUR (3920.99.90)
+        # 9. BẠC LÓT / MÀNG TRƯỢT NHỰA IGLIDUR (đã tạo hình -> 8483.30.90; tấm phẳng -> 3920.99.90)
         if re.search(r'\b(?:sliding\s+film|mang\s+truot|tam\s+lot\s+truot)\b', norm) and re.search(r'\b(?:iglidur|plastic|nhua)\b', norm):
+            if re.search(r'\b(?:bac\s+lot|ong\s+lot|bush(?:ing)?|liner|jum[\s-]?\d+|dai\s+\d+(?:[.,]\d+)?\s*mm|l\s*:?\s*\d+(?:[.,]\d+)?\s*mm)\b', norm):
+                return {
+                    "code": "8483.30.90",
+                    "level": 8,
+                    "status": "EXACT_8_DIGIT",
+                    "reasoning": "Căn cứ Chú giải chi tiết WCO Nhóm 84.83 mục (B) (HQKV8 tr. 1958): gối đỡ trục dùng ổ trượt phân loại vào nhóm này kể cả khi không có thân ổ, bao gồm vòng chống ma sát bằng plastic. Bạc lót iglidur đã tạo hình (có chiều dài/đường kính xác định) là ổ trượt. Áp dụng GRI 6: mã 8483.30.90 (Thuế NK MFN 0%, VAT 8%).",
+                    "missing_attributes": [],
+                    "assumptions": "Bạc lót trượt bằng plastic iglidur đã tạo hình ống lót (có chiều dài/đường kính xác định)",
+                    "reserve_code": "3920.99.90"
+                }
             return {
                 "code": "3920.99.90",
                 "level": 8,
                 "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 & Chú giải 1(g) Phần XVI loại trừ plastic sang Chương 39: Tấm/màng trượt bằng plastic iglidur chưa xốp hóa thuộc Nhóm 39.20. Áp dụng GRI 6: Mã số 3920.99.90 (Thuế NK MFN 6%, VAT 8%).",
+                "reasoning": "Màng/tấm trượt iglidur dạng phẳng chưa tạo hình: Chú giải 1(g) Phần XVI và Chú giải 10 Chương 39 -> Nhóm 39.20. Áp dụng GRI 6: mã 3920.99.90 (Thuế NK MFN 6%, VAT 8%).",
                 "missing_attributes": [],
-                "assumptions": "Màng trượt bằng plastic iglidur J dạng tấm/dải phẳng chưa xốp hóa",
-                "reserve_code": "3926.90.99"
+                "assumptions": "Màng trượt iglidur dạng tấm/dải phẳng chưa tạo hình. Nếu đã tạo hình thành ống lót thì dùng 8483.30.90",
+                "reserve_code": "8483.30.90"
             }
 
         # 10. BẠC ĐẠN CHÀ / Ổ TRƯỢT CHẶN IGLIDUR (8483.30.90)
@@ -495,7 +525,7 @@ class StatutoryTreeWalker:
                 "reasoning": "Áp dụng GRI 1: Máy cơ khí dập khuôn ép kim loại thuộc Nhóm 84.62. Áp dụng GRI 6 xếp vào mã 8462.62.11.",
                 "missing_attributes": [],
                 "assumptions": "Máy dập ép cơ khí dùng điện gia công kim loại",
-                "reserve_code": "8479.89.39"
+                "reserve_code": "8479.89.69"
             }
 
         if re.search(r'\b(?:may\s+in|printer|printing\s+machine)\b', hn):
@@ -535,13 +565,13 @@ class StatutoryTreeWalker:
         if re.search(r'\b(?:dong\s+ho\s+do|dong\s+ho|thiet\s+bi\s+do|may\s+do|bo\s+phan\s+cua\s+thuoc\s+do|gauge|measuring)\b', hn):
             if re.search(r'\b(?:ap\s+suat|pressure)\b', norm):
                 return {
-                    "code": "9026.20.30",
+                    "code": "9026.20.90",
                     "level": 8,
                     "status": "EXACT_8_DIGIT",
-                    "reasoning": "Áp dụng GRI 1 & Chú giải 1(m) Phần XVI loại trừ sang Chương 90 -> Nhóm 90.26 dụng cụ đo áp suất. Áp dụng GRI 6 xếp mã 9026.20.30.",
+                    "reasoning": "Áp dụng GRI 1 & Chú giải 1(m) Phần XVI loại trừ sang Chương 90 -> Nhóm 90.26 dụng cụ đo áp suất. Áp dụng GRI 6 xếp mã 9026.20.90.",
                     "missing_attributes": [],
                     "assumptions": "Đồng hồ đo áp suất cơ học ống bourdon",
-                    "reserve_code": "9026.20.40"
+                    "reserve_code": "9026.20.50"
                 }
             elif re.search(r'\b(?:thang\s+hang|kiem\s+tra|alignment)\b', norm):
                 return {
@@ -566,13 +596,13 @@ class StatutoryTreeWalker:
 
         if re.search(r'\b(?:thermostat|bo\s+dieu\s+nhiet)\b', hn) or re.search(r'\b(?:thermostat|bo\s+dieu\s+nhiet)\b', norm):
             return {
-                "code": "9032.10.10",
+                "code": "9032.10.00",
                 "level": 8,
                 "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 & Chú giải 7 Chương 90: Thiết bị điều chỉnh và kiểm soát tự động -> Phân nhóm 9032.10 Thermostat -> Mã 9032.10.10.",
+                "reasoning": "Áp dụng GRI 1 & Chú giải 7 Chương 90: Thiết bị điều chỉnh và kiểm soát tự động -> Phân nhóm 9032.10 Thermostat -> Mã 9032.10.00.",
                 "missing_attributes": [],
                 "assumptions": "Thermostat tự động ngắt điện",
-                "reserve_code": "9032.10.20"
+                "reserve_code": "9032.89.90"
             }
 
         # 6. VÚ TRA MỠ BÔI TRƠN (Nhóm 8487)
@@ -588,15 +618,33 @@ class StatutoryTreeWalker:
             }
 
         # 8. THIẾT BỊ ĐÓNG NGẮT: APTOMAT, CÔNG TẮC, ĐẦU NỐI (Nhóm 8536)
-        if re.search(r'\b(?:mcb|aptomat|cau\s+dao\s+tu\s+dong|circuit\s+breaker)\b', hn):
+        if re.search(r'\b(?:mcb|mccb|aptomat|cau\s+dao\s+tu\s+dong|circuit\s+breaker)\b', hn):
+            cur = attrs["current_a"]
+            moulded = bool(re.search(r'\b(?:mccb|hop\s+duc|moulded\s+case|molded\s+case)\b', norm))
+            if cur is None:
+                return {
+                    "code": "8536.20",
+                    "level": 6,
+                    "status": "STOP_6_DIGIT",
+                    "reasoning": "Áp dụng GRI 1 -> Nhóm 85.36. Áp dụng GRI 6: Bộ ngắt mạch tự động thuộc phân nhóm 8536.20. Thiếu dòng điện định mức (A) để chọn dòng 8 số (dưới 16 A / từ 16 A trở lên) -> dừng ở 6 số, không đoán.",
+                    "missing_attributes": ["current_a"],
+                    "assumptions": "Thiếu dòng điện định mức",
+                    "reserve_code": "8536.20.99"
+                }
+            if moulded:
+                code = "8536.20.11" if cur < 16 else ("8536.20.12" if cur <= 32 else ("8536.20.13" if cur <= 1000 else "8536.20.19"))
+                branch = "Loại hộp đúc (MCCB)"
+            else:
+                code = "8536.20.91" if cur < 16 else "8536.20.99"
+                branch = "Loại khác (không phải hộp đúc, ví dụ MCB)"
             return {
-                "code": "8536.20.91",
+                "code": code,
                 "level": 8,
                 "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 -> Nhóm 85.36 (loại trừ nhóm dây điện 8544). Áp dụng GRI 6: Cầu dao tự động ngắt mạch điện áp <= 1000V dòng <= 16A mã 8536.20.91.",
+                "reasoning": f"Áp dụng GRI 1 -> Nhóm 85.36 (≤ 1.000 V). Áp dụng GRI 6: Bộ ngắt mạch tự động 8536.20 -> {branch} -> dòng định mức {cur:g} A ({'dưới 16 A' if cur < 16 else 'từ 16 A trở lên'}) -> mã {code}.",
                 "missing_attributes": [],
-                "assumptions": "MCB bảo vệ quá tải <= 16A",
-                "reserve_code": "8536.20.99"
+                "assumptions": f"{branch}, dòng định mức {cur:g} A",
+                "reserve_code": "8536.20.99" if code != "8536.20.99" else "8536.20.91"
             }
 
         if re.search(r'\b(?:thiet\s+bi\s+dong\s+ngat|cong\s+tac|switch)\b', hn):
@@ -679,14 +727,18 @@ class StatutoryTreeWalker:
             }
 
         if re.search(r'\b(?:dai\s+oc|e-cu|nut|tan)\b', hn):
+            dmm = attrs.get("diameter_mm")
+            if dmm is None:
+                return {
+                    "code": "7318.16", "level": 6, "status": "STOP_6_DIGIT",
+                    "reasoning": "Áp dụng GRI 1 & Chú giải 2 Phần XV: Đai ốc bằng sắt thép thuộc Nhóm 73.18, phân nhóm 7318.16. Thiếu đường kính bu lông tương ứng (≤ 16 mm hay > 16 mm) -> dừng ở 6 số.",
+                    "missing_attributes": ["diameter_mm"], "assumptions": "Thiếu cỡ ren đai ốc", "reserve_code": "7318.16.10"
+                }
+            code = "7318.16.10" if dmm <= 16 else "7318.16.90"
             return {
-                "code": "7318.16.00",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 & Chú giải 2 Phần XV: Đai ốc bằng thép thuộc Nhóm 73.18. Áp dụng GRI 6: Đai ốc có ren thuộc mã 7318.16.00.",
-                "missing_attributes": [],
-                "assumptions": "Đai ốc thép tiêu chuẩn",
-                "reserve_code": "7318.15.10"
+                "code": code, "level": 8, "status": "EXACT_8_DIGIT",
+                "reasoning": f"Áp dụng GRI 1 & Chú giải 2 Phần XV: Đai ốc bằng sắt thép thuộc Nhóm 73.18. Áp dụng GRI 6: phân nhóm 7318.16 -> cho bu lông đường kính {dmm:g} mm ({'không quá' if dmm <= 16 else 'trên'} 16 mm) -> mã {code}.",
+                "missing_attributes": [], "assumptions": f"Đai ốc ren M{dmm:g}", "reserve_code": "7318.16.90" if code == "7318.16.10" else "7318.16.10"
             }
 
         # 12. THANH TRƯỢT & THÂN TRƯỢT (Nhóm 8482 vs 8483)
@@ -791,15 +843,15 @@ class StatutoryTreeWalker:
 
             if is_check:
                 is_cast = (attrs["material"] == "cast_iron" or 'gang' in norm)
-                if is_cast and (attrs["dn_mm"] is not None and attrs["dn_mm"] > 25.0):
+                if is_cast and (attrs["dn_mm"] is not None and 40.0 <= attrs["dn_mm"] <= 600.0):
                     return {
-                        "code": "8481.30.22",
+                        "code": "8481.30.10",
                         "level": 8,
                         "status": "EXACT_8_DIGIT",
-                        "reasoning": "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 84.81. Áp dụng GRI 6: Van một chiều Phân nhóm 8481.30 -> Bằng gang, đường kính trong trên 2,5 cm (DN50) -> Mã 8481.30.22.",
+                        "reasoning": "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 84.81. Áp dụng GRI 6: Van một chiều Phân nhóm 8481.30 -> Van cản bằng gang đúc, đường kính trong cửa nạp từ 4 cm đến 60 cm -> Mã 8481.30.10.",
                         "missing_attributes": [],
                         "assumptions": "Van một chiều bằng gang DN50",
-                        "reserve_code": "8481.30.21"
+                        "reserve_code": "8481.30.90"
                     }
                 else:
                     return {
@@ -809,12 +861,12 @@ class StatutoryTreeWalker:
                         "reasoning": "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 84.81. Áp dụng GRI 6: Van một chiều Phân nhóm 8481.30 -> Loại khác mã 8481.30.90.",
                         "missing_attributes": [],
                         "assumptions": "Van một chiều công nghiệp",
-                        "reserve_code": "8481.30.22"
+                        "reserve_code": "8481.30.10"
                     }
 
             if is_safety:
                 return {
-                    "code": "8481.40.21" if attrs["material"] == "copper" else "8481.40.90",
+                    "code": "8481.40.10" if (attrs["material"] == "copper" and attrs["dn_mm"] is not None and attrs["dn_mm"] <= 25.0) else "8481.40.90",
                     "level": 8,
                     "status": "EXACT_8_DIGIT",
                     "reasoning": "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 84.81. Áp dụng GRI 6: Van an toàn hoặc van xả áp suất thuộc Phân nhóm 8481.40.",
@@ -902,38 +954,56 @@ class StatutoryTreeWalker:
                         "reserve_code": "8544.42.99"
                     }
 
-        # 17. ĐỘNG CƠ ĐIỆN / MÔ TƠ (Nhóm 8501)
+        # 17. ĐỘNG CƠ ĐIỆN / MÔ TƠ (Nhóm 8501) - phân nhánh theo công suất, một chiều/xoay chiều, số pha, công dụng
         if re.search(r'\b(?:dong\s+co\s+dien|mo\s+to\s+dien|mo\s+to\s+buoc|motor|ac\s+motor|dc\s+motor)\b', hn):
-            is_dc = bool(re.search(r'\bdc\b', norm) or 'mot chieu' in norm)
-            if is_dc:
-                return {
-                    "code": "8501.31.60",
-                    "level": 8,
-                    "status": "EXACT_8_DIGIT",
-                    "reasoning": "Áp dụng GRI 1 -> Nhóm 85.01 động cơ điện. Áp dụng GRI 6: Động cơ DC công suất <= 750W (82W) -> Mô tơ bước mã 8501.31.60.",
-                    "missing_attributes": [],
-                    "assumptions": "Mô tơ bước DC",
-                    "reserve_code": "8501.10.29"
-                }
+            P = attrs["power_w"]
+            is_dc = bool(re.search(r'\b(?:dc|mot\s+chieu)\b', norm))
+            is_univ = bool(re.search(r'\b(?:van\s+nang|universal)\b', norm))
+            is_single = bool(re.search(r'\b(?:1\s*pha|mot\s+pha|single\s+phase)\b', norm))
+            is_multi = bool(re.search(r'\b(?:3\s*pha|ba\s+pha|da\s+pha|nhieu\s+pha|three\s+phase|3\s*phase)\b', norm))
+            is_step = bool(re.search(r'\b(?:buoc|stepper|stepping)\b', norm))
+            app3 = bool(re.search(r'\b(?:dieu\s+hoa|may\s+lanh|tu\s+lanh|may\s+giat)\b', norm))
+            app = app3 or bool(re.search(r'\b(?:may\s+hut\s+bui|binh\s+nong\s+lanh|may\s+say\s+toc|am\s+dun)\b', norm))
+            veh = bool(re.search(r'\b(?:xe\s+o\s+to|o\s+to|xe\s+dien|xe\s+may|chuong\s+87)\b', norm))
 
-            if attrs["power_w"] is None:
-                return {
-                    "code": "8501.5",
-                    "level": 5,
-                    "status": "STOP_6_DIGIT",
-                    "reasoning": "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 85.01. Áp dụng GRI 6: Động cơ điện xoay chiều AC nhiều pha thuộc Phân nhóm 8501.5. TUY NHIÊN, thiếu thông số công suất (kW/W/HP) để phân nhánh định thuế (<=750W, <=7.5kW, <=75kW hay >75kW) -> Dừng ở phân nhóm theo nguyên tắc Không đoán mò.",
-                    "missing_attributes": ["power_kw"],
-                    "assumptions": "Thiếu công suất động cơ",
-                    "reserve_code": "8501.51.00"
-                }
-            else:
-                p_kw = attrs["power_w"] / 1000.0
-                if p_kw <= 0.75:
-                    return {"code": "8501.51.00", "level": 8, "status": "EXACT_8_DIGIT", "reasoning": "Động cơ AC công suất <= 750W", "missing_attributes": [], "assumptions": "", "reserve_code": "8501.52.11"}
-                elif p_kw <= 7.5:
-                    return {"code": "8501.52.11", "level": 8, "status": "EXACT_8_DIGIT", "reasoning": "Động cơ AC công suất 750W - 7.5kW", "missing_attributes": [], "assumptions": "", "reserve_code": "8501.52.19"}
-                elif p_kw <= 75.0:
-                    return {"code": "8501.52.19", "level": 8, "status": "EXACT_8_DIGIT", "reasoning": "Động cơ AC công suất 7.5kW - 75kW", "missing_attributes": [], "assumptions": "", "reserve_code": "8501.53.00"}
+            def _mot(code, why, reserve=""):
+                n = len(code.replace('.', ''))
+                st = "EXACT_8_DIGIT" if n == 8 else ("STOP_6_DIGIT" if n >= 5 else "STOP_4_DIGIT")
+                return {"code": code, "level": n, "status": st,
+                        "reasoning": "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 85.01. Áp dụng GRI 6: " + why,
+                        "missing_attributes": [] if n == 8 else ["power_kw"], "assumptions": why, "reserve_code": reserve}
+
+            if P is None:
+                if is_multi and not is_dc:
+                    return _mot("8501.5", "Động cơ xoay chiều đa pha nhưng thiếu công suất (≤ 750 W / ≤ 75 kW / > 75 kW) -> dừng ở 8501.5, không đoán.", "8501.51.19")
+                return _mot("8501", "Thiếu công suất và/hoặc loại dòng điện (một chiều/xoay chiều), số pha -> dừng ở nhóm 85.01, không đoán.", "8501.51.19")
+            if P <= 37.5:
+                if is_dc:
+                    code = ("8501.10.21" if app else ("8501.10.22" if P <= 5 else "8501.10.29")) if is_step else ("8501.10.41" if app else "8501.10.49")
+                else:
+                    code = ("8501.10.51" if app else "8501.10.59") if is_step else ("8501.10.91" if app else "8501.10.99")
+                return _mot(code, f"Công suất {P:g} W (không quá 37,5 W) -> phân nhóm 8501.10 -> mã {code}.", "8501.10.99")
+            if is_univ:
+                code = ("8501.20.12" if app else "8501.20.19") if P <= 1000 else ("8501.20.21" if app else "8501.20.29")
+                return _mot(code, f"Động cơ vạn năng một chiều/xoay chiều {P:g} W -> mã {code}.")
+            if is_dc:
+                if P <= 750: code = "8501.31.30" if app else ("8501.31.60" if veh else "8501.31.70")
+                elif P <= 37500: code = "8501.32.21" if app else ("8501.32.24" if veh else "8501.32.25")
+                elif P <= 75000: code = "8501.32.31" if app3 else "8501.32.32"
+                elif P <= 375000: code = "8501.33.10" if veh else "8501.33.90"
+                else: code = "8501.34.00"
+                return _mot(code, f"Động cơ một chiều {P / 1000:g} kW -> mã {code}.")
+            if is_single:
+                code = ("8501.40.11" if app else "8501.40.19") if P <= 1000 else ("8501.40.21" if app else "8501.40.29")
+                return _mot(code, f"Động cơ xoay chiều một pha {P / 1000:g} kW -> mã {code}.")
+            if is_multi:
+                if P <= 750: code = "8501.51.11" if app else "8501.51.19"
+                elif P <= 1000: code = "8501.52.11" if app else ("8501.52.12" if veh else "8501.52.19")
+                elif P <= 37500: code = "8501.52.21" if app else ("8501.52.22" if veh else "8501.52.29")
+                elif P <= 75000: code = "8501.52.31" if app3 else ("8501.52.32" if veh else "8501.52.39")
+                else: code = "8501.53.10" if veh else "8501.53.90"
+                return _mot(code, f"Động cơ xoay chiều đa pha {P / 1000:g} kW -> mã {code}.")
+            return _mot("8501", f"Động cơ {P / 1000:g} kW nhưng chưa rõ một chiều/xoay chiều, một pha/đa pha -> dừng ở nhóm 85.01.", "8501.51.19")
 
         # 18. DỤNG CỤ CẮT GỌT THAY THẾ CHO MÁY CÔNG CỤ (Nhóm 8207)
         if re.search(r'\b(?:mui\s+khoan|dao\s+phay|dao\s+tien|drill\s+bit|milling\s+cutter)\b', hn):
@@ -983,14 +1053,42 @@ class StatutoryTreeWalker:
             }
 
         if re.search(r'\b(?:bien\s+ap|bien\s+the|transformer)\b', hn):
+            pw = attrs["power_w"]
+            if pw is None:
+                return {
+                    "code": "8504",
+                    "level": 4,
+                    "status": "STOP_4_DIGIT",
+                    "reasoning": "Áp dụng GRI 1 -> Nhóm 85.04 (máy biến điện). Thiếu công suất danh định (VA/kVA) và loại điện môi để chọn phân nhóm 6 số -> dừng ở 4 số, không đoán.",
+                    "missing_attributes": ["power_kva"],
+                    "assumptions": "Thiếu công suất danh định",
+                    "reserve_code": "8504.31"
+                }
+            kva = pw / 1000.0
+            if re.search(r'\b(?:ngam\s+dau|dien\s+moi\s+long|dau\s+cach\s+dien|oil)\b', norm):
+                sub = "8504.21" if kva <= 650 else ("8504.22" if kva <= 10000 else "8504.23")
+                kind = "điện môi lỏng"
+            else:
+                sub = "8504.31" if kva <= 1 else ("8504.32" if kva <= 16 else ("8504.33" if kva <= 500 else "8504.34"))
+                kind = "loại khác (không dùng điện môi lỏng)"
+            if sub == "8504.31":
+                for pat, code, label in ((r'\b(?:quet\s+ve|flyback)\b', "8504.31.30", "biến áp quét về"),
+                                         (r'\b(?:trung\s+tan)\b', "8504.31.40", "biến áp trung tần"),
+                                         (r'\b(?:do\s+choi|mo\s+hinh)\b', "8504.31.91", "dùng cho đồ chơi, mô hình")):
+                    if re.search(pat, norm):
+                        return {
+                            "code": code, "level": 8, "status": "EXACT_8_DIGIT",
+                            "reasoning": f"Áp dụng GRI 1 -> Nhóm 85.04. Áp dụng GRI 6: Máy biến điện {kind}, công suất {kva:g} kVA (≤ 1 kVA) -> {label} -> mã {code}.",
+                            "missing_attributes": [], "assumptions": label, "reserve_code": "8504.31.99"
+                        }
             return {
-                "code": "8504.31.24",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 -> Nhóm 85.04. Áp dụng GRI 6: Máy biến thế khác công suất <= 1kVA (500VA) -> Mã 8504.31.24.",
-                "missing_attributes": [],
-                "assumptions": "Biến áp cách ly công suất <= 1kVA",
-                "reserve_code": "8504.31.29"
+                "code": sub,
+                "level": 6,
+                "status": "STOP_6_DIGIT",
+                "reasoning": f"Áp dụng GRI 1 -> Nhóm 85.04. Áp dụng GRI 6: Máy biến điện {kind}, công suất {kva:g} kVA -> phân nhóm {sub}. Dòng 8 số phụ thuộc chủng loại (biến áp đo lường, biến áp tăng/giảm áp, biến áp thích ứng...) chưa đủ dữ kiện -> dừng ở 6 số.",
+                "missing_attributes": ["transformer_type"],
+                "assumptions": f"Công suất {kva:g} kVA; chưa xác định chủng loại biến áp" + (" (biến áp cách ly hạ áp thường xem xét 8504.31.93 hoặc 8504.31.99)" if sub == "8504.31" else ""),
+                "reserve_code": (sub + ".99") if sub != "8504.31" else "8504.31.99"
             }
 
         # 21. BẢNG ĐIỀU KHIỂN ĐIỆN (Nhóm 8537)
@@ -1014,7 +1112,7 @@ class StatutoryTreeWalker:
                 "reasoning": "Áp dụng GRI 1 -> Nhóm 85.36. Áp dụng GRI 6: Rơ le bảo vệ quá tải nhiệt phân nhóm 8536.49 -> Mã 8536.49.90.",
                 "missing_attributes": [],
                 "assumptions": "Rơ le nhiệt lưỡng kim",
-                "reserve_code": "8536.41.00"
+                "reserve_code": "8536.41.40"
             }
 
         # 23. BỘ NHỚ LƯU TRỮ FLASH / USB (Nhóm 8523)
@@ -1085,7 +1183,7 @@ class StatutoryTreeWalker:
                 "reasoning": "Áp dụng GRI 1 -> Chương 76 nhôm và các sản phẩm bằng nhôm. Nhóm 76.16 các sản phẩm bằng nhôm khác mã 7616.99.90.",
                 "missing_attributes": [],
                 "assumptions": "Miếng nhôm đục lỗ gia công cơ khí",
-                "reserve_code": "7616.99.19"
+                "reserve_code": "7616.99.80"
             }
 
         # 28. SẢN PHẨM SẮT THÉP KHÁC (Nhóm 7326)

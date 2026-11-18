@@ -139,6 +139,8 @@
     <script src="rulings_data.js"></script>
     <script src="tariff_engine.js"></script>
     <script src="universal_engine.js"></script>
+    <script src="statutory_rules.js"></script>
+    <script src="statutory_rules_engine.js"></script>
 
     <style id="print-styles">
         @media print {
@@ -3223,7 +3225,7 @@
             {
                 id: 'plastic_plates_articles_39',
                 headings: ['3926', '3920', '3921'],
-                keywords: ['tam nhua', 'phien nhua', 'mang nhua', 'la nhua', 'dai nhua', 'thanh nhua', 'khuon nhua', 'tam mica', 'tam pvc', 'tam pe', 'tam pp', 'tam acrylic', 'tam polycarbonate', 'tam pc', 'plastic sheet', 'plastic plate', 'tam nhua chiu luc', 'tam nhua bao ve', 'nhua tam'],
+                keywords: ['tam nhua', 'phien nhua', 'mang nhua', 'la nhua', 'dai nhua', 'thanh nhua', 'khuon nhua', 'tam nhua mica', 'nhua mica', 'tam pvc', 'tam pe', 'tam pp', 'tam acrylic', 'tam polycarbonate', 'tam pc', 'plastic sheet', 'plastic plate', 'tam nhua chiu luc', 'tam nhua bao ve', 'nhua tam'],
                 category: 'Tấm nhựa, Màng nhựa & Sản phẩm Plastic (Nhóm 39.20, 39.21 & 39.26)',
                 essential_criteria: [
                     {
@@ -4781,7 +4783,7 @@ Trường hợp đủ thông tin:
             // 14b. Mechanical Safety Guards & Machine Covers (3926, 8466 & 7326)
             {
                 name: 'mechanical_covers_guards',
-                pattern: /\b(?:tam\s+che|vo\s+che|nap\s+che|tam\s+chan|vach\s+chan|man\s+che|chan\s+bui|tam\s+(?:nhua|mica|thep|kim\s+loai)?\s*bao\s+ve|vo\s+bao\s+ve|nap\s+bao\s+ve|safety\s+guard|machine\s+guard|protective\s+cover)\b/i,
+                pattern: /\b(?:tam\s+che|vo\s+che|nap\s+che|tam\s+chan|vach\s+chan|man\s+che|chan\s+bui|tam\s+(?:nhua|nhua\s+mica|thep|kim\s+loai)?\s*bao\s+ve|vo\s+bao\s+ve|nap\s+bao\s+ve|safety\s+guard|machine\s+guard|protective\s+cover)\b/i,
                 target_headings: ['3926', '8466', '7326'],
                 forbidden_chapters: ['8544', '8535', '8536', '8537'],
                 bonus: 1350
@@ -4789,7 +4791,7 @@ Trường hợp đủ thông tin:
             // 14c. Plastic Plates, Sheets, Film, Strips & Fabricated Articles (3920, 3921, 3926) - Note 1(g) Section XVI
             {
                 name: 'plastic_plates_sheets_articles',
-                pattern: /\b(?:tam\s+nhua|phien\s+nhua|mang\s+nhua|la\s+nhua|dai\s+nhua|thanh\s+nhua|khuon\s+nhua|tam\s+mica|tam\s+pvc|tam\s+pe|tam\s+pp|tam\s+acrylic|tam\s+polycarbonate|tam\s+pc|plastic\s+sheet|plastic\s+plate|plastic\s+film|plastic\s+board|tam\s+nhua\s+chiu\s+luc|tam\s+nhua\s+bao\s+ve|nhua\s+tam)\b/i,
+                pattern: /\b(?:tam\s+nhua|phien\s+nhua|mang\s+nhua|la\s+nhua|dai\s+nhua|thanh\s+nhua|khuon\s+nhua|tam\s+nhua\s+mica|nhua\s+mica|tam\s+pvc|tam\s+pe|tam\s+pp|tam\s+acrylic|tam\s+polycarbonate|tam\s+pc|plastic\s+sheet|plastic\s+plate|plastic\s+film|plastic\s+board|tam\s+nhua\s+chiu\s+luc|tam\s+nhua\s+bao\s+ve|nhua\s+tam)\b/i,
                 target_headings: ['3926', '3920', '3921'],
                 forbidden_chapters: ['84', '85', '87', '72', '73', '74', '76', '90'],
                 bonus: 2400
@@ -5252,7 +5254,7 @@ Trường hợp đủ thông tin:
                 // bị loại trừ khỏi các nhóm BỘ PHẬN máy móc Phần XVI (như 84.66, 84.73, 84.09, 84.31, 84.87, 85.03, 85.29, 85.38, 85.48).
                 // TUYỆT ĐỐI KHÔNG loại trừ các thiết bị, máy móc có chức năng độc lập (như công tắc 8536, dây cáp 8544, mô tơ 8501, biến áp 8504, van 8481) dù có vỏ hoặc cách điện bằng nhựa!
                 const isMachinePartHeading = NOTE_2B_PARTS_HEADINGS.has(head) || ['8487', '8548', '8409', '8431', '8466', '8473', '8503', '8529', '8538'].includes(head);
-                const isSubjectStructuralPlastic = /\b(?:tam\s+che|vo\s+che|nap\s+che|tam\s+chan|vach\s+chan|man\s+che|chan\s+bui|tam\s+(?:nhua|mica)?\s*bao\s+ve|vo\s+bao\s+ve|nap\s+bao\s+ve|mieng\s+nhua|tam\s+nhua|thanh\s+nhua|khung\s+nhua|de\s+ga|gia\s+do\s+nhua)\b/i.test(subjLower);
+                const isSubjectStructuralPlastic = /\b(?:tam\s+che|vo\s+che|nap\s+che|tam\s+chan|vach\s+chan|man\s+che|chan\s+bui|tam\s+(?:nhua|nhua\s+mica)?\s*bao\s+ve|vo\s+bao\s+ve|nap\s+bao\s+ve|mieng\s+nhua|tam\s+nhua|thanh\s+nhua|khung\s+nhua|de\s+ga|gia\s+do\s+nhua)\b/i.test(subjLower);
 
                 if (isSubjectStructuralPlastic && isMachinePartHeading) {
                     return { 
@@ -6187,6 +6189,12 @@ Trường hợp đủ thông tin:
                 };
             }
 
+            // BƯỚC 1B: QUY TẮC PHÁP LÝ DÙNG CHUNG (statutory_rules.json / statutory_rules.js)
+            if (window.StatutoryRulesEngine) {
+                const sharedRes = window.StatutoryRulesEngine.match(hn, norm);
+                if (sharedRes) return sharedRes;
+            }
+
             // ========================================================
             // BƯỚC 2A: QUY TẮC PHÁP LÝ ĐỊNH DANH ĐẶC BIỆT (BUPI / CÔNG NGHIỆP / THIẾT BỊ)
             // ========================================================
@@ -6200,7 +6208,7 @@ Trường hợp đủ thông tin:
                     reasoning: "Áp dụng GRI 1: Lò xo khí nén (xi lanh khí nén chuyển động tịnh tiến trợ lực nắp máy) thuộc Nhóm 84.12. Áp dụng GRI 6: Phân nhóm 8412.31 mã số 8412.31.00 (Thuế NK MFN 0%, VAT 8%).",
                     missing_attributes: [],
                     assumptions: "Lò xo khí tịnh tiến dùng nâng đỡ nắp máy móc công nghiệp",
-                    reserve_code: "8487.90.90"
+                    reserve_code: "8487.90.00"
                 };
             }
 
@@ -6256,49 +6264,71 @@ Trường hợp đủ thông tin:
                     reasoning: "Áp dụng GRI 1: Bộ làm kín kiểu cơ khí (phớt cơ khí / mechanical seals) có phân nhóm định danh riêng tại Nhóm 84.84. Áp dụng GRI 6: Mã số 8484.20.00 (Thuế NK MFN 3%, VAT 8%).",
                     missing_attributes: [],
                     assumptions: "Bộ phớt cơ khí dùng làm kín trục bơm chất lỏng",
-                    reserve_code: "8487.90.90"
+                    reserve_code: "8487.90.00"
                 };
             }
 
-            // 7. THANH ĐIỆN TRỞ GIA NHIỆT / BỘ SƯỞI ĐIỆN / QUE NHIỆT (Nhóm 8516 / 8516.10.30 & 8516.80.80)
+            // 7. THANH ĐIỆN TRỞ GIA NHIỆT / BỘ SƯỞI ĐIỆN / QUE NHIỆT (Nhóm 8516 / 8516.10.30 & 8516.80.90)
             if (/\b(?:dien\s+tro\s+gia\s+nhiet|thanh\s+dien\s+tro|bo\s+suoi\s+dien|thanh\s+nhiet|que\s+nhiet|electric\s+radiator|heating\s+element|immersion\s+heater)\b/.test(norm) ||
                 (/\b(?:dien\s+tro|thanh\s+nhiet|bo\s+suoi)\b/.test(hn) && /\b(?:gia\s+nhiet|electric|radiator|heater)\b/.test(norm))) {
                 const isImmersion = /\b(?:nhung|dun\s+nuoc|dun\s+chua|immersion|tank|be\s+rua|radiator)\b/.test(norm);
                 return {
-                    code: isImmersion ? "8516.10.30" : "8516.80.80",
+                    code: isImmersion ? "8516.10.30" : "8516.80.90",
                     level: 8,
                     status: "EXACT_8_DIGIT",
-                    reasoning: `Áp dụng GRI 1: Thiết bị và điện trở gia nhiệt điện thuộc Nhóm 85.16. Áp dụng GRI 6: ${isImmersion ? 'Bộ gia nhiệt điện kiểu nhúng mã 8516.10.30' : 'Điện trở gia nhiệt loại khác mã 8516.80.80'} (Thuế NK MFN 20%, VAT 8%).`,
+                    reasoning: `Áp dụng GRI 1: Thiết bị và điện trở gia nhiệt điện thuộc Nhóm 85.16. Áp dụng GRI 6: ${isImmersion ? 'Bộ gia nhiệt điện kiểu nhúng mã 8516.10.30' : 'Điện trở gia nhiệt loại khác mã 8516.80.90'} (Thuế NK MFN ${isImmersion ? '20%' : '10%'}, VAT 8%).`,
                     missing_attributes: [],
                     assumptions: "Thanh điện trở gia nhiệt đun nóng dung dịch kiểu nhúng",
-                    reserve_code: isImmersion ? "8516.80.80" : "8516.10.30"
+                    reserve_code: isImmersion ? "8516.80.90" : "8516.10.30"
                 };
             }
 
-            // 8. PHỚT CHẮN DẦU TRỤC / PHỚT TRỤC (Nhóm 4016 / 4016.93.90)
-            if (/\b(?:phot\s+chan\s+dau|phot\s+dau|phot\s+truc|shaft\s+seal|oil\s+seal|vong\s+chan\s+dau)\b/.test(norm) ||
+            // 8. PHỚT CHẮN DẦU TRỤC (CGCT 84.87: cao su + cốt kim loại -> 8487.90.00; hoàn toàn cao su -> 4016.93.90)
+            if (/\b(?:phot\s+chan\s+dau|phot\s+dau|phot\s+truc|shaft\s+seal|oil\s+seal|vong\s+chan\s+dau|vong\s+lam\s+kin\s+dau|vong\s+bit\s+dau|radial\s+shaft\s+seal|wdr)\b/.test(norm) ||
                 (/\b(?:phot|seal)\b/.test(hn) && /\b(?:chan\s+dau|dau\s+truc|shaft)\b/.test(norm))) {
+                if (/\b(?:hoan\s+toan\s+bang\s+cao\s+su|toan\s+bo\s+bang\s+cao\s+su|100\s*%\s*cao\s+su|khong\s+(?:co\s+)?(?:cot|loi|khung|vong)\s+(?:kim\s+loai|thep)|all[\s-]+rubber|without\s+metal)\b/.test(norm)) {
+                    return {
+                        code: "4016.93.90",
+                        level: 8,
+                        status: "EXACT_8_DIGIT",
+                        reasoning: "Phớt hoàn toàn bằng cao su lưu hóa, không có cốt kim loại: Chú giải 1(a) Phần XVI loại trừ sang Nhóm 40.16. Áp dụng GRI 6: Phân nhóm 4016.93 mã 4016.93.90 (Thuế NK MFN 3%, VAT 8%).",
+                        missing_attributes: [],
+                        assumptions: "Phớt chắn dầu hoàn toàn bằng cao su lưu hóa, không có cốt kim loại",
+                        reserve_code: "8487.90.00"
+                    };
+                }
                 return {
-                    code: "4016.93.90",
+                    code: "8487.90.00",
                     level: 8,
                     status: "EXACT_8_DIGIT",
-                    reasoning: "Áp dụng GRI 1 & Chú giải 1(a) Phần XVI (loại trừ cao su sang Chương 40): Vòng đệm/phớt chắn dầu bằng cao su lưu hóa thuộc Nhóm 40.16. Áp dụng GRI 6: Phân nhóm 4016.93 mã số 4016.93.90 (Thuế NK MFN 3%, VAT 8%).",
+                    reasoning: "Căn cứ Chú giải chi tiết WCO Nhóm 84.87 (HQKV8 tr. 1969): nhóm này gồm các vòng làm kín dầu có cấu trúc đơn giản (vòng cao su co giãn và cốt kim loại gia cố bằng lưu hóa), không có bộ phận di động; Chú giải chi tiết 84.84 loại trừ (c) vòng bịt dầu sang 84.87. Áp dụng GRI 6: mã 8487.90.00 (Thuế NK MFN 0%, VAT 8%).",
                     missing_attributes: [],
-                    assumptions: "Phớt chắn dầu trục bằng cao su lưu hóa có hoặc không có lõi kim loại",
-                    reserve_code: "8487.90.90"
+                    assumptions: "Phớt chắn dầu kiểu tiêu chuẩn (môi cao su lưu hóa liền cốt kim loại). Nếu phớt hoàn toàn bằng cao su, không có cốt kim loại thì dùng 4016.93.90",
+                    reserve_code: "4016.93.90"
                 };
             }
 
-            // 9. MÀNG TRƯỢT / TẤM LÓT TRƯỢT NHỰA IGLIDUR (Nhóm 3920 / 3926)
+            // 9. BẠC LÓT / MÀNG TRƯỢT NHỰA IGLIDUR (đã tạo hình -> 8483.30.90; tấm phẳng -> 3920.99.90)
             if (/\b(?:sliding\s+film|mang\s+truot|tam\s+lot\s+truot)\b/.test(norm) && /\b(?:iglidur|plastic|nhua)\b/.test(norm)) {
+                if (/\b(?:bac\s+lot|ong\s+lot|bush(?:ing)?|liner|jum[\s-]?\d+|dai\s+\d+(?:[.,]\d+)?\s*mm|l\s*:?\s*\d+(?:[.,]\d+)?\s*mm)\b/.test(norm)) {
+                    return {
+                        code: "8483.30.90",
+                        level: 8,
+                        status: "EXACT_8_DIGIT",
+                        reasoning: "Căn cứ Chú giải chi tiết WCO Nhóm 84.83 mục (B) (HQKV8 tr. 1958): gối đỡ trục dùng ổ trượt phân loại vào nhóm này kể cả khi không có thân ổ, bao gồm vòng chống ma sát bằng plastic. Bạc lót iglidur đã tạo hình (có chiều dài/đường kính xác định) là ổ trượt. Áp dụng GRI 6: mã 8483.30.90 (Thuế NK MFN 0%, VAT 8%).",
+                        missing_attributes: [],
+                        assumptions: "Bạc lót trượt bằng plastic iglidur đã tạo hình ống lót (có chiều dài/đường kính xác định)",
+                        reserve_code: "3920.99.90"
+                    };
+                }
                 return {
                     code: "3920.99.90",
                     level: 8,
                     status: "EXACT_8_DIGIT",
-                    reasoning: "Áp dụng GRI 1 & Chú giải 1(g) Phần XVI loại trừ plastic sang Chương 39: Tấm/màng trượt bằng plastic iglidur chưa xốp hóa thuộc Nhóm 39.20. Áp dụng GRI 6: Mã số 3920.99.90 (Thuế NK MFN 6%, VAT 8%).",
+                    reasoning: "Màng/tấm trượt iglidur dạng phẳng chưa tạo hình: Chú giải 1(g) Phần XVI và Chú giải 10 Chương 39 -> Nhóm 39.20. Áp dụng GRI 6: mã 3920.99.90 (Thuế NK MFN 6%, VAT 8%).",
                     missing_attributes: [],
-                    assumptions: "Màng trượt bằng plastic iglidur J dạng tấm/dải phẳng chưa xốp hóa",
-                    reserve_code: "3926.90.99"
+                    assumptions: "Màng trượt iglidur dạng tấm/dải phẳng chưa tạo hình. Nếu đã tạo hình thành ống lót thì dùng 8483.30.90",
+                    reserve_code: "8483.30.90"
                 };
             }
 
@@ -6510,7 +6540,7 @@ Trường hợp đủ thông tin:
                     reasoning: "Áp dụng GRI 1: Máy cơ khí dập khuôn ép kim loại thuộc Nhóm 84.62. Áp dụng GRI 6 xếp vào mã 8462.62.11.",
                     missing_attributes: [],
                     assumptions: "Máy dập ép cơ khí dùng điện gia công kim loại",
-                    reserve_code: "8479.89.39"
+                    reserve_code: "8479.89.69"
                 };
             }
 
@@ -6554,13 +6584,13 @@ Trường hợp đủ thông tin:
             if (/\b(?:dong\s+ho\s+do|dong\s+ho|thiet\s+bi\s+do|may\s+do|bo\s+phan\s+cua\s+thuoc\s+do|gauge|measuring)\b/.test(hn)) {
                 if (/\b(?:ap\s+suat|pressure)\b/.test(norm)) {
                     return {
-                        code: "9026.20.30",
+                        code: "9026.20.90",
                         level: 8,
                         status: "EXACT_8_DIGIT",
-                        reasoning: "Áp dụng GRI 1 & Chú giải 1(m) Phần XVI loại trừ sang Chương 90 -> Nhóm 90.26 dụng cụ đo áp suất. Áp dụng GRI 6 xếp mã 9026.20.30.",
+                        reasoning: "Áp dụng GRI 1 & Chú giải 1(m) Phần XVI loại trừ sang Chương 90 -> Nhóm 90.26 dụng cụ đo áp suất. Áp dụng GRI 6 xếp mã 9026.20.90.",
                         missing_attributes: [],
                         assumptions: "Đồng hồ đo áp suất cơ học ống bourdon",
-                        reserve_code: "9026.20.40"
+                        reserve_code: "9026.20.50"
                     };
                 } else if (/\b(?:thang\s+hang|kiem\s+tra|alignment)\b/.test(norm)) {
                     return {
@@ -6587,13 +6617,13 @@ Trường hợp đủ thông tin:
 
             if (/\b(?:thermostat|bo\s+dieu\s+nhiet)\b/.test(hn) || /\b(?:thermostat|bo\s+dieu\s+nhiet)\b/.test(norm)) {
                 return {
-                    code: "9032.10.10",
+                    code: "9032.10.00",
                     level: 8,
                     status: "EXACT_8_DIGIT",
-                    reasoning: "Áp dụng GRI 1 & Chú giải 7 Chương 90: Thiết bị điều chỉnh và kiểm soát tự động -> Phân nhóm 9032.10 Thermostat -> Mã 9032.10.10.",
+                    reasoning: "Áp dụng GRI 1 & Chú giải 7 Chương 90: Thiết bị điều chỉnh và kiểm soát tự động -> Phân nhóm 9032.10 Thermostat -> Mã 9032.10.00.",
                     missing_attributes: [],
                     assumptions: "Thermostat tự động ngắt điện",
-                    reserve_code: "9032.10.20"
+                    reserve_code: "9032.89.90"
                 };
             }
 
@@ -6611,15 +6641,36 @@ Trường hợp đủ thông tin:
             }
 
             // 8. THIẾT BỊ ĐÓNG NGẮT: APTOMAT, CÔNG TẮC, ĐẦU NỐI (Nhóm 8536)
-            if (/\b(?:mcb|aptomat|cau\s+dao\s+tu\s+dong|circuit\s+breaker)\b/.test(hn)) {
+            if (/\b(?:mcb|mccb|aptomat|cau\s+dao\s+tu\s+dong|circuit\s+breaker)\b/.test(hn)) {
+                const cur = attrs.current_a;
+                const moulded = /\b(?:mccb|hop\s+duc|moulded\s+case|molded\s+case)\b/.test(norm);
+                if (cur === null || cur === undefined) {
+                    return {
+                        code: "8536.20",
+                        level: 6,
+                        status: "STOP_6_DIGIT",
+                        reasoning: "Áp dụng GRI 1 -> Nhóm 85.36. Áp dụng GRI 6: Bộ ngắt mạch tự động thuộc phân nhóm 8536.20. Thiếu dòng điện định mức (A) để chọn dòng 8 số (dưới 16 A / từ 16 A trở lên) -> dừng ở 6 số, không đoán.",
+                        missing_attributes: ["current_a"],
+                        assumptions: "Thiếu dòng điện định mức",
+                        reserve_code: "8536.20.99"
+                    };
+                }
+                let code, branch;
+                if (moulded) {
+                    code = cur < 16 ? "8536.20.11" : (cur <= 32 ? "8536.20.12" : (cur <= 1000 ? "8536.20.13" : "8536.20.19"));
+                    branch = "Loại hộp đúc (MCCB)";
+                } else {
+                    code = cur < 16 ? "8536.20.91" : "8536.20.99";
+                    branch = "Loại khác (không phải hộp đúc, ví dụ MCB)";
+                }
                 return {
-                    code: "8536.20.91",
+                    code: code,
                     level: 8,
                     status: "EXACT_8_DIGIT",
-                    reasoning: "Áp dụng GRI 1 -> Nhóm 85.36 (loại trừ nhóm dây điện 8544). Áp dụng GRI 6: Cầu dao tự động ngắt mạch điện áp <= 1000V dòng <= 16A mã 8536.20.91.",
+                    reasoning: `Áp dụng GRI 1 -> Nhóm 85.36 (≤ 1.000 V). Áp dụng GRI 6: Bộ ngắt mạch tự động 8536.20 -> ${branch} -> dòng định mức ${cur} A (${cur < 16 ? 'dưới 16 A' : 'từ 16 A trở lên'}) -> mã ${code}.`,
                     missing_attributes: [],
-                    assumptions: "MCB bảo vệ quá tải <= 16A",
-                    reserve_code: "8536.20.99"
+                    assumptions: `${branch}, dòng định mức ${cur} A`,
+                    reserve_code: code !== "8536.20.99" ? "8536.20.99" : "8536.20.91"
                 };
             }
 
@@ -6709,14 +6760,19 @@ Trường hợp đủ thông tin:
             }
 
             if (/\b(?:dai\s+oc|e-cu|nut|tan)\b/.test(hn)) {
+                const dmm = attrs.diameter_mm;
+                if (dmm === null || dmm === undefined) {
+                    return {
+                        code: "7318.16", level: 6, status: "STOP_6_DIGIT",
+                        reasoning: "Áp dụng GRI 1 & Chú giải 2 Phần XV: Đai ốc bằng sắt thép thuộc Nhóm 73.18, phân nhóm 7318.16. Thiếu đường kính bu lông tương ứng (≤ 16 mm hay > 16 mm) -> dừng ở 6 số.",
+                        missing_attributes: ["diameter_mm"], assumptions: "Thiếu cỡ ren đai ốc", reserve_code: "7318.16.10"
+                    };
+                }
+                const code = dmm <= 16 ? "7318.16.10" : "7318.16.90";
                 return {
-                    code: "7318.16.00",
-                    level: 8,
-                    status: "EXACT_8_DIGIT",
-                    reasoning: "Áp dụng GRI 1 & Chú giải 2 Phần XV: Đai ốc bằng thép thuộc Nhóm 73.18. Áp dụng GRI 6: Đai ốc có ren thuộc mã 7318.16.00.",
-                    missing_attributes: [],
-                    assumptions: "Đai ốc thép tiêu chuẩn",
-                    reserve_code: "7318.15.10"
+                    code: code, level: 8, status: "EXACT_8_DIGIT",
+                    reasoning: `Áp dụng GRI 1 & Chú giải 2 Phần XV: Đai ốc bằng sắt thép thuộc Nhóm 73.18. Áp dụng GRI 6: phân nhóm 7318.16 -> cho bu lông đường kính ${dmm} mm (${dmm <= 16 ? 'không quá' : 'trên'} 16 mm) -> mã ${code}.`,
+                    missing_attributes: [], assumptions: `Đai ốc ren M${dmm}`, reserve_code: code === "7318.16.10" ? "7318.16.90" : "7318.16.10"
                 };
             }
 
@@ -6830,15 +6886,15 @@ Trường hợp đủ thông tin:
 
                 if (isCheck) {
                     const isCast = (attrs.material === "cast_iron" || norm.includes('gang'));
-                    if (isCast && (attrs.dn_mm !== null && attrs.dn_mm > 25.0)) {
+                    if (isCast && (attrs.dn_mm !== null && attrs.dn_mm >= 40.0 && attrs.dn_mm <= 600.0)) {
                         return {
-                            code: "8481.30.22",
+                            code: "8481.30.10",
                             level: 8,
                             status: "EXACT_8_DIGIT",
-                            reasoning: "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 84.81. Áp dụng GRI 6: Van một chiều Phân nhóm 8481.30 -> Bằng gang, đường kính trong trên 2,5 cm (DN50) -> Mã 8481.30.22.",
+                            reasoning: "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 84.81. Áp dụng GRI 6: Van một chiều Phân nhóm 8481.30 -> Van cản bằng gang đúc, đường kính trong cửa nạp từ 4 cm đến 60 cm -> Mã 8481.30.10.",
                             missing_attributes: [],
                             assumptions: "Van một chiều bằng gang DN50",
-                            reserve_code: "8481.30.21"
+                            reserve_code: "8481.30.90"
                         };
                     } else {
                         return {
@@ -6848,14 +6904,14 @@ Trường hợp đủ thông tin:
                             reasoning: "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 84.81. Áp dụng GRI 6: Van một chiều Phân nhóm 8481.30 -> Loại khác mã 8481.30.90.",
                             missing_attributes: [],
                             assumptions: "Van một chiều công nghiệp",
-                            reserve_code: "8481.30.22"
+                            reserve_code: "8481.30.10"
                         };
                     }
                 }
 
                 if (isSafety) {
                     return {
-                        code: attrs.material === "copper" ? "8481.40.21" : "8481.40.90",
+                        code: (attrs.material === "copper" && attrs.dn_mm !== null && attrs.dn_mm <= 25.0) ? "8481.40.10" : "8481.40.90",
                         level: 8,
                         status: "EXACT_8_DIGIT",
                         reasoning: "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 84.81. Áp dụng GRI 6: Van an toàn hoặc van xả áp suất thuộc Phân nhóm 8481.40.",
@@ -6953,41 +7009,59 @@ Trường hợp đủ thông tin:
                 }
             }
 
-            // 17. ĐỘNG CƠ ĐIỆN / MÔ TƠ (Nhóm 8501)
+            // 17. ĐỘNG CƠ ĐIỆN / MÔ TƠ (Nhóm 8501) - phân nhánh theo công suất, một chiều/xoay chiều, số pha, công dụng
             if (/\b(?:dong\s+co\s+dien|mo\s+to\s+dien|mo\s+to\s+buoc|motor|ac\s+motor|dc\s+motor)\b/.test(hn)) {
-                const isDc = /\bdc\b/.test(norm) || norm.includes('mot chieu');
+                const P = attrs.power_w;
+                const isDc = /\b(?:dc|mot\s+chieu)\b/.test(norm);
+                const isUniv = /\b(?:van\s+nang|universal)\b/.test(norm);
+                const isSingle = /\b(?:1\s*pha|mot\s+pha|single\s+phase)\b/.test(norm);
+                const isMulti = /\b(?:3\s*pha|ba\s+pha|da\s+pha|nhieu\s+pha|three\s+phase|3\s*phase)\b/.test(norm);
+                const isStep = /\b(?:buoc|stepper|stepping)\b/.test(norm);
+                const app3 = /\b(?:dieu\s+hoa|may\s+lanh|tu\s+lanh|may\s+giat)\b/.test(norm);
+                const app = app3 || /\b(?:may\s+hut\s+bui|binh\s+nong\s+lanh|may\s+say\s+toc|am\s+dun)\b/.test(norm);
+                const veh = /\b(?:xe\s+o\s+to|o\s+to|xe\s+dien|xe\s+may|chuong\s+87)\b/.test(norm);
+                const mot = (code, why, reserve = "") => {
+                    const n = code.replace(/\./g, '').length;
+                    const st = n === 8 ? "EXACT_8_DIGIT" : (n >= 5 ? "STOP_6_DIGIT" : "STOP_4_DIGIT");
+                    return { code: code, level: n, status: st,
+                             reasoning: "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 85.01. Áp dụng GRI 6: " + why,
+                             missing_attributes: n === 8 ? [] : ["power_kw"], assumptions: why, reserve_code: reserve };
+                };
+                if (P === null || P === undefined) {
+                    if (isMulti && !isDc) return mot("8501.5", "Động cơ xoay chiều đa pha nhưng thiếu công suất (≤ 750 W / ≤ 75 kW / > 75 kW) -> dừng ở 8501.5, không đoán.", "8501.51.19");
+                    return mot("8501", "Thiếu công suất và/hoặc loại dòng điện (một chiều/xoay chiều), số pha -> dừng ở nhóm 85.01, không đoán.", "8501.51.19");
+                }
+                let code;
+                if (P <= 37.5) {
+                    if (isDc) code = isStep ? (app ? "8501.10.21" : (P <= 5 ? "8501.10.22" : "8501.10.29")) : (app ? "8501.10.41" : "8501.10.49");
+                    else code = isStep ? (app ? "8501.10.51" : "8501.10.59") : (app ? "8501.10.91" : "8501.10.99");
+                    return mot(code, `Công suất ${P} W (không quá 37,5 W) -> phân nhóm 8501.10 -> mã ${code}.`, "8501.10.99");
+                }
+                if (isUniv) {
+                    code = P <= 1000 ? (app ? "8501.20.12" : "8501.20.19") : (app ? "8501.20.21" : "8501.20.29");
+                    return mot(code, `Động cơ vạn năng một chiều/xoay chiều ${P} W -> mã ${code}.`);
+                }
                 if (isDc) {
-                    return {
-                        code: "8501.31.60",
-                        level: 8,
-                        status: "EXACT_8_DIGIT",
-                        reasoning: "Áp dụng GRI 1 -> Nhóm 85.01 động cơ điện. Áp dụng GRI 6: Động cơ DC công suất <= 750W (82W) -> Mô tơ bước mã 8501.31.60.",
-                        missing_attributes: [],
-                        assumptions: "Mô tơ bước DC",
-                        reserve_code: "8501.10.29"
-                    };
+                    if (P <= 750) code = app ? "8501.31.30" : (veh ? "8501.31.60" : "8501.31.70");
+                    else if (P <= 37500) code = app ? "8501.32.21" : (veh ? "8501.32.24" : "8501.32.25");
+                    else if (P <= 75000) code = app3 ? "8501.32.31" : "8501.32.32";
+                    else if (P <= 375000) code = veh ? "8501.33.10" : "8501.33.90";
+                    else code = "8501.34.00";
+                    return mot(code, `Động cơ một chiều ${P / 1000} kW -> mã ${code}.`);
                 }
-
-                if (attrs.power_w === null) {
-                    return {
-                        code: "8501.5",
-                        level: 5,
-                        status: "STOP_6_DIGIT",
-                        reasoning: "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 85.01. Áp dụng GRI 6: Động cơ điện xoay chiều AC nhiều pha thuộc Phân nhóm 8501.5. TUY NHIÊN, thiếu thông số công suất (kW/W/HP) để phân nhánh định thuế (<=750W, <=7.5kW, <=75kW hay >75kW) -> Dừng ở phân nhóm theo nguyên tắc Không đoán mò.",
-                        missing_attributes: ["power_kw"],
-                        assumptions: "Thiếu công suất động cơ",
-                        reserve_code: "8501.51.00"
-                    };
-                } else {
-                    const pKw = attrs.power_w / 1000.0;
-                    if (pKw <= 0.75) {
-                        return { code: "8501.51.00", level: 8, status: "EXACT_8_DIGIT", reasoning: "Động cơ AC công suất <= 750W", missing_attributes: [], assumptions: "", reserve_code: "8501.52.11" };
-                    } else if (pKw <= 7.5) {
-                        return { code: "8501.52.11", level: 8, status: "EXACT_8_DIGIT", reasoning: "Động cơ AC công suất 750W - 7.5kW", missing_attributes: [], assumptions: "", reserve_code: "8501.52.19" };
-                    } else if (pKw <= 75.0) {
-                        return { code: "8501.52.19", level: 8, status: "EXACT_8_DIGIT", reasoning: "Động cơ AC công suất 7.5kW - 75kW", missing_attributes: [], assumptions: "", reserve_code: "8501.53.00" };
-                    }
+                if (isSingle) {
+                    code = P <= 1000 ? (app ? "8501.40.11" : "8501.40.19") : (app ? "8501.40.21" : "8501.40.29");
+                    return mot(code, `Động cơ xoay chiều một pha ${P / 1000} kW -> mã ${code}.`);
                 }
+                if (isMulti) {
+                    if (P <= 750) code = app ? "8501.51.11" : "8501.51.19";
+                    else if (P <= 1000) code = app ? "8501.52.11" : (veh ? "8501.52.12" : "8501.52.19");
+                    else if (P <= 37500) code = app ? "8501.52.21" : (veh ? "8501.52.22" : "8501.52.29");
+                    else if (P <= 75000) code = app3 ? "8501.52.31" : (veh ? "8501.52.32" : "8501.52.39");
+                    else code = veh ? "8501.53.10" : "8501.53.90";
+                    return mot(code, `Động cơ xoay chiều đa pha ${P / 1000} kW -> mã ${code}.`);
+                }
+                return mot("8501", `Động cơ ${P / 1000} kW nhưng chưa rõ một chiều/xoay chiều, một pha/đa pha -> dừng ở nhóm 85.01.`, "8501.51.19");
             }
 
             // 18. DỤNG CỤ CẮT GỌT THAY THẾ CHO MÁY CÔNG CỤ (Nhóm 8207)
@@ -7042,14 +7116,49 @@ Trường hợp đủ thông tin:
             }
 
             if (/\b(?:bien\s+ap|bien\s+the|transformer)\b/.test(hn)) {
+                const pw = attrs.power_w;
+                if (pw === null || pw === undefined) {
+                    return {
+                        code: "8504",
+                        level: 4,
+                        status: "STOP_4_DIGIT",
+                        reasoning: "Áp dụng GRI 1 -> Nhóm 85.04 (máy biến điện). Thiếu công suất danh định (VA/kVA) và loại điện môi để chọn phân nhóm 6 số -> dừng ở 4 số, không đoán.",
+                        missing_attributes: ["power_kva"],
+                        assumptions: "Thiếu công suất danh định",
+                        reserve_code: "8504.31"
+                    };
+                }
+                const kva = pw / 1000.0;
+                let sub, kind;
+                if (/\b(?:ngam\s+dau|dien\s+moi\s+long|dau\s+cach\s+dien|oil)\b/.test(norm)) {
+                    sub = kva <= 650 ? "8504.21" : (kva <= 10000 ? "8504.22" : "8504.23");
+                    kind = "điện môi lỏng";
+                } else {
+                    sub = kva <= 1 ? "8504.31" : (kva <= 16 ? "8504.32" : (kva <= 500 ? "8504.33" : "8504.34"));
+                    kind = "loại khác (không dùng điện môi lỏng)";
+                }
+                if (sub === "8504.31") {
+                    const specials = [[/\b(?:quet\s+ve|flyback)\b/, "8504.31.30", "biến áp quét về"],
+                                      [/\b(?:trung\s+tan)\b/, "8504.31.40", "biến áp trung tần"],
+                                      [/\b(?:do\s+choi|mo\s+hinh)\b/, "8504.31.91", "dùng cho đồ chơi, mô hình"]];
+                    for (const [pat, code, label] of specials) {
+                        if (pat.test(norm)) {
+                            return {
+                                code: code, level: 8, status: "EXACT_8_DIGIT",
+                                reasoning: `Áp dụng GRI 1 -> Nhóm 85.04. Áp dụng GRI 6: Máy biến điện ${kind}, công suất ${kva} kVA (≤ 1 kVA) -> ${label} -> mã ${code}.`,
+                                missing_attributes: [], assumptions: label, reserve_code: "8504.31.99"
+                            };
+                        }
+                    }
+                }
                 return {
-                    code: "8504.31.24",
-                    level: 8,
-                    status: "EXACT_8_DIGIT",
-                    reasoning: "Áp dụng GRI 1 -> Nhóm 85.04. Áp dụng GRI 6: Máy biến thế khác công suất <= 1kVA (500VA) -> Mã 8504.31.24.",
-                    missing_attributes: [],
-                    assumptions: "Biến áp cách ly công suất <= 1kVA",
-                    reserve_code: "8504.31.29"
+                    code: sub,
+                    level: 6,
+                    status: "STOP_6_DIGIT",
+                    reasoning: `Áp dụng GRI 1 -> Nhóm 85.04. Áp dụng GRI 6: Máy biến điện ${kind}, công suất ${kva} kVA -> phân nhóm ${sub}. Dòng 8 số phụ thuộc chủng loại (biến áp đo lường, biến áp tăng/giảm áp, biến áp thích ứng...) chưa đủ dữ kiện -> dừng ở 6 số.`,
+                    missing_attributes: ["transformer_type"],
+                    assumptions: `Công suất ${kva} kVA; chưa xác định chủng loại biến áp` + (sub === "8504.31" ? " (biến áp cách ly hạ áp thường xem xét 8504.31.93 hoặc 8504.31.99)" : ""),
+                    reserve_code: sub !== "8504.31" ? sub + ".99" : "8504.31.99"
                 };
             }
 
@@ -7075,7 +7184,7 @@ Trường hợp đủ thông tin:
                     reasoning: "Áp dụng GRI 1 -> Nhóm 85.36. Áp dụng GRI 6: Rơ le bảo vệ quá tải nhiệt phân nhóm 8536.49 -> Mã 8536.49.90.",
                     missing_attributes: [],
                     assumptions: "Rơ le nhiệt lưỡng kim",
-                    reserve_code: "8536.41.00"
+                    reserve_code: "8536.41.40"
                 };
             }
 
@@ -7152,7 +7261,7 @@ Trường hợp đủ thông tin:
                     reasoning: "Áp dụng GRI 1 -> Chương 76 nhôm và các sản phẩm bằng nhôm. Nhóm 76.16 các sản phẩm bằng nhôm khác mã 7616.99.90.",
                     missing_attributes: [],
                     assumptions: "Miếng nhôm đục lỗ gia công cơ khí",
-                    reserve_code: "7616.99.19"
+                    reserve_code: "7616.99.80"
                 };
             }
 
@@ -7166,6 +7275,63 @@ Trường hợp đủ thông tin:
                     missing_attributes: [],
                     assumptions: "Sản phẩm thép gia công đột lỗ sơn phủ",
                     reserve_code: "7326.90.10"
+                };
+            }
+
+            // 29a. MICA: PHÂN BIỆT NHỰA MICA (PMMA - CHƯƠNG 39) VS KHOÁNG CHẤT MICA (NHÓM 68.14)
+            if (/\bmica\b/.test(norm)) {
+                const isPlasticMica = /\b(?:nhua\s+mica|mica\s+nhua|acrylic|pmma|poly\s*\(?\s*methyl\s+methacrylate\s*\)?|polymethyl|chat\s+deo|plastic)\b/.test(norm);
+                const isMineralMica = /\b(?:mica\s+khoang|khoang\s+(?:chat\s+)?mica|mica\s+tu\s+nhien|natural\s+mica|muscovite|phlogopite|mica\s+chiu\s+nhiet|mica\s+cach\s+dien|mica\s+ket\s+(?:khoi|tu)|mica\s+tai\s+(?:che|tao)|agglomerated\s+mica|reconstituted\s+mica|micanite)\b/.test(norm);
+
+                if (isMineralMica && !isPlasticMica) {
+                    const isAgglom = /\b(?:ket\s+(?:khoi|tu)|tai\s+(?:che|tao)|agglomerated|reconstituted|micanite)\b/.test(norm);
+                    return {
+                        code: isAgglom ? "6814.10.00" : "6814.90.00",
+                        level: 8,
+                        status: "EXACT_8_DIGIT",
+                        reasoning: isAgglom
+                            ? "Áp dụng GRI 1 & Chú giải Chương 68: Tấm, tấm mỏng hoặc dải bằng khoáng chất mica đã được kết khối hoặc tái chế thuộc Nhóm 68.14. Áp dụng GRI 6 xếp mã 6814.10.00 (Thuế NK MFN 10%)."
+                            : "Áp dụng GRI 1 & Chú giải Chương 68: Khoáng chất mica tự nhiên đã gia công hoặc sản phẩm làm từ mica (tấm che, chi tiết cách điện/chịu nhiệt...) thuộc Nhóm 68.14. Áp dụng GRI 6 xếp mã 6814.90.00 (Thuế NK MFN 10%).",
+                        missing_attributes: [],
+                        assumptions: isAgglom ? "Mica khoáng chất kết khối / tái chế" : "Mica khoáng chất tự nhiên đã gia công",
+                        reserve_code: isAgglom ? "6814.90.00" : "6814.10.00"
+                    };
+                }
+
+                if (isPlasticMica && !isMineralMica) {
+                    const isUnworkedSheet = /\b(?:chua\s+gia\s+cong|chua\s+khoet|tam\s+phang\s+nguyen|dang\s+tam\s+tieu\s+chuan)\b/.test(norm) && !/\b(?:tam\s+che|phu\s+tung|khoan|uon|dinh\s+hinh|bao\s+ve)\b/.test(norm);
+                    if (isUnworkedSheet) {
+                        return {
+                            code: "3920.51",
+                            level: 6,
+                            status: "STOP_6_DIGIT",
+                            reasoning: "Áp dụng GRI 1: Tấm phẳng nhựa mica (poly(metyl metacrylat) - PMMA) chưa gia công định hình thuộc Phân nhóm 3920.51. Cần xác nhận loại cứng (SEN) hay loại khác để chốt mã 8 số (3920.51.11 / 3920.51.19 / 3920.51.90).",
+                            missing_attributes: ["Xác nhận tấm nhựa PMMA thuộc loại cứng (SEN - 3920.51.11) hay loại khác (3920.51.90)"],
+                            assumptions: "Tấm nhựa PMMA phẳng chưa gia công cơ khí",
+                            reserve_code: "3926.90.99"
+                        };
+                    }
+                    return {
+                        code: "3926.90.99",
+                        level: 8,
+                        status: "EXACT_8_DIGIT",
+                        reasoning: "Áp dụng GRI 1 & Chú giải 1(g) Phần XVI: Sản phẩm bằng nhựa mica (Acrylic / PMMA) đã gia công thành tấm che/bộ phận dùng cho máy móc bị loại trừ khỏi Phần XVI, xếp vào Nhóm 39.26. Áp dụng GRI 6 xếp mã 3926.90.99.",
+                        missing_attributes: [],
+                        assumptions: "Nhựa mica (Acrylic / PMMA) đã gia công định hình",
+                        reserve_code: "3920.51"
+                    };
+                }
+
+                return {
+                    code: "INSUFFICIENT",
+                    level: 0,
+                    status: "INSUFFICIENT_INFO",
+                    reasoning: 'Từ "mica" trong thương mại có thể là NHỰA MICA (Acrylic/PMMA -> Chương 39: 3926.90.99 hoặc 3920.51) hoặc KHOÁNG CHẤT MICA tự nhiên/kết khối (Chương 68: 6814.10.00 / 6814.90.00). Cần xác nhận bản chất vật liệu trước khi chốt mã HS.',
+                    missing_attributes: [
+                        'Xác nhận bản chất chất liệu "mica": Là nhựa Mica (Acrylic / PMMA -> Nhóm 39.26 / 39.20) hay khoáng chất Mica tự nhiên / kết khối chịu nhiệt cách điện (Nhóm 68.14)?'
+                    ],
+                    assumptions: "",
+                    reserve_code: "3926.90.99 / 6814.90.00"
                 };
             }
 
@@ -7233,6 +7399,7 @@ Trường hợp đủ thông tin:
 
         function engineValidateWalkerClient(statRes, item) {
             if (!window.UniversalEngine || !statRes) return statRes;
+            if (statRes.rule_id && ((statRes.candidates && statRes.candidates.length > 0) || statRes.status === 'INSUFFICIENT_INFO')) return statRes;
             try {
                 const fullText = [item.name, item.desc, item.use, item.specs, item.model_en].join(' ').trim();
                 const fullNorm = UniversalEngine.norm(fullText);
@@ -7281,6 +7448,9 @@ Trường hợp đủ thông tin:
                         _insufficient_info: true,
                         _missing_fields: statRes.missing_attributes || [],
                         _reasoning: statRes.reasoning,
+                        _disambiguation_question: statRes.disambiguation_question || '',
+                        _candidates: statRes.candidates || [],
+                        _legal_basis: statRes.legal_basis || '',
                         c: '',
                         vn: 'Mô tả hàng hóa chưa đủ căn cứ pháp lý để định mã HS (Zero-Guessing).'
                     };
@@ -9065,11 +9235,41 @@ Trường hợp đủ thông tin:
             `;
         }
 
+        function renderDisambiguationCandidatesHtml(question, candidates, legalBasis) {
+            if (!candidates || candidates.length === 0) return '';
+            const cards = candidates.map(c => {
+                const clean = (c.code || '').replace(/\./g, '');
+                return `
+                    <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-sky-200 dark:border-sky-800/70 shadow-xs flex flex-col justify-between gap-2.5">
+                        <div>
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="px-2.5 py-0.5 rounded-lg bg-sky-100 dark:bg-sky-900/50 text-sky-800 dark:text-sky-300 font-mono font-black text-sm">${c.code}</span>
+                                <button type="button" onclick="applyAlternativeHsCode('${clean}')" class="px-2.5 py-1 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-[11px] font-bold cursor-pointer transition-all">Chọn mã này</button>
+                            </div>
+                            <div class="text-xs font-bold text-slate-800 dark:text-slate-100 mt-2">${c.label || ''}</div>
+                            ${c.legal_basis ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1"><i class="fa-solid fa-scale-balanced mr-1 text-sky-500"></i>${c.legal_basis}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            return `
+                <div class="p-4 rounded-2xl bg-sky-50/80 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-800/60 space-y-3">
+                    <div class="text-xs font-bold text-sky-900 dark:text-sky-200 flex items-center gap-2">
+                        <i class="fa-solid fa-code-branch text-sky-600"></i>
+                        <span>${question || 'Vui lòng xác nhận để chọn đúng 1 trong các mã ứng viên sau:'}</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">${cards}</div>
+                    ${legalBasis ? `<div class="text-[11px] text-slate-500 dark:text-slate-400"><i class="fa-solid fa-book-bookmark mr-1"></i>Căn cứ pháp lý: ${legalBasis}</div>` : ''}
+                </div>
+            `;
+        }
+
         function renderInsufficientInfoAlertHtml(res, rawInput) {
             const missing = res.missing_criteria || [
                 "Chất liệu cấu tạo chi tiết (ví dụ: bằng thép, bằng đồng, bằng nhựa...)",
                 "Nguyên lý vận hành hoặc công năng sử dụng trong máy móc/hệ thống nào"
             ];
+            const candBlock = renderDisambiguationCandidatesHtml(res.disambiguation_question, res.candidates, res.legal_basis);
             return `
                 <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border-2 border-amber-400/60 dark:border-amber-500/40 shadow-xl space-y-6 text-slate-800 dark:text-slate-100">
                     <div class="flex items-start gap-4">
@@ -9090,6 +9290,7 @@ Trường hợp đủ thông tin:
                         </div>
                     </div>
 
+                    ${candBlock}
                     <div class="p-5 rounded-2xl bg-amber-50/70 dark:bg-slate-800/60 border border-amber-200 dark:border-amber-900/60 space-y-3">
                         <h4 class="text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300 flex items-center gap-2">
                             <i class="fa-solid fa-list-check"></i>
@@ -9125,6 +9326,39 @@ Trường hợp đủ thông tin:
             const fullNorm = (typeof removeAccents === 'function') ? removeAccents(fullText) : fullText.toLowerCase();
             let cCode = (res.clean_code || res.hs_code || '').replace(/\./g, '');
 
+            // Quy tắc pháp lý có căn cứ Chú giải (StatutoryTreeWalker) được ưu tiên hơn mã do AI đề xuất
+            try {
+                if (typeof classifyStatutoryTreeClientSide === 'function') {
+                    const sw = classifyStatutoryTreeClientSide({ name: rawInput.name || '', desc: rawInput.desc || '', use: rawInput.use || '', specs: rawInput.specs || '', model_en: rawInput.model_en || '' });
+                    if (sw && sw.status === 'INSUFFICIENT_INFO') {
+                        res.is_insufficient_info = true;
+                        res.warning_title = 'Cần xác nhận dữ kiện phân định (Không đoán mò)';
+                        res.warning_message = sw.reasoning;
+                        res.missing_criteria = sw.missing_attributes || [];
+                        res.disambiguation_question = sw.disambiguation_question || '';
+                        res.candidates = sw.candidates || [];
+                        res.legal_basis = sw.legal_basis || '';
+                        return res;
+                    }
+                    const swCode = sw && sw.status === 'EXACT_8_DIGIT' ? (sw.code || '').replace(/\./g, '') : '';
+                    if (swCode.length === 8 && swCode !== cCode) {
+                        const dbw = (window.HS_DATABASE || []).find(it => (it.c || '').replace(/\./g, '') === swCode);
+                        if (dbw) {
+                            console.warn('[StatutoryWalker] Thay mã AI ' + cCode + ' bằng ' + swCode);
+                            res.exclusions = 'Loại trừ mã ' + (res.hs_code || cCode) + ' do AI đề xuất: không phù hợp quy tắc pháp lý. ' + (res.exclusions || '');
+                            res.clean_code = swCode;
+                            res.hs_code = sw.code;
+                            res.is_six_digit_proposed = false;
+                            res.item_description = dbw.vn;
+                            res.mfn = dbw.mfn ? dbw.mfn + '%' : res.mfn;
+                            res.vat = dbw.vat || res.vat;
+                            res.gri6 = sw.reasoning + (sw.assumptions ? ' Giả định: ' + sw.assumptions + '.' : '');
+                            res.candidates = null;
+                            return res;
+                        }
+                    }
+                }
+            } catch (eSw) { console.warn('StatutoryWalker post-audit error', eSw); }
             const isTelecom = /\b(?:vien\s+thong|cat\s*6|cat\s*5|cat\s*7|cat\s*8|lan\b|utp|ftp|stp|truyen\s+tin\s+hieu|mang\s+noi\s+bo|mang\s+lan|ethernet|cap\s+mang|telecom|telecommunication|data\s+cable)\b/i.test(fullNorm);
             const isUnshielded = /\b(?:khong\s+(?:co\s+)?(?:lop\s+boc\s+)?chong\s+nhieu|khong\s+boc\s+kim|utp|unshielded)\b/i.test(fullNorm);
             const isNoConnector = /\b(?:chua\s+gan\s+dau\s+noi|khong\s+co\s+dau\s+noi|without\s+connectors?|chua\s+bam\s+cos)\b/i.test(fullNorm);
@@ -9751,6 +9985,7 @@ Trường hợp đủ thông tin:
             const bestItem = classifyProductClientSide(name, desc, use, specs, model_en);
 
             if (bestItem && bestItem._insufficient_info) {
+                const candBlock = renderDisambiguationCandidatesHtml(bestItem._disambiguation_question, bestItem._candidates, bestItem._legal_basis);
                 const missingList = (bestItem._missing_fields && bestItem._missing_fields.length > 0)
                     ? bestItem._missing_fields.map(f => `<li class="flex items-center gap-2"><i class="fa-solid fa-circle-exclamation text-amber-500"></i> <span>${f}</span></li>`).join('')
                     : `<li class="flex items-center gap-2"><i class="fa-solid fa-circle-exclamation text-amber-500"></i> <span>Chất liệu cấu thành (thép, nhựa, đồng, cao su, gốm...)</span></li>
@@ -9773,6 +10008,7 @@ Trường hợp đủ thông tin:
                             </div>
                         </div>
 
+                        ${candBlock}
                         <div class="bg-amber-50 dark:bg-slate-950/70 border border-amber-200 dark:border-amber-500/30 rounded-xl p-4 text-xs space-y-2">
                             <div class="font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider text-[11px]">
                                 <i class="fa-solid fa-list-check mr-1.5"></i> Vui lòng bổ sung thêm thông tin kỹ thuật sau vào các ô tra cứu:
@@ -12500,8 +12736,8 @@ Trường hợp đủ thông tin:
                                                 "model_en": "CHECK-VALVE-CAST-IRON-DN50"
                                 },
                                 "expected": [
-                                                "8481.30.22",
-                                                "84813022"
+                                                "8481.30.10",
+                                                "84813010"
                                 ],
                                 "check_insufficient": false,
                                 "note": "GRI 1 -> 8481; GRI 6: Van một chiều 8481.30 -> Gang trên 25mm -> 8481.30.22"
@@ -12518,8 +12754,8 @@ Trường hợp đủ thông tin:
                                                 "model_en": "SAFETY-VALVE-15"
                                 },
                                 "expected": [
-                                                "8481.40.21",
-                                                "84814021"
+                                                "8481.40.10",
+                                                "84814010"
                                 ],
                                 "check_insufficient": false,
                                 "note": "GRI 1 -> 8481; GRI 6: Van an toàn 8481.40 -> Đồng <= 25mm -> 8481.40.21"
@@ -12572,8 +12808,8 @@ Trường hợp đủ thông tin:
                                                 "model_en": "HEX-NUT-M10"
                                 },
                                 "expected": [
-                                                "7318.16.00",
-                                                "73181600"
+                                                "7318.16.10",
+                                                "73181610"
                                 ],
                                 "check_insufficient": false,
                                 "note": "GRI 1 & Chú giải 2 Phần XV -> 7318; GRI 6: Có ren -> Đai ốc -> 7318.16.00"
@@ -12698,11 +12934,11 @@ Trường hợp đủ thông tin:
                                                 "model_en": "MCB-1P-16A"
                                 },
                                 "expected": [
-                                                "8536.20.91",
-                                                "85362091"
+                                                "8536.20.99",
+                                                "85362099"
                                 ],
                                 "check_insufficient": false,
-                                "note": "GRI 1 -> 8536; GRI 6: Cầu dao tự động <=1000V -> Dòng <= 16A -> 8536.20.91"
+                                "note": "GRI 1 -> 8536; GRI 6: Cầu dao tự động <=1000V -> Loại khác (không phải hộp đúc) -> 16 A không 'dưới 16 A' -> 8536.20.99"
                 },
                 {
                                 "id": 26,
@@ -12752,11 +12988,11 @@ Trường hợp đủ thông tin:
                                                 "model_en": "ISOLATION-TRANSFORMER-500VA"
                                 },
                                 "expected": [
-                                                "8504.31.24",
-                                                "85043124"
+                                                "8504.31",
+                                                "850431"
                                 ],
                                 "check_insufficient": false,
-                                "note": "GRI 1 -> 8504; GRI 6: Biến thế khác công suất <= 1kVA -> 8504.31"
+                                "note": "GRI 1 -> 8504; GRI 6: biến áp không dùng điện môi lỏng, 0,5 kVA (≤ 1 kVA) -> 8504.31; dòng 8 số (8504.31.93 / 8504.31.99) phụ thuộc chủng loại -> dừng ở 6 số"
                 },
                 {
                                 "id": 29,
@@ -13004,8 +13240,8 @@ Trường hợp đủ thông tin:
                                                 "model_en": "PRESSURE-GAUGE-0-25MPA"
                                 },
                                 "expected": [
-                                                "9026.20.30",
-                                                "90262030"
+                                                "9026.20.90",
+                                                "90262090"
                                 ],
                                 "check_insufficient": false,
                                 "note": "GRI 1 & Chú giải 1(m) Phần XVI loại trừ sang Chương 90 -> 9026.20 dụng cụ đo áp suất"
@@ -13022,8 +13258,8 @@ Trường hợp đủ thông tin:
                                                 "model_en": "THERMOSTAT-KSD301"
                                 },
                                 "expected": [
-                                                "9032.10.10",
-                                                "90321010"
+                                                "9032.10.00",
+                                                "90321000"
                                 ],
                                 "check_insufficient": false,
                                 "note": "GRI 1 & Chú giải 7 Chương 90: Thiết bị điều chỉnh và kiểm soát tự động -> 9032.10 Thermostat"

@@ -349,7 +349,7 @@
     "use": "",
     "specs": ""
    },
-   "expected": "39209990"
+   "expected": "84833090"
   },
   {
    "name": "[CHUYEN GIA] FZGLG 72794 Shaft seal WDR 25/35/7 SL",
@@ -359,7 +359,7 @@
     "use": "",
     "specs": ""
    },
-   "expected": "40169390"
+   "expected": "84879000"
   },
   {
    "name": "Bang tai kim loai",
@@ -380,6 +380,206 @@
     "specs": ""
    },
    "expected": "40101200"
+  },
+  {
+   "name": "Phot WDR web (cot kim loai)",
+   "info": {
+    "name": "Vòng làm kín dầu kiểu WDR SL",
+    "desc": "bằng cao su lưu hóa liền cốt kim loại, có môi chắn bụi, kích thước 25x35x7 mm",
+    "use": "phụ tùng máy rửa công nghiệp BUPI CLEANER",
+    "specs": ""
+   },
+   "expected": "84879000"
+  },
+  {
+   "name": "Phot toan cao su",
+   "info": {
+    "name": "Phớt chắn dầu trục hoàn toàn bằng cao su",
+    "desc": "Cao su NBR, không có cốt kim loại, kích thước 20x30x5 mm",
+    "use": "Làm kín trục bơm",
+    "specs": ""
+   },
+   "expected": "40169390"
+  },
+  {
+   "name": "Mang truot iglidur phang",
+   "info": {
+    "name": "Màng trượt iglidur J dạng tấm phẳng",
+    "desc": "Tấm nhựa iglidur J dày 0,5 mm, khổ 500 x 1000 mm",
+    "use": "Cắt làm bề mặt trượt",
+    "specs": ""
+   },
+   "expected": "39209990"
+  },
+  {
+   "name": "Dien tro khong nhung",
+   "info": {
+    "name": "Điện trở gia nhiệt dạng ống dùng cho máy ép nhựa",
+    "desc": "Heating element gắn khuôn",
+    "use": "Gia nhiệt khuôn",
+    "specs": "220V 500W"
+   },
+   "expected": "85168090"
+  },
+  {
+   "name": "MCB 16A",
+   "info": {
+    "name": "Aptomat cầu dao tự động tép MCB 1 cực 16A",
+    "desc": "Thiết bị đóng ngắt bảo vệ quá tải và ngắn mạch",
+    "use": "Bảo vệ đường dây điện chiếu sáng",
+    "specs": "Điện áp 230V, dòng định mức 16A, cắt 4.5kA"
+   },
+   "expected": "85362099"
+  },
+  {
+   "name": "MCB 10A",
+   "info": {
+    "name": "Aptomat MCB 1 cực 10A",
+    "desc": "Cầu dao tự động",
+    "use": "Bảo vệ quá tải",
+    "specs": "230V, 10A"
+   },
+   "expected": "85362091"
+  },
+  {
+   "name": "MCCB 100A",
+   "info": {
+    "name": "Aptomat MCCB loại hộp đúc 3 cực 100A",
+    "desc": "Moulded case circuit breaker",
+    "use": "Bảo vệ tủ điện",
+    "specs": "400V, 100A"
+   },
+   "expected": "85362013"
+  },
+  {
+   "name": "Bien ap 500VA",
+   "info": {
+    "name": "Máy biến áp cách ly 1 pha hạ áp 220V xuống 110V",
+    "desc": "Lõi thép silic quấn cuộn sơ cấp và thứ cấp cách điện",
+    "use": "Đổi điện dùng cho thiết bị nội địa Nhật",
+    "specs": "Công suất 500VA (0.5 kVA)"
+   },
+   "expected": "850431"
+  },
+  {
+   "name": "Bien ap 10kVA",
+   "info": {
+    "name": "Máy biến áp khô 3 pha",
+    "desc": "Biến áp cách ly",
+    "use": "Cấp điện cho máy CNC",
+    "specs": "Công suất 10 kVA, 380V/220V"
+   },
+   "expected": "850432"
+  },
+  {
+   "name": "Dong co 3 pha 5.5kW",
+   "info": {
+    "name": "Động cơ điện xoay chiều 3 pha",
+    "desc": "Vỏ gang",
+    "use": "Truyền động băng tải",
+    "specs": "380V, 5.5 kW"
+   },
+   "expected": "85015229"
+  },
+  {
+   "name": "Dong co 3 pha 0.37kW",
+   "info": {
+    "name": "Động cơ điện 3 pha",
+    "desc": "Vỏ nhôm",
+    "use": "Quay giỏ máy rửa",
+    "specs": "400V, 370 W"
+   },
+   "expected": "85015119"
+  },
+  {
+   "name": "Dong co 1 pha 0.75kW",
+   "info": {
+    "name": "Động cơ điện 1 pha",
+    "desc": "Vỏ nhôm",
+    "use": "Máy bơm nước",
+    "specs": "220V, 750 W"
+   },
+   "expected": "85014019"
+  },
+  {
+   "name": "Mo to buoc DC 82W",
+   "info": {
+    "name": "Mô tơ bước DC",
+    "desc": "Động cơ một chiều",
+    "use": "Máy CNC",
+    "specs": "24VDC, 82 W"
+   },
+   "expected": "85013170"
+  },
+  {
+   "name": "Dong co thieu cong suat",
+   "info": {
+    "name": "Động cơ điện xoay chiều",
+    "desc": "Vỏ nhôm",
+    "use": "Truyền động máy",
+    "specs": "220V"
+   },
+   "expected": "8501"
+  },
+  {
+   "name": "Dai oc M12",
+   "info": {
+    "name": "Đai ốc lục giác thép M12",
+    "desc": "Thép mạ kẽm, có ren",
+    "use": "Lắp ghép kết cấu",
+    "specs": "M12"
+   },
+   "expected": "73181610"
+  },
+  {
+   "name": "Mica mo ho -> hoi chat lieu",
+   "info": {
+    "name": "Tấm che an toàn chất liệu từ mica",
+    "desc": "kích thước 220x230x2mm (Phụ tùng thay thế máy gắn cục chống thấm nước)",
+    "use": "",
+    "specs": ""
+   },
+   "expected": "INSUFFICIENT"
+  },
+  {
+   "name": "Nhua mica PMMA tam che",
+   "info": {
+    "name": "Tấm che an toàn bằng nhựa mica PMMA",
+    "desc": "Gia công khoan lỗ gắn máy",
+    "use": "Che chắn an toàn cho máy",
+    "specs": "220x230x2mm"
+   },
+   "expected": "39269099"
+  },
+  {
+   "name": "Mica khoang chiu nhiet",
+   "info": {
+    "name": "Tấm che bằng mica khoáng tự nhiên chịu nhiệt",
+    "desc": "Cách điện chịu nhiệt cao",
+    "use": "Lót cách nhiệt lò",
+    "specs": "220x230x2mm"
+   },
+   "expected": "68149000"
+  },
+  {
+   "name": "Phot mo ho -> hoi cot kim loai",
+   "info": {
+    "name": "Phớt chắn dầu trục",
+    "desc": "kích thước 25x35x7 mm",
+    "use": "Làm kín trục bơm",
+    "specs": ""
+   },
+   "expected": "INSUFFICIENT"
+  },
+  {
+   "name": "MCB thieu Ampe -> dung 6 so",
+   "info": {
+    "name": "Cầu dao tự động MCB 1 cực",
+    "desc": "Thiết bị đóng ngắt hạ áp",
+    "use": "Bảo vệ mạch điện",
+    "specs": "230V"
+   },
+   "expected": "853620"
   }
  ],
  "correction": [

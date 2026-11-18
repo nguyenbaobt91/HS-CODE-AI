@@ -1,0 +1,269 @@
+{
+  "version": "2026.11.18",
+  "description": "Nguon quy tac phap ly DUY NHAT (Single Source of Truth) dung chung cho Python (server/walker) va JS (trinh duyet). Moi quy tac ghi ro can cu Chu giai va ho tro 2 ma ung vien + cau hoi phan dinh khi thieu du kien.",
+  "rules": [
+    {
+      "id": "mica_material_disambiguation",
+      "category": "Phân định chất liệu Mica (Chương 39 vs Chương 68)",
+      "legal_basis": "Chú giải 1(g) Phần XVI, Nhóm 39.20/39.26 (nhựa PMMA) vs Chú giải Chương 68, Nhóm 68.14 (khoáng chất Mica)",
+      "any_regex": ["\\bmica\\b"],
+      "branches": [
+        {
+          "name": "mineral_mica_agglomerated",
+          "all_regex": [
+            "\\b(?:mica\\s+khoang|khoang\\s+(?:chat\\s+)?mica|mica\\s+tu\\s+nhien|natural\\s+mica|muscovite|phlogopite|mica\\s+chiu\\s+nhiet|mica\\s+cach\\s+dien|mica\\s+ket\\s+(?:khoi|tu)|mica\\s+tai\\s+(?:che|tao)|agglomerated\\s+mica|reconstituted\\s+mica|micanite)\\b",
+            "\\b(?:ket\\s+(?:khoi|tu)|tai\\s+(?:che|tao)|agglomerated|reconstituted|micanite)\\b"
+          ],
+          "none_regex": ["\\b(?:nhua\\s+mica|mica\\s+nhua|acrylic|pmma|polymethyl|chat\\s+deo|plastic)\\b"],
+          "result": {
+            "code": "6814.10.00",
+            "level": 8,
+            "status": "EXACT_8_DIGIT",
+            "reasoning": "Áp dụng GRI 1 & Chú giải Chương 68: Tấm, tấm mỏng hoặc dải bằng khoáng chất mica đã được kết khối hoặc tái chế thuộc Nhóm 68.14. Áp dụng GRI 6 xếp mã 6814.10.00 (Thuế NK MFN 10%).",
+            "reserve_code": "6814.90.00"
+          }
+        },
+        {
+          "name": "mineral_mica_worked",
+          "any_regex": [
+            "\\b(?:mica\\s+khoang|khoang\\s+(?:chat\\s+)?mica|mica\\s+tu\\s+nhien|natural\\s+mica|muscovite|phlogopite|mica\\s+chiu\\s+nhiet|mica\\s+cach\\s+dien)\\b"
+          ],
+          "none_regex": ["\\b(?:nhua\\s+mica|mica\\s+nhua|acrylic|pmma|polymethyl|chat\\s+deo|plastic)\\b"],
+          "result": {
+            "code": "6814.90.00",
+            "level": 8,
+            "status": "EXACT_8_DIGIT",
+            "reasoning": "Áp dụng GRI 1 & Chú giải Chương 68: Khoáng chất mica tự nhiên đã gia công hoặc sản phẩm làm từ mica (tấm che, chi tiết cách điện/chịu nhiệt...) thuộc Nhóm 68.14. Áp dụng GRI 6 xếp mã 6814.90.00 (Thuế NK MFN 10%).",
+            "reserve_code": "6814.10.00"
+          }
+        },
+        {
+          "name": "plastic_mica_unworked_sheet",
+          "all_regex": [
+            "\\b(?:nhua\\s+mica|mica\\s+nhua|acrylic|pmma|poly\\s*\\(?\\s*methyl\\s+methacrylate\\s*\\)?|polymethyl|chat\\s+deo|plastic)\\b",
+            "\\b(?:chua\\s+gia\\s+cong|chua\\s+khoet|tam\\s+phang\\s+nguyen|dang\\s+tam\\s+tieu\\s+chuan)\\b"
+          ],
+          "none_regex": ["\\b(?:tam\\s+che|phu\\s+tung|khoan|uon|dinh\\s+hinh|bao\\s+ve)\\b"],
+          "result": {
+            "code": "3920.51",
+            "level": 6,
+            "status": "STOP_6_DIGIT",
+            "reasoning": "Áp dụng GRI 1: Tấm phẳng nhựa mica (poly(metyl metacrylat) - PMMA) chưa gia công định hình thuộc Phân nhóm 3920.51. Cần xác nhận loại cứng (SEN) hay loại khác để chốt 8 số.",
+            "disambiguation_question": "Tấm nhựa PMMA thuộc loại cứng (SEN) hay loại khác?",
+            "candidates": [
+              {"label": "Loại cứng (SEN)", "code": "3920.51.11", "legal_basis": "Biểu thuế 2026 - Phân nhóm 3920.51"},
+              {"label": "Loại khác", "code": "3920.51.90", "legal_basis": "Biểu thuế 2026 - Phân nhóm 3920.51"}
+            ],
+            "missing_attributes": ["Xác nhận tấm nhựa PMMA thuộc loại cứng (SEN - 3920.51.11) hay loại khác (3920.51.90)"],
+            "reserve_code": "3926.90.99"
+          }
+        },
+        {
+          "name": "plastic_mica_fabricated",
+          "any_regex": [
+            "\\b(?:nhua\\s+mica|mica\\s+nhua|acrylic|pmma|poly\\s*\\(?\\s*methyl\\s+methacrylate\\s*\\)?|polymethyl|chat\\s+deo|plastic)\\b"
+          ],
+          "result": {
+            "code": "3926.90.99",
+            "level": 8,
+            "status": "EXACT_8_DIGIT",
+            "reasoning": "Áp dụng GRI 1 & Chú giải 1(g) Phần XVI: Sản phẩm bằng nhựa mica (Acrylic / PMMA) đã gia công thành tấm che/bộ phận dùng cho máy móc bị loại trừ khỏi Phần XVI, xếp vào Nhóm 39.26. Áp dụng GRI 6 xếp mã 3926.90.99.",
+            "reserve_code": "3920.51"
+          }
+        }
+      ],
+      "default_result": {
+        "code": "INSUFFICIENT",
+        "level": 0,
+        "status": "INSUFFICIENT_INFO",
+        "reasoning": "Từ \"mica\" trong thương mại có thể là NHỰA MICA (Acrylic/PMMA -> Chương 39) hoặc KHOÁNG CHẤT MICA tự nhiên/kết khối (Chương 68 -> Nhóm 68.14). Chưa đủ dữ kiện vật liệu để chốt mã 8 số.",
+        "disambiguation_question": "Chất liệu \"mica\" thực tế là Nhựa Mica (Acrylic / PMMA) hay Khoáng chất Mica (cách điện, chịu nhiệt)?",
+        "candidates": [
+          {"label": "Nhựa Mica (Acrylic / PMMA) gia công cho máy", "code": "3926.90.99", "legal_basis": "Chú giải 1(g) Phần XVI -> Nhóm 39.26"},
+          {"label": "Khoáng chất Mica tự nhiên / kết khối", "code": "6814.90.00", "legal_basis": "Chú giải Chương 68 -> Nhóm 68.14"}
+        ],
+        "missing_attributes": [
+          "Xác nhận bản chất \"mica\": Nhựa Mica (Acrylic/PMMA -> 3926.90.99 / 3920.51) hay Khoáng chất Mica (6814.10.00 / 6814.90.00)?"
+        ],
+        "reserve_code": "3926.90.99 / 6814.90.00"
+      }
+    },
+    {
+      "id": "shaft_seal_metal_vs_rubber",
+      "category": "Phớt chắn dầu trục (Nhóm 84.87 vs 40.16)",
+      "legal_basis": "Chú giải chi tiết WCO Nhóm 84.87 (HQKV8 tr. 1969), CGCT 84.84 loại trừ (c), & Chú giải 1(a) Phần XVI",
+      "any_regex": [
+        "\\b(?:phot\\s+chan\\s+dau|phot\\s+dau|phot\\s+truc|shaft\\s+seal|oil\\s+seal|vong\\s+chan\\s+dau|vong\\s+lam\\s+kin\\s+dau|vong\\s+bit\\s+dau|radial\\s+shaft\\s+seal|wdr)\\b"
+      ],
+      "none_regex": ["\\b(?:co\\s+khi|mechanical\\s+seal)\\b"],
+      "branches": [
+        {
+          "name": "all_rubber_no_metal",
+          "any_regex": [
+            "\\b(?:hoan\\s+toan\\s+bang\\s+cao\\s+su|toan\\s+bo\\s+bang\\s+cao\\s+su|100\\s*%\\s*cao\\s+su|khong\\s+(?:co\\s+)?(?:cot|loi|khung|vong)\\s+(?:kim\\s+loai|thep)|all[\\s-]+rubber|without\\s+metal)\\b"
+          ],
+          "result": {
+            "code": "4016.93.90",
+            "level": 8,
+            "status": "EXACT_8_DIGIT",
+            "reasoning": "Phớt hoàn toàn bằng cao su lưu hóa, không có cốt kim loại: Chú giải 1(a) Phần XVI loại trừ sang Chương 40 -> Nhóm 40.16. Áp dụng GRI 6 xếp mã 4016.93.90 (Thuế NK MFN 3%, VAT 8%).",
+            "reserve_code": "8487.90.00"
+          }
+        },
+        {
+          "name": "rubber_with_metal_core_or_wdr",
+          "any_regex": [
+            "\\b(?:cot\\s+(?:kim\\s+loai|thep)|loi\\s+(?:kim\\s+loai|thep)|khung\\s+(?:kim\\s+loai|thep)|lien\\s+cot|metal[\\s-]+(?:cased|reinforced|insert)|wdr|radial\\s+shaft\\s+seal)\\b"
+          ],
+          "result": {
+            "code": "8487.90.00",
+            "level": 8,
+            "status": "EXACT_8_DIGIT",
+            "reasoning": "Căn cứ Chú giải chi tiết WCO Nhóm 84.87 (HQKV8 tr. 1969): vòng làm kín dầu cấu trúc đơn giản gồm vòng cao su co giãn và cốt kim loại gia cố bằng lưu hóa, không có bộ phận di động (CGCT 84.84 loại trừ mục (c) sang 84.87). Áp dụng GRI 6 xếp mã 8487.90.00 (Thuế NK MFN 0%).",
+            "reserve_code": "4016.93.90"
+          }
+        }
+      ],
+      "default_result": {
+        "code": "INSUFFICIENT",
+        "level": 0,
+        "status": "INSUFFICIENT_INFO",
+        "reasoning": "Phớt chắn dầu trục có 2 hướng phân loại hoàn toàn khác nhau tùy cấu tạo có cốt kim loại (Nhóm 84.87 theo CGCT WCO tr. 1969) hay hoàn toàn bằng cao su (Nhóm 40.16 theo Chú giải 1(a) Phần XVI).",
+        "disambiguation_question": "Phớt chắn dầu có cốt kim loại (lõi thép gia cố bên trong) không?",
+        "candidates": [
+          {"label": "Có cốt kim loại (lưu hóa liền cốt thép)", "code": "8487.90.00", "legal_basis": "CGCT WCO Nhóm 84.87 (HQKV8 tr. 1969)"},
+          {"label": "Không có cốt kim loại (100% cao su)", "code": "4016.93.90", "legal_basis": "Chú giải 1(a) Phần XVI -> Nhóm 40.16"}
+        ],
+        "missing_attributes": [
+          "Xác nhận cấu tạo phớt: Có cốt/lõi kim loại (8487.90.00) hay hoàn toàn bằng cao su (4016.93.90)?"
+        ],
+        "reserve_code": "8487.90.00 / 4016.93.90"
+      }
+    },
+    {
+      "id": "iglidur_sliding_element_8483_vs_3920",
+      "category": "Bạc lót / Màng trượt nhựa kỹ thuật (8483.30.90 vs 3920.99.90)",
+      "legal_basis": "Chú giải 2(b) Phần XVI (Nhóm 84.83 - ổ trượt/bạc lót) vs Chú giải 1(g) Phần XVI & Nhóm 39.20 (tấm phẳng chưa gia công)",
+      "any_regex": [
+        "\\b(?:mang\\s+truot|tam\\s+lot\\s+truot|sliding\\s+film|iglidur|bac\\s+dan\\s+cha|o\\s+truot\\s+chan|thrust\\s+bearing)\\b"
+      ],
+      "branches": [
+        {
+          "name": "flat_unworked_sheet",
+          "any_regex": ["\\b(?:dang\\s+tam\\s+phang|tam\\s+phang|kho\\s+\\d+|dang\\s+cuon|chua\\s+gia\\s+cong|sheet|roll)\\b"],
+          "none_regex": ["\\b(?:jum-|bac\\s+lot|o\\s+truot|dinh\\s+hinh|thrust\\s+bearing|bac\\s+dan)\\b"],
+          "result": {
+            "code": "3920.99.90",
+            "level": 8,
+            "status": "EXACT_8_DIGIT",
+            "reasoning": "Áp dụng GRI 1: Màng/tấm nhựa kỹ thuật dạng tấm phẳng nguyên khổ chưa gia công định hình thành bạc lót thuộc Nhóm 39.20 (tấm, phiến, màng bằng plastic khác). Áp dụng GRI 6 xếp mã 3920.99.90.",
+            "reserve_code": "8483.30.90"
+          }
+        },
+        {
+          "name": "shaped_plain_bearing",
+          "any_regex": ["\\b(?:bac\\s+lot|o\\s+truot|bac\\s+dan|thrust\\s+bearing|dinh\\s+hinh|jum-|tl80|fzg|may)\\b"],
+          "result": {
+            "code": "8483.30.90",
+            "level": 8,
+            "status": "EXACT_8_DIGIT",
+            "reasoning": "Áp dụng GRI 1 & Chú giải 2(b) Phần XVI: Chi tiết nhựa kỹ thuật đã gia công tạo hình làm ổ trượt/bạc lót trục (plain shaft bearings) định danh tại Nhóm 84.83. Áp dụng GRI 6 xếp mã 8483.30.90.",
+            "reserve_code": "3920.99.90"
+          }
+        }
+      ],
+      "default_result": {
+        "code": "INSUFFICIENT",
+        "level": 0,
+        "status": "INSUFFICIENT_INFO",
+        "reasoning": "Cần phân biệt hàng ở dạng tấm/cuộn phẳng nguyên liệu chưa cắt định hình (Nhóm 39.20) hay đã gia công tạo hình thành bạc lót/ổ trượt cho máy (Nhóm 84.83).",
+        "disambiguation_question": "Màng trượt là tấm phẳng nguyên khổ chưa gia công hay đã tạo hình thành bạc lót lắp trục?",
+        "candidates": [
+          {"label": "Đã gia công tạo hình làm bạc lót / ổ trượt", "code": "8483.30.90", "legal_basis": "Nhóm 84.83 - Ổ trượt trục không có bi"},
+          {"label": "Tấm phẳng nguyên khổ chưa tạo hình", "code": "3920.99.90", "legal_basis": "Nhóm 39.20 - Tấm, phiến, màng plastic"}
+        ],
+        "missing_attributes": ["Xác nhận đã tạo hình thành bạc lót (8483.30.90) hay tấm phẳng nguyên khổ (3920.99.90)?"],
+        "reserve_code": "8483.30.90 / 3920.99.90"
+      }
+    },
+    {
+      "id": "circuit_breaker_8536_20",
+      "category": "Cầu dao tự động MCB / MCCB (Nhóm 85.36)",
+      "legal_basis": "Biểu thuế XNK 2026 Chương 85 - Phân nhóm 8536.20 (Cầu dao tự động <= 1.000V); quy tắc 'dưới 16A' loại trừ đúng bằng 16A",
+      "any_regex": ["\\b(?:aptomat|mcb|mccb|cau\\s+dao\\s+tu\\s+dong|circuit\\s+breaker|cb\\s+chong\\s+giat|rcbo|rccb)\\b"],
+      "none_regex": ["\\b(?:trung\\s+the|cao\\s+the|[2-9]\\d{3}\\s*v|\\d+\\s*kv)\\b"],
+      "branches": [
+        {
+          "name": "mccb_moulded_case_high",
+          "all_regex": ["\\b(?:mccb|hop\\s+duc|moulded\\s+case|khoi)\\b"],
+          "any_regex": ["\\b(?:100\\s*a|125\\s*a|160\\s*a|200\\s*a|250\\s*a|400\\s*a|630\\s*a|800\\s*a|1000\\s*a)\\b"],
+          "result": {
+            "code": "8536.20.13",
+            "level": 8,
+            "status": "EXACT_8_DIGIT",
+            "reasoning": "Áp dụng GRI 1 -> Nhóm 85.36 (<= 1.000V). Áp dụng GRI 6: Cầu dao tự động loại hộp đúc (MCCB) công suất/dòng lớn mã 8536.20.13.",
+            "reserve_code": "8536.20.19"
+          }
+        },
+        {
+          "name": "mccb_moulded_case_generic",
+          "any_regex": ["\\b(?:mccb|hop\\s+duc|moulded\\s+case)\\b"],
+          "result": {
+            "code": "8536.20",
+            "level": 6,
+            "status": "STOP_6_DIGIT",
+            "reasoning": "Áp dụng GRI 1 & GRI 6: Cầu dao tự động loại hộp đúc (MCCB) <= 1.000V thuộc Phân nhóm 8536.20. Cần xác định ngưỡng dòng điện định mức để chốt mã 8 số trong nhánh 8536.20.1x.",
+            "disambiguation_question": "Dòng điện định mức của MCCB thuộc khoảng nào?",
+            "candidates": [
+              {"label": "Loại hộp đúc dòng lớn (thường >= 100A)", "code": "8536.20.13", "legal_basis": "Biểu thuế 2026 - 8536.20.1x"},
+              {"label": "Loại hộp đúc khác", "code": "8536.20.19", "legal_basis": "Biểu thuế 2026 - 8536.20.1x"}
+            ],
+            "missing_attributes": ["Xác nhận dòng điện định mức (Ampe) của MCCB để chọn 8 số thuộc 8536.20.1x"],
+            "reserve_code": "8536.20.13"
+          }
+        },
+        {
+          "name": "mcb_under_16a",
+          "any_regex": [
+            "\\b(?:[1-9]|1[0-5])(?:[.,]\\d+)?\\s*a(?:mpe)?\\b",
+            "\\bduoi\\s+16\\s*a\\b"
+          ],
+          "result": {
+            "code": "8536.20.91",
+            "level": 8,
+            "status": "EXACT_8_DIGIT",
+            "reasoning": "Áp dụng GRI 1 & GRI 6 (Biểu thuế 2026 Phân nhóm 8536.20): Cầu dao tự động <= 1.000V không phải loại hộp đúc, dòng điện định mức dưới 16 A -> Mã 8536.20.91.",
+            "reserve_code": "8536.20.99"
+          }
+        },
+        {
+          "name": "mcb_16a_or_above",
+          "any_regex": [
+            "\\b(?:16|20|25|32|40|50|63|80|100|125)(?:[.,]\\d+)?\\s*a(?:mpe)?\\b",
+            "\\b(?:tu|tren)\\s+16\\s*a\\b"
+          ],
+          "result": {
+            "code": "8536.20.99",
+            "level": 8,
+            "status": "EXACT_8_DIGIT",
+            "reasoning": "Áp dụng GRI 1 & GRI 6 (Biểu thuế 2026 Phân nhóm 8536.20): Cầu dao tự động <= 1.000V không phải loại hộp đúc; dòng >= 16 A (đúng 16A không thuộc 'dưới 16 A') -> Mã 8536.20.99.",
+            "reserve_code": "8536.20.91"
+          }
+        }
+      ],
+      "default_result": {
+        "code": "8536.20",
+        "level": 6,
+        "status": "STOP_6_DIGIT",
+        "reasoning": "Áp dụng GRI 1 & GRI 6: Cầu dao tự động hạ áp (<= 1.000V) thuộc Phân nhóm 8536.20. Thiếu thông số dòng điện định mức (A) và kiểu dáng (MCB tép vs MCCB hộp đúc) nên dừng tại 6 số 8536.20.",
+        "disambiguation_question": "Cầu dao thuộc kiểu MCB tép hay MCCB hộp đúc, và dòng điện định mức là bao nhiêu Ampe?",
+        "candidates": [
+          {"label": "MCB dòng dưới 16A (6A, 10A...)", "code": "8536.20.91", "legal_basis": "Biểu thuế 2026 - 8536.20.91"},
+          {"label": "MCB dòng từ 16A trở lên (16A, 20A, 32A...)", "code": "8536.20.99", "legal_basis": "Biểu thuế 2026 - 8536.20.99"}
+        ],
+        "missing_attributes": ["Bổ sung dòng điện định mức (A) và loại (MCB tép hay MCCB hộp đúc) để chọn 8 số trong 8536.20"],
+        "reserve_code": "8536.20.99"
+      }
+    }
+  ]
+}
