@@ -86,7 +86,7 @@ header {
   background: linear-gradient(135deg, rgba(7, 13, 30, 0.88) 0%, rgba(15, 23, 42, 0.82) 100%),
               url('./chem_abstract_bg.jpg') center/cover no-repeat;
   color: #ffffff;
-  padding: 18px 24px 14px 24px;
+  padding: 10px 24px 8px 24px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   position: sticky;
@@ -101,8 +101,8 @@ header {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 6px;
 }
 
 .brand-title {
@@ -136,102 +136,90 @@ header {
   flex-wrap: wrap;
 }
 
-/* Nav Tabs */
+/* Nav Tabs - Tinh gon 1 hang Micro-Pill can giua */
 .nav-tabs {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
-  padding: 8px 0 2px 0;
-}
-
-@media (max-width: 1200px) {
-  .nav-tabs {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .nav-tabs {
-    display: flex;
-    overflow-x: auto;
-    padding-bottom: 8px;
-  }
-}
-
-.nav-tab-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  color: #e2e8f0;
-  padding: 10px 12px;
-  border-radius: 12px;
-  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 10px;
-  transition: all 0.22s ease-in-out;
+  gap: 6px;
+  padding: 2px 0 0 0;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav-tabs::-webkit-scrollbar { display: none; }
+
+.nav-tab-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #cbd5e1;
+  padding: 5px 11px;
+  border-radius: 9999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.18s ease;
   text-align: left;
   position: relative;
-  overflow: hidden;
+  white-space: nowrap;
+  flex-shrink: 0;
   user-select: none;
 }
 
 .nav-tab-btn:hover {
-  background: rgba(255, 255, 255, 0.18);
-  border-color: rgba(255, 255, 255, 0.35);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
 }
 
 .nav-tab-btn.active {
-  background: #ffffff;
-  color: #0f172a;
-  border-color: #ffffff;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  color: #ffffff;
+  border-color: rgba(125, 211, 252, 0.7);
+  box-shadow: 0 3px 12px rgba(14, 165, 233, 0.35);
 }
 
 .tab-icon-box {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.15);
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  border-radius: 6px;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 19px;
-  transition: all 0.22s ease;
+  font-size: 13px;
+  line-height: 1;
 }
 
 .nav-tab-btn.active .tab-icon-box {
-  background: #f0f9ff;
-  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+  background: transparent;
+  box-shadow: none;
 }
 
 .tab-info-block {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
   min-width: 0;
 }
 
 .tab-info-main {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.1px;
 }
 
 .tab-info-sub {
-  font-size: 11px;
-  color: #94a3b8;
-  white-space: nowrap;
-  font-weight: 500;
+  display: none;
 }
 
 .nav-tab-btn.active .tab-info-sub {
-  color: #0284c7;
-  font-weight: 700;
+  color: #e0f2fe;
 }
 
 /* Main content */
@@ -905,27 +893,27 @@ html.dark .card-header-clean {
 
 /* Dark Navigation Tabs */
 html.dark .nav-tab-btn {
-  background: rgba(15, 23, 42, 0.65);
+  background: rgba(15, 23, 42, 0.55);
   border-color: rgba(255, 255, 255, 0.12);
   color: #94a3b8;
 }
 
 html.dark .nav-tab-btn:hover {
   background: rgba(30, 41, 59, 0.85);
-  border-color: rgba(56, 189, 248, 0.4);
+  border-color: rgba(56, 189, 248, 0.45);
   color: #f1f5f9;
 }
 
 html.dark .nav-tab-btn.active {
-  background: #1e293b;
-  color: #38bdf8;
-  border-color: #38bdf8;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(135deg, #0284c7, #0ea5e9);
+  color: #ffffff;
+  border-color: rgba(125, 211, 252, 0.75);
+  box-shadow: 0 3px 14px rgba(14, 165, 233, 0.4);
 }
 
 html.dark .nav-tab-btn.active .tab-icon-box {
-  background: #0f172a;
-  box-shadow: 0 2px 8px rgba(56, 189, 248, 0.35);
+  background: transparent;
+  box-shadow: none;
 }
 
 html.dark .nav-tab-btn.active .tab-info-sub {
@@ -1198,11 +1186,6 @@ html.dark strong {
     <div style="display: flex; flex-direction: column; gap: 4px;">
       <div class="brand-title">
         <span>🛡️ Cổng Thông Tin & Tra Cứu Nghiệp Vụ Hóa Chất 2026</span>
-        <span class="brand-badge">🏢 MOL LOGISTICS VIETNAM</span>
-      </div>
-      <div class="header-meta" style="margin-top: 2px;">
-        <span>📅 Cập nhật Luật Hóa chất 2025 &amp; NĐ 24, 25, 26, 28/2026/NĐ-CP</span>
-        <span>⚡ QĐ 1040/QĐ-BCT &amp; NQ 19/2026/NQ-CP</span>
       </div>
     </div>
 
