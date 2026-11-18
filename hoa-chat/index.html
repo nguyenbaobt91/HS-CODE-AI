@@ -3335,5 +3335,39 @@ document.addEventListener('DOMContentLoaded', () => {
   updateThemeButtonUI(isDark);
 });
 </script>
+
+<!-- Nut len dau trang (Back to Top) -->
+<button id="btn-scroll-top" type="button" title="Lên đầu trang" aria-label="Lên đầu trang"
+  style="position:fixed;right:20px;bottom:20px;z-index:9990;width:40px;height:40px;border-radius:9999px;border:1px solid rgba(148,163,184,0.35);background:rgba(15,23,42,0.86);color:#f8fafc;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 6px 20px rgba(2,6,23,0.28);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;pointer-events:none;transform:translateY(10px);transition:all 0.22s ease;"
+  onmouseenter="this.style.background='#0284c7';this.style.borderColor='#7dd3fc';this.style.transform='translateY(-2px)'"
+  onmouseleave="this.style.background='rgba(15,23,42,0.86)';this.style.borderColor='rgba(148,163,184,0.35)';this.style.transform=this.dataset.shown==='1'?'translateY(0)':'translateY(10px)'">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+</button>
+<script>
+(function(){
+  const b = document.getElementById('btn-scroll-top');
+  if (!b) return;
+  let lastPane = null;
+  const sync = (e) => {
+    if (e && e.target && e.target !== document && e.target !== window && typeof e.target.scrollTop === 'number') {
+      lastPane = e.target;
+    }
+    const paneTop = lastPane ? lastPane.scrollTop : 0;
+    const show = window.scrollY > 120 || paneTop > 120;
+    b.dataset.shown = show ? '1' : '0';
+    b.style.opacity = show ? '1' : '0';
+    b.style.pointerEvents = show ? 'auto' : 'none';
+    if (!b.matches(':hover')) b.style.transform = show ? 'translateY(0)' : 'translateY(10px)';
+  };
+  b.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (lastPane && lastPane.scrollTop > 0) lastPane.scrollTo({ top: 0, behavior: 'smooth' });
+    document.querySelectorAll('.overflow-y-auto').forEach(el => { if (el.scrollTop > 0) el.scrollTo({ top: 0, behavior: 'smooth' }); });
+  });
+  window.addEventListener('scroll', sync, { passive: true });
+  document.addEventListener('scroll', sync, { passive: true, capture: true });
+  sync();
+})();
+</script>
 </body>
 </html>
