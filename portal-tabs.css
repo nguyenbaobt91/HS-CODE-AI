@@ -1,0 +1,70 @@
+/* THANH + CỘT CHUYỂN CỔNG DÙNG CHUNG CHO 3 WEB: HS Code AI | Hóa Chất & MSDS | KTCN 4 Bộ 2026
+   Mỗi cổng một tông màu riêng (xanh cyan / đồng hổ phách / tím chàm), tông trầm cao cấp, viền mảnh, ánh kính.
+   1) .portal-rail: cột tab ở LỀ TRÁI (từ 900px trở lên), rộng vừa khít các tab.
+   2) .portal-bar : thanh ngang đầu trang, chỉ dùng cho màn hình dưới 900px.
+   Mỗi web đặt --portal-max trên <body> và --rail-top trên cột. */
+
+/* ---------- Bảng màu từng cổng: nền (c1→c2), màu sáng nhấn (lt), bóng đổ (sh) ---------- */
+.pt-hs{--c1:#0a4a5e;--c2:#0891b2;--lt:#67e8f9;--sh:rgba(8,145,178,.55)}
+.pt-hc{--c1:#7a2f06;--c2:#c2610f;--lt:#ffc27a;--sh:rgba(194,97,15,.55)}
+.pt-kt{--c1:#2b1565;--c2:#5f3fc0;--lt:#c1b0ff;--sh:rgba(95,63,192,.55)}
+
+@keyframes portal-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+
+/* ---------- Thẻ dùng chung: nền trầm + ánh kính + vạch nhấn mảnh bên trái ---------- */
+.portal-block,.portal-tab{color:#f8fafc;text-decoration:none;cursor:pointer;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.13) 0%,rgba(255,255,255,0) 42%),
+    linear-gradient(145deg,var(--c1),var(--c2));
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:inset 3px 0 0 var(--lt),inset 0 1px 0 rgba(255,255,255,.22),0 8px 18px -6px var(--sh);
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,filter .18s ease}
+.portal-block:hover,.portal-tab:hover{border-color:var(--lt);filter:brightness(1.12);
+  box-shadow:inset 3px 0 0 var(--lt),inset 0 1px 0 rgba(255,255,255,.28),0 12px 24px -6px var(--sh)}
+/* Tab đang mở: viền sáng mảnh cùng tông + quầng sáng nhẹ (kích thước không đổi) */
+.portal-block[aria-current="page"],.portal-tab[aria-current="page"]{cursor:default;border-color:var(--lt);
+  box-shadow:inset 3px 0 0 var(--lt),inset 0 1px 0 rgba(255,255,255,.3),0 0 0 1px var(--lt),0 0 20px -2px var(--sh),0 10px 22px -6px var(--sh)}
+.portal-block[aria-current="page"]:hover,.portal-tab[aria-current="page"]:hover{transform:none;filter:none}
+
+/* Ô biểu tượng (emoji): ô kính mờ bo góc, viền sáng mảnh */
+.pb-ico,.pt-ico{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1;
+  font-family:'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif;
+  background:linear-gradient(145deg,rgba(255,255,255,.20),rgba(255,255,255,.06));
+  border:1px solid rgba(255,255,255,.26);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.30),0 2px 6px rgba(2,6,23,.25)}
+
+/* ---------- 1. Cột tab ở lề trái ---------- */
+:root{--rail-w:120px;--rail-gap:8px;--rail-reserve:136px}
+.portal-rail{display:none;position:fixed;left:max(var(--rail-gap), calc((100vw - var(--portal-max,1380px)) / 2 - var(--rail-reserve) + var(--rail-gap)));top:var(--rail-top,84px);width:var(--rail-w);flex-direction:column;gap:10px;z-index:44;font-family:'Segoe UI','Plus Jakarta Sans',system-ui,-apple-system,sans-serif}
+@media (min-width:900px){
+  .portal-rail{display:flex}
+  .portal-bar{display:none}
+  /* chừa lề trái vừa đủ để cột tab không đè nội dung: 0 khi màn hình rộng, tối đa 136px khi màn hình hẹp */
+  body.has-portal-rail{--rail-pad:clamp(0px, calc(var(--rail-reserve) * 2 + var(--portal-max,1380px) - 100vw), var(--rail-reserve));padding-left:var(--rail-pad)}
+  /* thanh tiêu đề giữ nguyên chiều ngang đầy màn hình (cột tab nằm dưới thanh tiêu đề nên không đè) */
+  body.has-portal-rail > header{margin-left:calc(var(--rail-pad) * -1);width:calc(100% + var(--rail-pad)) !important}
+}
+.portal-block{box-sizing:border-box;width:100%;height:52px;display:flex;align-items:center;gap:7px;padding:0 6px 0 10px;border-radius:13px}
+.portal-block:hover{transform:translateX(3px)}
+.portal-block .pb-ico{width:30px;height:30px;border-radius:10px;font-size:16px}
+.portal-block .pb-txt{display:flex;flex-direction:column;justify-content:center;min-width:0;line-height:1.15}
+.portal-block .pb-sub{display:flex;align-items:center;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--lt);white-space:nowrap}
+.portal-block .pb-main{font-size:12.5px;font-weight:700;color:#f8fafc;letter-spacing:.01em;white-space:nowrap}
+.portal-block[aria-current="page"] .pb-sub{color:#fff}
+.portal-block[aria-current="page"] .pb-sub::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--lt);margin-right:5px;box-shadow:0 0 7px var(--lt);animation:portal-pulse 1.8s ease-in-out infinite}
+
+/* ---------- 2. Thanh ngang (màn hình < 900px) ---------- */
+.portal-bar{background:#0b1220;border-bottom:1px solid #1e293b;font-family:'Segoe UI','Plus Jakarta Sans',system-ui,-apple-system,sans-serif;position:relative;z-index:45}
+.portal-inner{max-width:var(--portal-max,1380px);margin:0 auto;padding:8px var(--portal-pad,16px);display:flex;align-items:center;gap:10px;overflow-x:auto;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.portal-inner::-webkit-scrollbar{display:none}
+@media (min-width:640px){.portal-inner{padding:8px var(--portal-pad,24px)}}
+@media (min-width:1024px){.portal-inner{padding:8px var(--portal-pad,32px)}}
+.portal-tab{display:inline-flex;align-items:center;gap:8px;padding:4px 14px 4px 10px;border-radius:12px;font-size:12.5px;font-weight:700;letter-spacing:.015em;line-height:1.2;flex-shrink:0}
+.portal-tab:hover{transform:translateY(-1px)}
+.portal-tab .pt-ico{width:28px;height:28px;border-radius:9px;font-size:15px}
+.portal-tab .pt-short{display:none}
+.portal-tab .pt-now{display:none;margin-left:2px;padding:1px 7px;border-radius:999px;background:rgba(255,255,255,.10);border:1px solid var(--lt);color:var(--lt);font-size:9px;font-weight:800;letter-spacing:.08em}
+.portal-tab[aria-current="page"] .pt-now{display:inline-block}
+@media (max-width:520px){.portal-tab{padding:4px 11px 4px 8px}.portal-tab .pt-full,.portal-tab .pt-now{display:none!important}.portal-tab .pt-short{display:inline}}
+
+@media print{.portal-bar,.portal-rail{display:none}}

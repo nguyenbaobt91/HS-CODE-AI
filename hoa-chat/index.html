@@ -1184,40 +1184,13 @@ html.dark strong {
 
 <!-- Tesseract.js Client-Side Optical Character Recognition (OCR) for Scanned Images & Documents -->
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <link rel="stylesheet" href="../portal-tabs.css">
 </head>
-<body>
+<body class="has-portal-rail" style="--portal-max:1380px">
+    <!-- Thanh chuyển cổng dùng chung 3 web -->
+    <nav class="portal-bar" style="--portal-max:1380px;--portal-pad:16px" aria-label="Chuyển cổng tra cứu"><div class="portal-inner"><a class="portal-tab pt-hs" href="../" title="Cổng Tra Cứu &amp; Đề Xuất Mã HS Code AI"><span class="pt-ico">🔍</span><span class="pt-full">HS Code AI</span><span class="pt-short">HS Code AI</span><span class="pt-now">ĐANG MỞ</span></a><a class="portal-tab pt-hc" href="../hoa-chat/" aria-current="page" title="Cổng Nghiệp Vụ Hóa Chất 2026 &amp; Quét MSDS"><span class="pt-ico">🧪</span><span class="pt-full">Hóa Chất &amp; MSDS</span><span class="pt-short">Hóa Chất</span><span class="pt-now">ĐANG MỞ</span></a><a class="portal-tab pt-kt" href="../chuyen-nganh/" title="Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026 (Nghị định 37/2026/NĐ-CP)"><span class="pt-ico">⚖️</span><span class="pt-full">KTCN 4 Bộ 2026</span><span class="pt-short">KTCN</span><span class="pt-now">ĐANG MỞ</span></a></div></nav>
+    <aside class="portal-rail" style="--rail-top:190px" aria-label="Cổng tra cứu (lề trái)"><a class="portal-block pt-hs" href="../" title="Cổng Tra Cứu &amp; Đề Xuất Mã HS Code AI"><span class="pb-ico">🔍</span><span class="pb-txt"><span class="pb-sub">Mở cổng</span><span class="pb-main">HS Code AI</span></span></a><a class="portal-block pt-hc" href="../hoa-chat/" aria-current="page" title="Cổng Nghiệp Vụ Hóa Chất 2026 &amp; Quét MSDS"><span class="pb-ico">🧪</span><span class="pb-txt"><span class="pb-sub">ĐANG MỞ</span><span class="pb-main">Hóa chất</span></span></a><a class="portal-block pt-kt" href="../chuyen-nganh/" title="Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026 (Nghị định 37/2026/NĐ-CP)"><span class="pb-ico">⚖️</span><span class="pb-txt"><span class="pb-sub">Mở cổng</span><span class="pb-main">KTCN 2026</span></span></a></aside>
 
-<style>
-/* Tab treo mép trái: luôn gập thành biểu tượng nhỏ sát mép (mọi kích thước màn hình), rê chuột để trượt ra */
-    .hsc-dock{position:fixed;left:0;z-index:9999;display:flex;align-items:center;gap:8px;min-height:34px;max-width:34px;padding:0;overflow:hidden;border-radius:0 17px 17px 0;color:#fff;text-decoration:none;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;white-space:nowrap;cursor:pointer;box-shadow:0 6px 16px rgba(15,23,42,.28);border:1px solid rgba(255,255,255,.28);border-left:0;transition:max-width .35s cubic-bezier(.4,0,.2,1),padding .35s ease,box-shadow .2s ease,filter .2s ease}
-    .hsc-dock:hover,.hsc-dock:focus-visible{max-width:380px;padding-right:12px;box-shadow:0 12px 26px rgba(15,23,42,.38);filter:brightness(1.06)}
-    .hsc-dock .hsc-ico{width:32px;min-height:32px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;line-height:1;transition:transform .3s ease}
-    .hsc-dock:hover .hsc-ico{transform:rotate(12deg)}
-    .hsc-dock .hsc-txt{display:flex;flex-direction:column;text-align:left;line-height:1.2;opacity:0;transition:opacity .2s ease .08s}
-    .hsc-dock .hsc-sub{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
-    .hsc-dock .hsc-main{font-size:12px;font-weight:900}
-    .hsc-dock .hsc-badge{font-size:8.5px;font-weight:900;text-transform:uppercase;padding:2px 6px;border-radius:999px;flex-shrink:0;opacity:0;transition:opacity .2s ease .08s}
-    .hsc-dock:hover .hsc-txt,.hsc-dock:hover .hsc-badge,.hsc-dock:focus-visible .hsc-txt,.hsc-dock:focus-visible .hsc-badge{opacity:1}
-    </style>
-
-<!-- Tab treo mép trái (thông minh: gập icon, hover trượt ra) -->
-<a class="hsc-dock" href="../" style="top:130px;background:linear-gradient(135deg,#0284c7,#2563eb);color:#fff" title="Quay trở lại Hệ thống Tra Cứu HS Code AI (rê chuột để mở rộng)">
-    <span class="hsc-ico">🤖</span>
-    <div class="hsc-txt">
-        <span class="hsc-sub" style="color:#bae6fd">Trở Về</span>
-        <span class="hsc-main">HSCoder AI</span>
-    </div>
-    
-</a>
-
-<a class="hsc-dock" href="../chuyen-nganh/" style="top:195px;background:linear-gradient(135deg,#2563eb,#4f46e5);color:#fff" title="Mở Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026 (Nghị định 37/2026/NĐ-CP - rê chuột để mở rộng)">
-    <span class="hsc-ico">⚖️</span>
-    <div class="hsc-txt">
-        <span class="hsc-sub" style="color:#bfdbfe">Cổng Tra Cứu</span>
-        <span class="hsc-main">KTCN 4 Bộ 2026</span>
-    </div>
-    
-</a>
 
 <header>
   <div class="header-top">
