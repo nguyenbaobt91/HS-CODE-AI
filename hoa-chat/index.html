@@ -1164,6 +1164,51 @@ html.dark strong {
   color: #f8fafc;
 }
 
+/* Infographic Overview Layout (Light & Dark) */
+.infog-auth-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+@media (max-width: 900px) { .infog-auth-grid { grid-template-columns: 1fr; } }
+.infog-auth-col { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.infog-auth-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 10px; border-bottom: 1px dashed #cbd5e1; }
+.infog-auth-title { font-size: 13.5px; font-weight: 800; display: flex; align-items: center; gap: 7px; }
+.infog-node { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 9px 11px; display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12.5px; }
+.infog-node-text { font-weight: 600; color: #1e293b; line-height: 1.4; }
+.infog-node-badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 9999px; white-space: nowrap; flex-shrink: 0; }
+.infog-badge-sky { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+.infog-badge-purple { background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+
+.infog-timeline { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; padding: 10px 12px; border-radius: 12px; background: #f1f5f9; border: 1px solid #e2e8f0; }
+@media (max-width: 980px) { .infog-timeline { grid-template-columns: 1fr; } }
+.infog-tl-step { display: flex; align-items: center; gap: 9px; font-size: 12px; font-weight: 700; color: #334155; }
+.infog-tl-dot { width: 24px; height: 24px; border-radius: 9999px; color: #fff; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+.infog-proc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+@media (max-width: 980px) { .infog-proc-grid { grid-template-columns: 1fr; } }
+.infog-proc-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 14px rgba(15,23,42,0.05); }
+.infog-proc-banner { padding: 13px 15px; color: #ffffff; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.infog-proc-num { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 900; opacity: 0.9; line-height: 1; }
+.infog-proc-name { font-size: 13.5px; font-weight: 800; line-height: 1.3; }
+.infog-proc-sub { font-size: 11px; opacity: 0.9; margin-top: 2px; font-weight: 600; }
+.infog-proc-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 9px; flex: 1; }
+.infog-row { display: flex; gap: 9px; align-items: flex-start; padding-bottom: 8px; border-bottom: 1px dashed #e2e8f0; font-size: 12.5px; line-height: 1.45; }
+.infog-row:last-child { border-bottom: none; padding-bottom: 0; }
+.infog-row-ico { width: 24px; height: 24px; border-radius: 7px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; margin-top: 1px; }
+.infog-row-lbl { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; color: #64748b; margin-bottom: 1px; }
+.infog-row-val { color: #1e293b; font-weight: 500; }
+.infog-hi-pill { display: inline-block; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 11.5px; }
+
+html.dark .infog-auth-col { background: rgba(15, 23, 42, 0.72); border-color: rgba(148, 163, 184, 0.2); }
+html.dark .infog-auth-head { border-bottom-color: rgba(148, 163, 184, 0.2); }
+html.dark .infog-node { background: rgba(30, 41, 59, 0.75); border-color: rgba(148, 163, 184, 0.18); }
+html.dark .infog-node-text { color: #e2e8f0; }
+html.dark .infog-badge-sky { background: rgba(14, 165, 233, 0.18); color: #7dd3fc; border-color: rgba(56, 189, 248, 0.35); }
+html.dark .infog-badge-purple { background: rgba(168, 85, 247, 0.18); color: #d8b4fe; border-color: rgba(192, 132, 252, 0.35); }
+html.dark .infog-timeline { background: rgba(15, 23, 42, 0.75); border-color: rgba(148, 163, 184, 0.2); }
+html.dark .infog-tl-step { color: #cbd5e1; }
+html.dark .infog-proc-card { background: rgba(15, 23, 42, 0.85); border-color: rgba(148, 163, 184, 0.22); }
+html.dark .infog-row { border-bottom-color: rgba(148, 163, 184, 0.15); }
+html.dark .infog-row-ico { background: rgba(30, 41, 59, 0.9); }
+html.dark .infog-row-lbl { color: #94a3b8; }
+html.dark .infog-row-val { color: #e2e8f0; }
 </style>
 
 
@@ -1254,93 +1299,200 @@ html.dark strong {
   <!-- TAB 1: TỔNG QUAN PHÁP LÝ -->
   <div id="tab-overview" class="tab-pane active">
     
-    <!-- Phân cấp Thẩm quyền 1040 -->
+    <!-- Phân cấp Thẩm quyền 1040 (Infographic) -->
     <div class="card">
       <div class="card-header-clean">
-        <div class="card-title">⚡ Bản Đồ Phân Cấp Thẩm Quyền Giải Quyết Thủ Tục Hành Chính (QĐ 1040/QĐ-BCT)</div>
+        <div class="card-title">⚡ Sơ Đồ Phân Cấp Thẩm Quyền Giải Quyết TTHC (QĐ 1040/QĐ-BCT)</div>
         <span class="pill pill-danger">PHÂN CẤP CẤP TỈNH</span>
       </div>
       
-      <div class="grid-2">
-        <div style="background: var(--gray-50); padding: 16px; border-radius: var(--radius-md); border-left: 4px solid var(--primary);">
-          <h4 style="color: var(--primary); margin-bottom: 8px;">🏛️ Cấp Địa Phương: UBND Tỉnh / Sở Công Thương</h4>
-          <ul style="padding-left: 18px; line-height: 1.8; font-size: 13.5px;">
-            <li><strong>Cấp GP XNK Hóa chất kiểm soát đặc biệt Nhóm 1</strong> (Mã TTHC: <span class="font-mono">1.014700</span> - xử lý 05 ngày).</li>
-            <li><strong>Cấp GP XNK Hóa chất kiểm soát đặc biệt Nhóm 2 & Tiền chất</strong> (Mã TTHC: <span class="font-mono">1.014713</span> - xử lý 05 ngày).</li>
-            <li><strong>Cấp GP Nhập khẩu Hóa chất cấm</strong> (Mã TTHC: <span class="font-mono">1.014707</span> - trực tuyến cấp tỉnh).</li>
-            <li><strong>Cấp GCN đủ điều kiện Sản xuất / Kinh doanh hóa chất có điều kiện</strong> (Mã: <span class="font-mono">1.014721</span> / <span class="font-mono">1.014720</span>).</li>
-            <li><strong>Cấp GP Sản xuất / Kinh doanh hóa chất Nhóm 2</strong> (Mã: <span class="font-mono">1.014728</span> / <span class="font-mono">1.014732</span>).</li>
-          </ul>
+      <div class="infog-auth-grid">
+        <div class="infog-auth-col" style="border-top: 3px solid #0284c7;">
+          <div class="infog-auth-head">
+            <div class="infog-auth-title" style="color: #0284c7;">🏛️ Cấp Địa Phương: UBND Tỉnh / Sở Công Thương</div>
+            <span class="infog-node-badge infog-badge-sky">5 TTHC</span>
+          </div>
+          <div class="infog-node">
+            <span class="infog-node-text">Cấp GP XNK Hóa chất kiểm soát đặc biệt <strong>Nhóm 1</strong></span>
+            <span class="infog-node-badge infog-badge-sky">1.014700 • 05 ngày</span>
+          </div>
+          <div class="infog-node">
+            <span class="infog-node-text">Cấp GP XNK Hóa chất kiểm soát đặc biệt <strong>Nhóm 2 &amp; Tiền chất</strong></span>
+            <span class="infog-node-badge infog-badge-sky">1.014713 • 05 ngày</span>
+          </div>
+          <div class="infog-node">
+            <span class="infog-node-text">Cấp GP Nhập khẩu <strong>Hóa chất cấm</strong> (trực tuyến cấp tỉnh)</span>
+            <span class="infog-node-badge infog-badge-sky">1.014707</span>
+          </div>
+          <div class="infog-node">
+            <span class="infog-node-text">Cấp GCN đủ điều kiện SX / KD hóa chất có điều kiện</span>
+            <span class="infog-node-badge infog-badge-sky">1.014721 / 1.014720</span>
+          </div>
+          <div class="infog-node">
+            <span class="infog-node-text">Cấp GP Sản xuất / Kinh doanh hóa chất <strong>Nhóm 2</strong></span>
+            <span class="infog-node-badge infog-badge-sky">1.014728 / 1.014732</span>
+          </div>
         </div>
 
-        <div style="background: var(--gray-50); padding: 16px; border-radius: var(--radius-md); border-left: 4px solid var(--purple);">
-          <h4 style="color: var(--purple); margin-bottom: 8px;">🏛️ Cấp Trung Ương: Cục Hóa chất - Bộ Công Thương</h4>
-          <ul style="padding-left: 18px; line-height: 1.8; font-size: 13.5px;">
-            <li><strong>Tiếp nhận Khai báo Hóa chất Nhập khẩu</strong> tự động 24/7 qua Cổng Một cửa Quốc gia (<span class="font-mono">vnsw.gov.vn</span>).</li>
-            <li><strong>Thẩm định Đăng ký hóa chất mới</strong> lần đầu tại Việt Nam (Mã TTHC: <span class="font-mono">1.014715</span>).</li>
-            <li><strong>Cấp GP Sản xuất Hóa chất cấm</strong> (Trình Thủ tướng Chính phủ phê duyệt).</li>
-            <li><strong>Phê duyệt Kế hoạch phòng ngừa, ứng phó sự cố hóa chất</strong> cấp Bộ (Mã: <span class="font-mono">1.003683</span>).</li>
-          </ul>
+        <div class="infog-auth-col" style="border-top: 3px solid #7c3aed;">
+          <div class="infog-auth-head">
+            <div class="infog-auth-title" style="color: #8b5cf6;">🏛️ Cấp Trung Ương: Cục Hóa chất - Bộ Công Thương</div>
+            <span class="infog-node-badge infog-badge-purple">4 TTHC</span>
+          </div>
+          <div class="infog-node">
+            <span class="infog-node-text">Tiếp nhận <strong>Khai báo Hóa chất Nhập khẩu</strong> tự động 24/7</span>
+            <span class="infog-node-badge infog-badge-purple">vnsw.gov.vn</span>
+          </div>
+          <div class="infog-node">
+            <span class="infog-node-text">Thẩm định <strong>Đăng ký hóa chất mới</strong> lần đầu tại Việt Nam</span>
+            <span class="infog-node-badge infog-badge-purple">1.014715</span>
+          </div>
+          <div class="infog-node">
+            <span class="infog-node-text">Cấp GP <strong>Sản xuất Hóa chất cấm</strong></span>
+            <span class="infog-node-badge infog-badge-purple">Trình Thủ tướng</span>
+          </div>
+          <div class="infog-node">
+            <span class="infog-node-text">Phê duyệt Kế hoạch phòng ngừa, ứng phó sự cố hóa chất cấp Bộ</span>
+            <span class="infog-node-badge infog-badge-purple">1.003683</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Ma Trận 3 Thủ Tục Trọng Tâm -->
+    <!-- Infographic 3 Thủ Tục Trọng Tâm -->
     <div class="card">
       <div class="card-header-clean">
-        <div class="card-title">📊 Ma Trận Phân Định 3 Thủ Tục Nhập Khẩu Trọng Tâm</div>
-        <span class="pill pill-primary">QUY TRÌNH CHUẨN</span>
+        <div class="card-title">📊 3 Thủ Tục Nhập Khẩu Trọng Tâm</div>
+        <span class="pill pill-primary">QUY TRÌNH CHUẨN 2026</span>
       </div>
 
-      <div class="table-responsive">
-        <table>
-          <thead>
-            <tr>
-              <th>Tiêu chí Phân định</th>
-              <th>1. Khai báo Hóa chất Nhập khẩu</th>
-              <th>2. Công bố Mục đích Sử dụng</th>
-              <th>3. Xin cấp Giấy phép XNK</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Căn cứ Pháp lý</strong></td>
-              <td>Khoản 1 Điều 25 Luật; Điều 6 NĐ 26</td>
-              <td>Khoản 2 Điều 25 Luật; Điều 7 NĐ 26; CV 813</td>
-              <td>Điều 13, 14 Luật; NĐ 24, NĐ 26; NQ 19; QĐ 1040</td>
-            </tr>
-            <tr>
-              <td><strong>Đối tượng Áp dụng</strong></td>
-              <td>Phụ lục I NĐ 24 (Hóa chất sản xuất, nhập khẩu cần khai báo)</td>
-              <td>Phụ lục II & III NĐ 24 nhập khẩu phục vụ <strong>tự sản xuất / sử dụng</strong></td>
-              <td>Phụ lục III Nhóm 1, Nhóm 2 (Tiền chất) và Hóa chất cấm</td>
-            </tr>
-            <tr>
-              <td><strong>Hệ thống Thực hiện</strong></td>
-              <td>Cổng Một cửa Quốc gia <span class="font-mono">vnsw.gov.vn</span> / <span class="font-mono">moit.gov.vn</span></td>
-              <td>CSDL Hóa chất Quốc gia <span class="font-mono">chemicaldata.gov.vn</span></td>
-              <td>Cổng Dịch vụ công Quốc gia nộp về <strong>UBND cấp tỉnh (Sở Công Thương)</strong></td>
-            </tr>
-            <tr>
-              <td><strong>Thời điểm Thực hiện</strong></td>
-              <td><strong>Bắt buộc trước khi thông quan</strong> hải quan</td>
-              <td><strong>Sau khi thông quan</strong>, trước 30 ngày đưa vào dùng thực tế (CV 813)</td>
-              <td><strong>Bắt buộc trước khi xếp hàng lên phương tiện vận chuyển</strong></td>
-            </tr>
-            <tr>
-              <td><strong>Thời hạn Hiệu lực</strong></td>
-              <td>Theo từng tờ khai hải quan (lô hàng cụ thể)</td>
-              <td>Theo kế hoạch sản xuất hàng năm của nhà máy</td>
-              <td><strong>05 năm</strong> đối với nhập tự sản xuất; <strong>06 tháng</strong> đối với thương mại</td>
-            </tr>
-            <tr>
-              <td><strong>Miễn trừ Đặc biệt (NQ 19)</strong></td>
-              <td>Lô hàng &lt; 10kg/hóa đơn; mẫu R&D &lt; 1kg; ngoài Chương 28, 29</td>
-              <td>Hoạt chất PL II &lt; 0.1%; Sản phẩm tiêu dùng đóng gói hoàn chỉnh</td>
-              <td><strong>Miễn hoàn toàn cho Doanh nghiệp chế xuất (DNCX)</strong>; Nhóm 1 &le; 1%, Nhóm 2 &le; 5%</td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- Dòng thời gian thực hiện -->
+      <div class="infog-timeline">
+        <div class="infog-tl-step">
+          <span class="infog-tl-dot" style="background: #d97706;">3</span>
+          <span>Trước khi xếp hàng: <strong style="color:#f59e0b;">Xin Giấy phép XNK</strong></span>
+        </div>
+        <div class="infog-tl-step">
+          <span class="infog-tl-dot" style="background: #0284c7;">1</span>
+          <span>Trước thông quan HQ: <strong style="color:#0ea5e9;">Khai báo Hóa chất</strong></span>
+        </div>
+        <div class="infog-tl-step">
+          <span class="infog-tl-dot" style="background: #059669;">2</span>
+          <span>Sau thông quan (&lt;30 ngày dùng): <strong style="color:#10b981;">Công bố MĐSD</strong></span>
+        </div>
+      </div>
+
+      <div class="infog-proc-grid">
+        <!-- Cột 1: Khai báo Hóa chất -->
+        <div class="infog-proc-card">
+          <div class="infog-proc-banner" style="background: linear-gradient(135deg, #0369a1, #0ea5e9);">
+            <div>
+              <div class="infog-proc-name">1. KHAI BÁO HÓA CHẤT NHẬP KHẨU</div>
+              <div class="infog-proc-sub">⏱️ Bắt buộc trước khi thông quan</div>
+            </div>
+            <div class="infog-proc-num">01</div>
+          </div>
+          <div class="infog-proc-body">
+            <div class="infog-row">
+              <div class="infog-row-ico">📜</div>
+              <div><div class="infog-row-lbl">Căn cứ pháp lý</div><div class="infog-row-val">Khoản 1 Điều 25 Luật; Điều 6 NĐ 26</div></div>
+            </div>
+            <div class="infog-row">
+              <div class="infog-row-ico">🧪</div>
+              <div><div class="infog-row-lbl">Đối tượng áp dụng</div><div class="infog-row-val">Phụ lục I NĐ 24 (Hóa chất SX, NK cần khai báo)</div></div>
+            </div>
+            <div class="infog-row">
+              <div class="infog-row-ico">🌐</div>
+              <div><div class="infog-row-lbl">Hệ thống thực hiện</div><div class="infog-row-val">Cổng Một cửa Quốc gia <span class="font-mono">vnsw.gov.vn</span> / <span class="font-mono">moit.gov.vn</span></div></div>
+            </div>
+            <div class="infog-row">
+              <div class="infog-row-ico">⏱️</div>
+              <div><div class="infog-row-lbl">Thời điểm thực hiện</div><div class="infog-row-val"><span class="infog-hi-pill" style="background:rgba(14,165,233,0.14);color:#0ea5e9;">Bắt buộc trước khi thông quan HQ</span></div></div>
+            </div>
+            <div class="infog-row">
+              <div class="infog-row-ico">📅</div>
+              <div><div class="infog-row-lbl">Thời hạn hiệu lực</div><div class="infog-row-val">Theo từng tờ khai hải quan (lô hàng cụ thể)</div></div>
+            </div>
+            <div class="infog-row">
+              <div class="infog-row-ico">🛡️</div>
+              <div><div class="infog-row-lbl">Miễn trừ đặc biệt (NQ 19)</div><div class="infog-row-val">Lô hàng &lt; 10kg/hóa đơn; mẫu R&amp;D &lt; 1kg; ngoài Chương 28, 29</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cột 2: Công bố Mục đích Sử dụng -->
+        <div class="infog-proc-card">
+          <div class="infog-proc-banner" style="background: linear-gradient(135deg, #047857, #10b981);">
+            <div>
+              <div class="infog-proc-name">2. CÔNG BỐ MỤC ĐÍCH SỬ DỤNG</div>
+              <div class="infog-proc-sub">⏱️ Sau thông quan, trước 30 ngày dùng</div>
+            </div>
+            <div class="infog-proc-num">02</div>
+          </div>
+          <div class="infog-proc-body">
+            <div class="infog-row">
+              <div class="infog-row-ico">📜</div>
+              <div><div class="infog-row-lbl">Căn cứ pháp lý</div><div class="infog-row-val">Khoản 2 Điều 25 Luật; Điều 7 NĐ 26; CV 813</div></div>
+            </div>
+            <div class="infog-row">
+              <div class="infog-row-ico">🧪</div>
+              <div><div class="infog-row-lbl">Đối tượng áp dụng</div><div class="infog-row-val">Phụ lục II &amp; III NĐ 24 nhập khẩu phục vụ <strong>tự sản xuất / sử dụng</strong></div></div>
+            </div>
+            <div class="infog-row">
+              <div class="infog-row-ico">🌐</div>
+              <div><div class="infog-row-lbl">Hệ thống thực hiện</div><div class="infog-row-val">CSDL Hóa chất Quốc gia <span class="font-mono">chemicaldata.gov.vn</span></div></div>
+            </div>
+            <div class="infog-row">
+              <div class="infog-row-ico">⏱️</div>
+              <div><div class="infog-row-lbl">Thời điểm thực hiện</div><div class="infog-row-val"><span class="infog-hi-pill" style="background:rgba(16,185,129,0.14);color:#10b981;">Sau thông quan, trước 30 ngày dùng thực tế</span></div></div>
+            </div>
+            <div class="infog-row">
+              <div class="infog-row-ico">📅</div>
+              <div><div class="infog-row-lbl">Thời hạn hiệu lực</div><div class="infog-row-val">Theo kế hoạch sản xuất hàng năm của nhà máy</div></div>
+            </div>
+            <div class="infog-row">
+              <div class="infog-row-ico">🛡️</div>
+              <div><div class="infog-row-lbl">Miễn trừ đặc biệt (NQ 19)</div><div class="infog-row-val">Hoạt chất PL II &lt; 0.1%; Sản phẩm tiêu dùng đóng gói hoàn chỉnh</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cột 3: Xin cấp Giấy phép XNK -->
+        <div class="infog-proc-card">
+          <div class="infog-proc-banner" style="background: linear-gradient(135deg, #b45309, #f59e0b);">
+            <div>
+              <div class="infog-proc-name">3. XIN CẤP GIẤY PHÉP XNK</div>
+              <div class="infog-proc-sub">⏱️ Trước khi xếp hàng lên phương tiện</div>
+            </div>
+            <div class="infog-proc-num">03</div>
+          </div>
+          <div class="infog-proc-body">
+            <div class="infog-row">
+              <div class="infog-row-ico">📜</div>
+              <div><div class="infog-row-lbl">Căn cứ pháp lý</div><div class="infog-row-val">Điều 13, 14 Luật; NĐ 24, NĐ 26; NQ 19; QĐ 1040</div></div>
+            </div>
+            <div class="infog-row">
+              <div class="infog-row-ico">🧪</div>
+              <div><div class="infog-row-lbl">Đối tượng áp dụng</div><div class="infog-row-val">Phụ lục III Nhóm 1, Nhóm 2 (Tiền chất) và Hóa chất cấm</div></div>
+            </div>
+            <div class="infog-row">
+              <div class="infog-row-ico">🌐</div>
+              <div><div class="infog-row-lbl">Hệ thống thực hiện</div><div class="infog-row-val">Cổng DVC Quốc gia nộp về <strong>UBND cấp tỉnh (Sở Công Thương)</strong></div></div>
+            </div>
+            <div class="infog-row">
+              <div class="infog-row-ico">⏱️</div>
+              <div><div class="infog-row-lbl">Thời điểm thực hiện</div><div class="infog-row-val"><span class="infog-hi-pill" style="background:rgba(245,158,11,0.16);color:#f59e0b;">Bắt buộc trước khi xếp hàng lên PTVT</span></div></div>
+            </div>
+            <div class="infog-row">
+              <div class="infog-row-ico">📅</div>
+              <div><div class="infog-row-lbl">Thời hạn hiệu lực</div><div class="infog-row-val"><strong>05 năm</strong> (tự sản xuất); <strong>06 tháng</strong> (thương mại)</div></div>
+            </div>
+            <div class="infog-row">
+              <div class="infog-row-ico">🛡️</div>
+              <div><div class="infog-row-lbl">Miễn trừ đặc biệt (NQ 19)</div><div class="infog-row-val">Nhóm 1 &le; 1%, Nhóm 2 &le; 5%</div></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
