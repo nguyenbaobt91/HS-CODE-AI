@@ -86,12 +86,15 @@ h1, h2, h3, h4, .brand-title, .card-title, .modal-title {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Header styling (Dong bo mau cam dong cua cong Hoa chat: #7a2f06 -> #c2610f) */
+/* Header styling (Dong bo chieu cao 65px voi Web AI & KTCN) */
 header {
   background: linear-gradient(135deg, rgba(122, 47, 6, 0.92) 0%, rgba(194, 97, 15, 0.88) 100%),
               url('./chem_abstract_bg.jpg') center/cover no-repeat;
   color: #ffffff;
-  padding: 10px 24px 8px 24px;
+  padding: 0 20px;
+  height: 65px;
+  display: flex;
+  align-items: center;
   box-shadow: 0 10px 30px rgba(122, 47, 6, 0.30);
   border-bottom: 1px solid rgba(255, 194, 122, 0.42);
   position: sticky;
@@ -99,6 +102,19 @@ header {
   z-index: 100;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+}
+.hc-header-inner {
+  width: 100%;
+  max-width: 1380px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+@media (max-width: 1120px) {
+  header { height: auto; min-height: 65px; padding: 8px 16px; }
+  .hc-header-inner { flex-wrap: wrap; }
 }
 
 .header-top {
@@ -141,30 +157,29 @@ header {
   flex-wrap: wrap;
 }
 
-/* Nav Tabs - Tinh gon 1 hang Micro-Pill can giua */
+/* Nav Tabs - Tinh gon 1 hang Micro-Pill nam giua header */
 .nav-tabs {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 2px 0 0 0;
-  width: fit-content;
+  gap: 5px;
+  padding: 0;
+  margin: 0;
   max-width: 100%;
-  margin: 0 auto;
   overflow-x: auto;
   scrollbar-width: none;
 }
 .nav-tabs::-webkit-scrollbar { display: none; }
 
 .nav-tab-btn {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #cbd5e1;
-  padding: 5px 11px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #f1f5f9;
+  padding: 5px 10px;
   border-radius: 9999px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   transition: all 0.18s ease;
   text-align: left;
   position: relative;
@@ -1223,34 +1238,16 @@ html.dark .infog-row-val { color: #e2e8f0; }
 <body class="has-portal-rail" style="--portal-max:1380px">
     <!-- Thanh chuyển cổng dùng chung 3 web -->
     <nav class="portal-bar" style="--portal-max:1380px;--portal-pad:16px" aria-label="Chuyển cổng tra cứu"><div class="portal-inner"><a class="portal-tab pt-hs" href="../" title="Cổng Tra Cứu &amp; Đề Xuất Mã HS Code AI"><span class="pt-ico">🔍</span><span class="pt-full">HS Code AI</span><span class="pt-short">HS Code AI</span><span class="pt-now">ĐANG MỞ</span></a><a class="portal-tab pt-hc" href="../hoa-chat/" aria-current="page" title="Cổng Nghiệp Vụ Hóa Chất 2026 &amp; Quét MSDS"><span class="pt-ico">🧪</span><span class="pt-full">Hóa Chất &amp; MSDS</span><span class="pt-short">Hóa Chất</span><span class="pt-now">ĐANG MỞ</span></a><a class="portal-tab pt-kt" href="../chuyen-nganh/" title="Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026 (Nghị định 37/2026/NĐ-CP)"><span class="pt-ico">⚖️</span><span class="pt-full">KTCN 4 Bộ 2026</span><span class="pt-short">KTCN</span><span class="pt-now">ĐANG MỞ</span></a></div></nav>
-    <aside class="portal-rail" style="--rail-top:112px" aria-label="Cổng tra cứu (lề trái)"><a class="portal-block pt-hs" href="../" title="Cổng Tra Cứu &amp; Đề Xuất Mã HS Code AI"><span class="pb-ico">🔍</span><span class="pb-txt"><span class="pb-sub">Mở cổng</span><span class="pb-main">HS Code AI</span></span></a><a class="portal-block pt-hc" href="../hoa-chat/" aria-current="page" title="Cổng Nghiệp Vụ Hóa Chất 2026 &amp; Quét MSDS"><span class="pb-ico">🧪</span><span class="pb-txt"><span class="pb-sub">ĐANG MỞ</span><span class="pb-main">Hóa chất</span></span></a><a class="portal-block pt-kt" href="../chuyen-nganh/" title="Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026 (Nghị định 37/2026/NĐ-CP)"><span class="pb-ico">⚖️</span><span class="pb-txt"><span class="pb-sub">Mở cổng</span><span class="pb-main">KTCN 2026</span></span></a></aside>
+    <aside class="portal-rail" style="--rail-top:84px" aria-label="Cổng tra cứu (lề trái)"><a class="portal-block pt-hs" href="../" title="Cổng Tra Cứu &amp; Đề Xuất Mã HS Code AI"><span class="pb-ico">🔍</span><span class="pb-txt"><span class="pb-sub">Mở cổng</span><span class="pb-main">HS Code AI</span></span></a><a class="portal-block pt-hc" href="../hoa-chat/" aria-current="page" title="Cổng Nghiệp Vụ Hóa Chất 2026 &amp; Quét MSDS"><span class="pb-ico">🧪</span><span class="pb-txt"><span class="pb-sub">ĐANG MỞ</span><span class="pb-main">Hóa chất</span></span></a><a class="portal-block pt-kt" href="../chuyen-nganh/" title="Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026 (Nghị định 37/2026/NĐ-CP)"><span class="pb-ico">⚖️</span><span class="pb-txt"><span class="pb-sub">Mở cổng</span><span class="pb-main">KTCN 2026</span></span></a></aside>
 
 
 <header>
-  <div class="header-top">
-    <!-- Bên trái: Tiêu đề Cổng & Bản quyền -->
-    <div style="display: flex; flex-direction: column; gap: 4px;">
-      <div class="brand-title">
-        <span>🛡️ Cổng Thông Tin & Tra Cứu Nghiệp Vụ Hóa Chất 2026</span>
-      </div>
+  <div class="hc-header-inner">
+    <div class="brand-title" style="font-size: 16px; white-space: nowrap; flex-shrink: 0;" title="Cổng Thông Tin &amp; Tra Cứu Nghiệp Vụ Hóa Chất 2026">
+      <span>🛡️ Hóa Chất 2026</span>
     </div>
 
-    <!-- Góc phải: Tác vụ & Nút Đổi Sáng / Tối y chang Web AI -->
-    <div class="header-actions-right">
-      <a href="./Quy_trinh_huong_dan_nghiep_vu_hoa_chat.pdf" target="_blank" class="btn btn-primary" style="background: #e11d48; color: #ffffff; border: 1px solid #fda4af; padding: 7px 16px; font-size: 13px; font-weight: 700; border-radius: 20px; box-shadow: 0 2px 8px rgba(225,29,72,0.35); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
-        <i class="fa-solid fa-file-pdf"></i>
-        <span>Master SOP PDF</span>
-      </a>
-
-      <!-- Nút Chuyển Đổi Sáng / Tối (Dong bo 36x36 tron kinh mo + SVG) -->
-      <button type="button" id="btn-theme-toggle" onclick="toggleDarkMode()" class="theme-toggle-btn-corner" title="Chuyển chế độ Sáng / Tối (Dark / Light Mode)">
-        <svg class="hc-ico-moon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
-        <svg class="hc-ico-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
-      </button>
-    </div>
-  </div>
-
-  <div class="nav-tabs">
+    <div class="nav-tabs">
     <button class="nav-tab-btn active" data-tab="tab-overview" onclick="switchTab('tab-overview')">
       <div class="tab-icon-box">📊</div>
       <div class="tab-info-block">
@@ -1293,6 +1290,18 @@ html.dark .infog-row-val { color: #e2e8f0; }
         <div class="tab-info-sub">23 Mẫu chuẩn Word</div>
       </div>
     </button>
+  </div>
+
+    <div class="header-actions-right" style="margin-left: 0; flex-shrink: 0;">
+      <a href="./Quy_trinh_huong_dan_nghiep_vu_hoa_chat.pdf" target="_blank" class="btn btn-primary" style="background: #e11d48; color: #ffffff; border: 1px solid #fda4af; padding: 6px 12px; font-size: 12px; font-weight: 700; border-radius: 9999px; box-shadow: 0 2px 8px rgba(225,29,72,0.35); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;">
+        <i class="fa-solid fa-file-pdf"></i>
+        <span>Master SOP PDF</span>
+      </a>
+      <button type="button" id="btn-theme-toggle" onclick="toggleDarkMode()" class="theme-toggle-btn-corner" title="Chuyển chế độ Sáng / Tối (Dark / Light Mode)">
+        <svg class="hc-ico-moon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
+        <svg class="hc-ico-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </button>
+    </div>
   </div>
 </header>
 
