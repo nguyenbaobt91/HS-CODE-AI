@@ -86,14 +86,14 @@ h1, h2, h3, h4, .brand-title, .card-title, .modal-title {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Header styling (Concept B) */
+/* Header styling (Dong bo mau cam dong cua cong Hoa chat: #7a2f06 -> #c2610f) */
 header {
-  background: linear-gradient(135deg, rgba(7, 13, 30, 0.88) 0%, rgba(15, 23, 42, 0.82) 100%),
+  background: linear-gradient(135deg, rgba(122, 47, 6, 0.92) 0%, rgba(194, 97, 15, 0.88) 100%),
               url('./chem_abstract_bg.jpg') center/cover no-repeat;
   color: #ffffff;
   padding: 10px 24px 8px 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 30px rgba(122, 47, 6, 0.30);
+  border-bottom: 1px solid rgba(255, 194, 122, 0.42);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -180,10 +180,10 @@ header {
 }
 
 .nav-tab-btn.active {
-  background: linear-gradient(135deg, #0ea5e9, #0284c7);
-  color: #ffffff;
-  border-color: rgba(125, 211, 252, 0.7);
-  box-shadow: 0 3px 12px rgba(14, 165, 233, 0.35);
+  background: #ffffff;
+  color: #7a2f06;
+  border-color: #ffc27a;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
 }
 
 .tab-icon-box {
@@ -791,41 +791,32 @@ footer {
 }
 
 .theme-toggle-btn-corner {
-  width: 38px;
-  height: 38px;
-  min-width: 38px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  color: #fbbf24;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.30);
+  color: #fde68a;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  flex-shrink: 0;
 }
 
 .theme-toggle-btn-corner:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.6);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  background: rgba(255, 255, 255, 0.26);
+  border-color: rgba(255, 255, 255, 0.55);
 }
 
-html.dark .theme-toggle-btn-corner {
-  background: #1e293b;
-  border-color: #334155;
-  color: #f59e0b;
-}
-
-html.dark .theme-toggle-btn-corner:hover {
-  background: #334155;
-  border-color: #475569;
-}
+.theme-toggle-btn-corner .hc-ico-sun { display: none; }
+html.dark .theme-toggle-btn-corner .hc-ico-moon { display: none; }
+html.dark .theme-toggle-btn-corner .hc-ico-sun { display: block; }
 
 /* Theme Toggle Button */
 .theme-toggle-btn {
@@ -915,10 +906,10 @@ html.dark .nav-tab-btn:hover {
 }
 
 html.dark .nav-tab-btn.active {
-  background: linear-gradient(135deg, #0284c7, #0ea5e9);
-  color: #ffffff;
-  border-color: rgba(125, 211, 252, 0.75);
-  box-shadow: 0 3px 14px rgba(14, 165, 233, 0.4);
+  background: #ffffff;
+  color: #7a2f06;
+  border-color: #ffc27a;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.35);
 }
 
 html.dark .nav-tab-btn.active .tab-icon-box {
@@ -1251,9 +1242,10 @@ html.dark .infog-row-val { color: #e2e8f0; }
         <span>Master SOP PDF</span>
       </a>
 
-      <!-- Nút Chuyển Đổi Sáng / Tối Ở Góc Phải Y Chang Web AI -->
+      <!-- Nút Chuyển Đổi Sáng / Tối (Dong bo 36x36 tron kinh mo + SVG) -->
       <button type="button" id="btn-theme-toggle" onclick="toggleDarkMode()" class="theme-toggle-btn-corner" title="Chuyển chế độ Sáng / Tối (Dark / Light Mode)">
-        <i id="theme-icon" class="fa-solid fa-moon"></i>
+        <svg class="hc-ico-moon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
+        <svg class="hc-ico-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
       </button>
     </div>
   </div>

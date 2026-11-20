@@ -74,8 +74,8 @@
             color: #0f172a !important;
         }
         html:not(.dark) header {
-            background: rgba(255, 255, 255, 0.95) !important;
-            border-color: #e2e8f0 !important;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0) 42%), linear-gradient(135deg, #0a4a5e 0%, #0891b2 100%) !important;
+            border-color: rgba(103, 232, 249, 0.35) !important;
         }
 
         /* Dark Mode: Futuristic Cyber Port Seaport & Global Trade Routes Background */
@@ -89,10 +89,10 @@
             color: #f1f5f9 !important;
         }
         .dark header {
-            background: rgba(7, 13, 30, 0.90) !important;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 42%), linear-gradient(135deg, #0a4a5e 0%, #0891b2 100%) !important;
             backdrop-filter: blur(16px) !important;
             -webkit-backdrop-filter: blur(16px) !important;
-            border-color: rgba(56, 189, 248, 0.18) !important;
+            border-color: rgba(103, 232, 249, 0.35) !important;
         }
         .dark .glass {
             background: rgba(11, 19, 43, 0.80) !important;
@@ -186,37 +186,37 @@
     <nav class="portal-bar" style="--portal-max:1280px" aria-label="Chuyển cổng tra cứu"><div class="portal-inner"><a class="portal-tab pt-hs" href="./" aria-current="page" title="Cổng Tra Cứu &amp; Đề Xuất Mã HS Code AI"><span class="pt-ico">🔍</span><span class="pt-full">HS Code AI</span><span class="pt-short">HS Code AI</span><span class="pt-now">ĐANG MỞ</span></a><a class="portal-tab pt-hc" href="./hoa-chat/" title="Cổng Nghiệp Vụ Hóa Chất 2026 &amp; Quét MSDS"><span class="pt-ico">🧪</span><span class="pt-full">Hóa Chất &amp; MSDS</span><span class="pt-short">Hóa Chất</span><span class="pt-now">ĐANG MỞ</span></a><a class="portal-tab pt-kt" href="./chuyen-nganh/" title="Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026 (Nghị định 37/2026/NĐ-CP)"><span class="pt-ico">⚖️</span><span class="pt-full">KTCN 4 Bộ 2026</span><span class="pt-short">KTCN</span><span class="pt-now">ĐANG MỞ</span></a></div></nav>
     <aside class="portal-rail" style="--rail-top:84px" aria-label="Cổng tra cứu (lề trái)"><a class="portal-block pt-hs" href="./" aria-current="page" title="Cổng Tra Cứu &amp; Đề Xuất Mã HS Code AI"><span class="pb-ico">🔍</span><span class="pb-txt"><span class="pb-sub">ĐANG MỞ</span><span class="pb-main">HS Code AI</span></span></a><a class="portal-block pt-hc" href="./hoa-chat/" title="Cổng Nghiệp Vụ Hóa Chất 2026 &amp; Quét MSDS"><span class="pb-ico">🧪</span><span class="pb-txt"><span class="pb-sub">Mở cổng</span><span class="pb-main">Hóa chất</span></span></a><a class="portal-block pt-kt" href="./chuyen-nganh/" title="Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026 (Nghị định 37/2026/NĐ-CP)"><span class="pb-ico">⚖️</span><span class="pb-txt"><span class="pb-sub">Mở cổng</span><span class="pb-main">KTCN 2026</span></span></a></aside>
 
-<!-- Header / Navbar (Đã xóa tab Cổng Hóa Chất ở trên, giữ nguyên vẹn bố cục chuẩn) -->
-    <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/90 dark:border-slate-800 shadow-sm w-full">
+<!-- Header / Navbar (Nen mau nhan dien cong HS Code AI #0a4a5e -> #0891b2) -->
+    <header class="sticky top-0 z-40 backdrop-blur-md border-b shadow-md w-full">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
             <!-- Brand Logo (Siêu Tinh Gọn: HSCoder AI) -->
             <div class="flex items-center space-x-2 cursor-pointer shrink-0" onclick="switchTab('propose')">
-                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-500/25">
+                <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/15 border border-cyan-300/45 flex items-center justify-center text-white shadow-md">
                     <i class="fa-solid fa-robot text-base sm:text-lg"></i>
                 </div>
-                <span class="text-base sm:text-lg font-black bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent whitespace-nowrap">HSCoder AI</span>
+                <span class="text-base sm:text-lg font-black text-white drop-shadow-sm whitespace-nowrap">HSCoder AI</span>
             </div>
 
-            <!-- Separated Micro-Pill Navigation Bar: 5 Tab Tach Roi Giong Hoa Chat -->
+            <!-- Separated Micro-Pill Navigation Bar: 5 Tab Tach Roi -->
             <nav class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar shrink-0 py-0.5">
-                <button onclick="switchTab('propose')" id="tab-btn-propose" class="tab-btn active px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-150 flex items-center gap-1.5 bg-gradient-to-r from-sky-500 to-blue-600 text-white border border-sky-400/60 shadow-sm whitespace-nowrap cursor-pointer">
-                    <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+                <button onclick="switchTab('propose')" id="tab-btn-propose" class="tab-btn active px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-150 flex items-center gap-1.5 bg-white text-cyan-900 border border-cyan-200 shadow-md whitespace-nowrap cursor-pointer">
+                    <i class="fa-solid fa-wand-magic-sparkles text-sky-600"></i>
                     <span>AI Đề Xuất HS</span>
                 </button>
-                <button onclick="switchTab('batch')" id="tab-btn-batch" class="tab-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-white/85 dark:bg-slate-800/75 text-slate-600 dark:text-slate-300 border border-slate-200/90 dark:border-slate-700/70 shadow-2xs hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-50 dark:hover:bg-slate-700/80 hover:border-emerald-300 dark:hover:border-emerald-500/50 transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
-                    <i class="fa-solid fa-file-excel text-emerald-500"></i>
+                <button onclick="switchTab('batch')" id="tab-btn-batch" class="tab-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-white/12 text-slate-100 border border-white/20 hover:bg-white/22 hover:border-cyan-300/60 hover:text-white transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
+                    <i class="fa-solid fa-file-excel text-emerald-300"></i>
                     <span>Excel Hàng Loạt</span>
                 </button>
-                <button onclick="switchTab('tree')" id="tab-btn-tree" class="tab-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-white/85 dark:bg-slate-800/75 text-slate-600 dark:text-slate-300 border border-slate-200/90 dark:border-slate-700/70 shadow-2xs hover:text-sky-600 dark:hover:text-sky-400 hover:bg-slate-50 dark:hover:bg-slate-700/80 hover:border-sky-300 dark:hover:border-sky-500/50 transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
-                    <i class="fa-solid fa-sitemap text-sky-500"></i>
+                <button onclick="switchTab('tree')" id="tab-btn-tree" class="tab-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-white/12 text-slate-100 border border-white/20 hover:bg-white/22 hover:border-cyan-300/60 hover:text-white transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
+                    <i class="fa-solid fa-sitemap text-cyan-300"></i>
                     <span>Biểu Thuế 98 Chương</span>
                 </button>
-                <button onclick="switchTab('rules')" id="tab-btn-rules" class="tab-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-white/85 dark:bg-slate-800/75 text-slate-600 dark:text-slate-300 border border-slate-200/90 dark:border-slate-700/70 shadow-2xs hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-700/80 hover:border-indigo-300 dark:hover:border-indigo-500/50 transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
-                    <i class="fa-solid fa-scale-balanced text-indigo-500"></i>
+                <button onclick="switchTab('rules')" id="tab-btn-rules" class="tab-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-white/12 text-slate-100 border border-white/20 hover:bg-white/22 hover:border-cyan-300/60 hover:text-white transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
+                    <i class="fa-solid fa-scale-balanced text-indigo-200"></i>
                     <span>6 Quy Tắc GRI</span>
                 </button>
-                <button onclick="switchTab('notes')" id="tab-btn-notes" class="tab-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-white/85 dark:bg-slate-800/75 text-slate-600 dark:text-slate-300 border border-slate-200/90 dark:border-slate-700/70 shadow-2xs hover:text-amber-600 dark:hover:text-amber-400 hover:bg-slate-50 dark:hover:bg-slate-700/80 hover:border-amber-300 dark:hover:border-amber-500/50 transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
-                    <i class="fa-solid fa-book-open text-amber-500"></i>
+                <button onclick="switchTab('notes')" id="tab-btn-notes" class="tab-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-white/12 text-slate-100 border border-white/20 hover:bg-white/22 hover:border-cyan-300/60 hover:text-white transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap cursor-pointer">
+                    <i class="fa-solid fa-book-open text-amber-300"></i>
                     <span>Chú Giải WCO 2022</span>
                 </button>
             </nav>
@@ -225,24 +225,25 @@
             <div class="flex items-center space-x-2 shrink-0">
                 <!-- Quick User Guide Button -->
                 <button type="button" onclick="openUserGuideModal()" 
-                        class="px-2.5 sm:px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50 border border-amber-300 dark:border-amber-500/40 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer shrink-0" 
+                        class="px-2.5 sm:px-3 py-1.5 rounded-full bg-amber-400/20 text-amber-100 hover:bg-amber-400/30 border border-amber-300/45 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer shrink-0" 
                         title="Xem cẩm nang hướng dẫn sử dụng & nguyên tắc vàng điền mô tả">
-                    <i class="fa-solid fa-circle-question text-amber-500 text-sm"></i>
+                    <i class="fa-solid fa-circle-question text-amber-300 text-sm"></i>
                     <span class="hidden md:inline">Hướng Dẫn</span>
                 </button>
 
-                <!-- Light / Dark Mode Toggle Button -->
+                <!-- Light / Dark Mode Toggle Button (Dong bo 36x36 tron kinh mo + SVG) -->
                 <button type="button" id="btn-theme-toggle" onclick="toggleDarkMode()" 
-                        class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800/90 text-slate-700 dark:text-amber-300 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center transition-all cursor-pointer border border-slate-200 dark:border-slate-700 shadow-sm" 
+                        class="w-9 h-9 rounded-full bg-white/15 text-amber-200 hover:bg-white/25 flex items-center justify-center transition-all cursor-pointer border border-white/30 shadow-sm shrink-0" 
                         title="Chuyển chế độ Sáng / Tối">
-                    <i id="theme-icon" class="fa-solid fa-moon text-sm"></i>
+                    <svg class="w-4 h-4 dark:hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
+                    <svg class="w-4 h-4 hidden dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
                 </button>
                 
-                <button id="btn-gemini-settings" onclick="openApiKeyModal()" class="px-3 py-1.5 rounded-xl bg-purple-100 dark:bg-purple-900/40 border border-purple-300 dark:border-purple-500/50 text-purple-800 dark:text-purple-300 hover:border-purple-500 text-xs font-semibold transition-colors duration-150 flex items-center space-x-1.5 shadow-sm cursor-pointer shrink-0" title="Google Gemini AI đang hoạt động và áp dụng cho mọi phân tích (Bấm để đổi Key)">
+                <button id="btn-gemini-settings" onclick="openApiKeyModal()" class="px-3 py-1.5 rounded-full bg-purple-500/25 border border-purple-300/45 text-purple-100 hover:bg-purple-500/35 text-xs font-semibold transition-colors duration-150 flex items-center space-x-1.5 shadow-sm cursor-pointer shrink-0" title="Google Gemini AI đang hoạt động và áp dụng cho mọi phân tích (Bấm để đổi Key)">
                     <span id="gemini-status-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <i class="fa-solid fa-brain text-purple-600 dark:text-purple-300"></i>
+                    <i class="fa-solid fa-brain text-purple-200"></i>
                     <span id="gemini-status-label" class="hidden lg:inline">Gemini AI</span>
-                    <i class="fa-solid fa-gear text-[10px] ml-0.5 text-slate-400"></i>
+                    <i class="fa-solid fa-gear text-[10px] ml-0.5 text-purple-200/80"></i>
                 </button>
             </div>
         </div>
@@ -3621,17 +3622,13 @@
                 }
                 if (btn) {
                     if (id === tabId || (tabId === 'precedents' && id === 'rules')) {
-                        let activeColor = 'bg-gradient-to-r from-sky-500 to-blue-600 text-white border border-sky-400/60 shadow-sm';
-                        if (id === 'batch') activeColor = 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white border border-emerald-400/60 shadow-sm';
-                        if (id === 'rules') activeColor = 'bg-gradient-to-r from-indigo-500 to-violet-600 text-white border border-indigo-400/60 shadow-sm';
-                        if (id === 'notes') activeColor = 'bg-gradient-to-r from-amber-500 to-orange-600 text-white border border-amber-400/60 shadow-sm';
+                        let activeColor = 'bg-white text-cyan-900 border border-cyan-200 shadow-md';
+                        if (id === 'batch') activeColor = 'bg-white text-emerald-900 border border-emerald-200 shadow-md';
+                        if (id === 'rules') activeColor = 'bg-white text-indigo-900 border border-indigo-200 shadow-md';
+                        if (id === 'notes') activeColor = 'bg-white text-amber-900 border border-amber-200 shadow-md';
                         btn.className = `tab-btn active px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-150 flex items-center gap-1.5 ${activeColor} whitespace-nowrap cursor-pointer`;
                     } else {
-                        let hoverColor = 'hover:text-sky-600 hover:border-sky-300 dark:hover:border-sky-500/50';
-                        if (id === 'batch') hoverColor = 'hover:text-emerald-600 hover:border-emerald-300 dark:hover:border-emerald-500/50';
-                        if (id === 'rules') hoverColor = 'hover:text-indigo-600 hover:border-indigo-300 dark:hover:border-indigo-500/50';
-                        if (id === 'notes') hoverColor = 'hover:text-amber-600 hover:border-amber-300 dark:hover:border-amber-500/50';
-                        btn.className = `tab-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-white/85 dark:bg-slate-800/75 text-slate-600 dark:text-slate-300 border border-slate-200/90 dark:border-slate-700/70 shadow-2xs ${hoverColor} dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700/80 transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap cursor-pointer`;
+                        btn.className = `tab-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-white/12 text-slate-100 border border-white/20 hover:bg-white/22 hover:border-cyan-300/60 hover:text-white transition-all duration-150 flex items-center gap-1.5 whitespace-nowrap cursor-pointer`;
                     }
                 }
             });

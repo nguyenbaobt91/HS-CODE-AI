@@ -103,22 +103,22 @@
 
 
 <!-- TOP NAVIGATION (CHUẨN QUỐC TẾ) -->
-    <header class="sticky top-0 z-40 bg-white/90 dark:bg-[#0f172a]/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 shadow-subtle">
+    <header class="sticky top-0 z-40 backdrop-blur-md border-b shadow-md" style="background: linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 42%), linear-gradient(135deg, #2b1565 0%, #5f3fc0 100%); border-color: rgba(193, 176, 255, 0.42);">
         <div class="max-w-[1380px] mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-13">
                 <!-- Brand / Logo -->
                 <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-700 via-indigo-900 to-slate-900 dark:from-indigo-600 dark:to-emerald-500 flex items-center justify-center text-white shadow-sm ring-1 ring-white/20">
+                    <div class="w-9 h-9 rounded-xl bg-white/15 border border-purple-300/45 flex items-center justify-center text-white shadow-sm">
                         <i class="fa-solid fa-table-columns text-sm"></i>
                     </div>
                     <div>
                         <div class="flex items-center space-x-2">
-                            <span class="font-extrabold text-slate-900 dark:text-white tracking-tight text-sm sm:text-base">
+                            <span class="font-extrabold text-white tracking-tight text-sm sm:text-base drop-shadow-sm">
                                 KTCN 2026
                             </span>
                             
                         </div>
-                        <p class="text-[11px] text-slate-400 hidden sm:block">
+                        <p class="text-[11px] text-purple-200/90 hidden sm:block">
                             Cổng Tra Cứu Kiểm Tra Chuyên Ngành 4 Bộ Quản Lý (Nghị định 37/2026/NĐ-CP)
                         </p>
                     </div>
@@ -127,14 +127,14 @@
                 <!-- Right Toolbar -->
                 <div class="flex items-center space-x-2 sm:space-x-3">
                     <!-- Layout Switcher (Giữ 3 nút để anh tùy ý đổi khi cần) -->
-                    <div class="bg-slate-100 dark:bg-slate-800/90 p-1 rounded-xl flex items-center space-x-1 border border-slate-200 dark:border-slate-700/80 text-xs font-semibold" title="Chuyển chế độ xem">
+                    <div class="bg-white/15 p-1 rounded-xl flex items-center space-x-1 border border-white/25 text-xs font-semibold" title="Chuyển chế độ xem">
                         <button id="btn-layout-dual" onclick="setLayout('dual')" class="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs flex items-center justify-center transition" title="2 Cột Nghiệp Vụ (Mặc định)">
                             <i class="fa-solid fa-table-columns text-sm"></i>
                         </button>
-                        <button id="btn-layout-cards" onclick="setLayout('cards')" class="w-8 h-8 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition" title="Dạng Thẻ">
+                        <button id="btn-layout-cards" onclick="setLayout('cards')" class="w-8 h-8 rounded-lg text-white/80 hover:text-white hover:bg-white/10 flex items-center justify-center transition" title="Dạng Thẻ">
                             <i class="fa-solid fa-layer-group text-sm"></i>
                         </button>
-                        <button id="btn-layout-table" onclick="setLayout('table')" class="w-8 h-8 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition" title="Bảng Toàn Cảnh">
+                        <button id="btn-layout-table" onclick="setLayout('table')" class="w-8 h-8 rounded-lg text-white/80 hover:text-white hover:bg-white/10 flex items-center justify-center transition" title="Bảng Toàn Cảnh">
                             <i class="fa-solid fa-list-check text-sm"></i>
                         </button>
                     </div>
@@ -147,10 +147,10 @@
 
                     
 
-                    <!-- Nút Đổi Sáng / Tối (Mặt Trăng Khuyết) -->
-                    <button id="theme-btn" onclick="toggleDarkMode()" class="w-8 h-8 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center justify-center shadow-xs cursor-pointer" title="Đổi giao diện Sáng / Tối">
-                        <i class="fa-solid fa-moon dark:hidden text-sm"></i>
-                        <i class="fa-solid fa-sun hidden dark:inline text-sm text-amber-400"></i>
+                    <!-- Nút Đổi Sáng / Tối (Dong bo 36x36 tron kinh mo + SVG) -->
+                    <button id="theme-btn" onclick="toggleDarkMode()" class="w-9 h-9 rounded-full bg-white/15 border border-white/30 text-amber-200 hover:bg-white/25 transition flex items-center justify-center shadow-sm cursor-pointer shrink-0" title="Đổi giao diện Sáng / Tối">
+                        <svg class="w-4 h-4 dark:hidden" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
+                        <svg class="w-4 h-4 hidden dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
                     </button>
                 </div>
             </div>
@@ -10149,14 +10149,14 @@ const KTCN_DATA = [
             const btnTable = document.getElementById('btn-layout-table');
 
             [btnDual, btnCards, btnTable].forEach(b => {
-                if (b) b.className = "w-8 h-8 rounded-lg text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition";
+                if (b) b.className = "w-8 h-8 rounded-lg text-white/80 hover:text-white hover:bg-white/10 flex items-center justify-center transition";
             });
 
             let activeBtn = btnDual;
             if (layout === 'cards') activeBtn = btnCards;
             if (layout === 'table') activeBtn = btnTable;
             if (activeBtn) {
-                activeBtn.className = "w-8 h-8 rounded-lg bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-xs flex items-center justify-center transition";
+                activeBtn.className = "w-8 h-8 rounded-lg bg-white text-indigo-700 shadow-xs flex items-center justify-center transition";
             }
 
             document.getElementById('layout-dual-view').classList.toggle('hidden', layout !== 'dual');
