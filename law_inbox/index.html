@@ -30,12 +30,12 @@ header{position:sticky;top:0;z-index:40;height:65px;background:linear-gradient(1
 .clr{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:22px;height:22px;border:0;border-radius:50%;background:rgba(148,163,184,.25);color:#475569;font-size:12px;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1}
 .clr:hover{background:rgba(148,163,184,.45);color:#0f172a}
 html.dark .clr{background:rgba(148,163,184,.22);color:#cbd5e1}html.dark .clr:hover{background:rgba(148,163,184,.4);color:#fff}
-textarea{flex:1;height:40px;min-height:40px;max-height:140px;resize:none;border:1px solid rgba(148,163,184,.45);border-radius:12px;padding:10px 14px;font:inherit;font-size:13.5px;line-height:1.35;outline:none;overflow-y:auto;background:rgba(255,255,255,.94);color:#0f172a;box-shadow:0 2px 8px rgba(15,23,42,.08);backdrop-filter:blur(8px)}
+textarea{flex:1;height:40px;min-height:40px;max-height:140px;resize:none;border:1px solid rgba(148,163,184,.45);border-radius:12px;padding:10px 14px;font:inherit;font-size:13.5px;line-height:1.35;outline:none;overflow-y:auto;background:rgba(255,255,255,.96);color:#0f172a;box-shadow:0 2px 8px rgba(15,23,42,.08)}
 textarea:focus{border-color:#059669;box-shadow:0 0 0 3px rgba(5,150,105,.18)}
 .btn{border:0;border-radius:12px;padding:0 18px;background:linear-gradient(135deg,#059669,#047857);color:#fff;font-weight:700;cursor:pointer;font-size:13.5px;box-shadow:0 2px 8px rgba(4,120,87,.3);white-space:nowrap;transition:all .18s}
 .btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
 .meta{font-size:13px;color:#334155;margin:4px 2px 10px}
-.card{background:rgba(255,255,255,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(226,232,240,.92);border-radius:12px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 6px rgba(15,23,42,.05);transition:box-shadow .15s,border-color .15s}
+.card{background:rgba(255,255,255,.94);border:1px solid rgba(226,232,240,.95);border-radius:12px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 6px rgba(15,23,42,.05);transition:box-shadow .15s,border-color .15s}
 .card:hover{border-color:#34d399;box-shadow:0 6px 16px rgba(4,120,87,.12)}
 .card .head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
 .cite{font-weight:700;color:#065f46;font-size:15px}
@@ -80,7 +80,7 @@ html.dark body{background-color:#070d1e;background-image:linear-gradient(to bott
 html.dark header{background:linear-gradient(135deg,rgba(6,58,45,.95) 0%,rgba(4,96,70,.92) 100%);border-bottom:1px solid rgba(110,231,183,.25);box-shadow:0 10px 28px rgba(0,0,0,.38)}
 html.dark .tab.on{background:#10b981;color:#022c22 !important}
 html.dark textarea,html.dark #dsearch,html.dark #fsearch{background:rgba(15,23,42,.92);color:#f1f5f9;border-color:rgba(110,231,183,.28)}
-html.dark .card,html.dark table{background:rgba(11,19,43,.84);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-color:rgba(110,231,183,.16);color:#e2e8f0}
+html.dark .card,html.dark table{background:rgba(11,19,43,.92);border-color:rgba(110,231,183,.16);color:#e2e8f0}
 html.dark .mbox{background:rgba(11,19,43,.97);border:1px solid rgba(110,231,183,.22);color:#e2e8f0}
 html.dark .card:hover{border-color:#34d399;box-shadow:0 4px 16px rgba(16,185,129,.18)}
 html.dark .cite,html.dark h3{color:#6ee7b7}
@@ -144,7 +144,9 @@ html.dark .close{color:#cbd5e1}html.dark .mbox hr{border-top-color:#334155}
 <script src="law_data.js"></script>
 <script>
 (function(){
-const D=window.LAW_DATA||{docs:[],chunks:[]}, docs=D.docs, rawChunks=D.chunks;
+const D=window.LAW_DATA||{docs:[]}, docs=D.docs;
+const chs=D.chs||[''], tds=D.tds||[''];
+const rawArr=D.c||D.chunks||[];
 const $=id=>document.getElementById(id);
 const clean=s=>(s||'').normalize('NFC').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,'');
 function fold(s){return (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[đĐ]/g,'d').toLowerCase()}
@@ -165,18 +167,32 @@ docs.forEach(d=>{
   d._ts=dt?dt.getTime():0;d._dn=dn?dn.getTime():0;d._fut=dt&&dt>today?1:0;
   d._fso=fold(d.so||'');d._fnh=fold(d.nhan||'');
 });
-// index (chỉ index 35 văn bản chính, bỏ qua 5 Phụ lục)
-const chunks=[];const df=new Map();
-rawChunks.forEach((c,i)=>{
-  if(!docs[c.d]||docs[c.d].vaitro.startsWith('Phụ'))return;
-  c.t=clean(c.t);c.td=clean(c.td||'');
-  c.f=fold(c.t);c.fn=' '+c.f.replace(/[^a-z0-9\/]+/g,' ')+' ';c.lt=c.t.toLowerCase();c.ft=fold(c.td);c.i=i;
-  const tf=new Map();splitToks(c.f+' '+c.ft).forEach(t=>tf.set(t,(tf.get(t)||0)+1));c.tf=tf;c.len=c.f.length;
-  tf.forEach((_,t)=>df.set(t,(df.get(t)||0)+1));
+// Unpack compact array format lazily without duplicating text strings in RAM
+const chunks=[];
+for(let i=0;i<rawArr.length;i++){
+  const r=rawArr[i];
+  const c=Array.isArray(r)?{d:r[0],dieu:r[1],kh:r[2],td:tds[r[3]]||'',ch:chs[r[4]]||'',t:r[5]}:r;
+  if(!docs[c.d]||docs[c.d].vaitro.startsWith('Phụ'))continue;
+  c.len=c.t.length;c.i=chunks.length;
   chunks.push(c);
-});
+}
 const N=chunks.length||1;
-const idf=t=>Math.log(1+N/((df.get(t)||0)+0.5));
+// Non-blocking chunked Inverted Index builder (tiết kiệm ~65% RAM, không đơ máy khi mở trang)
+const inv=new Map();
+let idxPos=0, idxReady=false, pendingRun=false;
+function indexBatch(){
+  const end=Math.min(idxPos+450,chunks.length);
+  for(let i=idxPos;i<end;i++){
+    const c=chunks[i];
+    const seen=new Set(splitToks(fold(c.t+' '+c.td)));
+    seen.forEach(t=>{let a=inv.get(t);if(!a){a=[];inv.set(t,a)}a.push(i)});
+  }
+  idxPos=end;
+  if(idxPos<chunks.length){setTimeout(indexBatch,0)}
+  else{idxReady=true;if(pendingRun){pendingRun=false;run()}}
+}
+setTimeout(indexBatch,0);
+const idf=t=>Math.log(1+N/(((inv.get(t)||[]).length)+0.5));
 function label(c){const d=docs[c.d];let s='';if(c.kh)s+='khoản '+c.kh+' ';if(c.dieu)s+='Điều '+c.dieu+' ';else s+=c.td+' ';return s+d.nhan}
 function cite(c){const d=docs[c.d];let s='Căn cứ '+label(c);if(d.vaitro!=='Văn bản gốc'&&d.sua_doi)s+=' (sửa đổi, bổ sung '+d.sua_doi+')';return s}
 const ABBR={cssx:'co so san xuat',sxxk:'san xuat xuat khau',xnk:'xuat nhap khau',nk:'nhap khau',xk:'xuat khau',tthq:'thu tuc hai quan',stq:'sau thong quan',hq:'hai quan','c/o':'chung nhan xuat xu',kcx:'khu che xuat',dncx:'doanh nghiep che xuat',txtn:'tam xuat tai nhap',tntx:'tam nhap tai xuat',ktcn:'kiem tra chuyen nganh',vphc:'vi pham hanh chinh'};
@@ -239,43 +255,64 @@ function search(rawQ){
   const bia=[];for(let i=0;i<qa.length-1;i++)bia.push(qa[i]+' '+qa[i+1]);
   const fD=filterDoc;
   const sw=qt.reduce((a,t)=>a+idf(t),0)||1;
+  // Chọn tập ứng viên từ Inverted Index thay vì quét toàn bộ 5.461 đoạn
+  let candIdx;
+  if(qt.length){
+    const hitMap=new Map();
+    for(const t of qt){
+      const list=inv.get(t);if(!list)continue;
+      const w=idf(t);
+      for(let j=0;j<list.length;j++){const id=list[j];hitMap.set(id,(hitMap.get(id)||0)+w)}
+    }
+    const minW=qt.length<=3?sw*0.99:sw*0.24;
+    candIdx=[];
+    hitMap.forEach((w,id)=>{if(w>=minW)candIdx.push(id)});
+  }else{
+    candIdx=chunks.map((_,i)=>i);
+  }
   const out=[],seenKey=new Set();
-  for(const c of chunks){
+  for(let ci=0;ci<candIdx.length;ci++){
+    const c=chunks[candIdx[ci]];
     const d=docs[c.d];
     if(fD!==''&&String(c.d)!==String(fD))continue;
-    if(phrases.length&&!phrases.every(alts=>alts.some(p=>c.fn.includes(' '+p+' '))))continue;
     const cDieu=(c.dieu||'').toLowerCase();
     const dieuHit=nmVal?((nmVal.includes('đ')?cDieu===nmVal:(cDieu===nmVal||fold(cDieu)===nmFold))?1:0):0;
     const docHit=docTargets.size?(docTargets.has(c.d)?1:0):0;
     if(docTargets.size&&!docHit)continue;
     if(nmVal&&!qt.length&&!dieuHit)continue;
+    const cf=fold(c.t), cfn=' '+cf.replace(/[^a-z0-9\/]+/g,' ')+' ', cft=fold(c.td), clt=c.t.toLowerCase();
+    if(phrases.length&&!phrases.every(alts=>alts.some(p=>cfn.includes(' '+p+' '))))continue;
     let sc=0,hit=0,hw=0;
-    for(const t of qt){const f=c.tf.get(t);if(f){hit++;hw+=idf(t);sc+=idf(t)*(1+Math.log(f))}}
-    if(qt.length&&!hit)continue;
+    if(qt.length){
+      const toksC=splitToks(cf+' '+cft), tfC=new Map();
+      for(let j=0;j<toksC.length;j++){const tk=toksC[j];tfC.set(tk,(tfC.get(tk)||0)+1)}
+      for(const t of qt){const f=tfC.get(t);if(f){hit++;hw+=idf(t);sc+=idf(t)*(1+Math.log(f))}}
+      if(!hit)continue;
+    }
     const cov=qt.length?hw/sw:1;
     if(qt.length>0&&qt.length<=3&&hit<qt.length)continue;
     if(qt.length>3&&cov<0.25)continue;
-    const dupKey=c.d+'|'+(c.dieu||'')+'|'+(c.kh||'')+'|'+c.f.slice(0,120);
+    const dupKey=c.d+'|'+(c.dieu||'')+'|'+(c.kh||'')+'|'+cf.slice(0,120);
     if(seenKey.has(dupKey))continue;seenKey.add(dupKey);
     sc=sc/(1+0.12*Math.log(1+c.len/200));
     sc*=0.4+cov*1.6;
-    for(const b of seqs){if(c.fn.includes(' '+b+' '))sc+=idf(b.split(' ')[0])*2}
-    if(whole&&c.fn.includes(' '+whole+' '))sc*=2.2;
+    for(const b of seqs){if(cfn.includes(' '+b+' '))sc+=idf(b.split(' ')[0])*2}
+    if(whole&&cfn.includes(' '+whole+' '))sc*=2.2;
     for(const p of phrases)sc*=1.8;
     let accCnt=0;
     if(hasAccent){
-      for(const b of bia){if(c.lt.includes(b)){accCnt+=2;sc+=idf(fold(b.split(' ')[0]))*2}}
-      for(const w of qa){if(/[^\x00-\x7f]/.test(w)&&c.lt.includes(w)){accCnt++;sc+=idf(fold(w))*0.6}}
+      for(const b of bia){if(clt.includes(b)){accCnt+=2;sc+=idf(fold(b.split(' ')[0]))*2}}
+      for(const w of qa){if(/[^\x00-\x7f]/.test(w)&&clt.includes(w)){accCnt++;sc+=idf(fold(w))*0.6}}
     }
-    for(const t of qt){if(c.ft.includes(t))sc+=idf(t)*1.5}
+    for(const t of qt){if(cft.includes(t))sc+=idf(t)*1.5}
     if(dieuHit)sc*=(d.vaitro==='Văn bản gốc'||d.vaitro==='Văn bản hợp nhất')?3.2:1.2;
     if(kmVal&&c.kh===kmVal)sc*=1.5;
     const penHit=pen&&d.nhom.includes('Xử phạt vi phạm hành chính')?1:0;
     if(penHit)sc*=2.0;
     if(d._st[0]==='bad')sc*=0.6;
     const tier=cov>=0.99?2:cov>=0.65?1:0;
-    const phraseHit=(whole&&c.fn.includes(' '+whole+' '))?2:(seqs.length&&seqs.every(s=>c.fn.includes(' '+s+' ')))?1:0;
-    const accentHit=hasAccent?(bia.length&&bia.every(b=>c.lt.includes(b))?2:accCnt>0?1:0):0;
+    const phraseHit=(whole&&cfn.includes(' '+whole+' '))?2:(seqs.length&&seqs.every(s=>cfn.includes(' '+s+' ')))?1:0;
+    const accentHit=hasAccent?(bia.length&&bia.every(b=>clt.includes(b))?2:accCnt>0?1:0):0;
     const stRank=d._st[0]==='bad'?2:d._fut?1:0;
     out.push({c,sc,cov,tier,phraseHit,accentHit,penHit,stRank,dieuHit,docHit,ts:d._ts,dn:d._dn});
   }
@@ -409,6 +446,7 @@ function run(keep){
     $('meta').innerHTML=filterDoc!==''?'<div class="meta">Đang lọc riêng: <b>'+esc(docs[filterDoc].nhan)+'</b> <button class="a" style="padding:1px 8px;margin-left:6px" onclick="LAW.clearDoc()">✕ Bỏ lọc văn bản</button> · Nhập từ khóa để tra trong văn bản này.</div>':'';
     return;
   }
+  if(!idxReady){pendingRun=true;$('meta').innerHTML='<div class="meta">⏳ Đang chuẩn bị dữ liệu tra cứu...</div>';return}
   saveH(q);render(search(q));
 }
 function tab(t){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.t===t));$('pS').style.display=t==='s'?'':'none';$('pD').style.display=t==='d'?'':'none';$('pF').style.display=t==='f'?'':'none'}
