@@ -1216,8 +1216,9 @@ def decompose_query(query_text, desc="", use="", specs="", model_en=""):
             materials.append((mat_name, boost_chaps, penalty_chaps))
 
     # Subject part material supremacy (vật liệu trong tên hàng là tối thượng)
+    subj_no_copper_coll = re.sub(r'\b(?:dong\s+bo|dong\s+ho|dong\s+truc|dong\s+tam|dong\s+muc|dong\s+quy|dong\s+dang|hop\s+dong|cong\s+dong|tu\s+dong|chuyen\s+dong|truyen\s+dong|hoat\s+dong|phat\s+dong|khoi\s+dong|bien\s+dong|luu\s+dong|rung\s+dong|lao\s+dong)\b', '', subj_norm)
     subj_has_steel = bool(re.search(r'\b(?:thep|sat|steel|iron|inox)\b', subj_norm, re.I))
-    subj_has_copper = bool(re.search(r'\b(?:dong|brass|copper|bronze)\b', subj_norm, re.I))
+    subj_has_copper = bool(re.search(r'\b(?:dong|brass|copper|bronze)\b', subj_no_copper_coll, re.I))
     subj_has_aluminum = bool(re.search(r'\b(?:nhom|aluminum|aluminium)\b', subj_norm, re.I))
     subj_has_plastic = bool(re.search(r'\b(?:nhua|plastic)\b', subj_norm, re.I))
     subj_has_rubber = bool(re.search(r'\b(?:cao\s+su|rubber)\b', subj_norm, re.I))
@@ -1427,7 +1428,7 @@ def engine_validate_walker(stat_res, item_input, full_text):
         qi = _ue.extract_query(remove_accents(full_text))
         need = False
         why_txt = ""
-        if status == "INSUFFICIENT_INFO":
+        if status in ("INSUFFICIENT_INFO", "UNRESOLVED"):
             need = True
         elif code.isdigit() and len(code) >= 4:
             dq, why, _ = _ue.evaluate(code, qi)
@@ -1452,7 +1453,7 @@ def engine_validate_walker(stat_res, item_input, full_text):
                 "assumptions": "Phân loại bằng Universal GRI-6 Engine",
                 "reserve_code": stat_res.get("reserve_code", "N/A"),
             }
-        if status != "INSUFFICIENT_INFO":
+        if status not in ("INSUFFICIENT_INFO", "UNRESOLVED"):
             # Ma cua walker bi engine loai nhung khong tim duoc ma thay the -> khong xuat ma sai
             return {
                 "code": "INSUFFICIENT_INFO", "level": 0, "status": "INSUFFICIENT_INFO",
@@ -1656,6 +1657,12 @@ def classify_product_python(name, desc="", use="", specs="", model_en=""):
         if score > 0:
             heading_scores[head] = score
             
+    if _ue is not None:
+        try:
+            for _lh, _lb in _ue.leaf_phrase_headings(full_text_norm).items():
+                heading_scores[_lh] = heading_scores.get(_lh, 0) + _lb
+        except Exception as _el:
+            print("leaf_phrase_headings error:", _el)
     ranked_headings = sorted(heading_scores.items(), key=lambda x: x[1], reverse=True)
     top_headings = [h[0] for h in ranked_headings[:5]]
     if not top_headings:
@@ -2801,17 +2808,15 @@ def run_automation_workflow(name, desc, use, specs="", model_en="", image_b64=No
     # Optional Google Gemini AI integration if API key is provided
     gemini_api_key = get_system_gemini_api_key(gemini_api_key)
     gemini_res = None
-    # Ket qua tu StatutoryTreeWalker (quy tac co can cu Chu giai) duoc uu tien hon de xuat cua Gemini.
-    _walker_item = best_item if (best_item.get('_statutory') and best_item.get('_level', 8) == 8) else None
+    # Ket qua tu StatutoryTreeWalker (bao gom ca STOP_4_DIGIT, STOP_6_DIGIT, INSUFFICIENT_INFO) duoc uu tien hon de xuat cua Gemini.
+    _walker_item = best_item if (best_item.get('_statutory') or best_item.get('_insufficient_info')) else None
     if gemini_api_key:
         try:
             all_cands = [best_item] + competing_items
             gemini_res = call_gemini_api_python(gemini_api_key, name, desc, use, specs, model_en, candidates=all_cands, top_headings=top_headings)
             if gemini_res:
                 g_code = (gemini_res.get('clean_code') or gemini_res.get('hs_code', '')).replace('.', '').strip()
-                matched = next((item for item in HS_DATABASE if item.get('c', '').replace('.', '') == g_code), None)
-                if not matched and len(g_code) >= 6:
-                    matched = next((item for item in HS_DATABASE if item.get('c', '').replace('.', '').startswith(g_code[:6])), None)
+                matched = next((item for item in HS_DATABASE if item.get('c', '').replace('.', '') == g_code), None) if len(g_code) == 8 else None
                 if matched:
                     best_item = matched
                     # Kiem tra cheo ma do AI de xuat bang Universal GRI-6 Engine
@@ -2830,9 +2835,14 @@ def run_automation_workflow(name, desc, use, specs="", model_en="", image_b64=No
                         print("GRI6 engine post-check error:", _eg)
                     print(f"Gemini proposed statutory code {matched.get('c')} ({matched.get('vn')}) verified & adopted.")
                     if _walker_item is not None:
-                        _wc = _walker_item.get('c', '').replace('.', '')
-                        if _wc and _wc != best_item.get('c', '').replace('.', ''):
-                            print(f"StatutoryTreeWalker override: AI {best_item.get('c')} -> walker {_walker_item.get('c')}")
+                        _wc = (_walker_item.get('c') or '').replace('.', '')
+                        if _walker_item.get('_insufficient_info'):
+                            print(f"StatutoryTreeWalker INSUFFICIENT_INFO preserved over AI {best_item.get('c')}")
+                            _walker_item = dict(_walker_item)
+                            _walker_item['_ai_rejected_code'] = best_item.get('c')
+                            best_item = _walker_item
+                        elif _wc and _wc != best_item.get('c', '').replace('.', ''):
+                            print(f"StatutoryTreeWalker override ({_walker_item.get('_status', 'WALKER')}): AI {best_item.get('c')} -> walker {_walker_item.get('c')}")
                             _walker_item = dict(_walker_item)
                             _walker_item['_ai_rejected_code'] = best_item.get('c')
                             best_item = _walker_item
@@ -2840,12 +2850,19 @@ def run_automation_workflow(name, desc, use, specs="", model_en="", image_b64=No
         except Exception as e:
             print("Gemini integration fallback:", e)
 
-    code_raw = best_item.get('c', '00000000').replace('.', '')
-    code_fmt = f"{code_raw[:4]}.{code_raw[4:6]}.{code_raw[6:8]}"
+    code_raw = (best_item.get('c') or '').replace('.', '')
+    if len(code_raw) == 8:
+        code_fmt = f"{code_raw[:4]}.{code_raw[4:6]}.{code_raw[6:8]}"
+    elif len(code_raw) == 6:
+        code_fmt = f"{code_raw[:4]}.{code_raw[4:6]}"
+    elif len(code_raw) == 4:
+        code_fmt = code_raw
+    else:
+        code_fmt = best_item.get('c') or ''
     heading = code_raw[:4]
     chapter = code_raw[:2]
     heading_desc = HEAD_MAP.get(heading, 'Nhóm hàng hóa tương ứng')
-    subheading_desc = SUBHEAD_MAP.get(code_raw[:6], 'Phân nhóm hàng hóa tương ứng')
+    subheading_desc = SUBHEAD_MAP.get(code_raw[:6], 'Phân nhóm hàng hóa tương ứng') if len(code_raw) >= 6 else heading_desc
 
     mfn = best_item.get('mfn', '0%')
     mfn_str = mfn if '%' in str(mfn) else f"{mfn}%"

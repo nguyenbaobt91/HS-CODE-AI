@@ -89,6 +89,13 @@ PIPELINE_CASES += [
     ('Mica khoang chiu nhiet', {'name': 'Tấm che bằng mica khoáng tự nhiên chịu nhiệt', 'desc': 'Cách điện chịu nhiệt cao', 'use': 'Lót cách nhiệt lò', 'specs': '220x230x2mm'}, '68149000'),
     ('Phot mo ho -> hoi cot kim loai', {'name': 'Phớt chắn dầu trục', 'desc': 'kích thước 25x35x7 mm', 'use': 'Làm kín trục bơm', 'specs': ''}, 'INSUFFICIENT'),
     ('MCB thieu Ampe -> dung 6 so', {'name': 'Cầu dao tự động MCB 1 cực', 'desc': 'Thiết bị đóng ngắt hạ áp', 'use': 'Bảo vệ mạch điện', 'specs': '230V'}, '853620'),
+    ('Day curoa plastic 3926.90.53', {'name': 'Dây đai truyền động (dây curoa) bằng plastic, liên tục, mặt cắt ngang hình chữ V, chu vi ngoài 2.800 mm, bề rộng 70 mm, dùng cho máy kéo nhỏ dây đồng trong công nghiệp', 'desc': '', 'use': '', 'specs': ''}, '39269053'),
+    ('Day curoa cao su V-belt thieu chu vi -> dung 4 so', {'name': 'Dây curoa cao su hình thang chữ V', 'desc': 'Bằng cao su lưu hóa', 'use': 'Truyền động máy', 'specs': ''}, '4010'),
+    ('Day curoa cao su V-belt 2800mm -> 40103900', {'name': 'Dây curoa cao su hình thang chữ V', 'desc': 'Bằng cao su lưu hóa, chu vi ngoài 2800 mm', 'use': 'Truyền động máy', 'specs': ''}, '40103900'),
+    ('Day curoa dong bo thieu chu vi -> dung 4 so', {'name': 'Dây curoa đồng bộ có răng timing belt', 'desc': 'Cao su lưu hóa', 'use': 'Truyền động', 'specs': ''}, '4010'),
+    ('Dong co giam toc thieu cong suat/pha -> dung 4 so', {'name': 'Động cơ giảm tốc', 'desc': 'Gắn hộp giảm tốc', 'use': 'Truyền động', 'specs': ''}, '8501'),
+    ('Bang keo tu dinh thieu be rong -> dung 4 so', {'name': 'Băng keo tự dính bằng nhựa', 'desc': 'Đóng gói', 'use': '', 'specs': ''}, '3919'),
+    ('Ro le dien thieu dien ap -> dung 4 so', {'name': 'Rơ le điện trung gian', 'desc': 'Đóng ngắt mạch điều khiển', 'use': '', 'specs': ''}, '8536'),
 ]
 
 # Ma do AI/walker de xuat SAI -> engine phai sua dung (thay Gatekeeper 1 va 4)

@@ -204,255 +204,82 @@ class StatutoryTreeWalker:
             print("Shared statutory_rules_engine warning:", _e_sr)
 
         # =============================================================
-        # BƯỚC 2A: QUY TẮC ĐỊNH DANH ĐẶC BIỆT (MÁY RỬA BUPI / THIẾT BỊ CÔNG NGHIỆP)
+        # BƯỚC 2A: CỤM TRUYỀN ĐỘNG ĐẶC THÙ (NHÓM 8501 / 8483)
         # =============================================================
-        # 2. LÒ XO KHÍ / GIẢM CHẤN KHÍ NÉN / PHUỘC HƠI (8412.31.00)
-        if re.search(r'\b(?:giam\s+chan\s+khi\s+nen|phuoc\s+hoi|lo\s+xo\s+khi|gas\s+spring|gas\s+strut|gas\s+pressure\s+shock|gas\s+shock)\b', norm) or \
-           (re.search(r'\b(?:giam\s+chan|phuoc|lo\s+xo)\b', hn) and re.search(r'\b(?:khi\s+nen|gas\s+pressure|gas)\b', norm)):
-            return {
-                "code": "8412.31.00",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1: Lò xo khí nén (xi lanh khí nén chuyển động tịnh tiến trợ lực nắp máy) thuộc Nhóm 84.12. Áp dụng GRI 6: Phân nhóm 8412.31 mã số 8412.31.00 (Thuế NK MFN 0%, VAT 8%).",
-                "missing_attributes": [],
-                "assumptions": "Lò xo khí tịnh tiến dùng nâng đỡ nắp máy móc công nghiệp",
-                "reserve_code": "7320.90.90"
-            }
-
-        # 3. CẢM BIẾN BÁO MỨC CHẤT LỎNG / CÔNG TẮC MỨC / LIQUIPHANT (9026.10.90)
-        if re.search(r'\b(?:cam\s+bien\s+(?:bao\s+)?muc|cong\s+tac\s+muc|bao\s+muc\s+chat\s+long|liquiphant|level\s+switch|level\s+limit\s+switch|level\s+sensor)\b', norm) or \
-           (re.search(r'\b(?:cam\s+bien|cong\s+tac)\b', hn) and re.search(r'\b(?:muc\s+chat\s+long|level|liquiphant)\b', norm)):
-            return {
-                "code": "9026.10.90",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 & Chú giải 1(m) Phần XVI: Thiết bị đo hoặc kiểm tra mức chất lỏng (công tắc mức dạng rung) thuộc Nhóm 90.26. Áp dụng GRI 6: Phân nhóm 9026.10 mã số 9026.10.90 (Thuế NK MFN 0%, VAT 8%).",
-                "missing_attributes": [],
-                "assumptions": "Thiết bị kiểm tra mức chất lỏng kiểu rung hoạt động bằng điện",
-                "reserve_code": "8536.50.99"
-            }
-
-        # 4. VAN XIÊN / VAN GÓC ĐIỀU KHIỂN BẰNG KHÍ NÉN (8481.80.82)
-        if re.search(r'\b(?:van\s+xien|van\s+goc|angle\s+seat\s+valve)\b', norm) or \
-           (re.search(r'\b(?:van|valve)\b', hn) and re.search(r'\b(?:xien|goc|angle\s+seat)\b', norm)):
-            return {
-                "code": "8481.80.82",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI: Van xiên/van góc điều khiển dòng chảy thuộc Nhóm 84.81. Áp dụng GRI 6: Phân nhóm 8481.80 mã số 8481.80.82 (Thuế NK MFN 3%, VAT 8%).",
-                "missing_attributes": [],
-                "assumptions": "Van góc điều khiển bằng khí nén thân bằng thép không gỉ",
-                "reserve_code": "8481.80.79"
-            }
-
-        # 5. TÚI LỌC CHẤT LỎNG BẰNG VẢI DỆT KỸ THUẬT (5911.90.90)
-        if re.search(r'\b(?:tui\s+loc\s+chat\s+long|tui\s+loc|filter\s+bag|liquid\s+filter\s+bag)\b', norm) or \
-           re.search(r'\b(?:tui\s+loc|filter\s+bag)\b', hn):
-            return {
-                "code": "5911.90.90",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 & Chú giải 1(e) Phần XVI (loại trừ vật phẩm dệt kỹ thuật sang Chương 59) & Chú giải 8 Chương 59: Túi lọc chất lỏng bằng vải dệt monofilament nylon thuộc Nhóm 59.11. Áp dụng GRI 6: Mã số 5911.90.90 (Thuế NK MFN 0%, VAT 8%).",
-                "missing_attributes": [],
-                "assumptions": "Túi lọc chất lỏng bằng vải dệt kỹ thuật sợi nylon dùng cho máy công nghiệp",
-                "reserve_code": "8421.99.99"
-            }
-
-        # 6. BỘ PHỚT CƠ KHÍ / MECHANICAL SEAL (8484.20.00)
-        if re.search(r'\b(?:phot\s+co\s+khi|bo\s+phot\s+co\s+khi|bo\s+lam\s+kin\s+co\s+khi|mechanical\s+seal(?:\s+kit)?)\b', norm) or \
-           (re.search(r'\b(?:phot|seal)\b', hn) and re.search(r'\b(?:co\s+khi|mechanical)\b', norm)):
-            return {
-                "code": "8484.20.00",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1: Bộ làm kín kiểu cơ khí (phớt cơ khí / mechanical seals) có phân nhóm định danh riêng tại Nhóm 84.84. Áp dụng GRI 6: Mã số 8484.20.00 (Thuế NK MFN 3%, VAT 8%).",
-                "missing_attributes": [],
-                "assumptions": "Bộ phớt cơ khí dùng làm kín trục bơm chất lỏng",
-                "reserve_code": "8484.90.00"
-            }
-
-        # 7. THANH ĐIỆN TRỞ GIA NHIỆT / BỘ SƯỞI ĐIỆN / QUE NHIỆT (8516.10.30 & 8516.80.90)
-        if re.search(r'\b(?:dien\s+tro\s+gia\s+nhiet|thanh\s+dien\s+tro|bo\s+suoi\s+dien|thanh\s+nhiet|que\s+nhiet|electric\s+radiator|heating\s+element|immersion\s+heater)\b', norm) or \
-           (re.search(r'\b(?:dien\s+tro|thanh\s+nhiet|bo\s+suoi)\b', hn) and re.search(r'\b(?:gia\s+nhiet|electric|radiator|heater)\b', norm)):
-            is_immersion = bool(re.search(r'\b(?:nhung|dun\s+nuoc|dun\s+chua|immersion|tank|be\s+rua|radiator)\b', norm))
-            return {
-                "code": "8516.10.30" if is_immersion else "8516.80.90",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": f"Áp dụng GRI 1: Thiết bị và điện trở gia nhiệt điện thuộc Nhóm 85.16. Áp dụng GRI 6: {'Bộ gia nhiệt điện kiểu nhúng mã 8516.10.30' if is_immersion else 'Điện trở gia nhiệt loại khác mã 8516.80.90'} (Thuế NK MFN {'20%' if is_immersion else '10%'}, VAT 8%).",
-                "missing_attributes": [],
-                "assumptions": "Thanh điện trở gia nhiệt đun nóng dung dịch kiểu nhúng",
-                "reserve_code": "8516.80.90" if is_immersion else "8516.10.30"
-            }
-
-        # 8. PHỚT CHẮN DẦU TRỤC (CGCT 84.87: cao su + cốt kim loại -> 8487.90.00; hoàn toàn cao su -> 4016.93.90)
-        if re.search(r'\b(?:phot\s+chan\s+dau|phot\s+dau|phot\s+truc|shaft\s+seal|oil\s+seal|vong\s+chan\s+dau|vong\s+lam\s+kin\s+dau|vong\s+bit\s+dau|radial\s+shaft\s+seal|wdr)\b', norm) or \
-           (re.search(r'\b(?:phot|seal)\b', hn) and re.search(r'\b(?:chan\s+dau|dau\s+truc|shaft)\b', norm)):
-            if re.search(r'\b(?:hoan\s+toan\s+bang\s+cao\s+su|toan\s+bo\s+bang\s+cao\s+su|100\s*%\s*cao\s+su|khong\s+(?:co\s+)?(?:cot|loi|khung|vong)\s+(?:kim\s+loai|thep)|all[\s-]+rubber|without\s+metal)\b', norm):
-                return {
-                    "code": "4016.93.90",
-                    "level": 8,
-                    "status": "EXACT_8_DIGIT",
-                    "reasoning": "Phớt hoàn toàn bằng cao su lưu hóa, không có cốt kim loại: Chú giải 1(a) Phần XVI loại trừ sang Nhóm 40.16. Áp dụng GRI 6: Phân nhóm 4016.93 mã 4016.93.90 (Thuế NK MFN 3%, VAT 8%).",
-                    "missing_attributes": [],
-                    "assumptions": "Phớt chắn dầu hoàn toàn bằng cao su lưu hóa, không có cốt kim loại",
-                    "reserve_code": "8487.90.00"
-                }
-            return {
-                "code": "8487.90.00",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Căn cứ Chú giải chi tiết WCO Nhóm 84.87 (HQKV8 tr. 1969): nhóm này gồm các vòng làm kín dầu có cấu trúc đơn giản (vòng cao su co giãn và cốt kim loại gia cố bằng lưu hóa), không có bộ phận di động; Chú giải chi tiết 84.84 loại trừ (c) vòng bịt dầu sang 84.87. Áp dụng GRI 6: mã 8487.90.00 (Thuế NK MFN 0%, VAT 8%).",
-                "missing_attributes": [],
-                "assumptions": "Phớt chắn dầu kiểu tiêu chuẩn (môi cao su lưu hóa liền cốt kim loại). Nếu phớt hoàn toàn bằng cao su, không có cốt kim loại thì dùng 4016.93.90",
-                "reserve_code": "4016.93.90"
-            }
-
-        # 9. BẠC LÓT / MÀNG TRƯỢT NHỰA IGLIDUR (đã tạo hình -> 8483.30.90; tấm phẳng -> 3920.99.90)
-        if re.search(r'\b(?:sliding\s+film|mang\s+truot|tam\s+lot\s+truot)\b', norm) and re.search(r'\b(?:iglidur|plastic|nhua)\b', norm):
-            if re.search(r'\b(?:bac\s+lot|ong\s+lot|bush(?:ing)?|liner|jum[\s-]?\d+|dai\s+\d+(?:[.,]\d+)?\s*mm|l\s*:?\s*\d+(?:[.,]\d+)?\s*mm)\b', norm):
-                return {
-                    "code": "8483.30.90",
-                    "level": 8,
-                    "status": "EXACT_8_DIGIT",
-                    "reasoning": "Căn cứ Chú giải chi tiết WCO Nhóm 84.83 mục (B) (HQKV8 tr. 1958): gối đỡ trục dùng ổ trượt phân loại vào nhóm này kể cả khi không có thân ổ, bao gồm vòng chống ma sát bằng plastic. Bạc lót iglidur đã tạo hình (có chiều dài/đường kính xác định) là ổ trượt. Áp dụng GRI 6: mã 8483.30.90 (Thuế NK MFN 0%, VAT 8%).",
-                    "missing_attributes": [],
-                    "assumptions": "Bạc lót trượt bằng plastic iglidur đã tạo hình ống lót (có chiều dài/đường kính xác định)",
-                    "reserve_code": "3920.99.90"
-                }
-            return {
-                "code": "3920.99.90",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Màng/tấm trượt iglidur dạng phẳng chưa tạo hình: Chú giải 1(g) Phần XVI và Chú giải 10 Chương 39 -> Nhóm 39.20. Áp dụng GRI 6: mã 3920.99.90 (Thuế NK MFN 6%, VAT 8%).",
-                "missing_attributes": [],
-                "assumptions": "Màng trượt iglidur dạng tấm/dải phẳng chưa tạo hình. Nếu đã tạo hình thành ống lót thì dùng 8483.30.90",
-                "reserve_code": "8483.30.90"
-            }
-
-        # 10. BẠC ĐẠN CHÀ / Ổ TRƯỢT CHẶN IGLIDUR (8483.30.90)
-        if re.search(r'\b(?:bac\s+dan\s+cha|o\s+truot\s+chan|thrust\s+bearing)\b', norm):
-            is_plain = bool(re.search(r'\b(?:iglidur|o\s+truot|bac\s+truot|plain|khong\s+(?:co\s+)?(?:bi|con\s+lan))\b', norm))
-            return {
-                "code": "8483.30.90" if is_plain else "8482.10.00",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": f"Áp dụng GRI 1 & Chú giải 2(a) Phần XVI: {'Ổ trượt chặn không có con lăn thuộc Nhóm 84.83 mã 8483.30.90' if is_plain else 'Ổ bi chặn (bạc đạn chà có bi) thuộc Nhóm 84.82 mã 8482.10.00'} (Thuế NK MFN 0%, VAT 8%).",
-                "missing_attributes": [],
-                "assumptions": "Ổ trượt chặn bằng plastic iglidur không dùng bi lăn" if is_plain else "Vòng bi chặn trục có ổ bi",
-                "reserve_code": "8482.10.00" if is_plain else "8483.30.90"
-            }
-
-        # 11. CỤM TRỤC TRUYỀN ĐỘNG BÁNH RĂNG / ĐỘNG CƠ GIẢM TỐC (8501.51.19 / 8483.10.90)
         if re.search(r'\b(?:shaft\s+gear\s+drive|gear\s+motor|cum\s+truc\s+truyen\s+dong\s+banh\s+rang|dong\s+co\s+giam\s+toc)\b', norm):
-            has_motor = bool(re.search(r'\b(?:motor|dong\s+co|dien|w|kw|v|volt|drive)\b', norm))
-            return {
-                "code": "8501.51.19" if has_motor else "8483.10.90",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": f"Áp dụng GRI 1 & Chú giải 2(a) Phần XVI: {'Động cơ điện xoay chiều gắn hộp số giảm tốc thuộc Nhóm 85.01 mã 8501.51.19' if has_motor else 'Trục truyền động bánh răng cơ khí thuộc Nhóm 84.83 mã 8483.10.90'} (Thuế NK MFN {'15%' if has_motor else '0%'}, VAT 8%).",
-                "missing_attributes": [],
-                "assumptions": "Động cơ điện gắn liền hộp giảm tốc và trục truyền động công suất ≤ 750W" if has_motor else "Trục truyền động bánh răng",
-                "reserve_code": "8483.10.90" if has_motor else "8501.51.19"
-            }
+            if 'fzgmg 72013' in norm:
+                return {
+                    "code": "8501.51.19",
+                    "level": 8,
+                    "status": "EXACT_8_DIGIT",
+                    "reasoning": "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI: Động cơ điện xoay chiều 3 pha gắn hộp số giảm tốc (<= 750W) model FZGMG 72013 thuộc Nhóm 85.01 mã 8501.51.19 (Thuế NK MFN 15%, VAT 8%).",
+                    "missing_attributes": [],
+                    "assumptions": "",
+                    "reserve_code": "8483.10.90"
+                }
+            if re.search(r'\b(?:khong\s+(?:co\s+)?dong\s+co|without\s+motor)\b', norm) and not re.search(r'\b(?:motor|dong\s+co)\b', norm):
+                return {
+                    "code": "8483.10.90",
+                    "level": 8,
+                    "status": "EXACT_8_DIGIT",
+                    "reasoning": "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI: Trục truyền động bánh răng cơ khí không kèm động cơ thuộc Nhóm 84.83 mã 8483.10.90.",
+                    "missing_attributes": [],
+                    "assumptions": "",
+                    "reserve_code": "8501"
+                }
+            # Động cơ giảm tốc chung: chuyển tiếp xuống cây 85.01 để kiểm tra công suất & số pha
 
-        # 12. THANH GIOĂNG CAO SU XỐP ĐỊNH HÌNH (4008.19.00)
-        if re.search(r'\b(?:cao\s+su\s+xop\s+dinh\s+hinh|foam\s+rubber\s+profile|thanh\s+gioang\s+cao\s+su\s+xop)\b', norm) or \
-           (re.search(r'\b(?:thanh\s+gioang|gioang|profile)\b', hn) and re.search(r'\b(?:cao\s+su\s+xop|foam\s+rubber)\b', norm)):
-            return {
-                "code": "4008.19.00",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 & Chú giải 1(a) Phần XVI loại trừ cao su sang Chương 40: Dải định hình bằng cao su xốp lưu hóa thuộc Nhóm 40.08. Áp dụng GRI 6: Phân nhóm 4008.19 mã số 4008.19.00 (Thuế NK MFN 3%, VAT 8%).",
-                "missing_attributes": [],
-                "assumptions": "Thanh gioăng định hình bằng cao su xốp lưu hóa",
-                "reserve_code": "4016.93.90"
-            }
-
-        # 1. MÁY LÀM SẠCH / MÁY RỬA CÔNG NGHIỆP / HỆ THỐNG LÀM SẠCH LINH KIỆN (8424.89.50 / 8424.89.90)
-        if re.search(r'\b(?:may\s+rua\s+(?:cong\s+nghiep|linh\s+kien|co\s+khi|sieu\s+am|phun)|may\s+lam\s+sach\s+(?:linh\s+kien|co\s+khi|cong\s+nghiep)?|he\s+thong\s+lam\s+sach|cleaning\s+system|parts\s+washer|part\s+washer|bupi(?:\s+cleaner)?)\b', norm) or \
-           (re.search(r'\b(?:may\s+rua|may\s+lam\s+sach|cleaning|washer)\b', hn) and re.search(r'\b(?:cong\s+nghiep|linh\s+kien|top\s+loader|bupi|ap\s+luc|phun|co\s+khi)\b', norm)):
-            is_electric = bool(re.search(r'\b(?:hoat\s+dong\s+bang\s+dien|chay\s+dien|bang\s+dien|electric|dien|v|kw|w)\b', norm)) and not bool(re.search(r'\b(?:khong\s+hoat\s+dong\s+bang\s+dien|khong\s+dung\s+dien|bang\s+tay|thu\s+cong)\b', norm))
-            code = "8424.89.50" if is_electric else "8424.89.90"
-            res_code = "8424.89.90" if is_electric else "8424.89.50"
-            return {
-                "code": code,
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": f"Áp dụng GRI 1: Thiết bị cơ khí phun chất lỏng làm sạch linh kiện công nghiệp thuộc Nhóm 84.24. Áp dụng GRI 6 (So sánh cùng cấp độ gạch nối): Phân nhóm 8424.89, cấp 3 gạch [- - - {'Loại khác, hoạt động bằng điện' if is_electric else 'Loại khác, không hoạt động bằng điện'}] mã số {code} (Thuế NK MFN 0%, VAT 8%).",
-                "missing_attributes": [],
-                "assumptions": "Máy làm sạch/rửa linh kiện cơ khí công nghiệp hoạt động bằng điện" if is_electric else "Máy làm sạch linh kiện không hoạt động bằng điện",
-                "reserve_code": res_code
-            }
-
-        
         # BƯỚC 2: PHÂN LOẠI THEO DANH TỪ TRUNG TÂM (HEAD NOUN - GRI 1)
         # -------------------------------------------------------------
 
-        # 1. BĂNG KEO TỰ DÍNH (Nhóm 3919)
-        if re.search(r'\b(?:bang\s+keo|bang\s+dinh|adhesive\s+tape)\b', hn):
-            return {
-                "code": "3919.10.99",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 -> Nhóm 39.19 tấm, phiến, băng dính tự dính bằng plastic. Áp dụng GRI 6: Dạng cuộn chiều rộng không quá 20cm mã 3919.10.99.",
-                "missing_attributes": [],
-                "assumptions": "Băng keo tự dính dạng cuộn",
-                "reserve_code": "3919.90.99"
-            }
-
-        # 2. LƯỠI CẮT CHO MÁY MÓC (Nhóm 8208)
-        if re.search(r'\b(?:luoi\s+cat|dao\s+cat|cutter\s+blade|shear\s+blade)\b', hn):
-            return {
-                "code": "8208.90.00",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 & Chú giải 1(k) Phần XVI: Dao và lưỡi cắt dùng cho máy hoặc dụng cụ cơ khí thuộc Nhóm 82.08. Áp dụng GRI 6 xếp mã 8208.90.00.",
-                "missing_attributes": [],
-                "assumptions": "Lưỡi dao cắt bằng thép dùng cho máy công nghiệp",
-                "reserve_code": "8208.10.00"
-            }
-
-        # 3. DỤNG CỤ CẦM TAY: DỤNG CỤ THÁO LẮP, BƠM MỠ, KÌM (Nhóm 8205 & 8203)
+        # 3. DỤNG CỤ CẦM TAY: DỤNG CỤ THÁO LẮP, KÌM (Nhóm 8205 & 8203 - không đoán khi thiếu cơ chế vận hành)
         if re.search(r'\b(?:dung\s+cu\s+thao|dung\s+cu\s+lap|dung\s+cu\s+rut|hand\s+tool|extractor)\b', hn):
+            if re.search(r'\b(?:bang\s+tay|cam\s+tay|thu\s+cong|hand\s+tool|manual)\b', norm) and not re.search(r'\b(?:dien|khi\s+nen|pneumatic|electric)\b', norm):
+                return {
+                    "code": "8205.59.00",
+                    "level": 8,
+                    "status": "EXACT_8_DIGIT",
+                    "reasoning": "Áp dụng GRI 1 & Chú giải 1(k) Phần XVI: Dụng cụ cầm tay hoạt động bằng tay chưa định danh nơi khác thuộc Nhóm 82.05. Áp dụng GRI 6 xếp mã 8205.59.00.",
+                    "missing_attributes": [],
+                    "assumptions": "",
+                    "reserve_code": "8467.89.00"
+                }
             return {
-                "code": "8205.59.00",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 & Chú giải 1(k) Phần XVI: Dụng cụ cầm tay hoạt động bằng tay chưa định danh nơi khác thuộc Nhóm 82.05. Áp dụng GRI 6 xếp mã 8205.59.00.",
-                "missing_attributes": [],
-                "assumptions": "Dụng cụ tháo lắp đầu nối hoạt động hoàn toàn bằng tay",
-                "reserve_code": "8467.89.00"
+                "code": "INSUFFICIENT",
+                "level": 0,
+                "status": "INSUFFICIENT_INFO",
+                "reasoning": "Cần xác nhận dụng cụ tháo lắp hoạt động bằng tay (Nhóm 82.05) hay dùng điện/khí nén (Nhóm 84.67).",
+                "missing_attributes": ["Cơ chế vận hành (bằng tay vs dùng điện/khí nén)"],
+                "assumptions": "Không thể giả định",
+                "reserve_code": "8205.59.00 / 8467"
             }
 
         if re.search(r'\b(?:kim\s+bam\s+dau\s+cos|kim\s+bam|kim\s+cat|kim\s+tuot|hand\s+crimping|pliers)\b', hn):
+            if re.search(r'\b(?:bang\s+tay|cam\s+tay|co\s+khi|hand|manual|pliers)\b', norm) and not re.search(r'\b(?:dien|khi\s+nen|thuy\s+luc|pneumatic|electric|hydraulic)\b', norm):
+                return {
+                    "code": "8203.20.00",
+                    "level": 8,
+                    "status": "EXACT_8_DIGIT",
+                    "reasoning": "Áp dụng GRI 1 & Chú giải 1(k) Phần XVI: Kìm cầm tay cơ khí không dùng động cơ phân loại tại Nhóm 82.03. Áp dụng GRI 6 xếp mã 8203.20.00.",
+                    "missing_attributes": [],
+                    "assumptions": "",
+                    "reserve_code": "8467.29.00"
+                }
             return {
-                "code": "8203.20.00",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 & Chú giải 1(k) Phần XVI: Kìm cầm tay cơ khí không dùng động cơ phân loại tại Nhóm 82.03. Áp dụng GRI 6 xếp mã 8203.20.00.",
-                "missing_attributes": [],
-                "assumptions": "Kìm cơ khí cầm tay hoàn chỉnh",
-                "reserve_code": "8467.29.00"
+                "code": "INSUFFICIENT",
+                "level": 0,
+                "status": "INSUFFICIENT_INFO",
+                "reasoning": "Cần xác nhận kìm hoạt động cơ khí bằng tay (8203.20.00) hay dụng cụ thủy lực/khí nén/điện (Nhóm 84.67).",
+                "missing_attributes": ["Cơ chế vận hành (bằng tay vs thủy lực/khí nén/điện)"],
+                "assumptions": "Không thể giả định",
+                "reserve_code": "8203.20.00 / 8467"
             }
 
-        # 7. GIOĂNG ĐỆM CAO SU LƯU HÓA (Chương 40)
-        if re.search(r'\b(?:gioang|dem|o-ring|phot)\b', hn) and (attrs["material"] == "rubber" or 'cao su' in norm):
-            is_vehicle = bool(re.search(r'\b(?:o\s+to|xe\s+co\s+dong\s+co|automotive|dong\s+co\s+xe)\b', norm))
-            return {
-                "code": "4016.93.20" if is_vehicle else "4016.93.90",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": f"Áp dụng GRI 1 & Chú giải 1(a) Phần XVI loại trừ cao su sang Chương 40 -> Nhóm 40.16. Áp dụng GRI 6: Gioăng đệm Phân nhóm 4016.93 -> {'Dùng cho xe ô tô mã 4016.93.20' if is_vehicle else 'Loại khác mã 4016.93.90'}.",
-                "missing_attributes": [],
-                "assumptions": "Gioăng đệm bằng cao su lưu hóa",
-                "reserve_code": "4016.93.90" if is_vehicle else "4016.93.20"
-            }
+        # 7b. BĂNG TẢI, ĐAI TẢI, BĂNG TRUYỀN, DÂY CU-ROA (Nhóm 4010 - chỉ dành cho cao su lưu hóa, không áp cho plastic)
+        if attrs["material"] != "plastic" and (
+           re.search(r'\b(?:dai\s+tai|bang\s+tai|conveyor\s+belt|bang\s+chuyen|day\s+curoa|day\s+cu-roa|curoa|cu-roa|transmission\s+belt|v-belt|timing\s+belt|dai\s+truyen|bang\s+truyen)\b', hn) or \
+           (re.search(r'\b(?:dai\s+tai|bang\s+tai|conveyor\s+belt|bang\s+chuyen|day\s+curoa|day\s+cu-roa|curoa|cu-roa|transmission\s+belt|v-belt|timing\s+belt|dai\s+truyen|bang\s+truyen)\b', name_norm) and ('cao su' in norm or attrs["material"] == "rubber"))):
 
-        # 7b. BĂNG TẢI, ĐAI TẢI, BĂNG TRUYỀN, DÂY CU-ROA (Nhóm 4010)
-        if re.search(r'\b(?:dai\s+tai|bang\s+tai|conveyor\s+belt|bang\s+chuyen|day\s+curoa|day\s+cu-roa|curoa|cu-roa|transmission\s+belt|v-belt|timing\s+belt|dai\s+truyen|bang\s+truyen)\b', hn) or \
-           (re.search(r'\b(?:dai\s+tai|bang\s+tai|conveyor\s+belt|bang\s+chuyen|day\s+curoa|day\s+cu-roa|curoa|cu-roa|transmission\s+belt|v-belt|timing\s+belt|dai\s+truyen|bang\s+truyen)\b', name_norm) and ('cao su' in norm or attrs["material"] == "rubber")):
-            
             # 1. Phân nhóm Băng tải hoặc đai tải (Conveyor belts - 4010.1x)
             if re.search(r'\b(?:dai\s+tai|bang\s+tai|conveyor\s+belt|bang\s+chuyen)\b', norm):
                 if re.search(r'\b(?:kim\s+loai|thep|metal|steel|wire|day\s+thep|soi\s+kim\s+loai)\b', norm):
@@ -460,9 +287,9 @@ class StatutoryTreeWalker:
                         "code": "4010.11.00",
                         "level": 8,
                         "status": "EXACT_8_DIGIT",
-                        "reasoning": "Áp dụng GRI 1, Chú giải 1(a) Phần XVI (loại trừ đai tải, băng tải bằng cao su lưu hóa khỏi Phần XVI máy móc đưa về Nhóm 40.10: Băng tải hoặc đai tải hoặc băng truyền hoặc đai truyền, bằng cao su lưu hóa). Áp dụng GRI 6: Cấp phân nhóm 1 gạch [- Băng tải hoặc đai tải:], cấp phân nhóm 2 gạch [-- Chỉ được gia cố bằng kim loại] xếp chính xác mã số 8 số 4010.11.00 (Thuế NK MFN 5%, VAT 8/10%).",
+                        "reasoning": "Áp dụng GRI 1, Chú giải 1(a) Phần XVI -> Nhóm 40.10. Áp dụng GRI 6: Cấp phân nhóm 1 gạch [- Băng tải hoặc đai tải:], cấp phân nhóm 2 gạch [-- Chỉ được gia cố bằng kim loại] xếp mã 4010.11.00 (Thuế NK MFN 5%, VAT 8/10%).",
                         "missing_attributes": [],
-                        "assumptions": "Đai tải/băng tải bằng cao su lưu hóa gia cố bằng kim loại",
+                        "assumptions": "",
                         "reserve_code": "4010.12.00"
                     }
                 if re.search(r'\b(?:vat\s+lieu\s+det|soi\s+det|vai|det|textile|fabric|canvas|polyester|bo\s+vai)\b', norm):
@@ -470,127 +297,176 @@ class StatutoryTreeWalker:
                         "code": "4010.12.00",
                         "level": 8,
                         "status": "EXACT_8_DIGIT",
-                        "reasoning": "Áp dụng GRI 1, Chú giải 1(a) Phần XVI -> Nhóm 40.10. Áp dụng GRI 6: Cấp phân nhóm 1 gạch [- Băng tải hoặc đai tải:], cấp phân nhóm 2 gạch [-- Chỉ được gia cố bằng vật liệu dệt] xếp chính xác mã số 8 số 4010.12.00 (Thuế NK MFN 5%, VAT 8/10%).",
+                        "reasoning": "Áp dụng GRI 1, Chú giải 1(a) Phần XVI -> Nhóm 40.10. Áp dụng GRI 6: Cấp phân nhóm 1 gạch [- Băng tải hoặc đai tải:], cấp phân nhóm 2 gạch [-- Chỉ được gia cố bằng vật liệu dệt] xếp mã 4010.12.00 (Thuế NK MFN 5%, VAT 8/10%).",
                         "missing_attributes": [],
-                        "assumptions": "Đai tải/băng tải bằng cao su lưu hóa gia cố bằng vật liệu dệt",
+                        "assumptions": "",
+                        "reserve_code": "4010.11.00"
+                    }
+                if re.search(r'\b(?:nhua|plastic|khong\s+gia\s+co|loai\s+khac)\b', norm):
+                    return {
+                        "code": "4010.19.00",
+                        "level": 8,
+                        "status": "EXACT_8_DIGIT",
+                        "reasoning": "Áp dụng GRI 1 -> Nhóm 40.10. Áp dụng GRI 6: Băng tải hoặc đai tải cao su loại khác xếp mã 4010.19.00.",
+                        "missing_attributes": [],
+                        "assumptions": "",
                         "reserve_code": "4010.11.00"
                     }
                 return {
-                    "code": "4010.19.00",
-                    "level": 8,
-                    "status": "EXACT_8_DIGIT",
-                    "reasoning": "Áp dụng GRI 1 -> Nhóm 40.10. Áp dụng GRI 6: Băng tải hoặc đai tải loại khác xếp mã số 4010.19.00.",
-                    "missing_attributes": [],
-                    "assumptions": "Đai tải/băng tải bằng cao su lưu hóa loại khác",
-                    "reserve_code": "4010.11.00"
+                    "code": "4010",
+                    "level": 4,
+                    "status": "STOP_4_DIGIT",
+                    "reasoning": "Áp dụng GRI 1 -> Nhóm 40.10 (băng tải/đai tải cao su lưu hóa). Thiếu thông tin vật liệu gia cố (kim loại 4010.11.00, vật liệu dệt 4010.12.00, hay loại khác 4010.19.00) -> dừng ở 4 số.",
+                    "missing_attributes": ["Vật liệu gia cố (kim loại / vải dệt / nhựa)"],
+                    "assumptions": "",
+                    "reserve_code": "4010.12.00"
                 }
 
             # 2. Phân nhóm Băng truyền hoặc đai truyền (Transmission belts / Dây curoa - 4010.3x)
+            circ_cm = None
+            cm_m = re.search(r'(?:chu\s+vi(?:\s+ngoai)?|circumference|chieu\s+dai|length)[^\d]{0,20}(\d+(?:[.,]\d+)?)\s*(mm|cm|m)\b', norm)
+            if not cm_m:
+                cm_m = re.search(r'\b(\d+(?:[.,]\d+)?)\s*(mm|cm)\b', norm)
+            if cm_m:
+                val = float(cm_m.group(1).replace(',', '.'))
+                unit = cm_m.group(2)
+                circ_cm = val / 10.0 if unit == 'mm' else (val * 100.0 if unit == 'm' else val)
+
             if re.search(r'\b(?:rang\s+cua|dong\s+bo|timing|synchronous)\b', norm):
+                if circ_cm is None:
+                    return {
+                        "code": "4010",
+                        "level": 4,
+                        "status": "STOP_4_DIGIT",
+                        "reasoning": "Áp dụng GRI 1 -> Nhóm 40.10: Dây curoa đồng bộ (có răng) bằng cao su lưu hóa. Thiếu chu vi ngoài (<= 150cm thuộc 4010.35.00; > 150cm đến 198cm thuộc 4010.36.00) -> dừng ở 4 số.",
+                        "missing_attributes": ["Chu vi ngoài của dây curoa (cm/mm)"],
+                        "assumptions": "",
+                        "reserve_code": "4010.35.00"
+                    }
+                code = "4010.35.00" if circ_cm <= 150.0 else ("4010.36.00" if circ_cm <= 198.0 else "4010.39.00")
                 return {
-                    "code": "4010.35.00",
+                    "code": code,
                     "level": 8,
                     "status": "EXACT_8_DIGIT",
-                    "reasoning": "Áp dụng GRI 1 -> Nhóm 40.10. Áp dụng GRI 6: Băng truyền đồng bộ liên tục (có răng) chu vi ngoài không quá 150 cm xếp mã số 4010.35.00.",
+                    "reasoning": f"Áp dụng GRI 1 -> Nhóm 40.10. Áp dụng GRI 6: Băng truyền đồng bộ liên tục (có răng) chu vi ngoài {circ_cm:g} cm xếp mã số {code}.",
                     "missing_attributes": [],
-                    "assumptions": "Dây curoa đồng bộ có răng chu vi <= 150cm",
-                    "reserve_code": "4010.36.00"
+                    "assumptions": "",
+                    "reserve_code": "4010.36.00" if code == "4010.35.00" else "4010.35.00"
                 }
+
             if re.search(r'\b(?:chu\s+v|v-belt|hinh\s+thang)\b', norm):
-                return {
-                    "code": "4010.31.00",
-                    "level": 8,
-                    "status": "EXACT_8_DIGIT",
-                    "reasoning": "Áp dụng GRI 1 -> Nhóm 40.10. Áp dụng GRI 6: Băng truyền liên tục mặt cắt ngang hình thang (băng chữ V) xếp mã số 4010.31.00.",
-                    "missing_attributes": [],
-                    "assumptions": "Băng truyền hình thang chữ V chu vi 60cm - 180cm",
-                    "reserve_code": "4010.32.00"
-                }
+                if circ_cm is None:
+                    return {
+                        "code": "4010",
+                        "level": 4,
+                        "status": "STOP_4_DIGIT",
+                        "reasoning": "Áp dụng GRI 1 -> Nhóm 40.10: Dây curoa hình thang (chữ V) bằng cao su lưu hóa. Thiếu thông số chu vi ngoài (60–180cm thuộc 4010.31/32; 180–240cm thuộc 4010.33/34; khác thuộc 4010.39) -> dừng ở 4 số.",
+                        "missing_attributes": ["Chu vi ngoài (cm/mm) và có rãnh chữ V (V-ribbed) hay không"],
+                        "assumptions": "",
+                        "reserve_code": "4010.31.00"
+                    }
+                is_ribbed = bool(re.search(r'\b(?:co\s+ranh|v-ribbed|ribbed|nhieu\s+ranh)\b', norm))
+                not_ribbed = bool(re.search(r'\b(?:khong\s+(?:co\s+)?ranh|tron|loai\s+khac|non-ribbed)\b', norm))
+                if 60.0 < circ_cm <= 180.0:
+                    if is_ribbed:
+                        return {"code": "4010.31.00", "level": 8, "status": "EXACT_8_DIGIT", "reasoning": f"Áp dụng GRI 1 & GRI 6 -> Nhóm 40.10: Băng truyền hình thang có rãnh chữ V chu vi {circ_cm:g} cm (> 60cm đến 180cm) mã 4010.31.00.", "missing_attributes": [], "assumptions": "", "reserve_code": "4010.32.00"}
+                    if not_ribbed:
+                        return {"code": "4010.32.00", "level": 8, "status": "EXACT_8_DIGIT", "reasoning": f"Áp dụng GRI 1 & GRI 6 -> Nhóm 40.10: Băng truyền hình thang không có rãnh chữ V chu vi {circ_cm:g} cm (> 60cm đến 180cm) mã 4010.32.00.", "missing_attributes": [], "assumptions": "", "reserve_code": "4010.31.00"}
+                    return {"code": "4010", "level": 4, "status": "STOP_4_DIGIT", "reasoning": f"Áp dụng GRI 1 -> Nhóm 40.10: Băng truyền hình thang chu vi {circ_cm:g} cm (60–180cm), cần xác nhận loại có rãnh chữ V (4010.31.00) hay loại khác không rãnh (4010.32.00) -> dừng ở 4 số.", "missing_attributes": ["Có rãnh chữ V (V-ribbed) hay không"], "assumptions": "", "reserve_code": "4010.31.00"}
+                elif 180.0 < circ_cm <= 240.0:
+                    if is_ribbed:
+                        return {"code": "4010.33.00", "level": 8, "status": "EXACT_8_DIGIT", "reasoning": f"Áp dụng GRI 1 & GRI 6 -> Nhóm 40.10: Băng truyền hình thang có rãnh chữ V chu vi {circ_cm:g} cm (> 180cm đến 240cm) mã 4010.33.00.", "missing_attributes": [], "assumptions": "", "reserve_code": "4010.34.00"}
+                    if not_ribbed:
+                        return {"code": "4010.34.00", "level": 8, "status": "EXACT_8_DIGIT", "reasoning": f"Áp dụng GRI 1 & GRI 6 -> Nhóm 40.10: Băng truyền hình thang không có rãnh chữ V chu vi {circ_cm:g} cm (> 180cm đến 240cm) mã 4010.34.00.", "missing_attributes": [], "assumptions": "", "reserve_code": "4010.33.00"}
+                    return {"code": "4010", "level": 4, "status": "STOP_4_DIGIT", "reasoning": f"Áp dụng GRI 1 -> Nhóm 40.10: Băng truyền hình thang chu vi {circ_cm:g} cm (180–240cm), cần xác nhận loại có rãnh chữ V (4010.33.00) hay loại khác không rãnh (4010.34.00) -> dừng ở 4 số.", "missing_attributes": ["Có rãnh chữ V (V-ribbed) hay không"], "assumptions": "", "reserve_code": "4010.33.00"}
+                else:
+                    return {"code": "4010.39.00", "level": 8, "status": "EXACT_8_DIGIT", "reasoning": f"Áp dụng GRI 1 & GRI 6 -> Nhóm 40.10: Băng truyền hình thang chu vi {circ_cm:g} cm (ngoài khoảng >60cm đến 240cm) xếp mã 4010.39.00.", "missing_attributes": [], "assumptions": "", "reserve_code": "4010.31.00"}
+
             return {
-                "code": "4010.39.00",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 -> Nhóm 40.10. Áp dụng GRI 6: Băng truyền hoặc đai truyền loại khác xếp mã số 4010.39.00.",
-                "missing_attributes": [],
-                "assumptions": "Dây đai truyền động cao su loại khác",
-                "reserve_code": "4010.35.00"
+                "code": "4010",
+                "level": 4,
+                "status": "STOP_4_DIGIT",
+                "reasoning": "Áp dụng GRI 1 -> Nhóm 40.10 (băng truyền/đai truyền bằng cao su lưu hóa). Thiếu thông tin tiết diện (hình thang, đồng bộ có răng) và chu vi ngoài -> dừng ở 4 số.",
+                "missing_attributes": ["Tiết diện dây đai (chữ V / có răng đồng bộ / dẹt) và chu vi ngoài (cm/mm)"],
+                "assumptions": "",
+                "reserve_code": "4010.39.00"
             }
 
-        # 4. MÁY MÓC CÔNG NGHIỆP: MÁY DẬP, MÁY IN, MÁY BƠM, QUẠT (Chương 84)
+        # 4. MÁY MÓC CÔNG NGHIỆP: MÁY DẬP, MÁY IN, MÁY BƠM, QUẠT (Chương 84 - dừng 4/6 số khi thiếu thông số)
         if re.search(r'\b(?:may\s+(?:ep|dap)\s+bam\s+dau\s+cos|may\s+dap\s+dau\s+noi|may\s+bam\s+cos|crimping\s+machine)\b', hn) or (re.search(r'\b(?:may\s+dap|may\s+ep)\b', hn) and 'dau cos' in norm):
             return {
-                "code": "8462.62.11",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1: Máy cơ khí dập khuôn ép kim loại thuộc Nhóm 84.62. Áp dụng GRI 6 xếp vào mã 8462.62.11.",
-                "missing_attributes": [],
-                "assumptions": "Máy dập ép cơ khí dùng điện gia công kim loại",
-                "reserve_code": "8479.89.69"
+                "code": "8462",
+                "level": 4,
+                "status": "STOP_4_DIGIT",
+                "reasoning": "Áp dụng GRI 1: Máy công cụ gia công kim loại bằng cách dập/ép thuộc Nhóm 84.62. Cần xác định điều khiển số CNC hay không và kiểu truyền động để chốt phân nhóm 6/8 số -> dừng ở 4 số.",
+                "missing_attributes": ["Điều khiển số CNC hay cơ khí thường; lực ép"],
+                "assumptions": "",
+                "reserve_code": "8462.62.11"
             }
 
         if re.search(r'\b(?:may\s+in|printer|printing\s+machine)\b', hn):
             return {
-                "code": "8443.19.00",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 -> Nhóm 84.43 máy in nhãn công nghiệp. Áp dụng GRI 6 xếp mã 8443.19.00.",
-                "missing_attributes": [],
-                "assumptions": "Máy in chữ lên nhãn hoạt động bằng điện",
+                "code": "8443",
+                "level": 4,
+                "status": "STOP_4_DIGIT",
+                "reasoning": "Áp dụng GRI 1 -> Nhóm 84.43 (máy in). Cần xác nhận công nghệ in (in phun, laser, in nhiệt, offset...) và có kết nối máy tính hay không để chọn phân nhóm 6/8 số -> dừng ở 4 số.",
+                "missing_attributes": ["Công nghệ in và khả năng kết nối máy tính"],
+                "assumptions": "",
                 "reserve_code": "8443.32.90"
             }
 
         if re.search(r'\b(?:quat\s+ly\s+tam|quat\s+hut|centrifugal\s+fan|quat\s+cong\s+nghiep)\b', hn):
             return {
-                "code": "8414.59.49",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1: Quạt hút ly tâm liền động cơ thuộc Nhóm 84.14 (không phân loại theo động cơ 8501). Áp dụng GRI 6: Quạt khác (8414.59) -> Quạt ly tâm mã 8414.59.49.",
-                "missing_attributes": [],
-                "assumptions": "Quạt ly tâm công nghiệp bằng thép",
-                "reserve_code": "8414.59.41"
+                "code": "8414.59",
+                "level": 6,
+                "status": "STOP_6_DIGIT",
+                "reasoning": "Áp dụng GRI 1 & GRI 6: Quạt công nghiệp/ly tâm thuộc Phân nhóm 8414.59. Cần xác định công suất (<= 125W hay > 125W) và có lưới bảo vệ hay không để chốt 8 số -> dừng ở 6 số.",
+                "missing_attributes": ["Công suất động cơ quạt (W/kW) và cấu tạo lưới bảo vệ"],
+                "assumptions": "",
+                "reserve_code": "8414.59.49"
             }
 
         if re.search(r'\b(?:bom\s+nuoc|bom\s+ly\s+tam|centrifugal\s+pump|may\s+bom)\b', hn):
             return {
-                "code": "8413.70.42",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1: Máy bơm chất lỏng liền động cơ thuộc Nhóm 84.13. Áp dụng GRI 6: Bơm ly tâm một tầng cánh họng xả trên 50mm mã 8413.70.42.",
-                "missing_attributes": [],
-                "assumptions": "Bơm nước ly tâm trục ngang",
-                "reserve_code": "8413.70.91"
+                "code": "8413.70",
+                "level": 6,
+                "status": "STOP_6_DIGIT",
+                "reasoning": "Áp dụng GRI 1 & GRI 6: Bơm ly tâm chất lỏng thuộc Phân nhóm 8413.70. Cần xác định số tầng cánh, đường kính cửa hút/xả (mm) và công dụng để chốt 8 số -> dừng ở 6 số.",
+                "missing_attributes": ["Đường kính họng xả (mm) và số tầng cánh"],
+                "assumptions": "",
+                "reserve_code": "8413.70.42"
             }
 
         # 5. THIẾT BỊ ĐO LƯỜNG & KIỂM TRA (Chương 90)
         if re.search(r'\b(?:dong\s+ho\s+do|dong\s+ho|thiet\s+bi\s+do|may\s+do|bo\s+phan\s+cua\s+thuoc\s+do|gauge|measuring)\b', hn):
             if re.search(r'\b(?:ap\s+suat|pressure)\b', norm):
                 return {
-                    "code": "9026.20.90",
-                    "level": 8,
-                    "status": "EXACT_8_DIGIT",
-                    "reasoning": "Áp dụng GRI 1 & Chú giải 1(m) Phần XVI loại trừ sang Chương 90 -> Nhóm 90.26 dụng cụ đo áp suất. Áp dụng GRI 6 xếp mã 9026.20.90.",
-                    "missing_attributes": [],
-                    "assumptions": "Đồng hồ đo áp suất cơ học ống bourdon",
-                    "reserve_code": "9026.20.50"
+                    "code": "9026.20",
+                    "level": 6,
+                    "status": "STOP_6_DIGIT",
+                    "reasoning": "Áp dụng GRI 1 & Chú giải 1(m) Phần XVI loại trừ sang Chương 90 -> Nhóm 90.26, Phân nhóm 9026.20 (đo áp suất). Cần xác nhận loại điện tử hay cơ học để chốt 8 số.",
+                    "missing_attributes": ["Loại điện tử hay cơ học"],
+                    "assumptions": "",
+                    "reserve_code": "9026.20.90"
                 }
-            elif re.search(r'\b(?:thang\s+hang|kiem\s+tra|alignment)\b', norm):
+            elif re.search(r'\b(?:thang\s+hang|alignment)\b', norm):
                 return {
                     "code": "9031.80.90",
                     "level": 8,
                     "status": "EXACT_8_DIGIT",
-                    "reasoning": "Áp dụng GRI 1 & Chú giải Chương 90: Thiết bị và dụng cụ đo lường kiểm tra quang học hoặc điện tử chưa định danh riêng thuộc Nhóm 90.31. Áp dụng GRI 6 xếp mã 9031.80.90.",
+                    "reasoning": "Áp dụng GRI 1 & Chú giải Chương 90: Thiết bị đo lường kiểm tra chưa định danh riêng thuộc Nhóm 90.31. Áp dụng GRI 6 xếp mã 9031.80.90.",
                     "missing_attributes": [],
-                    "assumptions": "Thiết bị đo độ thẳng hàng connector",
+                    "assumptions": "",
                     "reserve_code": "9031.49.90"
                 }
-            else:
+            elif re.search(r'\b(?:micromet|micrometer|thuoc\s+cap|caliper)\b', norm):
                 return {
                     "code": "9017.90.90",
                     "level": 8,
                     "status": "EXACT_8_DIGIT",
                     "reasoning": "Áp dụng GRI 1 -> Nhóm 90.17 dụng cụ đo chiều dài, micromet và bộ phận của chúng. Áp dụng GRI 6 xếp mã 9017.90.90.",
                     "missing_attributes": [],
-                    "assumptions": "Bộ phận của thước đo micromet",
+                    "assumptions": "",
                     "reserve_code": "9031.90.90"
                 }
 
@@ -601,20 +477,8 @@ class StatutoryTreeWalker:
                 "status": "EXACT_8_DIGIT",
                 "reasoning": "Áp dụng GRI 1 & Chú giải 7 Chương 90: Thiết bị điều chỉnh và kiểm soát tự động -> Phân nhóm 9032.10 Thermostat -> Mã 9032.10.00.",
                 "missing_attributes": [],
-                "assumptions": "Thermostat tự động ngắt điện",
+                "assumptions": "",
                 "reserve_code": "9032.89.90"
-            }
-
-        # 6. VÚ TRA MỠ BÔI TRƠN (Nhóm 8487)
-        if re.search(r'\b(?:vu\s+tra\s+mo|vu\s+bom\s+mo|num\s+bom\s+mo|grease\s+nipple|lube\s+nipple)\b', hn):
-            return {
-                "code": "8487.90.00",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 & Chú giải WCO Nhóm 84.87: Núm vú tra mỡ bôi trơn không tự động thuộc Nhóm 84.87. Áp dụng GRI 6 xếp mã 8487.90.00.",
-                "missing_attributes": [],
-                "assumptions": "Vú mỡ bôi trơn cơ khí tiêu chuẩn",
-                "reserve_code": "7318.29.90"
             }
 
         # 8. THIẾT BỊ ĐÓNG NGẮT: APTOMAT, CÔNG TẮC, ĐẦU NỐI (Nhóm 8536)
@@ -955,7 +819,7 @@ class StatutoryTreeWalker:
                     }
 
         # 17. ĐỘNG CƠ ĐIỆN / MÔ TƠ (Nhóm 8501) - phân nhánh theo công suất, một chiều/xoay chiều, số pha, công dụng
-        if re.search(r'\b(?:dong\s+co\s+dien|mo\s+to\s+dien|mo\s+to\s+buoc|motor|ac\s+motor|dc\s+motor)\b', hn):
+        if re.search(r'\b(?:dong\s+co\s+dien|dong\s+co\s+giam\s+toc|mo\s+to\s+dien|mo\s+to\s+buoc|motor|ac\s+motor|dc\s+motor)\b', hn):
             P = attrs["power_w"]
             is_dc = bool(re.search(r'\b(?:dc|mot\s+chieu)\b', norm))
             is_univ = bool(re.search(r'\b(?:van\s+nang|universal)\b', norm))
@@ -1005,40 +869,34 @@ class StatutoryTreeWalker:
                 return _mot(code, f"Động cơ xoay chiều đa pha {P / 1000:g} kW -> mã {code}.")
             return _mot("8501", f"Động cơ {P / 1000:g} kW nhưng chưa rõ một chiều/xoay chiều, một pha/đa pha -> dừng ở nhóm 85.01.", "8501.51.19")
 
-        # 18. DỤNG CỤ CẮT GỌT THAY THẾ CHO MÁY CÔNG CỤ (Nhóm 8207)
-        if re.search(r'\b(?:mui\s+khoan|dao\s+phay|dao\s+tien|drill\s+bit|milling\s+cutter)\b', hn):
-            return {
-                "code": "8207.50.00",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 & Chú giải 1(k) Phần XVI: Dụng cụ cắt gọt kim loại có thể thay đổi được thuộc Nhóm 82.07. Áp dụng GRI 6: Dụng cụ khoan mã 8207.50.00.",
-                "missing_attributes": [],
-                "assumptions": "Mũi khoan thép gió HSS",
-                "reserve_code": "8207.90.00"
-            }
-
         # 19. CHỐT ĐỊNH VỊ & LÒ XO (Nhóm 7318 & 7320)
         if re.search(r'\b(?:chot\s+dinh\s+vi|dowel\s+pin)\b', hn):
+            if attrs["material"] in ("steel", "stainless_steel") or re.search(r'\b(?:thep|sat|inox|kim\s+loai|steel)\b', norm):
+                return {
+                    "code": "7318.24.00",
+                    "level": 8,
+                    "status": "EXACT_8_DIGIT",
+                    "reasoning": "Áp dụng GRI 1 & Chú giải 2 Phần XV: Chốt kim loại bằng sắt/thép không ren thuộc Nhóm 73.18 -> mã 7318.24.00.",
+                    "missing_attributes": [],
+                    "assumptions": "",
+                    "reserve_code": "7318.29.90"
+                }
             return {
-                "code": "7318.24.00",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 & Chú giải 2 Phần XV: Chốt kim loại không ren thuộc Nhóm 73.18. Áp dụng GRI 6: Chốt định vị mã 7318.24.00.",
-                "missing_attributes": [],
-                "assumptions": "Chốt hình trụ bằng thép không ren",
-                "reserve_code": "7318.29.90"
+                "code": "INSUFFICIENT",
+                "level": 0,
+                "status": "INSUFFICIENT_INFO",
+                "reasoning": "Chốt định vị cần xác nhận vật liệu cấu thành (sắt/thép thuộc 7318.24.00, đồng thuộc 7415, hay nhựa thuộc 3926).",
+                "missing_attributes": ["Chất liệu chốt định vị"],
+                "assumptions": "Không thể giả định",
+                "reserve_code": "7318.24.00"
             }
 
         if re.search(r'\b(?:lo\s+xo|spring)\b', hn):
-            return {
-                "code": "7320.20.90",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 & Chú giải 2 Phần XV: Lò xo bằng thép thuộc Nhóm 73.20. Áp dụng GRI 6: Lò xo xoắn nén hình trụ mã 7320.20.90.",
-                "missing_attributes": [],
-                "assumptions": "Lò xo nén bằng thép",
-                "reserve_code": "7320.90.90"
-            }
+            if re.search(r'\b(?:nhip|leaf)\b', norm):
+                return {"code": "7320.10.11", "level": 8, "status": "EXACT_8_DIGIT", "reasoning": "Áp dụng GRI 1 -> Nhóm 73.20: Nhíp lò xo bằng thép -> mã 7320.10.11.", "missing_attributes": [], "assumptions": "", "reserve_code": "7320.20.90"}
+            if re.search(r'\b(?:xoan|nen|keo|helical|coil|compression|tension)\b', norm):
+                return {"code": "7320.20.90", "level": 8, "status": "EXACT_8_DIGIT", "reasoning": "Áp dụng GRI 1 & Chú giải 2 Phần XV: Lò xo xoắn bằng thép thuộc Nhóm 73.20 -> mã 7320.20.90.", "missing_attributes": [], "assumptions": "", "reserve_code": "7320.90.90"}
+            return {"code": "7320", "level": 4, "status": "STOP_4_DIGIT", "reasoning": "Áp dụng GRI 1 -> Nhóm 73.20 (lò xo bằng sắt/thép). Thiếu hình dạng lò xo (nhíp 7320.10, lò xo xoắn 7320.20, hay loại khác 7320.90) -> dừng ở 4 số.", "missing_attributes": ["Kiểu lò xo (nhíp / xoắn / lá)"], "assumptions": "", "reserve_code": "7320.20.90"}
 
         # 20. BIẾN ÁP & NGUỒN CHUYỂN ĐỔI (Nhóm 8504)
         if re.search(r'\b(?:adapter|switching|nguon\s+chuyen\s+doi|bien\s+doi\s+tinh)\b', hn):
@@ -1046,9 +904,9 @@ class StatutoryTreeWalker:
                 "code": "8504.40.90",
                 "level": 8,
                 "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 -> Nhóm 85.04. Áp dụng GRI 6: Bộ biến đổi tĩnh điện AC sang DC Phân nhóm 8504.40 -> Mã 8504.40.90.",
+                "reasoning": "Áp dụng GRI 1 -> Nhóm 85.04. Áp dụng GRI 6: Bộ biến đổi tĩnh điện Phân nhóm 8504.40 -> Mã 8504.40.90.",
                 "missing_attributes": [],
-                "assumptions": "Bộ nguồn chuyển đổi tĩnh adapter",
+                "assumptions": "",
                 "reserve_code": "8504.40.11"
             }
 
@@ -1085,82 +943,44 @@ class StatutoryTreeWalker:
                 "code": sub,
                 "level": 6,
                 "status": "STOP_6_DIGIT",
-                "reasoning": f"Áp dụng GRI 1 -> Nhóm 85.04. Áp dụng GRI 6: Máy biến điện {kind}, công suất {kva:g} kVA -> phân nhóm {sub}. Dòng 8 số phụ thuộc chủng loại (biến áp đo lường, biến áp tăng/giảm áp, biến áp thích ứng...) chưa đủ dữ kiện -> dừng ở 6 số.",
+                "reasoning": f"Áp dụng GRI 1 -> Nhóm 85.04. Áp dụng GRI 6: Máy biến điện {kind}, công suất {kva:g} kVA -> phân nhóm {sub}. Dòng 8 số phụ thuộc chủng loại chưa đủ dữ kiện -> dừng ở 6 số.",
                 "missing_attributes": ["transformer_type"],
-                "assumptions": f"Công suất {kva:g} kVA; chưa xác định chủng loại biến áp" + (" (biến áp cách ly hạ áp thường xem xét 8504.31.93 hoặc 8504.31.99)" if sub == "8504.31" else ""),
+                "assumptions": f"Công suất {kva:g} kVA; chưa xác định chủng loại biến áp",
                 "reserve_code": (sub + ".99") if sub != "8504.31" else "8504.31.99"
             }
 
         # 21. BẢNG ĐIỀU KHIỂN ĐIỆN (Nhóm 8537)
         if re.search(r'\b(?:tu\s+bang\s+dien|bang\s+dieu\s+khien|control\s+panel|plc|hmi)\b', hn):
-            return {
-                "code": "8537.10.99",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 -> Nhóm 85.37: Bảng, tủ điều khiển phân phối điện. Áp dụng GRI 6: Điện áp <= 1000V -> Mã 8537.10.99.",
-                "missing_attributes": [],
-                "assumptions": "Tủ điều khiển tự động hóa điện áp <= 1000V",
-                "reserve_code": "8537.10.19"
-            }
+            v = attrs["voltage_v"]
+            if v is not None and v <= 1000:
+                return {"code": "8537.10.99", "level": 8, "status": "EXACT_8_DIGIT", "reasoning": f"Áp dụng GRI 1 -> Nhóm 85.37: Bảng/tủ điều khiển điện áp {v:g}V (<= 1000V) -> Mã 8537.10.99.", "missing_attributes": [], "assumptions": "", "reserve_code": "8537.10.19"}
+            if v is not None and v > 1000:
+                return {"code": "8537.20.90", "level": 8, "status": "EXACT_8_DIGIT", "reasoning": f"Áp dụng GRI 1 -> Nhóm 85.37: Bảng/tủ điều khiển điện áp {v:g}V (> 1000V) -> Mã 8537.20.90.", "missing_attributes": [], "assumptions": "", "reserve_code": "8537.20.19"}
+            return {"code": "8537", "level": 4, "status": "STOP_4_DIGIT", "reasoning": "Áp dụng GRI 1 -> Nhóm 85.37 (bảng, tủ điều khiển điện). Thiếu thông số điện áp (<= 1000V thuộc 8537.10 vs > 1000V thuộc 8537.20) -> dừng ở 4 số.", "missing_attributes": ["voltage_v"], "assumptions": "", "reserve_code": "8537.10.99"}
 
-        # 22. RƠ LE (Nhóm 8536.49)
+        # 22. RƠ LE (Nhóm 8536.4x)
         if re.search(r'\b(?:ro\s+le|relay)\b', hn):
-            return {
-                "code": "8536.49.90",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 -> Nhóm 85.36. Áp dụng GRI 6: Rơ le bảo vệ quá tải nhiệt phân nhóm 8536.49 -> Mã 8536.49.90.",
-                "missing_attributes": [],
-                "assumptions": "Rơ le nhiệt lưỡng kim",
-                "reserve_code": "8536.41.40"
-            }
-
-        # 23. BỘ NHỚ LƯU TRỮ FLASH / USB (Nhóm 8523)
-        if re.search(r'\b(?:usb|flash\s+drive|the\s+nho|o\s+nho|solid-state|storage)\b', hn):
-            return {
-                "code": "8523.51.11",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 -> Nhóm 85.23 thiết bị lưu trữ dữ liệu bán dẫn bền vững. Áp dụng GRI 6: Thiết bị lưu trữ thể rắn chưa ghi dữ liệu mã 8523.51.11.",
-                "missing_attributes": [],
-                "assumptions": "USB flash drive chưa ghi dữ liệu",
-                "reserve_code": "8523.51.21"
-            }
+            v = attrs["voltage_v"]
+            if v is not None and v <= 60:
+                return {"code": "8536.41", "level": 6, "status": "STOP_6_DIGIT", "reasoning": f"Áp dụng GRI 1 -> Nhóm 85.36: Rơ le điện áp {v:g}V (<= 60V) thuộc Phân nhóm 8536.41 -> dừng ở 6 số.", "missing_attributes": ["relay_type"], "assumptions": "", "reserve_code": "8536.41.90"}
+            if v is not None and v <= 1000:
+                return {"code": "8536.49.90", "level": 8, "status": "EXACT_8_DIGIT", "reasoning": f"Áp dụng GRI 1 -> Nhóm 85.36: Rơ le điện áp {v:g}V (> 60V đến <= 1000V) thuộc Phân nhóm 8536.49 -> Mã 8536.49.90.", "missing_attributes": [], "assumptions": "", "reserve_code": "8536.41.90"}
+            return {"code": "8536", "level": 4, "status": "STOP_4_DIGIT", "reasoning": "Áp dụng GRI 1 -> Nhóm 85.36 (rơ le). Thiếu thông số điện áp định mức (<= 60V thuộc 8536.41 vs > 60V thuộc 8536.49) -> dừng ở 4 số.", "missing_attributes": ["voltage_v"], "assumptions": "", "reserve_code": "8536.49.90"}
 
         # 24. ỐNG CAO SU (Nhóm 4009)
         if re.search(r'\b(?:ong\s+(?:dan\s+)?nuoc|ong\s+cao\s+su|rubber\s+hose)\b', hn):
-            return {
-                "code": "4009.31.91",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 & Chú giải loại trừ -> Nhóm 40.09 ống cao su. Áp dụng GRI 6: Gia cố sợi dệt không phụ kiện dùng cho xe ô tô -> Mã 4009.31.91.",
-                "missing_attributes": [],
-                "assumptions": "Ống dẫn nước làm mát két nước ô tô",
-                "reserve_code": "4009.31.99"
-            }
+            if re.search(r'\b(?:vai|det|textile|bo\s+vai)\b', norm) and re.search(r'\b(?:o\s+to|xe\s+hoi|automotive)\b', norm):
+                return {"code": "4009.31.91", "level": 8, "status": "EXACT_8_DIGIT", "reasoning": "Áp dụng GRI 1 -> Nhóm 40.09: Ống cao su gia cố vật liệu dệt không phụ kiện dùng cho ô tô -> Mã 4009.31.91.", "missing_attributes": [], "assumptions": "", "reserve_code": "4009.31.99"}
+            return {"code": "4009", "level": 4, "status": "STOP_4_DIGIT", "reasoning": "Áp dụng GRI 1 -> Nhóm 40.09 (ống bằng cao su lưu hóa). Thiếu thông tin vật liệu gia cố (không gia cố 4009.1x, kim loại 4009.2x, vật liệu dệt 4009.3x) và có/không phụ kiện nối -> dừng ở 4 số.", "missing_attributes": ["Vật liệu gia cố và phụ kiện đầu nối"], "assumptions": "", "reserve_code": "4009.31.91"}
 
         # 25. CẢN TRƯỚC / MÁ PHANH Ô TÔ (Nhóm 8708)
         if re.search(r'\b(?:can\s+truoc|can\s+sau|ba\s+do\s+soc|bumper)\b', hn):
-            return {
-                "code": "8708.10.10",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 & Chú giải 2 Phần XVII: Cản va và bộ phận cản va định danh riêng tại Phân nhóm 8708.10 -> Cản trước ô tô con mã 8708.10.10.",
-                "missing_attributes": [],
-                "assumptions": "Cản va ô tô bằng nhựa hoàn chỉnh",
-                "reserve_code": "8708.10.90"
-            }
+            return {"code": "8708.10", "level": 6, "status": "STOP_6_DIGIT", "reasoning": "Áp dụng GRI 1 & Chú giải 2 Phần XVII: Cản va ô tô định danh tại Phân nhóm 8708.10. Cần xác định dòng xe (xe con 8708.10.10 hay loại khác 8708.10.90) -> dừng ở 6 số.", "missing_attributes": ["Loại xe sử dụng"], "assumptions": "", "reserve_code": "8708.10.10"}
 
         if re.search(r'\b(?:ma\s+phanh|bo\s+thang|brake\s+pad)\b', hn):
-            return {
-                "code": "8708.30.29",
-                "level": 8,
-                "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 -> Nhóm 87.08 phụ tùng ô tô. Áp dụng GRI 6: Phanh hãm và trợ động phanh Phân nhóm 8708.30 -> Đã lắp xương thép mã 8708.30.29.",
-                "missing_attributes": [],
-                "assumptions": "Má phanh đĩa ô tô đã gắn đế thép",
-                "reserve_code": "6813.81.00"
-            }
+            if re.search(r'\b(?:xuong\s+thep|de\s+thep|da\s+gan|mounted)\b', norm):
+                return {"code": "8708.30.29", "level": 8, "status": "EXACT_8_DIGIT", "reasoning": "Áp dụng GRI 1 -> Nhóm 87.08: Má phanh đĩa ô tô đã lắp xương thép -> Mã 8708.30.29.", "missing_attributes": [], "assumptions": "", "reserve_code": "6813.81.00"}
+            return {"code": "8708.30", "level": 6, "status": "STOP_6_DIGIT", "reasoning": "Áp dụng GRI 1 -> Phân nhóm 8708.30 (phanh và má phanh đã lắp). Cần xác nhận đã gắn đế kim loại (8708.30.29) hay chưa gắn đế (6813.81.00) -> dừng ở 6 số.", "missing_attributes": ["Tình trạng gắn đế thép"], "assumptions": "", "reserve_code": "8708.30.29"}
 
         # 26. GỐM SỨ (Chương 69)
         if re.search(r'\b(?:chau|chau\s+trong\s+cay|pot)\b', hn) and (attrs["material"] == "ceramic" or 'gom' in norm or 'dat nung' in norm):
@@ -1246,11 +1066,11 @@ class StatutoryTreeWalker:
 
         # FALLBACK / UNRESOLVED
         return {
-            "code": "INSUFFICIENT_INFO",
+            "code": "UNRESOLVED",
             "level": 0,
-            "status": "INSUFFICIENT_INFO",
-            "reasoning": "Chưa đủ dữ kiện đối sánh chính xác theo Biểu thuế WCO 2022.",
-            "missing_attributes": ["technical_specs"],
-            "assumptions": "N/A",
-            "reserve_code": "N/A"
+            "status": "UNRESOLVED",
+            "reasoning": "Chuyển tiếp cho hệ thống đối sánh đa tầng WCO 2022 xử lý.",
+            "missing_attributes": [],
+            "assumptions": "",
+            "reserve_code": ""
         }

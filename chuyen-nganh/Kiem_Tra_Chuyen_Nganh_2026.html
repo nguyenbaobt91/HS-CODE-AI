@@ -139,6 +139,13 @@
                         </button>
                     </div>
 
+                    <!-- Tab Văn Bản & Đính Kèm -->
+                    <button id="btn-docs-tab" onclick="toggleDocsView()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/15 hover:bg-white/25 border border-white/25 text-white shadow-xs transition" title="Thư viện văn bản pháp quy &amp; đính kèm tài liệu">
+                        <i class="fa-solid fa-paperclip"></i>
+                        <span class="hidden sm:inline">Văn bản</span>
+                        <span id="docs-tab-count" class="px-1.5 rounded-full bg-white/25 text-[10px] font-bold leading-4">0</span>
+                    </button>
+
                     <!-- Tải Excel -->
                     <a href="./DANH_MUC_KIEM_TRA_CHUYEN_NGANH_2026.xlsx" download class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition">
                         <i class="fa-solid fa-file-excel"></i>
@@ -295,6 +302,9 @@
             </div>
         </div>
 
+        <!-- TAB VĂN BẢN: THƯ VIỆN PHÁP QUY & ĐÍNH KÈM (render bởi van-ban.js) -->
+        <div id="layout-docs-view" class="hidden"></div>
+
         <!-- EMPTY STATE -->
         <div id="empty-state" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 p-12 text-center space-y-3 hidden">
             <div class="w-12 h-12 mx-auto rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">
@@ -324,7 +334,7 @@
     </footer>
 
     <!-- TOAST -->
-    <div id="toast" class="fixed bottom-5 right-5 z-50 px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold shadow-lg flex items-center space-x-2 transition-all duration-300 opacity-0 pointer-events-none transform translate-y-2">
+    <div id="toast" class="fixed bottom-16 right-5 z-50 px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold shadow-lg flex items-center space-x-2 transition-all duration-300 opacity-0 pointer-events-none transform translate-y-2">
         <i class="fa-solid fa-circle-check text-emerald-400"></i>
         <span id="toast-text">Đã sao chép mã HS!</span>
     </div>
@@ -10917,5 +10927,7 @@ const KTCN_DATA = [
   sync();
 })();
 </script>
+<!-- Tab Văn bản: thư viện pháp quy & đính kèm tài liệu -->
+<script src="./van-ban.js"></script>
 </body>
 </html>
