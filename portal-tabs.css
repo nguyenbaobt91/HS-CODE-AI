@@ -8,6 +8,7 @@
 .pt-hs{--c1:#0a4a5e;--c2:#0891b2;--lt:#67e8f9;--sh:rgba(8,145,178,.55)}
 .pt-hc{--c1:#7a2f06;--c2:#c2610f;--lt:#ffc27a;--sh:rgba(194,97,15,.55)}
 .pt-kt{--c1:#2b1565;--c2:#5f3fc0;--lt:#c1b0ff;--sh:rgba(95,63,192,.55)}
+.pt-pl{--c1:#064e3b;--c2:#047857;--lt:#6ee7b7;--sh:rgba(4,120,87,.55)}
 
 @keyframes portal-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
 

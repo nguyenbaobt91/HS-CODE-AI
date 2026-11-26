@@ -1,0 +1,713 @@
+{
+ "luat hq 54.docx": {
+  "so": "54/2014/QH13",
+  "loai": "Luật",
+  "ten": "Luật Hải quan",
+  "ngay": "23/06/2014",
+  "nhom": [
+   "Thủ tục hải quan"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực (đã sửa bởi Luật 90/2025/QH15; sẽ sửa tiếp bởi Luật 11/2026/QH16 từ 01/03/2027)",
+  "ghi_chu": "",
+  "ngay_hl": "01/01/2015",
+  "sua_doi_boi": "Luật 90/2025/QH15; Luật 11/2026/QH16",
+  "trang_thai": "con_hieu_luc"
+ },
+ "Luật HQ.doc": {
+  "so": "11/2026/QH16",
+  "loai": "Luật",
+  "ten": "Luật sửa đổi, bổ sung một số điều của Luật Hải quan",
+  "ngay": "23/08/2026",
+  "nhom": [
+   "Thủ tục hải quan"
+  ],
+  "vaitro": "Văn bản sửa đổi, bổ sung",
+  "sua_doi": "Luật Hải quan 54/2014/QH13",
+  "hieu_luc": "Chưa có hiệu lực (từ 01/03/2027)",
+  "ghi_chu": "",
+  "ngay_hl": "01/03/2027",
+  "trang_thai": "chua_co_hieu_luc"
+ },
+ "NGHI DINH 08.2015.docx": {
+  "so": "08/2015/NĐ-CP",
+  "loai": "Nghị định",
+  "ten": "Quy định chi tiết và biện pháp thi hành Luật Hải quan về thủ tục hải quan, kiểm tra, giám sát, kiểm soát hải quan",
+  "ngay": "21/01/2015",
+  "nhom": [
+   "Thủ tục hải quan"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực (đã được sửa đổi bởi NĐ 167/2025/NĐ-CP)",
+  "ghi_chu": "",
+  "ngay_hl": "15/03/2015",
+  "trang_thai": "con_hieu_luc"
+ },
+ "ND59-2018 SỬA ĐỔI, BỔ SUNG MỘT SỐ ĐIỀU CỦA NGHỊ ĐỊNH SỐ 08-2015-NĐ-CP.docx": {
+  "so": "59/2018/NĐ-CP",
+  "loai": "Nghị định",
+  "ten": "Sửa đổi, bổ sung một số điều của Nghị định 08/2015/NĐ-CP",
+  "ngay": "20/04/2018",
+  "nhom": [
+   "Thủ tục hải quan"
+  ],
+  "vaitro": "Văn bản sửa đổi, bổ sung",
+  "sua_doi": "Nghị định 08/2015/NĐ-CP",
+  "hieu_luc": "Đã bị bãi bỏ bởi NĐ 167/2025/NĐ-CP (hiệu lực từ 15/08/2025)",
+  "ghi_chu": "",
+  "ngay_hl": "05/06/2018",
+  "trang_thai": "het_hieu_luc"
+ },
+ "167_2025_ND-CP_577436.doc": {
+  "so": "167/2025/NĐ-CP",
+  "loai": "Nghị định",
+  "ten": "Sửa đổi, bổ sung một số điều của Nghị định 08/2015/NĐ-CP về thủ tục hải quan, kiểm tra, giám sát, kiểm soát hải quan",
+  "ngay": "30/06/2025",
+  "nhom": [
+   "Thủ tục hải quan"
+  ],
+  "vaitro": "Văn bản sửa đổi, bổ sung",
+  "sua_doi": "Nghị định 08/2015/NĐ-CP",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "Riêng khoản 5, 6, 19 Điều 1 (sửa Điều 10, 11, 35 NĐ 08/2015) có hiệu lực từ 01/07/2025",
+  "ngay_hl": "15/08/2025",
+  "trang_thai": "con_hieu_luc"
+ },
+ "Thong tu 38.2015.doc": {
+  "so": "38/2015/TT-BTC",
+  "loai": "Thông tư",
+  "ten": "Quy định về thủ tục hải quan; kiểm tra, giám sát hải quan; thuế XK, thuế NK và quản lý thuế đối với hàng hóa XK, NK",
+  "ngay": "25/03/2015",
+  "nhom": [
+   "Thủ tục hải quan",
+   "Thuế XNK & quản lý thuế"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực một phần (đã sửa bởi TT 39/2018, TT 121/2025; một số điều bị bãi bỏ bởi TT 86/2026/TT-BTC)",
+  "ghi_chu": "Riêng điểm đ.2 khoản 1, điểm đ khoản 4 Điều 42; khoản 4, 7, 8 Điều 133; Điều 135 hiệu lực từ 01/01/2015",
+  "ngay_hl": "01/04/2015",
+  "trang_thai": "con_hieu_luc_mot_phan"
+ },
+ "TT39.2018.docx": {
+  "so": "39/2018/TT-BTC",
+  "loai": "Thông tư",
+  "ten": "Sửa đổi, bổ sung một số điều tại Thông tư 38/2015/TT-BTC",
+  "ngay": "20/04/2018",
+  "nhom": [
+   "Thủ tục hải quan",
+   "Thuế XNK & quản lý thuế"
+  ],
+  "vaitro": "Văn bản sửa đổi, bổ sung",
+  "sua_doi": "Thông tư 38/2015/TT-BTC",
+  "hieu_luc": "Còn hiệu lực một phần (khoản 15 Điều 1 đã bị TT 60/2019 bãi bỏ; một số khoản bị TT 86/2026 bãi bỏ)",
+  "ghi_chu": "",
+  "ngay_hl": "05/06/2018",
+  "trang_thai": "con_hieu_luc_mot_phan"
+ },
+ "121_2025_TT-BTC_633118.doc": {
+  "so": "121/2025/TT-BTC",
+  "loai": "Thông tư",
+  "ten": "Sửa đổi, bổ sung một số điều của các Thông tư quy định về thủ tục hải quan, kiểm tra, giám sát hải quan, thuế XK, thuế NK và quản lý thuế đối với hàng hóa XK, NK",
+  "ngay": "18/12/2025",
+  "nhom": [
+   "Thủ tục hải quan",
+   "Thuế XNK & quản lý thuế"
+  ],
+  "vaitro": "Văn bản sửa đổi, bổ sung",
+  "sua_doi": "Thông tư 38/2015/TT-BTC, 39/2018/TT-BTC và các Thông tư khác",
+  "hieu_luc": "Còn hiệu lực (một số khoản bị bãi bỏ bởi TT 86/2026/TT-BTC)",
+  "ghi_chu": "",
+  "ngay_hl": "01/02/2026",
+  "trang_thai": "con_hieu_luc"
+ },
+ "PL-I TT 121.doc": {
+  "so": "121/2025/TT-BTC (PL I)",
+  "loai": "Phụ lục",
+  "ten": "Phụ lục I TT 121/2025: thay thế Phụ lục I, 1A, 1B của TT 38/2015",
+  "ngay": "18/12/2025",
+  "nhom": [
+   "Thủ tục hải quan"
+  ],
+  "vaitro": "Phụ lục / biểu mẫu",
+  "sua_doi": "Thông tư 38/2015/TT-BTC",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "",
+  "ngay_hl": "01/02/2026",
+  "trang_thai": "con_hieu_luc"
+ },
+ "PL-II TT 121.docx": {
+  "so": "121/2025/TT-BTC (PL II)",
+  "loai": "Phụ lục",
+  "ten": "Phụ lục II TT 121/2025: sửa Phụ lục VIII (biểu mẫu kiểm tra sau thông quan)",
+  "ngay": "18/12/2025",
+  "nhom": [
+   "Thủ tục hải quan"
+  ],
+  "vaitro": "Phụ lục / biểu mẫu",
+  "sua_doi": "Thông tư 38/2015/TT-BTC",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "",
+  "ngay_hl": "01/02/2026",
+  "trang_thai": "con_hieu_luc"
+ },
+ "PL-III TT 121.docx": {
+  "so": "121/2025/TT-BTC (PL III)",
+  "loai": "Phụ lục",
+  "ten": "Phụ lục III TT 121/2025: sửa Phụ lục X (trao đổi thông tin với DN cảng, kho, bãi)",
+  "ngay": "18/12/2025",
+  "nhom": [
+   "Thủ tục hải quan"
+  ],
+  "vaitro": "Phụ lục / biểu mẫu",
+  "sua_doi": "Thông tư 38/2015/TT-BTC",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "",
+  "ngay_hl": "01/02/2026",
+  "trang_thai": "con_hieu_luc"
+ },
+ "PL-IV TT 121.docx": {
+  "so": "121/2025/TT-BTC (PL IV)",
+  "loai": "Phụ lục",
+  "ten": "Phụ lục IV TT 121/2025: bổ sung Phụ lục XI (biểu mẫu chế độ ưu tiên)",
+  "ngay": "18/12/2025",
+  "nhom": [
+   "Thủ tục hải quan"
+  ],
+  "vaitro": "Phụ lục / biểu mẫu",
+  "sua_doi": "Thông tư 38/2015/TT-BTC",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "",
+  "ngay_hl": "01/02/2026",
+  "trang_thai": "con_hieu_luc"
+ },
+ "PL-V TT 121.docx": {
+  "so": "121/2025/TT-BTC (PL V)",
+  "loai": "Phụ lục",
+  "ten": "Phụ lục V TT 121/2025: bổ sung Phụ lục XII (biểu mẫu phân loại máy liên hợp, tháo rời)",
+  "ngay": "18/12/2025",
+  "nhom": [
+   "Thủ tục hải quan",
+   "Thuế XNK & quản lý thuế"
+  ],
+  "vaitro": "Phụ lục / biểu mẫu",
+  "sua_doi": "Thông tư 38/2015/TT-BTC",
+  "hieu_luc": "Còn hiệu lực một phần (TT 85/2026/TT-BTC từ 15/09/2026 đã bỏ yêu cầu đăng ký Danh mục/Phiếu theo dõi trừ lùi cho máy liên hợp Chương 84, 85, 90)",
+  "ghi_chu": "",
+  "ngay_hl": "01/02/2026",
+  "trang_thai": "con_hieu_luc_mot_phan"
+ },
+ "TT QUY ĐỊNH VỀ QUẢN LÝ THUẾ ĐỐI VỚI HÀNG HÓA XUẤT KHẨU, NHẬP KHẨU  86_2026_TT-BTC_699140.doc": {
+  "so": "86/2026/TT-BTC",
+  "loai": "Thông tư",
+  "ten": "Quy định về quản lý thuế đối với hàng hóa xuất khẩu, nhập khẩu",
+  "ngay": "30/06/2026",
+  "nhom": [
+   "Thuế XNK & quản lý thuế"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực (thay thế TT 06/2021/TT-BTC; bãi bỏ một phần TT 38/2015, 39/2018, 121/2025)",
+  "ghi_chu": "",
+  "ngay_hl": "01/07/2026",
+  "trang_thai": "con_hieu_luc"
+ },
+ "Luat thue xuat nhap khau 107_2016_QH13_280693.doc": {
+  "so": "107/2016/QH13",
+  "loai": "Luật",
+  "ten": "Luật Thuế xuất khẩu, thuế nhập khẩu (bản gốc 2016)",
+  "ngay": "06/04/2016",
+  "nhom": [
+   "Thuế XNK & quản lý thuế"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực (xem bản hợp nhất 96/VBHN-VPQH)",
+  "ghi_chu": "",
+  "ngay_hl": "01/09/2016",
+  "trang_thai": "con_hieu_luc"
+ },
+ "96_VBHN-VPQH_699728.doc": {
+  "so": "96/VBHN-VPQH",
+  "loai": "Luật",
+  "ten": "Luật Thuế xuất khẩu, thuế nhập khẩu (văn bản hợp nhất, đã tích hợp Luật 90/2025/QH15)",
+  "ngay": "31/03/2026",
+  "nhom": [
+   "Thuế XNK & quản lý thuế"
+  ],
+  "vaitro": "Văn bản hợp nhất",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "Hợp nhất Luật 107/2016/QH13 và Luật 90/2025/QH15",
+  "ngay_hl": "31/03/2026",
+  "trang_thai": "con_hieu_luc"
+ },
+ "134_2016_ND-CP_323602.doc": {
+  "so": "134/2016/NĐ-CP",
+  "loai": "Nghị định",
+  "ten": "Quy định chi tiết một số điều và biện pháp thi hành Luật Thuế xuất khẩu, thuế nhập khẩu",
+  "ngay": "01/09/2016",
+  "nhom": [
+   "Thuế XNK & quản lý thuế"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực (đã sửa bởi NĐ 18/2021, NĐ 182/2025)",
+  "ghi_chu": "",
+  "ngay_hl": "01/09/2016",
+  "trang_thai": "con_hieu_luc"
+ },
+ "18_2021_ND-CP_386321.doc": {
+  "so": "18/2021/NĐ-CP",
+  "loai": "Nghị định",
+  "ten": "Sửa đổi, bổ sung một số điều của Nghị định 134/2016/NĐ-CP",
+  "ngay": "11/03/2021",
+  "nhom": [
+   "Thuế XNK & quản lý thuế"
+  ],
+  "vaitro": "Văn bản sửa đổi, bổ sung",
+  "sua_doi": "Nghị định 134/2016/NĐ-CP",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "",
+  "ngay_hl": "25/04/2021",
+  "trang_thai": "con_hieu_luc"
+ },
+ "182_2025_ND-CP_663503.doc": {
+  "so": "182/2025/NĐ-CP",
+  "loai": "Nghị định",
+  "ten": "Sửa đổi, bổ sung một số điều của Nghị định 134/2016/NĐ-CP (đã được sửa đổi bởi NĐ 18/2021)",
+  "ngay": "01/07/2025",
+  "nhom": [
+   "Thuế XNK & quản lý thuế"
+  ],
+  "vaitro": "Văn bản sửa đổi, bổ sung",
+  "sua_doi": "Nghị định 134/2016/NĐ-CP",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "",
+  "ngay_hl": "01/07/2025",
+  "trang_thai": "con_hieu_luc"
+ },
+ "169_2026_ND-CP_679683.doc": {
+  "so": "169/2026/NĐ-CP",
+  "loai": "Nghị định",
+  "ten": "Quy định xử phạt vi phạm hành chính trong lĩnh vực hải quan",
+  "ngay": "15/05/2026",
+  "nhom": [
+   "Xử phạt vi phạm hành chính"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực (từ 01/07/2026; thay thế NĐ 128/2020/NĐ-CP và Điều 2 NĐ 102/2021/NĐ-CP)",
+  "ghi_chu": "",
+  "ngay_hl": "01/07/2026",
+  "trang_thai": "con_hieu_luc"
+ },
+ "90_2025_QH15_662379.doc": {
+  "so": "90/2025/QH15",
+  "loai": "Luật",
+  "ten": "Sửa đổi, bổ sung một số điều của Luật Đấu thầu, Luật PPP, Luật Hải quan, Luật Thuế GTGT, Luật Thuế XNK, Luật Đầu tư, Luật Đầu tư công, Luật Quản lý, sử dụng tài sản công",
+  "ngay": "25/06/2025",
+  "nhom": [
+   "Thủ tục hải quan",
+   "Thuế XNK & quản lý thuế"
+  ],
+  "vaitro": "Văn bản sửa đổi, bổ sung",
+  "sua_doi": "Luật Hải quan 54/2014/QH13 (Điều 3); Luật Thuế XNK 107/2016/QH13 (Điều 5); Luật Thuế GTGT (Điều 4); và các luật khác",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "Luật sửa nhiều luật; chỉ Điều 3, 4, 5 liên quan hải quan/thuế",
+  "ngay_hl": "01/07/2025",
+  "trang_thai": "con_hieu_luc"
+ },
+ "Luat quan ly thue 108_2025_QH15_675268.doc": {
+  "so": "108/2025/QH15",
+  "loai": "Luật",
+  "ten": "Luật Quản lý thuế",
+  "ngay": "10/12/2025",
+  "nhom": [
+   "Thuế XNK & quản lý thuế"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực (từ 01/07/2026; riêng Điều 13 và Điều 26 từ 01/01/2026)",
+  "ghi_chu": "Điều 13 và việc dùng hóa đơn điện tử của hộ, cá nhân kinh doanh (Điều 26) hiệu lực từ 01/01/2026",
+  "ngay_hl": "01/07/2026",
+  "trang_thai": "con_hieu_luc"
+ },
+ "ND 252_2026_ND-CP_713086 huong dan luat quan ly thue.doc": {
+  "so": "252/2026/NĐ-CP",
+  "loai": "Nghị định",
+  "ten": "Quy định chi tiết một số điều và biện pháp để tổ chức, hướng dẫn thi hành Luật Quản lý thuế",
+  "ngay": "30/06/2026",
+  "nhom": [
+   "Thuế XNK & quản lý thuế"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "",
+  "ngay_hl": "01/07/2026",
+  "trang_thai": "con_hieu_luc"
+ },
+ "TT 39_2015_TT-BTC_269859 tri gia hai quan.doc": {
+  "so": "39/2015/TT-BTC",
+  "loai": "Thông tư",
+  "ten": "Quy định về trị giá hải quan đối với hàng hóa xuất khẩu, nhập khẩu",
+  "ngay": "25/03/2015",
+  "nhom": [
+   "Trị giá hải quan",
+   "Thủ tục hải quan"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực (đã sửa bởi TT 60/2019/TT-BTC; một số nội dung sửa bởi TT 121/2025/TT-BTC)",
+  "ghi_chu": "",
+  "ngay_hl": "01/04/2015",
+  "trang_thai": "con_hieu_luc"
+ },
+ "TT 60_2019_TT-BTC_423281 tri gia hai quan.doc": {
+  "so": "60/2019/TT-BTC",
+  "loai": "Thông tư",
+  "ten": "Sửa đổi, bổ sung một số điều của Thông tư 39/2015/TT-BTC về trị giá hải quan",
+  "ngay": "30/08/2019",
+  "nhom": [
+   "Trị giá hải quan",
+   "Thủ tục hải quan"
+  ],
+  "vaitro": "Văn bản sửa đổi, bổ sung",
+  "sua_doi": "Thông tư 39/2015/TT-BTC (và bãi bỏ khoản 15 Điều 1 TT 39/2018/TT-BTC)",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "",
+  "ngay_hl": "15/10/2019",
+  "trang_thai": "con_hieu_luc"
+ },
+ "TT 85_2026_TT-BTC_713423 phan loai hang hoa.doc": {
+  "so": "85/2026/TT-BTC",
+  "loai": "Thông tư",
+  "ten": "Quy định về phân loại hàng hóa, phân tích để phân loại hàng hóa xuất khẩu, nhập khẩu",
+  "ngay": "30/06/2026",
+  "nhom": [
+   "Phân loại hàng hóa",
+   "Thủ tục hải quan"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực (thay thế TT 14/2015/TT-BTC và TT 17/2021/TT-BTC)",
+  "ghi_chu": "",
+  "ngay_hl": "15/09/2026",
+  "trang_thai": "con_hieu_luc"
+ },
+ "TT 142_2026_TT-BTC_727249 hang chuyen phat nhanh.doc": {
+  "so": "142/2026/TT-BTC",
+  "loai": "Thông tư",
+  "ten": "Sửa đổi, bổ sung các Thông tư quy định thủ tục hải quan đối với hàng hóa XK, NK, quá cảnh gửi qua bưu chính, chuyển phát nhanh quốc tế",
+  "ngay": "29/09/2026",
+  "nhom": [
+   "Chuyển phát nhanh",
+   "Thủ tục hải quan"
+  ],
+  "vaitro": "Văn bản sửa đổi, bổ sung",
+  "sua_doi": "Thông tư 191/2015/TT-BTC, Thông tư 49/2015/TT-BTC và Thông tư 56/2019/TT-BTC",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "",
+  "ngay_hl": "16/11/2026",
+  "trang_thai": "con_hieu_luc"
+ },
+ "QD 2123_QD-CHQ_688857 quy trinh kiem tra sau thong quan.doc": {
+  "so": "2123/QĐ-CHQ",
+  "loai": "Quyết định",
+  "ten": "Ban hành Quy trình kiểm tra sau thông quan và quản lý chế độ ưu tiên",
+  "ngay": "30/12/2025",
+  "nhom": [
+   "Kiểm tra sau thông quan",
+   "Thủ tục hải quan"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực (thay thế QĐ 575/QĐ-TCHQ năm 2019 và QĐ 2659/QĐ-TCHQ năm 2015)",
+  "ghi_chu": "",
+  "ngay_hl": "01/02/2026",
+  "trang_thai": "con_hieu_luc"
+ },
+ "TT 33_2023_TT-BTC_548476 quy định về xác định xuất xứ hàng hóa xuất khẩu, nhập khẩu do Bộ trưởng Bộ Tài chính ban hành.doc": {
+  "so": "33/2023/TT-BTC",
+  "loai": "Thông tư",
+  "ten": "Quy định về xác định xuất xứ hàng hóa XK, NK tại khu vực hải quan",
+  "ngay": "31/05/2023",
+  "nhom": [
+   "Thủ tục hải quan",
+   "Xuất xứ hàng hóa"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực (thay thế một số thông tư trước; bổ sung bởi TT 124/2026/TT-BTC)",
+  "ghi_chu": "",
+  "ngay_hl": "15/07/2023",
+  "trang_thai": "con_hieu_luc"
+ },
+ "TT 124_2026_TT-BTC_721643bổ sung Khoản 10 Điều 15 Thông tư 33.2023.TT-BTC quy định về xác định xuất xứ hàng hóa xuất khẩu, nhập khẩu do Bộ trưởng Bộ Tài chính ban hành.doc": {
+  "so": "124/2026/TT-BTC",
+  "loai": "Thông tư",
+  "ten": "Bổ sung khoản 10 Điều 15 Thông tư 33/2023/TT-BTC (kiểm tra chứng từ chứng nhận xuất xứ theo quản lý rủi ro)",
+  "ngay": "22/08/2026",
+  "nhom": [
+   "Thủ tục hải quan",
+   "Xuất xứ hàng hóa"
+  ],
+  "vaitro": "Văn bản sửa đổi, bổ sung",
+  "sua_doi": "Thông tư 33/2023/TT-BTC",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "",
+  "ngay_hl": "22/08/2026",
+  "trang_thai": "con_hieu_luc"
+ },
+ "ND 31_2018_ND-CP_376559 về hướng dẫn Luật Quản lý ngoại thương về xuất xứ hàng hóa.doc": {
+  "so": "31/2018/NĐ-CP",
+  "loai": "Nghị định",
+  "ten": "Quy định chi tiết Luật Quản lý ngoại thương về xuất xứ hàng hóa",
+  "ngay": "08/03/2018",
+  "nhom": [
+   "Xuất xứ hàng hóa"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "",
+  "ngay_hl": "08/03/2018",
+  "trang_thai": "con_hieu_luc"
+ },
+ "TT 05_2018_TT-BCT_366061 quy định về xuất xứ hàng hóa do Bộ trưởng Bộ Công Thương ban hành.doc": {
+  "so": "05/2018/TT-BCT",
+  "loai": "Thông tư",
+  "ten": "Quy định về xuất xứ hàng hóa",
+  "ngay": "03/04/2018",
+  "nhom": [
+   "Xuất xứ hàng hóa"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực (đã sửa bởi TT 44/2023, TT 23/2025/TT-BCT)",
+  "ghi_chu": "",
+  "ngay_hl": "03/04/2018",
+  "trang_thai": "con_hieu_luc"
+ },
+ "TT 44_2023_TT-BCT_594358 sửa đổi Thông tư 05.2018.TT-BCT quy định về xuất xứ hàng hóa do Bộ trưởng Bộ Công Thương ban hành.doc": {
+  "so": "44/2023/TT-BCT",
+  "loai": "Thông tư",
+  "ten": "Sửa đổi, bổ sung một số điều của Thông tư 05/2018/TT-BCT về xuất xứ hàng hóa",
+  "ngay": "29/12/2023",
+  "nhom": [
+   "Xuất xứ hàng hóa"
+  ],
+  "vaitro": "Văn bản sửa đổi, bổ sung",
+  "sua_doi": "Thông tư 05/2018/TT-BCT",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "",
+  "ngay_hl": "15/02/2024",
+  "trang_thai": "con_hieu_luc"
+ },
+ "TT 23_2025_TT-BCT_656048 sua doi bo sung TT05.2018.doc": {
+  "so": "23/2025/TT-BCT",
+  "loai": "Thông tư",
+  "ten": "Sửa đổi, bổ sung Thông tư 05/2018/TT-BCT về xuất xứ hàng hóa",
+  "ngay": "05/05/2025",
+  "nhom": [
+   "Xuất xứ hàng hóa"
+  ],
+  "vaitro": "Văn bản sửa đổi, bổ sung",
+  "sua_doi": "Thông tư 05/2018/TT-BCT",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "",
+  "ngay_hl": "05/05/2025",
+  "trang_thai": "con_hieu_luc"
+ },
+ "TT 40_2025_TT-BCT_662963 quy định về cấp Giấy chứng nhận xuất xứ hàng hóa.doc": {
+  "so": "40/2025/TT-BCT",
+  "loai": "Thông tư",
+  "ten": "Quy định về cấp Giấy chứng nhận xuất xứ hàng hóa và chấp thuận cho thương nhân tự chứng nhận xuất xứ hàng hóa xuất khẩu",
+  "ngay": "22/06/2025",
+  "nhom": [
+   "Xuất xứ hàng hóa"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực (có thể đã được sửa bởi TT 26/2026/TT-BCT - chưa có trong thư mục)",
+  "ghi_chu": "",
+  "ngay_hl": "01/07/2025",
+  "trang_thai": "con_hieu_luc"
+ },
+ "luat quan ly ngoai thuong 05_2017_QH14_322219.doc": {
+  "so": "05/2017/QH14",
+  "loai": "Luật",
+  "ten": "Luật Quản lý ngoại thương",
+  "ngay": "12/06/2017",
+  "nhom": [
+   "Quản lý ngoại thương"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "",
+  "ngay_hl": "01/01/2018",
+  "trang_thai": "con_hieu_luc"
+ },
+ "ND 292_2026_ND-CP_716030 huong dan luat quan ly ngoai thuong.doc": {
+  "so": "292/2026/NĐ-CP",
+  "loai": "Nghị định",
+  "ten": "Quy định chi tiết một số điều và biện pháp để tổ chức, hướng dẫn thi hành Luật Quản lý ngoại thương",
+  "ngay": "22/07/2026",
+  "nhom": [
+   "Quản lý ngoại thương"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực (thay thế NĐ 69/2018/NĐ-CP)",
+  "ghi_chu": "",
+  "ngay_hl": "05/09/2026",
+  "trang_thai": "con_hieu_luc"
+ },
+ "ND 342_2026_ND-CP_318607 quy dinh chi tiet luat quan ly ngoai thuong.doc": {
+  "so": "342/2026/NĐ-CP",
+  "loai": "Nghị định",
+  "ten": "Quy định chi tiết Luật Thương mại và Luật Quản lý ngoại thương về hoạt động mua bán hàng hóa của nhà đầu tư nước ngoài, tổ chức kinh tế có vốn đầu tư nước ngoài",
+  "ngay": "03/09/2026",
+  "nhom": [
+   "Quản lý ngoại thương"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "",
+  "ngay_hl": "18/10/2026",
+  "trang_thai": "con_hieu_luc"
+ },
+ "TT 48_2026_TT-BCT_724196 huong dan luat quan ly ngoai thuong.doc": {
+  "so": "48/2026/TT-BCT",
+  "loai": "Thông tư",
+  "ten": "Quy định chi tiết một số điều của Luật Quản lý ngoại thương và Nghị định 292/2026/NĐ-CP",
+  "ngay": "05/09/2026",
+  "nhom": [
+   "Quản lý ngoại thương"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "",
+  "ngay_hl": "05/09/2026",
+  "trang_thai": "con_hieu_luc"
+ },
+ "Luat xu ly vi pham hanh chinh 15_2012_QH13_142766.doc": {
+  "so": "15/2012/QH13",
+  "loai": "Luật",
+  "ten": "Luật Xử lý vi phạm hành chính (bản gốc 2012)",
+  "ngay": "20/06/2012",
+  "nhom": [
+   "Xử phạt vi phạm hành chính",
+   "Pháp luật chung"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực (đã sửa bởi Luật 67/2020/QH14 và Luật 88/2025/QH15)",
+  "ghi_chu": "",
+  "ngay_hl": "01/07/2013",
+  "sua_doi_boi": "Luật 67/2020/QH14; Luật 88/2025/QH15",
+  "trang_thai": "con_hieu_luc"
+ },
+ "Luật số 67.2020.QH1467_2020_QH14_373520.doc": {
+  "so": "67/2020/QH14",
+  "loai": "Luật",
+  "ten": "Luật sửa đổi, bổ sung một số điều của Luật Xử lý vi phạm hành chính",
+  "ngay": "13/11/2020",
+  "nhom": [
+   "Xử phạt vi phạm hành chính"
+  ],
+  "vaitro": "Văn bản sửa đổi, bổ sung",
+  "sua_doi": "Luật Xử lý vi phạm hành chính 15/2012/QH13",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "",
+  "ngay_hl": "01/01/2022",
+  "trang_thai": "con_hieu_luc"
+ },
+ "Luật số 88.2025.QH15 88_2025_QH15_659898.doc": {
+  "so": "88/2025/QH15",
+  "loai": "Luật",
+  "ten": "Luật sửa đổi, bổ sung một số điều của Luật Xử lý vi phạm hành chính",
+  "ngay": "25/06/2025",
+  "nhom": [
+   "Xử phạt vi phạm hành chính"
+  ],
+  "vaitro": "Văn bản sửa đổi, bổ sung",
+  "sua_doi": "Luật Xử lý vi phạm hành chính 15/2012/QH13",
+  "hieu_luc": "Còn hiệu lực",
+  "ghi_chu": "",
+  "ngay_hl": "01/07/2025",
+  "trang_thai": "con_hieu_luc"
+ },
+ "Luật Thuế GTGT 48.2024.QH1548_2024_QH15_556390.doc": {
+  "so": "48/2024/QH15",
+  "loai": "Luật",
+  "ten": "Luật Thuế giá trị gia tăng",
+  "ngay": "26/11/2024",
+  "nhom": [
+   "Thuế XNK & quản lý thuế"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực (thay thế Luật Thuế GTGT 13/2008/QH12; đã sửa bởi Luật 90/2025/QH15)",
+  "ghi_chu": "Riêng khoản 25 Điều 5 và Điều 17 có hiệu lực từ 01/01/2026",
+  "ngay_hl": "01/07/2025",
+  "sua_doi_boi": "Luật 90/2025/QH15",
+  "trang_thai": "con_hieu_luc"
+ },
+ "TT 191.2015 TT-BTC_296944.doc": {
+  "so": "191/2015/TT-BTC",
+  "loai": "Thông tư",
+  "ten": "Quy định thủ tục hải quan đối với hàng hóa xuất khẩu, nhập khẩu, quá cảnh gửi qua dịch vụ chuyển phát nhanh quốc tế",
+  "ngay": "24/11/2015",
+  "nhom": [
+   "Chuyển phát nhanh",
+   "Thủ tục hải quan"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực (đã sửa bởi TT 56/2019/TT-BTC và TT 142/2026/TT-BTC)",
+  "ghi_chu": "",
+  "ngay_hl": "01/01/2016",
+  "sua_doi_boi": "Thông tư 56/2019/TT-BTC; Thông tư 142/2026/TT-BTC",
+  "trang_thai": "con_hieu_luc"
+ },
+ "TT 49_2015_TT-BTC_271479.doc": {
+  "so": "49/2015/TT-BTC",
+  "loai": "Thông tư",
+  "ten": "Quy định thủ tục hải quan đối với thư, gói, kiện hàng hóa xuất khẩu, nhập khẩu gửi qua dịch vụ bưu chính của doanh nghiệp được chỉ định",
+  "ngay": "14/04/2015",
+  "nhom": [
+   "Chuyển phát nhanh",
+   "Thủ tục hải quan"
+  ],
+  "vaitro": "Văn bản gốc",
+  "sua_doi": "",
+  "hieu_luc": "Còn hiệu lực (đã sửa bởi TT 56/2019/TT-BTC và TT 142/2026/TT-BTC)",
+  "ghi_chu": "",
+  "ngay_hl": "29/05/2015",
+  "sua_doi_boi": "Thông tư 56/2019/TT-BTC; Thông tư 142/2026/TT-BTC",
+  "trang_thai": "con_hieu_luc"
+ },
+ "TT 56.2019.doc": {
+  "so": "56/2019/TT-BTC",
+  "loai": "Thông tư",
+  "ten": "Sửa đổi, bổ sung một số điều của Thông tư 49/2015/TT-BTC và Thông tư 191/2015/TT-BTC về thủ tục hải quan hàng bưu chính, chuyển phát nhanh",
+  "ngay": "23/08/2019",
+  "nhom": [
+   "Chuyển phát nhanh",
+   "Thủ tục hải quan"
+  ],
+  "vaitro": "Văn bản sửa đổi, bổ sung",
+  "sua_doi": "Thông tư 49/2015/TT-BTC và Thông tư 191/2015/TT-BTC",
+  "hieu_luc": "Còn hiệu lực (một số nội dung đã sửa tiếp bởi TT 142/2026/TT-BTC)",
+  "ghi_chu": "",
+  "ngay_hl": "15/10/2019",
+  "trang_thai": "con_hieu_luc"
+ }
+}

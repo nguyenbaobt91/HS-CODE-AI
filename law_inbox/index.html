@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tra cứu Pháp luật Hải quan</title>
+<link rel="stylesheet" href="../portal-tabs.css">
+<script>(function(){try{const s=localStorage.getItem('hscoder_theme')||localStorage.getItem('law_theme');if(s==='light')document.documentElement.classList.remove('dark');else document.documentElement.classList.add('dark')}catch(e){}})();</script>
+<style>
+.pt-pl{--c1:#064e3b;--c2:#047857;--lt:#6ee7b7;--sh:rgba(4,120,87,.55)}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;background-color:#f1f5f9;background-image:linear-gradient(to bottom,rgba(241,245,249,.60),rgba(248,250,252,.78)),url('./bg_cyber_port.jpg');background-attachment:fixed;background-position:center center;background-repeat:no-repeat;background-size:cover;color:#0f172a;line-height:1.55;min-height:100vh;transition:background .25s,color .25s}
+header{position:sticky;top:0;z-index:40;height:65px;background:linear-gradient(135deg,rgba(6,78,59,.96) 0%,rgba(4,120,87,.93) 100%);color:#f8fafc;border-bottom:1px solid rgba(110,231,183,.32);box-shadow:0 6px 20px rgba(6,78,59,.22);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.h-inner{max-width:1380px;height:100%;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
+.wrap{max-width:1380px;margin:0 auto;padding:18px 24px 36px}
+.brand{display:flex;align-items:center;gap:8px;white-space:nowrap;flex-shrink:0}
+.brand h1{margin:0;font-size:17px;font-weight:800;color:#fff;letter-spacing:-.01em}
+.nav-pills{display:inline-flex;align-items:center;gap:4px;padding:4px;border-radius:999px;background:rgba(2,6,23,.28);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(8px);overflow-x:auto;max-width:100%;scrollbar-width:none;justify-self:center}
+.nav-pills::-webkit-scrollbar{display:none}
+.tab{padding:5px 14px;height:28px;border-radius:999px;background:transparent;color:#f1f5f9 !important;cursor:pointer;font-size:12.5px;font-weight:600;border:0;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;transition:background .15s,color .15s}
+.tab:hover{background:rgba(255,255,255,.16);color:#fff !important}
+.tab.on{background:#fff;color:#065f46 !important;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.theme-toggle-btn{justify-self:end;width:36px;height:36px;min-width:36px;padding:0;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.30);color:#fde68a;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.theme-toggle-btn:hover{background:rgba(255,255,255,.26);border-color:rgba(255,255,255,.55);transform:translateY(-1px)}
+.theme-toggle-btn svg{width:17px;height:17px;fill:currentColor;display:block}
+.fsearch-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.sbox{display:flex;gap:8px;align-items:stretch;width:100%;max-width:680px}
+.qwrap{position:relative;flex:1;display:flex}
+.qwrap textarea{width:100%;padding-right:38px}
+.clr{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:22px;height:22px;border:0;border-radius:50%;background:rgba(148,163,184,.25);color:#475569;font-size:12px;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1}
+.clr:hover{background:rgba(148,163,184,.45);color:#0f172a}
+html.dark .clr{background:rgba(148,163,184,.22);color:#cbd5e1}html.dark .clr:hover{background:rgba(148,163,184,.4);color:#fff}
+textarea{flex:1;height:40px;min-height:40px;max-height:140px;resize:none;border:1px solid rgba(148,163,184,.45);border-radius:12px;padding:10px 14px;font:inherit;font-size:13.5px;line-height:1.35;outline:none;overflow-y:auto;background:rgba(255,255,255,.94);color:#0f172a;box-shadow:0 2px 8px rgba(15,23,42,.08);backdrop-filter:blur(8px)}
+textarea:focus{border-color:#059669;box-shadow:0 0 0 3px rgba(5,150,105,.18)}
+.btn{border:0;border-radius:12px;padding:0 18px;background:linear-gradient(135deg,#059669,#047857);color:#fff;font-weight:700;cursor:pointer;font-size:13.5px;box-shadow:0 2px 8px rgba(4,120,87,.3);white-space:nowrap;transition:all .18s}
+.btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.meta{font-size:13px;color:#334155;margin:4px 2px 10px}
+.card{background:rgba(255,255,255,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(226,232,240,.92);border-radius:12px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 6px rgba(15,23,42,.05);transition:box-shadow .15s,border-color .15s}
+.card:hover{border-color:#34d399;box-shadow:0 6px 16px rgba(4,120,87,.12)}
+.card .head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.cite{font-weight:700;color:#065f46;font-size:15px}
+.sub{font-size:12.5px;color:#64748b;margin:2px 0 6px}
+.chip{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:1px 8px;margin-right:4px;background:#d1fae5;color:#065f46}
+.chip.sd{background:#fef3c7;color:#92400e}.chip.pl{background:#ede9fe;color:#5b21b6}.chip.hn{background:#dcfce7;color:#166534}
+.chip.bad{background:#fee2e2;color:#991b1b}.chip.warn{background:#ffedd5;color:#9a3412}.chip.ok{background:#dcfce7;color:#166534}
+.txt{white-space:pre-wrap;font-size:14px;margin-top:6px;background:rgba(248,250,252,.85);border-left:3px solid #34d399;padding:8px 12px;border-radius:0 8px 8px 0;line-height:1.65}
+mark{background:#fde68a;border-radius:3px;padding:0 1px}
+.acts{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+.a{font-size:12.5px;border:1px solid #cbd5e1;background:#f8fafc;border-radius:8px;padding:4px 10px;cursor:pointer;color:#0f172a;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:background .15s}
+.a:hover{background:#d1fae5;border-color:#6ee7b7}
+.score{flex:0 0 auto;background:#f1f5f9;border-radius:999px;padding:1px 8px;font-size:11px;color:#64748b}
+.num{display:inline-block;min-width:22px;text-align:center;background:#047857;color:#fff;border-radius:6px;font-size:11px;padding:0 5px;margin-right:6px}
+table{width:100%;border-collapse:collapse;background:rgba(255,255,255,.92);border-radius:10px;overflow:hidden;font-size:13px}
+th,td{padding:8px 10px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top}
+th{background:#e2e8f0;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+tr.cl{cursor:pointer}tr.cl:hover td{background:#ecfdf5}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.68);display:none;align-items:flex-start;justify-content:center;padding:24px 14px;overflow:auto;z-index:100}
+.modal.on{display:flex}
+.mbox{background:#fff;border-radius:14px;max-width:1040px;width:100%;padding:18px 20px;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.mbox hr{border:0;border-top:1px dashed #cbd5e1;margin:12px 0}
+.close{float:right;cursor:pointer;font-size:22px;border:0;background:none}
+.empty{text-align:center;color:#475569;padding:32px 10px}
+.hist{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0;font-size:12px;color:#475569}
+.hist a{background:rgba(255,255,255,.82);border:1px solid #cbd5e1;border-radius:999px;padding:3px 10px;color:#047857;cursor:pointer;text-decoration:none;backdrop-filter:blur(6px);display:inline-flex;align-items:center;gap:5px}
+.hist a:hover{background:#d1fae5;border-color:#34d399}
+.hist a .hx{font-size:11px;color:#94a3b8;padding:0 2px;border-radius:50%}
+.hist a .hx:hover{color:#dc2626;background:rgba(220,38,38,.12)}
+.hist .hcl{background:rgba(254,226,226,.85);border:1px solid #fca5a5;border-radius:999px;color:#b91c1c;cursor:pointer;font-size:11.5px;font-weight:600;padding:3px 10px}
+.hist .hcl:hover{background:#fecaca;color:#991b1b}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;display:none;z-index:70}
+.more{display:block;margin:14px auto 30px;padding:9px 22px;border:1px solid #047857;background:rgba(255,255,255,.9);color:#047857;border-radius:999px;font-weight:600;cursor:pointer}.more:hover{background:#047857;color:#fff}
+.tw{overflow-x:auto;border-radius:12px;box-shadow:0 2px 8px rgba(15,23,42,.06)}.tw table{min-width:760px}
+h3{font-size:15px;color:#065f46;margin:18px 2px 8px}
+#dsearch,#fsearch{width:100%;max-width:320px;border:1px solid #cbd5e1;border-radius:999px;padding:7px 14px;font-size:13px;margin:0 0 8px;outline:none;background:rgba(255,255,255,.92);box-shadow:0 1px 4px rgba(15,23,42,.06)}
+.fbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.fn{font-family:Consolas,monospace;font-size:11.5px;color:#475569;word-break:break-all}
+#btn-scroll-top{position:fixed;right:20px;bottom:20px;opacity:.92;width:40px;height:40px;border-radius:50%;border:1px solid rgba(110,231,183,.4);background:linear-gradient(135deg,#059669,#047857);color:#fff;font-size:18px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(4,120,87,.35);z-index:50;transition:transform .18s}
+#btn-scroll-top:hover{transform:translateY(-2px)}
+html.dark body{background-color:#070d1e;background-image:linear-gradient(to bottom,rgba(7,13,30,.85),rgba(5,10,24,.92)),url('./bg_cyber_port.jpg');background-attachment:fixed;background-position:center center;background-repeat:no-repeat;background-size:cover;color:#f1f5f9}
+html.dark header{background:linear-gradient(135deg,rgba(6,58,45,.95) 0%,rgba(4,96,70,.92) 100%);border-bottom:1px solid rgba(110,231,183,.25);box-shadow:0 10px 28px rgba(0,0,0,.38)}
+html.dark .tab.on{background:#10b981;color:#022c22 !important}
+html.dark textarea,html.dark #dsearch,html.dark #fsearch{background:rgba(15,23,42,.92);color:#f1f5f9;border-color:rgba(110,231,183,.28)}
+html.dark .card,html.dark table{background:rgba(11,19,43,.84);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-color:rgba(110,231,183,.16);color:#e2e8f0}
+html.dark .mbox{background:rgba(11,19,43,.97);border:1px solid rgba(110,231,183,.22);color:#e2e8f0}
+html.dark .card:hover{border-color:#34d399;box-shadow:0 4px 16px rgba(16,185,129,.18)}
+html.dark .cite,html.dark h3{color:#6ee7b7}
+html.dark .sub,html.dark .meta,html.dark .fn,html.dark .empty,html.dark .hist{color:#94a3b8}
+html.dark .hist a{background:rgba(15,23,42,.78);border-color:rgba(110,231,183,.25);color:#6ee7b7}
+html.dark .hist a:hover{background:rgba(6,78,59,.65);border-color:#34d399}
+html.dark .hist .hcl{background:rgba(127,29,29,.45);border-color:rgba(248,113,113,.45);color:#fca5a5}
+html.dark .hist .hcl:hover{background:rgba(153,27,27,.7)}
+html.dark .txt{background:rgba(30,41,59,.85);border-left-color:#10b981;color:#e2e8f0}
+html.dark .score{background:#1e293b;color:#94a3b8}
+html.dark .a{background:#1e293b;border-color:#334155;color:#e2e8f0}html.dark .a:hover{background:#064e3b;border-color:#34d399}
+html.dark th{background:#1e293b;color:#cbd5e1}html.dark th,html.dark td{border-bottom-color:#1e293b}
+html.dark tr.cl:hover td{background:rgba(6,78,59,.35)}
+html.dark .chip{background:rgba(16,185,129,.22);color:#6ee7b7}
+html.dark .chip.sd{background:rgba(217,119,6,.22);color:#fcd34d}
+html.dark .chip.pl{background:rgba(124,58,237,.22);color:#c4b5fd}
+html.dark .chip.hn,html.dark .chip.ok{background:rgba(22,163,74,.22);color:#86efac}
+html.dark .chip.bad{background:rgba(220,38,38,.22);color:#fca5a5}
+html.dark .chip.warn{background:rgba(234,88,12,.22);color:#fdba74}
+html.dark mark{background:#854d0e;color:#fef08a}
+html.dark .more{background:rgba(15,23,42,.85);border-color:#10b981;color:#6ee7b7}html.dark .more:hover{background:#059669;color:#fff}
+html.dark .close{color:#cbd5e1}html.dark .mbox hr{border-top-color:#334155}
+@media(max-width:760px){header{height:auto;padding:8px 0}.h-inner{display:flex;flex-wrap:wrap;justify-content:space-between;padding:0 14px}.wrap{padding:14px}.brand h1{font-size:15.5px}.sbox{max-width:100%}.card{padding:12px}.card .head{flex-direction:column;gap:2px}}
+@media print{header,.fsearch-bar,.acts,#btn-scroll-top,.toast{display:none}body{background:#fff}.card{break-inside:avoid;box-shadow:none}}
+</style>
+</head>
+<body class="has-portal-rail" style="--portal-max:1380px">
+<nav class="portal-bar" style="--portal-max:1380px;--portal-pad:16px" aria-label="Chuyển cổng tra cứu"><div class="portal-inner"><a class="portal-tab pt-hs" href="../" title="Cổng Tra Cứu &amp; Đề Xuất Mã HS Code AI"><span class="pt-ico">🔍</span><span class="pt-full">HS Code AI</span><span class="pt-short">HS Code AI</span></a><a class="portal-tab pt-hc" href="../hoa-chat/" title="Cổng Nghiệp Vụ Hóa Chất 2026 &amp; Quét MSDS"><span class="pt-ico">🧪</span><span class="pt-full">Hóa Chất &amp; MSDS</span><span class="pt-short">Hóa Chất</span></a><a class="portal-tab pt-kt" href="../chuyen-nganh/" title="Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026"><span class="pt-ico">⚖️</span><span class="pt-full">KTCN 4 Bộ 2026</span><span class="pt-short">KTCN</span></a><a class="portal-tab pt-pl" href="./" aria-current="page" title="Cổng Tra Cứu Pháp Luật Hải Quan"><span class="pt-ico">📜</span><span class="pt-full">Pháp luật HQ</span><span class="pt-short">Pháp luật</span><span class="pt-now">ĐANG MỞ</span></a></div></nav>
+<aside class="portal-rail" style="--rail-top:84px" aria-label="Cổng tra cứu (lề trái)"><a class="portal-block pt-hs" href="../" title="Cổng Tra Cứu &amp; Đề Xuất Mã HS Code AI"><span class="pb-ico">🔍</span><span class="pb-txt"><span class="pb-sub">Mở cổng</span><span class="pb-main">HS Code AI</span></span></a><a class="portal-block pt-hc" href="../hoa-chat/" title="Cổng Nghiệp Vụ Hóa Chất 2026 &amp; Quét MSDS"><span class="pb-ico">🧪</span><span class="pb-txt"><span class="pb-sub">Mở cổng</span><span class="pb-main">Hóa chất</span></span></a><a class="portal-block pt-kt" href="../chuyen-nganh/" title="Cổng Tra Cứu Kiểm Tra Chuyên Ngành 2026"><span class="pb-ico">⚖️</span><span class="pb-txt"><span class="pb-sub">Mở cổng</span><span class="pb-main">KTCN 2026</span></span></a><a class="portal-block pt-pl" href="./" aria-current="page" title="Cổng Tra Cứu Pháp Luật Hải Quan"><span class="pb-ico">📜</span><span class="pb-txt"><span class="pb-sub">ĐANG MỞ</span><span class="pb-main">Pháp luật</span></span></a></aside>
+<header>
+  <div class="h-inner">
+    <div class="brand"><h1>📜 Pháp luật Hải quan</h1></div>
+    <div class="nav-pills">
+      <button class="tab on" data-t="s">🔎 Tra cứu</button>
+      <button class="tab" data-t="d">📚 Danh mục</button>
+      <button class="tab" data-t="f">📎 Văn bản đính kèm</button>
+    </div>
+    <button id="themeBtn" class="theme-toggle-btn" title="Chuyển chế độ Tối / Sáng"></button>
+  </div>
+</header>
+<div class="wrap">
+  <div id="pS">
+    <div class="fsearch-bar">
+      <div class="sbox">
+        <div class="qwrap">
+          <textarea id="q" rows="1" spellcheck="false" placeholder='VD: thông báo CSSX, "khai bổ sung", Điều 15 NĐ 169' autofocus></textarea>
+          <button id="clr" class="clr" type="button" title="Xóa nhanh để nhập lại">✕</button>
+        </div>
+        <button class="btn" id="go">Tìm</button>
+      </div>
+      <div id="hist" class="hist" style="display:none"></div>
+    </div>
+    <div class="meta" id="meta"></div>
+    <div id="res"></div>
+  </div>
+  <div id="pD" style="display:none"></div>
+  <div id="pF" style="display:none"></div>
+</div>
+<div class="modal" id="modal"><div class="mbox"><button class="close" onclick="closeM()">×</button><div id="mc"></div></div></div>
+<div class="toast" id="toast">Đã copy trích dẫn</div>
+<script src="law_data.js"></script>
+<script>
+(function(){
+const D=window.LAW_DATA||{docs:[],chunks:[]}, docs=D.docs, rawChunks=D.chunks;
+const $=id=>document.getElementById(id);
+const clean=s=>(s||'').normalize('NFC').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,'');
+function fold(s){return (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[đĐ]/g,'d').toLowerCase()}
+const STOP=new Set('va la cua cho cac nhung mot duoc de khi thi tai trong voi khong nay do ve theo tu den nhu neu quy dinh hay hoac the nao nhieu gi sao bi se da dang tren duoi sau truoc phai can'.split(' '));
+function splitToks(f){return f.split(/[^a-z0-9\/]+/).filter(x=>x)}
+const today=new Date();
+function pd(s){const m=(s||'').match(/(\d+)\/(\d+)\/(\d{4})/);return m?new Date(+m[3],+m[2]-1,+m[1]):null}
+function status(d){
+  const h=d.hieu_luc||'', hMain=h.split('(')[0];
+  if(/bãi bỏ bởi|đã bị bãi bỏ|hết hiệu lực/i.test(h)&&!/một phần|còn hiệu lực/i.test(hMain))return['bad','Hết hiệu lực'];
+  const t=pd(d.ngay_hl);if(t&&t>today)return['warn','Chưa có hiệu lực ('+d.ngay_hl+')'];
+  if(/một phần/i.test(hMain))return['warn','Còn hiệu lực một phần'];
+  return['ok','Còn hiệu lực'];
+}
+docs.forEach(d=>{
+  d._st=status(d);
+  const dt=pd(d.ngay_hl)||pd(d.ngay),dn=pd(d.ngay);
+  d._ts=dt?dt.getTime():0;d._dn=dn?dn.getTime():0;d._fut=dt&&dt>today?1:0;
+  d._fso=fold(d.so||'');d._fnh=fold(d.nhan||'');
+});
+// index (chỉ index 35 văn bản chính, bỏ qua 5 Phụ lục)
+const chunks=[];const df=new Map();
+rawChunks.forEach((c,i)=>{
+  if(!docs[c.d]||docs[c.d].vaitro.startsWith('Phụ'))return;
+  c.t=clean(c.t);c.td=clean(c.td||'');
+  c.f=fold(c.t);c.fn=' '+c.f.replace(/[^a-z0-9\/]+/g,' ')+' ';c.lt=c.t.toLowerCase();c.ft=fold(c.td);c.i=i;
+  const tf=new Map();splitToks(c.f+' '+c.ft).forEach(t=>tf.set(t,(tf.get(t)||0)+1));c.tf=tf;c.len=c.f.length;
+  tf.forEach((_,t)=>df.set(t,(df.get(t)||0)+1));
+  chunks.push(c);
+});
+const N=chunks.length||1;
+const idf=t=>Math.log(1+N/((df.get(t)||0)+0.5));
+function label(c){const d=docs[c.d];let s='';if(c.kh)s+='khoản '+c.kh+' ';if(c.dieu)s+='Điều '+c.dieu+' ';else s+=c.td+' ';return s+d.nhan}
+function cite(c){const d=docs[c.d];let s='Căn cứ '+label(c);if(d.vaitro!=='Văn bản gốc'&&d.sua_doi)s+=' (sửa đổi, bổ sung '+d.sua_doi+')';return s}
+const ABBR={cssx:'co so san xuat',sxxk:'san xuat xuat khau',xnk:'xuat nhap khau',nk:'nhap khau',xk:'xuat khau',tthq:'thu tuc hai quan',stq:'sau thong quan',hq:'hai quan','c/o':'chung nhan xuat xu',kcx:'khu che xuat',dncx:'doanh nghiep che xuat',txtn:'tam xuat tai nhap',tntx:'tam nhap tai xuat',ktcn:'kiem tra chuyen nganh',vphc:'vi pham hanh chinh'};
+const KEEP1=new Set(['diem','mau','form','khoan','phu']);
+function expandWord(w){const k=fold(w).replace(/[^a-z0-9\/]/g,'');return ABBR[k]||w}
+function expandStr(s){return s.split(/\s+/).map(expandWord).join(' ')}
+function matchDocRef(q){
+  const re=/(?:^|\s)(nđ|nd|nghị định|nghi dinh|tt|thông tư|thong tu|luật|luat|qđ|qd|quyết định|quyet dinh|vbhn)\s*(\d+(?:\/\d{4})?)/gi;
+  const targets=new Set();
+  const qClean=q.replace(re,(all,tp,num)=>{
+    const t=fold(tp),n=num.toLowerCase();
+    let matched=false;
+    docs.forEach((d,idx)=>{
+      if(d.vaitro.startsWith('Phụ'))return;
+      const soMatch=d._fso.startsWith(n+'/')||d._fso===n||d._fnh.includes(' '+n+'/')||d._fnh.endsWith(' '+n);
+      if(!soMatch)return;
+      const tpOk=(t.startsWith('n')&&d._fnh.includes('nghi dinh'))||(t.startsWith('t')&&d._fnh.includes('thong tu'))||(t.startsWith('l')&&d._fnh.includes('luat'))||(t.startsWith('q')&&d._fnh.includes('quyet dinh'))||(t==='vbhn'&&d._fso.includes('vbhn'));
+      if(tpOk){targets.add(idx);matched=true}
+    });
+    return matched?' ':all;
+  });
+  return{targets,qClean};
+}
+function search(rawQ){
+  const phrases=[];
+  let q=rawQ.replace(/["“”]([^"“”]+)["“”]/g,(m,p)=>{
+    const a=fold(p).replace(/[^a-z0-9\/]+/g,' ').trim();
+    const b=fold(expandStr(p)).replace(/[^a-z0-9\/]+/g,' ').trim();
+    if(a)phrases.push(b&&b!==a?[a,b]:[a]);
+    return ' '+p+' ';
+  });
+  const {targets:docTargets,qClean}=matchDocRef(q);
+  q=qClean;
+  const nmRaw=q.toLowerCase().match(/(?:điều|dieu)\s+(\d+[a-zđ]?)/i);
+  const nmVal=nmRaw?nmRaw[1].toLowerCase():'';
+  const nmFold=fold(nmVal);
+  const kmRaw=fold(q).match(/khoan\s+(\d+)/);
+  const kmVal=kmRaw?kmRaw[1]:'';
+  const pen=/\b(phat|xu phat|vi pham)\b/.test(fold(q));
+  const qExp=expandStr(q);
+  const qraw=splitToks(fold(qExp));
+  const qo=[];
+  for(let i=0;i<qraw.length;i++){
+    const t=qraw[i],prev=i>0?qraw[i-1]:'';
+    if(STOP.has(t))continue;
+    if(t.length>1||/^\d$/.test(t)||KEEP1.has(prev))qo.push(t);
+  }
+  let qt=[...new Set(qo)];
+  if(nmVal)qt=qt.filter(t=>t!=='dieu'&&t!==nmFold);
+  if(kmVal)qt=qt.filter(t=>t!=='khoan'&&t!==kmVal);
+  const hasStruct=Boolean(nmVal||docTargets.size);
+  if(!qt.length&&!hasStruct)qt=[...new Set(qraw)];
+  const seqs=[];
+  for(let i=0;i<qraw.length-1;i++){
+    if(!STOP.has(qraw[i])&&!STOP.has(qraw[i+1]))seqs.push(qraw[i]+' '+qraw[i+1]);
+  }
+  const whole=qo.length>=2&&qo.length<=8?qo.join(' '):'';
+  const qa=q.toLowerCase().normalize('NFC').split(/[^\p{L}\p{N}\/]+/u).filter(x=>x&&!STOP.has(fold(x)));
+  const hasAccent=/[^\x00-\x7f]/.test(q);
+  const bia=[];for(let i=0;i<qa.length-1;i++)bia.push(qa[i]+' '+qa[i+1]);
+  const fD=filterDoc;
+  const sw=qt.reduce((a,t)=>a+idf(t),0)||1;
+  const out=[],seenKey=new Set();
+  for(const c of chunks){
+    const d=docs[c.d];
+    if(fD!==''&&String(c.d)!==String(fD))continue;
+    if(phrases.length&&!phrases.every(alts=>alts.some(p=>c.fn.includes(' '+p+' '))))continue;
+    const cDieu=(c.dieu||'').toLowerCase();
+    const dieuHit=nmVal?((nmVal.includes('đ')?cDieu===nmVal:(cDieu===nmVal||fold(cDieu)===nmFold))?1:0):0;
+    const docHit=docTargets.size?(docTargets.has(c.d)?1:0):0;
+    if(docTargets.size&&!docHit)continue;
+    if(nmVal&&!qt.length&&!dieuHit)continue;
+    let sc=0,hit=0,hw=0;
+    for(const t of qt){const f=c.tf.get(t);if(f){hit++;hw+=idf(t);sc+=idf(t)*(1+Math.log(f))}}
+    if(qt.length&&!hit)continue;
+    const cov=qt.length?hw/sw:1;
+    if(qt.length>0&&qt.length<=3&&hit<qt.length)continue;
+    if(qt.length>3&&cov<0.25)continue;
+    const dupKey=c.d+'|'+(c.dieu||'')+'|'+(c.kh||'')+'|'+c.f.slice(0,120);
+    if(seenKey.has(dupKey))continue;seenKey.add(dupKey);
+    sc=sc/(1+0.12*Math.log(1+c.len/200));
+    sc*=0.4+cov*1.6;
+    for(const b of seqs){if(c.fn.includes(' '+b+' '))sc+=idf(b.split(' ')[0])*2}
+    if(whole&&c.fn.includes(' '+whole+' '))sc*=2.2;
+    for(const p of phrases)sc*=1.8;
+    let accCnt=0;
+    if(hasAccent){
+      for(const b of bia){if(c.lt.includes(b)){accCnt+=2;sc+=idf(fold(b.split(' ')[0]))*2}}
+      for(const w of qa){if(/[^\x00-\x7f]/.test(w)&&c.lt.includes(w)){accCnt++;sc+=idf(fold(w))*0.6}}
+    }
+    for(const t of qt){if(c.ft.includes(t))sc+=idf(t)*1.5}
+    if(dieuHit)sc*=(d.vaitro==='Văn bản gốc'||d.vaitro==='Văn bản hợp nhất')?3.2:1.2;
+    if(kmVal&&c.kh===kmVal)sc*=1.5;
+    const penHit=pen&&d.nhom.includes('Xử phạt vi phạm hành chính')?1:0;
+    if(penHit)sc*=2.0;
+    if(d._st[0]==='bad')sc*=0.6;
+    const tier=cov>=0.99?2:cov>=0.65?1:0;
+    const phraseHit=(whole&&c.fn.includes(' '+whole+' '))?2:(seqs.length&&seqs.every(s=>c.fn.includes(' '+s+' ')))?1:0;
+    const accentHit=hasAccent?(bia.length&&bia.every(b=>c.lt.includes(b))?2:accCnt>0?1:0):0;
+    const stRank=d._st[0]==='bad'?2:d._fut?1:0;
+    out.push({c,sc,cov,tier,phraseHit,accentHit,penHit,stRank,dieuHit,docHit,ts:d._ts,dn:d._dn});
+  }
+  out.sort((a,b)=>b.dieuHit-a.dieuHit||b.docHit-a.docHit||a.stRank-b.stRank||b.penHit-a.penHit||b.tier-a.tier||b.phraseHit-a.phraseHit||b.accentHit-a.accentHit||b.ts-a.ts||b.dn-a.dn||b.sc-a.sc);
+  const docCnt=new Map();
+  out.forEach(x=>docCnt.set(x.c.d,(docCnt.get(x.c.d)||0)+1));
+  if(fD===''){
+    const grouped=[];
+    for(const st of [0,1,2]){
+      const p1=[],p2=[],seen=new Map();
+      for(const x of out){
+        if(x.stRank!==st)continue;
+        const n=seen.get(x.c.d)||0;seen.set(x.c.d,n+1);(n<3?p1:p2).push(x);
+      }
+      grouped.push(...p1,...p2);
+    }
+    return{out:grouped,qt,docCnt};
+  }
+  return{out,qt,docCnt};
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+function hl(text,qt,max){
+  const f=fold(text);const rg=[];
+  const isW=ch=>ch&&/[a-z0-9]/.test(ch);
+  for(const t of qt){
+    if(!t)continue;
+    let p=0;
+    while((p=f.indexOf(t,p))>=0){
+      const e=p+t.length;
+      if(!isW(f[p-1])&&!isW(f[e]))rg.push([p,e]);
+      p=e;
+    }
+  }
+  rg.sort((a,b)=>a[0]-b[0]||b[1]-a[1]);
+  const mg=[];
+  for(const r of rg){if(!mg.length||r[0]>mg[mg.length-1][1])mg.push([r[0],r[1]]);else if(r[1]>mg[mg.length-1][1])mg[mg.length-1][1]=r[1]}
+  let start=0,end=text.length,pre='',post='';
+  if(max&&text.length>max){
+    const first=mg.length?mg[0][0]:0;
+    start=Math.max(0,first-120);
+    if(start>0){const sp=text.indexOf(' ',start);if(sp>0&&sp-start<25)start=sp+1;pre='… '}
+    end=Math.min(text.length,start+max);
+    if(end<text.length){const sp=text.lastIndexOf(' ',end);if(sp>start+max-40)end=sp;post=' …'}
+  }
+  let o='',pos=start;
+  for(const [a,b] of mg){if(b<=pos||a>=end)continue;const aa=Math.max(a,pos);o+=esc(text.slice(pos,aa));o+='<mark>'+esc(text.slice(aa,Math.min(b,end)))+'</mark>';pos=Math.min(b,end)}
+  o+=esc(text.slice(pos,end));return pre+o+post;
+}
+function chips(d){
+  const vc=d.vaitro==='Văn bản gốc'?'':d.vaitro==='Văn bản hợp nhất'?'hn':'sd';
+  return '<span class="chip '+vc+'">'+d.vaitro+'</span>'+d.nhom.map(n=>'<span class="chip">'+n+'</span>').join('')+'<span class="chip '+d._st[0]+'">'+d._st[1]+'</span>';
+}
+let shown=[],qtG=[],lim=25,lastR=null,filterDoc='',toastTm=null,docModal={xs:[],lim:50,prev:''};
+function cardHtml(x,k,docCnt){
+  const c=x.c,d=docs[c.d];
+  return '<div class="card"><div class="head"><div class="cite"><span class="num">'+(k+1)+'</span>'+esc(label(c))+'</div><span class="score">độ khớp '+Math.round(x.cov*100)+'%</span></div>'+
+    '<div class="sub">'+esc(d.ten)+' · ban hành '+esc(d.ngay)+(c.ch?' · '+esc(c.ch):'')+(c.dieu&&c.td?' · <b>'+esc(c.td)+'</b>':'')+'</div>'+
+    '<div>'+chips(d)+'</div>'+
+    (d.vaitro!=='Văn bản gốc'&&d.sua_doi?'<div class="sub">Sửa đổi, bổ sung: '+esc(d.sua_doi)+'</div>':'')+
+    '<div class="txt" id="t'+k+'">'+hl(c.t,qtG,700)+'</div>'+
+    '<div class="acts">'+(c.t.length>700?'<button class="a" onclick="LAW.full('+k+')">Xem đầy đủ</button>':'')+
+    '<button class="a" onclick="LAW.copy('+k+')">📋 Copy trích dẫn</button>'+
+    '<button class="a" onclick="LAW.copyTxt('+k+')">📄 Copy nội dung + trích dẫn</button>'+
+    (c.dieu?'<button class="a" onclick="LAW.dieu('+k+')">Xem toàn bộ Điều '+esc(c.dieu)+'</button>':'')+
+    (docCnt&&docCnt.get(c.d)>3&&filterDoc===''?'<button class="a" onclick="LAW.onlyDoc('+c.d+')">📑 Xem cả '+docCnt.get(c.d)+' đoạn trong '+esc(d.nhan)+'</button>':'')+
+    (d.file?'<a class="a" href="'+encodeURIComponent(d.file)+'" target="_blank">📎 File gốc</a>':'')+'</div></div>';
+}
+function render(r){
+  const {out,qt,docCnt}=r;qtG=qt;lastR=r;shown=out.slice(0,lim);
+  const fBadge=filterDoc!==''?'<div class="meta">Đang lọc riêng: <b>'+esc(docs[filterDoc].nhan)+'</b> <button class="a" style="padding:1px 8px;margin-left:6px" onclick="LAW.clearDoc()">✕ Bỏ lọc văn bản</button></div>':'';
+  $('meta').innerHTML=fBadge+(out.length?('Tìm thấy <b>'+out.length+'</b> đoạn phù hợp'+(out.length>shown.length?' (đang hiển thị '+shown.length+' đoạn khớp nhất)':'')+(qt.length?' · Từ khóa: '+qt.map(t=>'<span class="chip">'+esc(t)+'</span>').join(''):'')):'');
+  if(!out.length){$('res').innerHTML='<div class="empty">Không tìm thấy nội dung phù hợp. Thử dùng từ khóa khác hoặc bỏ bớt bộ lọc.</div>';return}
+  $('res').innerHTML=shown.map((x,k)=>cardHtml(x,k,docCnt)).join('')+(out.length>shown.length?'<button class="more" id="moreBtn" onclick="LAW.more()">Xem thêm '+Math.min(25,out.length-shown.length)+' kết quả (còn '+(out.length-shown.length)+')</button>':'');
+}
+function toast(msg){const t=$('toast');t.textContent=msg||'Đã copy';t.style.display='block';clearTimeout(toastTm);toastTm=setTimeout(()=>t.style.display='none',1500)}
+function clip(s,msg){
+  const fb=()=>{const a=document.createElement('textarea');a.value=s;document.body.appendChild(a);a.select();try{document.execCommand('copy');toast(msg)}catch(e){}a.remove()};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(s).then(()=>toast(msg)).catch(fb);else fb();
+}
+function openModal(html){$('mc').innerHTML=html;$('modal').classList.add('on');$('modal').scrollTop=0;document.body.style.overflow='hidden'}
+function renderDocSlice(from,to){
+  let h='';
+  for(let j=from;j<to;j++){
+    const x=docModal.xs[j];
+    const showH=x.dieu&&x.dieu!==docModal.prev;
+    if(x.dieu)docModal.prev=x.dieu;
+    h+=(j>0?'<hr>':'')+'<div class="txt">'+(showH?'<b>Điều '+esc(x.dieu)+(x.td?'. '+esc(x.td):'')+'</b>\n':'')+esc(x.t)+'</div>';
+  }
+  return h;
+}
+window.LAW={
+  full(k){const c=shown[k].c;$('t'+k).innerHTML=hl(c.t,qtG,0)},
+  copy(k){clip(cite(shown[k].c),'Đã copy trích dẫn')},
+  copyTxt(k){const c=shown[k].c;clip(cite(c)+':\n"'+c.t+'"','Đã copy nội dung + trích dẫn')},
+  dieu(k){const c=shown[k].c;const same=chunks.filter(x=>x.d===c.d&&x.dieu===c.dieu);const d=docs[c.d];
+    openModal('<div class="cite">Điều '+esc(c.dieu)+'. '+esc(same[0].td||'')+'</div><div class="sub">'+esc(d.nhan)+' - '+esc(d.ten)+'</div><div style="margin-bottom:8px">'+chips(d)+(d.file?' <a class="a" style="margin-left:6px" href="'+encodeURIComponent(d.file)+'" target="_blank">📂 Mở file Word gốc</a>':'')+'</div>'+
+      same.map(x=>'<div class="txt">'+hl(x.t,qtG,0)+'</div>').join('<hr>'))},
+  readDoc(i){const d=docs[i];const xs=chunks.filter(x=>x.d===i);
+    docModal={xs,lim:50,prev:''};
+    const end=Math.min(50,xs.length);
+    const body=renderDocSlice(0,end);
+    openModal('<div class="cite">'+esc(d.nhan)+'</div><div class="sub">'+esc(d.ten)+' · Ban hành '+esc(d.ngay)+' · Hiệu lực '+esc(d.ngay_hl||d.ngay||'—')+' ('+xs.length+' đoạn)</div>'+
+      '<div style="margin:6px 0 10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">'+chips(d)+(d.file?'<a class="a" href="'+encodeURIComponent(d.file)+'" target="_blank">📂 Mở file gốc ('+esc(d.file)+')</a>':'')+'</div>'+
+      '<div id="mbody">'+body+'</div>'+(xs.length>end?'<button class="more" id="mdocMore" onclick="LAW.moreDoc()">Xem thêm '+Math.min(50,xs.length-end)+' đoạn (còn '+(xs.length-end)+')</button>':''))},
+  moreDoc(){const prev=docModal.lim;const end=Math.min(prev+50,docModal.xs.length);docModal.lim=end;
+    $('mbody').insertAdjacentHTML('beforeend',renderDocSlice(prev,end));
+    const b=$('mdocMore');if(b){if(end>=docModal.xs.length)b.remove();else b.textContent='Xem thêm '+Math.min(50,docModal.xs.length-end)+' đoạn (còn '+(docModal.xs.length-end)+')'}},
+  more(){const prev=shown.length;lim+=25;const {out,docCnt}=lastR;shown=out.slice(0,lim);
+    const b=$('moreBtn');if(b)b.remove();
+    let add='';for(let k=prev;k<shown.length;k++)add+=cardHtml(shown[k],k,docCnt);
+    if(out.length>shown.length)add+='<button class="more" id="moreBtn" onclick="LAW.more()">Xem thêm '+Math.min(25,out.length-shown.length)+' kết quả (còn '+(out.length-shown.length)+')</button>';
+    $('res').insertAdjacentHTML('beforeend',add);
+    const fBadge=filterDoc!==''?'<div class="meta">Đang lọc riêng: <b>'+esc(docs[filterDoc].nhan)+'</b> <button class="a" style="padding:1px 8px;margin-left:6px" onclick="LAW.clearDoc()">✕ Bỏ lọc văn bản</button></div>':'';
+    $('meta').innerHTML=fBadge+'Tìm thấy <b>'+out.length+'</b> đoạn phù hợp'+(out.length>shown.length?' (đang hiển thị '+shown.length+' đoạn khớp nhất)':'')+(qtG.length?' · Từ khóa: '+qtG.map(t=>'<span class="chip">'+esc(t)+'</span>').join(''):'')},
+  onlyDoc(i){filterDoc=String(i);run()},
+  clearDoc(){filterDoc='';run()},
+  doc(i){filterDoc=String(i);tab('s');run();$('q').focus()}
+};
+window.closeM=()=>{$('modal').classList.remove('on');document.body.style.overflow=''};
+$('modal').onclick=e=>{if(e.target.id==='modal')closeM()};
+function getH(){try{return JSON.parse(localStorage.getItem('law_hist')||'[]')}catch(e){return[]}}
+function saveH(q){let h=getH().filter(x=>x.toLowerCase()!==q.toLowerCase());h.unshift(q);if(h.length>8)h=h.slice(0,8);try{localStorage.setItem('law_hist',JSON.stringify(h))}catch(e){}drawH()}
+function drawH(){const h=getH(),el=$('hist');if(!h.length){el.style.display='none';return}el.style.display='flex';el.innerHTML='<span>Gần đây:</span>'+h.map((x,i)=>'<a data-q="'+esc(x)+'">'+esc(x)+'<span class="hx" data-i="'+i+'" title="Xóa mục này">×</span></a>').join('')+'<button class="hcl" type="button" title="Xóa toàn bộ lịch sử">✕ Xóa lịch sử</button>';el.querySelectorAll('a').forEach(a=>a.onclick=e=>{if(e.target.classList.contains('hx')){e.stopPropagation();const arr=getH();arr.splice(+e.target.dataset.i,1);try{localStorage.setItem('law_hist',JSON.stringify(arr))}catch(er){}drawH();return}$('q').value=a.dataset.q;run()});el.querySelector('.hcl').onclick=()=>{try{localStorage.removeItem('law_hist')}catch(e){}drawH()}}
+function syncClr(){$('clr').style.display=$('q').value?'flex':'none'}
+function run(keep){
+  syncClr();if(keep!==true)lim=25;
+  const q=$('q').value.trim();
+  try{history.replaceState(null,'',q?'#q='+encodeURIComponent(q):location.pathname)}catch(e){}
+  if(!q){
+    $('res').innerHTML='';
+    $('meta').innerHTML=filterDoc!==''?'<div class="meta">Đang lọc riêng: <b>'+esc(docs[filterDoc].nhan)+'</b> <button class="a" style="padding:1px 8px;margin-left:6px" onclick="LAW.clearDoc()">✕ Bỏ lọc văn bản</button> · Nhập từ khóa để tra trong văn bản này.</div>':'';
+    return;
+  }
+  saveH(q);render(search(q));
+}
+function tab(t){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.t===t));$('pS').style.display=t==='s'?'':'none';$('pD').style.display=t==='d'?'':'none';$('pF').style.display=t==='f'?'':'none'}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>tab(b.dataset.t));
+$('go').onclick=()=>run();
+$('q').addEventListener('input',syncClr);
+$('clr').onclick=()=>{$('q').value='';filterDoc='';syncClr();run();$('q').focus()};
+$('q').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();run()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeM();if(e.key==='/'&&document.activeElement.tagName!=='TEXTAREA'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();$('q').focus()}});
+const tp=document.createElement('button');tp.id='btn-scroll-top';tp.title='Lên đầu trang';tp.textContent='↑';tp.onclick=()=>scrollTo({top:0,behavior:'smooth'});document.body.appendChild(tp);addEventListener('scroll',()=>tp.style.display=scrollY>120?'flex':'none');
+const MOON='<svg viewBox="0 0 384 512"><path d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"/></svg>';
+const SUN='<svg viewBox="0 0 512 512"><path d="M361.5 1.2c5 2.1 8.6 6.6 9.6 11.9L391 121l107.9 19.8c5.3 1 9.8 4.6 11.9 9.6s1.5 10.7-1.6 15.2L446.9 256l62.3 90.3c3.1 4.5 3.7 10.2 1.6 15.2s-6.6 8.6-11.9 9.6L391 391 371.1 498.9c-1 5.3-4.6 9.8-9.6 11.9s-10.7 1.5-15.2-1.6L256 446.9l-90.3 62.3c-4.5 3.1-10.2 3.7-15.2 1.6s-8.6-6.6-9.6-11.9L121 391 13.1 371.1c-5.3-1-9.8-4.6-11.9-9.6s-1.5-10.7 1.6-15.2L65.1 256 2.8 165.7c-3.1-4.5-3.7-10.2-1.6-15.2s6.6-8.6 11.9-9.6L121 121 140.9 13.1c1-5.3 4.6-9.8 9.6-11.9s10.7-1.5 15.2 1.6L256 65.1 346.3 2.8c4.5-3.1 10.2-3.7 15.2-1.6zM160 256a96 96 0 1 1 192 0 96 96 0 1 1 -192 0zm224 0a128 128 0 1 0 -256 0 128 128 0 1 0 256 0z"/></svg>';
+const tb=$('themeBtn'),syncT=()=>{const dk=document.documentElement.classList.contains('dark');tb.innerHTML=dk?SUN:MOON};
+syncT();tb.onclick=()=>{const dk=document.documentElement.classList.toggle('dark');try{localStorage.setItem('law_theme',dk?'dark':'light');localStorage.setItem('hscoder_theme',dk?'dark':'light')}catch(e){}syncT()};
+// danh mục
+(function(){
+  const groups=['Văn bản gốc','Văn bản hợp nhất','Văn bản sửa đổi, bổ sung'];
+  const nDocs=docs.filter(d=>!d.vaitro.startsWith('Phụ')).length;
+  let h='<div class="meta">Bấm vào một dòng để tra cứu trong văn bản đó. Tổng <b>'+nDocs+'</b> văn bản, <b>'+chunks.length.toLocaleString('vi-VN')+'</b> đoạn.</div>';
+  groups.forEach(g=>{
+    const xs=docs.map((d,i)=>[d,i]).filter(x=>x[0].vaitro===g);if(!xs.length)return;
+    h+='<h3>'+g+' ('+xs.length+')</h3><div class="tw"><table><tr><th style="white-space:nowrap">Văn bản</th><th>Tên</th><th>Lĩnh vực</th><th style="white-space:nowrap">Ban hành</th><th>Tình trạng</th><th style="white-space:nowrap">Sửa đổi cho</th></tr>'+
+      xs.map(([d,i])=>'<tr class="cl" onclick="LAW.doc('+i+')"><td style="white-space:nowrap"><b>'+esc(d.nhan)+'</b></td><td>'+esc(d.ten)+'</td><td>'+d.nhom.join(', ')+'</td><td style="white-space:nowrap">'+esc(d.ngay)+'</td><td><span class="chip '+d._st[0]+'">'+d._st[1]+'</span><div class="sub">'+esc(d.hieu_luc)+'</div></td><td>'+esc(d.sua_doi||'-')+'</td></tr>').join('')+'</table></div>';
+  });
+  $('pD').innerHTML='<input id="dsearch" placeholder="Lọc danh mục theo số hiệu / tên...">'+h;
+  const rows=[...document.querySelectorAll('#pD tr.cl')];rows.forEach(r=>r.dataset.f=fold(r.textContent));
+  $('dsearch').oninput=function(){const v=fold(this.value);rows.forEach(r=>r.style.display=r.dataset.f.includes(v)?'':'none')};
+})();
+// văn bản đính kèm
+(function(){
+  const withFile=docs.map((d,i)=>[d,i]).filter(x=>x[0].file&&!x[0].vaitro.startsWith('Phụ'));
+  const rows=withFile.map(([d,i],idx)=>'<tr class="frow"><td>'+(idx+1)+'</td><td><b>'+esc(d.nhan)+'</b><div class="sub">'+esc(d.ten)+'</div><div style="margin-top:3px">'+chips(d)+'</div></td>'+
+    '<td style="white-space:nowrap"><div>'+esc(d.ngay||'—')+'</div><div class="sub">Hiệu lực: '+esc(d.ngay_hl||d.ngay||'—')+'</div></td>'+
+    '<td><div class="fn">'+esc(d.file)+'</div></td>'+
+    '<td style="white-space:nowrap"><div style="display:flex;gap:6px;flex-wrap:wrap"><a class="a" href="'+encodeURIComponent(d.file)+'" target="_blank">📂 Mở file gốc</a><button class="a" onclick="LAW.readDoc('+i+')">📖 Đọc nhanh</button></div></td></tr>').join('');
+  $('pF').innerHTML='<div class="fbar"><input id="fsearch" placeholder="Tìm văn bản đính kèm theo số hiệu, tên, tên file..."><div class="meta" style="margin:0">Tổng <b>'+withFile.length+'</b> văn bản gốc đính kèm (bấm <b>Mở file gốc</b> để tải/mở bằng Word đối chiếu).</div></div>'+
+    '<div class="tw"><table><tr><th style="width:42px">#</th><th>Văn bản</th><th style="width:130px;white-space:nowrap">Ban hành / HL</th><th style="width:230px">Tên file trong thư mục</th><th style="width:210px">Đối chiếu</th></tr>'+rows+'</table></div>';
+  const frows=[...document.querySelectorAll('#pF tr.frow')];frows.forEach(r=>r.dataset.f=fold(r.textContent));
+  $('fsearch').oninput=function(){const v=fold(this.value);frows.forEach(r=>r.style.display=r.dataset.f.includes(v)?'':'none')};
+})();
+drawH();
+const hm=location.hash.match(/^#q=(.+)/);if(hm){$('q').value=decodeURIComponent(hm[1]);run()}
+})();
+</script>
+</body>
+</html>
