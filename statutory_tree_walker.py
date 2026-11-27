@@ -21,7 +21,14 @@ def clean_vietnamese(input_str):
     return ''.join([c for c in nfkd if not unicodedata.combining(c)]).lower()
 
 def extract_head_noun(desc):
-    clean = clean_vietnamese(desc)
+    clean = clean_vietnamese(desc).strip()
+    # Bỏ qua tiền tố quy cách/số ở đầu tên hàng (vd: "25mm Van bi", "M12 Bu lông", "10A MCB", "3-phase Motor")
+    prefix_pat = re.compile(r'^(?:(?:\d+(?:[.,/]\d+)?\s*(?:mm|cm|m|a|v|vac|vdc|w|kw|kva|va|hz|bar|mpa|inch|in|"|pha|phase)?|[mdn]\d+(?:x\d+(?:[.,]\d+)?)?|ø\s*\d+)\s*[-–/]*\s+)')
+    for _ in range(3):
+        nxt = prefix_pat.sub('', clean).strip()
+        if nxt == clean or not nxt:
+            break
+        clean = nxt
     parts = re.split(r'[,;()\-–\d]', clean)
     first_part = parts[0].strip() if parts else clean
     m = re.match(r'^(mieng\s+nhua|tam\s+nhua(?:\s+phang)?|thanh\s+nhua|khung\s+nhua|mieng\s+thep|tam\s+thep|thanh\s+thep|chau\s+day|ga\s+dap|ga\s+lap\s+rap)', first_part)
@@ -145,23 +152,27 @@ class StatutoryTreeWalker:
         elif re.search(r'\b(?:khong\s+ren|chua\s+ren|tron\s+khong\s+ren)\b', text_norm):
             attrs["is_threaded"] = False
 
-        # 9. Chất liệu cấu thành (Material)
-        if re.search(r'\b(?:nhom|aluminum|aluminium)\b', text_norm):
-            attrs["material"] = "aluminum"
-        elif re.search(r'\b(?:nhua|plastic|pvc|pa66|acrylic|abs|polymer|chat\s+deo)\b', text_norm):
-            attrs["material"] = "plastic"
-        elif re.search(r'\b(?:cao\s+su|rubber|epdm|nitrile|silicone|vulcanized)\b', text_norm):
-            attrs["material"] = "rubber"
-        elif re.search(r'\b(?:thep\s+khong\s+gi|inox|ss304|ss316)\b', text_norm):
-            attrs["material"] = "stainless_steel"
-        elif re.search(r'\b(?:gang|cast\s+iron)\b', text_norm):
-            attrs["material"] = "cast_iron"
-        elif re.search(r'\b(?:thep|sat|kim\s+loai\s+den|carbon\s+steel)\b', text_norm):
-            attrs["material"] = "steel"
-        elif re.search(r'\b(?:dong\s+thau|hop\s+kim\s+dong|dong|brass|bronze|copper)\b', text_norm):
-            attrs["material"] = "copper"
-        elif re.search(r'\b(?:gom|dat\s+nung|su|ceramic|porcelain)\b', text_norm):
-            attrs["material"] = "ceramic"
+        # 9. Chất liệu cấu thành (Material - ưu tiên cụm chủ thể, tránh nhiễm ngữ cảnh máy chủ)
+        subj_mat_text = re.sub(r'\b(?:dung\s+cho|cho|trong|cua)\s+(?:may|day\s+chuyen|he\s+thong|thiet\s+bi|tu\s+dien|nha\s+may|xuong)[^,.;]*', '', text_norm)
+        def _detect_mat(src):
+            if re.search(r'\b(?:nhom|aluminum|aluminium)\b', src):
+                return "aluminum"
+            if re.search(r'\b(?:nhua|plastic|pvc|pa66|acrylic|abs|polymer|chat\s+deo)\b', src):
+                return "plastic"
+            if re.search(r'\b(?:cao\s+su|rubber|epdm|nitrile|silicone|vulcanized)\b', src):
+                return "rubber"
+            if re.search(r'\b(?:thep\s+khong\s+gi|inox|ss304|ss316)\b', src):
+                return "stainless_steel"
+            if re.search(r'\b(?:gang|cast\s+iron)\b', src):
+                return "cast_iron"
+            if re.search(r'\b(?:thep|sat|kim\s+loai\s+den|carbon\s+steel)\b', src):
+                return "steel"
+            if re.search(r'\b(?:dong\s+thau|hop\s+kim\s+dong|dong|brass|bronze|copper)\b', src):
+                return "copper"
+            if re.search(r'\b(?:gom|dat\s+nung|su|ceramic|porcelain)\b', src):
+                return "ceramic"
+            return None
+        attrs["material"] = _detect_mat(subj_mat_text) or _detect_mat(text_norm)
 
         return attrs
 

@@ -143,8 +143,8 @@
     <script src="rulings_data.js"></script>
     <script src="tariff_engine.js"></script>
     <script src="universal_engine.js"></script>
-    <script src="statutory_rules.js?v=20261126"></script>
-    <script src="statutory_rules_engine.js?v=20261126"></script>
+    <script src="statutory_rules.js?v=20261127"></script>
+    <script src="statutory_rules_engine.js?v=20261127"></script>
 
     <style id="print-styles">
         @media print {
@@ -1397,10 +1397,10 @@
             }
 
             const candidateModels = [
-                'gemini-3.5-flash',
-                'gemini-3.5-flash-lite',
-                'gemini-flash-lite-latest',
-                'gemini-3.8-flash'
+                'gemini-2.5-flash',
+                'gemini-2.0-flash',
+                'gemini-2.5-flash-lite',
+                'gemini-flash-latest'
             ];
             let successModel = null;
             let lastError = null;
@@ -4139,10 +4139,10 @@
             if (!apiKey || apiKey.length < 15) throw new Error("Chưa cấu hình Google Gemini API Key hợp lệ");
 
             const candidateModels = [
-                'gemini-3.5-flash',
-                'gemini-3.5-flash-lite',
-                'gemini-flash-lite-latest',
-                'gemini-3.8-flash'
+                'gemini-2.5-flash',
+                'gemini-2.0-flash',
+                'gemini-2.5-flash-lite',
+                'gemini-flash-latest'
             ];
 
             // Extract relevant Customs Rulings Precedents from Database (Strict Chapter Guard)
@@ -6011,7 +6011,13 @@ Trường hợp đủ thông tin:
         }
 
         function extractHeadNounStatutory(desc) {
-            const clean = cleanVietnameseStatutory(desc);
+            let clean = cleanVietnameseStatutory(desc).trim();
+            const prefixPat = /^(?:(?:\d+(?:[.,/]\d+)?\s*(?:mm|cm|m|a|v|vac|vdc|w|kw|kva|va|hz|bar|mpa|inch|in|"|pha|phase)?|[mdn]\d+(?:x\d+(?:[.,]\d+)?)?|ø\s*\d+)\s*[-–/]*\s+)/;
+            for (let i = 0; i < 3; i++) {
+                const nxt = clean.replace(prefixPat, '').trim();
+                if (nxt === clean || !nxt) break;
+                clean = nxt;
+            }
             const parts = clean.split(/[,;()\-–\d]/);
             const firstPart = parts[0] ? parts[0].trim() : clean;
             const m = firstPart.match(/^(mieng\s+nhua|tam\s+nhua(?:\s+phang)?|thanh\s+nhua|khung\s+nhua|mieng\s+thep|tam\s+thep|thanh\s+thep|chau\s+day|ga\s+dap|ga\s+lap\s+rap)/);
@@ -6145,24 +6151,20 @@ Trường hợp đủ thông tin:
                 attrs.is_threaded = false;
             }
 
-            // 9. Chất liệu cấu thành (Material)
-            if (/\b(?:nhom|aluminum|aluminium)\b/.test(textNorm)) {
-                attrs.material = "aluminum";
-            } else if (/\b(?:nhua|plastic|pvc|pa66|acrylic|abs|polymer|chat\s+deo)\b/.test(textNorm)) {
-                attrs.material = "plastic";
-            } else if (/\b(?:cao\s+su|rubber|epdm|nitrile|silicone|vulcanized)\b/.test(textNorm)) {
-                attrs.material = "rubber";
-            } else if (/\b(?:thep\s+khong\s+gi|inox|ss304|ss316)\b/.test(textNorm)) {
-                attrs.material = "stainless_steel";
-            } else if (/\b(?:gang|cast\s+iron)\b/.test(textNorm)) {
-                attrs.material = "cast_iron";
-            } else if (/\b(?:thep|sat|kim\s+loai\s+den|carbon\s+steel)\b/.test(textNorm)) {
-                attrs.material = "steel";
-            } else if (/\b(?:dong\s+thau|hop\s+kim\s+dong|dong|brass|bronze|copper)\b/.test(textNorm)) {
-                attrs.material = "copper";
-            } else if (/\b(?:gom|dat\s+nung|su|ceramic|porcelain)\b/.test(textNorm)) {
-                attrs.material = "ceramic";
-            }
+            // 9. Chất liệu cấu thành (Material - ưu tiên cụm chủ thể, tránh nhiễm ngữ cảnh máy chủ)
+            const subjMatText = textNorm.replace(/\b(?:dung\s+cho|cho|trong|cua)\s+(?:may|day\s+chuyen|he\s+thong|thiet\s+bi|tu\s+dien|nha\s+may|xuong)[^,.;]*/g, '');
+            const detectMat = (src) => {
+                if (/\b(?:nhom|aluminum|aluminium)\b/.test(src)) return "aluminum";
+                if (/\b(?:nhua|plastic|pvc|pa66|acrylic|abs|polymer|chat\s+deo)\b/.test(src)) return "plastic";
+                if (/\b(?:cao\s+su|rubber|epdm|nitrile|silicone|vulcanized)\b/.test(src)) return "rubber";
+                if (/\b(?:thep\s+khong\s+gi|inox|ss304|ss316)\b/.test(src)) return "stainless_steel";
+                if (/\b(?:gang|cast\s+iron)\b/.test(src)) return "cast_iron";
+                if (/\b(?:thep|sat|kim\s+loai\s+den|carbon\s+steel)\b/.test(src)) return "steel";
+                if (/\b(?:dong\s+thau|hop\s+kim\s+dong|dong|brass|bronze|copper)\b/.test(src)) return "copper";
+                if (/\b(?:gom|dat\s+nung|su|ceramic|porcelain)\b/.test(src)) return "ceramic";
+                return null;
+            };
+            attrs.material = detectMat(subjMatText) || detectMat(textNorm);
 
             return attrs;
         }
@@ -7373,8 +7375,9 @@ Trường hợp đủ thông tin:
                         }
                     }
                     for (let sw of subjectWords) {
-                        if (sw.length >= 3 && wcoText.includes(sw)) {
-                            score += 45;
+                        if (sw.length >= 3) {
+                            const swRegex = new RegExp('\\b' + sw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+                            if (swRegex.test(wcoText)) score += 45;
                         }
                     }
                 }
@@ -7440,8 +7443,10 @@ Trường hợp đủ thông tin:
                 // Stage 1 Universal Material Chapter Bounds
                 const isGenuinelyValve = /\b(?:van\b|valve|valves|voi\b|cock|cocks|faucet|faucets|tap\b|taps|khoa\s+nuoc|khoa\s+khi|khoa\s+dau|dong\s+ngat\s+dong\s+chay)\b/i.test(fullTextNorm);
                 const IS_FUNC_HEAD = NOTE_2A_HEADINGS.has(head) || [
-                    '8413', '8414', (isGenuinelyValve ? '8481' : null), '8501', '8504', '8535', '8536', '8537', 
-                    '9025', '9026', '9031', '9032', '8207', '8208', '8482', '8483'
+                    '8413', '8414', '8419', '8421', '8424', '8471', (isGenuinelyValve ? '8481' : null),
+                    '8482', '8483', '8501', '8504', '8517', '8525', '8535', '8536', '8537',
+                    '8541', '8542', '8543', '9013', '9015', '9018', '9022', '9025', '9026',
+                    '9027', '9030', '9031', '9032', '8207', '8208'
                 ].filter(Boolean).includes(head);
 
                 if (!isGenuinelyValve && head === '8481') {
@@ -7554,9 +7559,7 @@ Trường hợp đủ thông tin:
             }
             const rankedHeadings = Object.keys(headingScores).sort((a, b) => headingScores[b] - headingScores[a]);
             let topHeadings = rankedHeadings.slice(0, 6);
-            if (!topHeadings.length) {
-                topHeadings = ['8481', '7318', '8536', '3917'];
-            }
+            // Không ép fallback mặc định ['8481','7318','8536','3917']: nếu rỗng -> để cổng Zero-Guessing trả INSUFFICIENT_INFO
 
             // -----------------------------------------------------------------
             // STAGE 2: 8-DIGIT TARIFF LINE SCORING WITHIN TOP CANDIDATE HEADINGS
@@ -8067,15 +8070,15 @@ Trường hợp đủ thông tin:
             const validCandidates = candidates.filter(c => c.score > -2000);
             const pool = validCandidates.length > 0 ? validCandidates : candidates;
             pool.sort((a, b) => b.score - a.score);
-            const bestItem = pool.length > 0 ? pool[0].item : (db[0] || {});
+            const bestItem = pool.length > 0 ? Object.assign({}, pool[0].item) : { c: '', vn: 'Chưa xác định' };
             const bestCode = (bestItem.c || '').replace(/\./g, '');
-            const bestScore = pool.length > 0 ? pool[0].score : 1;
+            const bestScore = pool.length > 0 ? pool[0].score : 0;
 
-            // Strict Customs Information Sufficiency Gate (Nguyên tắc Zero-Guessing)
+            // Strict Customs Information Sufficiency Gate (Nguyên tắc Zero-Guessing tổng quát cho toàn Biểu thuế)
             const meaningfulTokens = extractWordTokens(fullTextNorm);
             const isDirectCodeMatch = db.some(it => (it.c || '').replace(/\./g, '') === fullTextNorm.replace(/\./g, ''));
             const isTooVague = (meaningfulTokens.length < 2 && !isDirectCodeMatch) || (fullTextNorm.length < 4);
-            const isLowConfidence = bestScore < 100 && !isDirectCodeMatch;
+            const isLowConfidence = pool.length === 0 || (bestScore < 100 && !isDirectCodeMatch);
 
             if (isTooVague || isLowConfidence) {
                 bestItem._insufficient_info = true;
@@ -8083,6 +8086,19 @@ Trường hợp đủ thông tin:
                 if (!decomp.materials || decomp.materials.length === 0) bestItem._missing_fields.push('Chất liệu cấu thành (ví dụ: thép, nhôm, đồng, nhựa, cao su, gốm nung...)');
                 if (!use || use.trim().length < 4) bestItem._missing_fields.push('Công dụng / Chức năng hoạt động chính của mặt hàng');
                 if (!specs || specs.trim().length < 3) bestItem._missing_fields.push('Thông số kỹ thuật / Kích thước định danh / Điện áp');
+            } else if (!isDirectCodeMatch && pool.length >= 2 && bestCode.length === 8) {
+                const secondItem = pool[1].item;
+                const secondCode = (secondItem.c || '').replace(/\./g, '');
+                const secondScore = pool[1].score;
+                const scoreGap = bestScore - secondScore;
+                const hasNumericSpec = /\d/.test(specs || '') || /\d+\s*(?:v|a|w|kw|mm|cm|m|kg|bar|mpa|hz)\b/i.test(fullTextNorm);
+                if (!hasNumericSpec && scoreGap <= 30 && secondCode.length === 8 && secondCode.substring(0, 4) === bestCode.substring(0, 4)) {
+                    const stopLen = (secondCode.substring(0, 6) === bestCode.substring(0, 6)) ? 6 : 4;
+                    bestItem._is_stopped = true;
+                    bestItem._stop_level = stopLen;
+                    bestItem._stop_reason = `Các mã cạnh tranh trong ${stopLen === 6 ? 'phân nhóm ' + bestCode.substring(0, 4) + '.' + bestCode.substring(4, 6) : 'nhóm ' + bestCode.substring(0, 4)} có mức độ phù hợp tương đương và hồ sơ chưa nêu thông số định lượng để phân tách tiếp theo GRI 6.`;
+                    bestItem.c = bestCode.substring(0, stopLen);
+                }
             }
 
             const competingItems = [];
@@ -8224,7 +8240,7 @@ Trường hợp đủ thông tin:
                 const specs = document.getElementById('auto-specs')?.value || desc;
                 input = { name, model_en, desc, use, specs };
                 let bestItem = classifyProductClientSide(name, desc, use, specs, model_en);
-            bestItem = auditAndSanitizeProposedHS(bestItem, data);
+                bestItem = auditAndSanitizeProposedHS(bestItem, input);
                 r = {
                     hs_code: formatHSCode(cleanCode || bestItem.c || '85365096'),
                     clean_code: cleanCode || (bestItem.c || '85365096').replace(/\./g, ''),
@@ -9231,6 +9247,141 @@ Trường hợp đủ thông tin:
             return res;
         }
 
+        function formatTradeNameWithModel(name, model) {
+            const base = (name || '').trim();
+            const mdl = (model || '').trim();
+            if (!mdl || mdl.toLowerCase() === 'tiêu chuẩn' || mdl.toLowerCase() === 'theo hồ sơ kỹ thuật') return base;
+            if (base.toLowerCase().includes(mdl.toLowerCase()) || /\(\s*model\s*:/i.test(base)) return base;
+            return `${base} (Model: ${mdl})`;
+        }
+
+        function renderDynamicChapterNotesCards(cleanCode) {
+            const ch = (cleanCode || '').substring(0, 2);
+            const hd = (cleanCode || '').substring(0, 4);
+            const chNum = parseInt(ch, 10) || 0;
+            const cards = [];
+
+            if (chNum === 39 || chNum === 40) {
+                cards.push({
+                    color: 'sky', icon: 'fa-flask',
+                    title: chNum === 39 ? 'Chú giải Chương 39 (Plastic)' : 'Chú giải Chương 40 (Cao su)',
+                    body: chNum === 39
+                        ? 'Phân biệt dạng nguyên sinh (39.01–39.14), bán thành phẩm tấm/màng/ống (39.16–39.21) và thành phẩm gia công hoàn chỉnh (39.22–39.26).'
+                        : 'Phân loại cao su lưu hóa theo hình dạng và công dụng riêng: dây đai truyền động (40.10), gioăng/phớt không cốt kim loại (40.16), ống (40.09).'
+                });
+                cards.push({
+                    color: 'amber', icon: 'fa-gears',
+                    title: 'Chú giải 1(a) & 1(g) Phần XVI',
+                    body: 'Dây đai truyền động và vòng đệm/phớt bằng cao su lưu hóa (1(a)) hoặc bộ phận dùng chung bằng plastic (1(g)) bị loại trừ khỏi Phần XVI máy móc.'
+                });
+                cards.push({
+                    color: 'rose', icon: 'fa-ban',
+                    title: 'Ranh giới Hàng chuyên dụng (84.87 / 87.08)',
+                    body: 'Phớt chắn dầu có cốt kim loại (CGCT 84.87 tr. 1969) hoặc bộ phận định danh riêng ở Chương khác không xếp vào Nhóm 39.26 / 40.16.'
+                });
+            } else if (chNum >= 72 && chNum <= 83) {
+                cards.push({
+                    color: 'amber', icon: 'fa-wrench',
+                    title: 'Chú giải 2 Phần XV (Công dụng chung)',
+                    body: 'Bu lông, ốc vít (73.18), lò xo (73.20), ống & phụ kiện (73.07/74.12), sản phẩm thép khác (73.26) dùng chung thuộc Phần XV, không xếp vào Phần XVI.'
+                });
+                cards.push({
+                    color: 'sky', icon: 'fa-hammer',
+                    title: 'Chú giải Chương 82 (Dụng cụ cầm tay/cắt gọt)',
+                    body: 'Dụng cụ cầm tay (82.03–82.05) và dụng cụ cắt gọt/dao cắt thay thế cho máy (82.07–82.08) được loại trừ khỏi Phần XVI theo Chú giải 1(k) Phần XVI.'
+                });
+                cards.push({
+                    color: 'rose', icon: 'fa-ban',
+                    title: 'Ranh giới Bộ phận máy chuyên dùng',
+                    body: 'Chỉ khi chi tiết kim loại được gia công định hình duy nhất cho máy (không thuộc nhóm công dụng chung) mới xét Chú giải 2(b) Phần XVI (84.66 / 84.73 / 84.87).'
+                });
+            } else if (chNum === 90) {
+                cards.push({
+                    color: 'sky', icon: 'fa-compass-drafting',
+                    title: 'Chú giải 1 Chương 90 (Loại trừ)',
+                    body: 'Loại trừ các bộ phận dùng chung Phần XV, sản phẩm cao su (40.16), van điều chỉnh (84.81), và thiết bị đóng cắt điện (85.36) khỏi Chương 90.'
+                });
+                cards.push({
+                    color: 'amber', icon: 'fa-gauge-high',
+                    title: 'Chú giải 2 Chương 90 (Bộ phận & Phụ kiện)',
+                    body: 'Bộ phận có chức năng độc lập thuộc Nhóm 84/85/90 xếp theo nhóm riêng của nó; bộ phận chuyên dùng chỉ dùng cho máy Chương 90 xếp theo máy đó.'
+                });
+                cards.push({
+                    color: 'rose', icon: 'fa-scale-balanced',
+                    title: 'Phân tách Đo lường (90.25–90.26) vs Kiểm tra (90.31)',
+                    body: 'Thiết bị đo/kiểm tra biến số chất lỏng, khí, nhiệt độ thuộc 90.25–90.26; dụng cụ đo kiểm cơ học/quang học không nêu nơi khác thuộc 90.31.'
+                });
+            } else if (chNum === 84 || chNum === 85) {
+                cards.push({
+                    color: 'sky', icon: 'fa-bolt',
+                    title: 'Chú giải 2(a) Phần XVI (Định danh riêng)',
+                    body: 'Máy móc/thiết bị có nhóm riêng độc lập (bơm 84.13, van 84.81, ổ bi 84.82, ổ trượt 84.83, động cơ 85.01, công tắc/MCB 85.36...) luôn xếp vào đúng nhóm của chúng.'
+                });
+                cards.push({
+                    color: 'amber', icon: 'fa-wrench',
+                    title: 'Chú giải 2(b) Phần XVI vs Chú giải 2 Phần XV',
+                    body: 'Bộ phận chuyên dùng duy nhất cho 1 loại máy xếp theo máy đó (hoặc 84.66/84.73); chi tiết công dụng chung bằng kim loại cơ bản xếp về Phần XV.'
+                });
+                cards.push({
+                    color: 'rose', icon: 'fa-ban',
+                    title: 'Chú giải loại trừ 1 Phần XVI',
+                    body: 'Loại trừ băng/dây đai cao su (1a -> 40.10), bộ phận dùng chung bằng plastic (1g -> 39.26), dao cắt & dụng cụ (1k -> Ch. 82), thiết bị đo (1m -> Ch. 90).'
+                });
+            } else {
+                const chTitle = (window.CHAPTER_TITLES && window.CHAPTER_TITLES[ch]) || `Chương ${ch || 'HS'}`;
+                cards.push({
+                    color: 'sky', icon: 'fa-book-open',
+                    title: `Chú giải ${ch ? 'Chương ' + ch : 'Phần & Chương'}`,
+                    body: `Đối chiếu trực tiếp lời văn Nhóm ${hd.length === 4 ? hd.slice(0,2) + '.' + hd.slice(2,4) : hd} và các Chú giải đầu ${chTitle} để xác định phạm vi bao gồm.`
+                });
+                cards.push({
+                    color: 'amber', icon: 'fa-filter',
+                    title: 'Chú giải Loại trừ Liên Chương',
+                    body: 'Kiểm tra danh mục hàng hóa bị loại trừ ở đầu Phần/Chương nhằm tránh xếp nhầm sang Chương vật liệu thô hoặc phụ tùng chung.'
+                });
+                cards.push({
+                    color: 'rose', icon: 'fa-scale-balanced',
+                    title: 'Thứ tự ưu tiên GRI 1',
+                    body: 'Tên nhóm hàng và Chú giải Phần/Chương có hiệu lực pháp lý cao nhất, chỉ chuyển sang GRI 2–5 khi GRI 1 chưa đủ căn cứ.'
+                });
+            }
+
+            const colorCls = {
+                sky: 'text-sky-700 dark:text-sky-300',
+                amber: 'text-amber-700 dark:text-amber-300',
+                rose: 'text-rose-700 dark:text-rose-300'
+            };
+            return cards.map(c => `
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-1.5">
+                    <div class="text-[11px] font-bold ${colorCls[c.color]} flex items-center gap-1.5">
+                        <i class="fa-solid ${c.icon}"></i>${c.title}
+                    </div>
+                    <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">${c.body}</p>
+                </div>
+            `).join('');
+        }
+
+        function buildTariffLineageHtml(cleanCode, resItemDesc, codeFmt) {
+            if (!cleanCode || cleanCode.length < 4) return `Mã số ${codeFmt || 'chưa xác định'}`;
+            const hd = cleanCode.substring(0, 4);
+            const hdFmt = `${hd.substring(0,2)}.${hd.substring(2,4)}`;
+            const hdTitle = (window.HS_HEADING_TITLES && window.HS_HEADING_TITLES[hd]) || '';
+            const parts = [`<strong>Nhóm ${hdFmt}</strong>${hdTitle ? `: ${hdTitle}` : ''}`];
+
+            if (cleanCode.length >= 6) {
+                const sub6 = cleanCode.substring(0, 6);
+                const sub6Fmt = `${sub6.substring(0,4)}.${sub6.substring(4,6)}`;
+                const sub6Title = (window.HS_SUBHEADING_TITLES && window.HS_SUBHEADING_TITLES[sub6]) || '';
+                parts.push(`<span class="text-slate-500 dark:text-slate-400">[-]</span> <strong>${sub6Fmt}</strong>${sub6Title ? `: ${sub6Title}` : ''}`);
+            }
+            if (cleanCode.length === 8) {
+                const dbMatch = (window.HS_DATABASE || []).find(it => (it.c || '').replace(/\./g, '') === cleanCode);
+                const leafDesc = (dbMatch && dbMatch.lin) ? dbMatch.lin : (resItemDesc || (dbMatch && dbMatch.vn) || '');
+                parts.push(`<strong class="text-teal-600 dark:text-amber-300">${codeFmt}: ${leafDesc}</strong>`);
+            }
+            return parts.join(' <span class="mx-1 text-slate-400">&rsaquo;</span> ');
+        }
+
         function renderGeminiAIReportHtml(res, rawInput) {
             if (res) {
                 if (res.gri2) res.gri2 = res.gri2.replace(/\bchứa\s+hoàn\s+chỉnh\b/gi, 'chưa hoàn chỉnh');
@@ -9250,20 +9401,23 @@ Trường hợp đủ thông tin:
             const matchedRulings = findMatchedCustomsRulings(rawInput, cleanCode);
 
             const step1 = res.step1_tech_review || {
-                trade_name: `${rawInput.name || declName} (Model: ${rawInput.model_en || 'Tiêu chuẩn'})`,
+                trade_name: formatTradeNameWithModel(rawInput.name || declName, rawInput.model_en),
                 material: rawInput.desc || rawInput.specs || 'Vật liệu chế tạo theo Datasheet / Hồ sơ kỹ thuật',
                 dimensions_specs: rawInput.specs || rawInput.desc || 'Thông số kỹ thuật định mức tiêu chuẩn',
                 function_transmission: rawInput.use || 'Vận hành đóng cắt, kiểm soát hoặc truyền động'
             };
+            if (step1 && step1.trade_name) {
+                step1.trade_name = step1.trade_name.replace(/(\(\s*Model:\s*[^)]+\))\s*\1+/gi, '$1');
+            }
 
-            // If 6-digit HS code is proposed, populate sub-candidates with 8-digit split branches
-            if (cleanCode.length === 6) {
+            // If 4-digit or 6-digit HS code is proposed, populate sub-candidates with 8-digit split branches
+            if (cleanCode.length === 4 || cleanCode.length === 6) {
                 const sub8Items = (window.HS_DATABASE || []).filter(it => {
                     const c = (it.c || '').replace(/\./g, '');
                     return c.startsWith(cleanCode) && c.length === 8;
                 });
-                if (sub8Items.length > 0) {
-                    res.candidates = sub8Items.slice(0, 4).map((it, idx) => {
+                if (sub8Items.length > 0 && (!res.candidates || res.candidates.length === 0)) {
+                    res.candidates = sub8Items.slice(0, 6).map((it, idx) => {
                         const itClean = (it.c || '').replace(/\./g, '');
                         return {
                             hs_code: formatHSCode(itClean),
@@ -9512,53 +9666,28 @@ Trường hợp đủ thông tin:
                             <p class="text-xs text-slate-700 dark:text-slate-200 leading-relaxed">${res.gri1 || `Căn cứ Quy tắc 1 (GRI 1), việc phân loại được xác định căn cứ vào nội dung của Nhóm ${cleanCode.substring(0,2)}.${cleanCode.substring(2,4)} và các Chú giải Phần, Chú giải Chương liên quan của Biểu thuế XNK 2026.`}</p>
                         </div>
 
-                        <!-- Khối Ma trận 3 Chú giải Pháp lý Cốt lõi (Phần XV & Phần XVI) -->
+                        <!-- Khối Ma trận 3 Chú giải Pháp lý động theo Phần & Chương của mã đang xét -->
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                            <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-1.5">
-                                <div class="text-[11px] font-bold text-sky-700 dark:text-sky-300 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-bolt"></i>Chú giải 2(a) Phần XVI
-                                </div>
-                                <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    Máy móc/thiết bị có chức năng độc lập (van 84.81, ổ bi 84.82, công tắc 85.36, dây cáp 85.44, nguồn tĩnh 85.04...) trong mọi trường hợp phải phân loại vào đúng nhóm của chúng, không phân loại theo nhóm phụ tùng chung.
-                                </p>
-                            </div>
-
-                            <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-1.5">
-                                <div class="text-[11px] font-bold text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-wrench"></i>Chú giải 2 Phần XV
-                                </div>
-                                <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    Bộ phận công dụng chung bằng kim loại cơ bản (bu lông ốc vít 73.18, lò xo 73.20, miếng thép gá lắp/bộ phận khác 73.26) thuộc Phần XV, không phân loại theo máy móc Phần XVI.
-                                </p>
-                            </div>
-
-                            <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 space-y-1.5">
-                                <div class="text-[11px] font-bold text-rose-700 dark:text-rose-300 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-ban"></i>Chú giải loại trừ 1(g) Phần XVI
-                                </div>
-                                <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    Chỉ loại trừ các bộ phận máy móc gia công bằng nhựa plastic sang Chương 39 (Nhóm 39.26); các bộ phận kim loại máy móc chuyên dụng tuân thủ Chú giải 2(b) Phần XVI.
-                                </p>
-                            </div>
+                            ${renderDynamicChapterNotesCards(cleanCode)}
                         </div>
 
                         <!-- 4 Quy tắc bổ trợ GRI 2 - GRI 5 -->
                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-[11px]">
                             <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60">
-                                <span class="font-bold text-slate-800 dark:text-slate-200 block text-[10px] uppercase font-mono">GRI 2 (Hoàn chỉnh)</span>
-                                <span class="text-slate-600 dark:text-slate-400 text-[11px] leading-tight block mt-1">${res.gri2 || 'Hàng hóa hoàn chỉnh, mang đặc tính cơ bản của thành phẩm.'}</span>
+                                <span class="font-bold text-slate-800 dark:text-slate-200 block text-[10px] uppercase font-mono">GRI 2 (Hoàn chỉnh / Tháo rời)</span>
+                                <span class="text-slate-600 dark:text-slate-400 text-[11px] leading-tight block mt-1">${res.gri2 || 'Không cần áp dụng (hoặc áp dụng GRI 2(a) nếu nhập khẩu ở dạng chưa lắp ráp/chưa hoàn chỉnh nhưng đã có đặc tính cơ bản).'}</span>
                             </div>
                             <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60">
                                 <span class="font-bold text-slate-800 dark:text-slate-200 block text-[10px] uppercase font-mono">GRI 3 (Đặc trưng nhất)</span>
-                                <span class="text-slate-600 dark:text-slate-400 text-[11px] leading-tight block mt-1">${res.gri3 || 'Mô tả định danh cụ thể nhất được ưu tiên theo GRI 3(a).'}</span>
+                                <span class="text-slate-600 dark:text-slate-400 text-[11px] leading-tight block mt-1">${res.gri3 || 'Không áp dụng (hàng hóa đã được xác định trực tiếp theo GRI 1 và Chú giải Phần/Chương).'}</span>
                             </div>
                             <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60">
                                 <span class="font-bold text-slate-800 dark:text-slate-200 block text-[10px] uppercase font-mono">GRI 4 (Giống nhất)</span>
-                                <span class="text-slate-600 dark:text-slate-400 text-[11px] leading-tight block mt-1">${res.gri4 || 'Không cần áp dụng do đã xác định cụ thể theo GRI 1-3.'}</span>
+                                <span class="text-slate-600 dark:text-slate-400 text-[11px] leading-tight block mt-1">${res.gri4 || 'Không áp dụng (chỉ dùng khi không thể phân loại theo GRI 1–3).'}</span>
                             </div>
                             <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700/60">
                                 <span class="font-bold text-slate-800 dark:text-slate-200 block text-[10px] uppercase font-mono">GRI 5 (Bao bì)</span>
-                                <span class="text-slate-600 dark:text-slate-400 text-[11px] leading-tight block mt-1">${res.gri5 || 'Bao bì đóng gói thông thường đi kèm cùng hàng hóa.'}</span>
+                                <span class="text-slate-600 dark:text-slate-400 text-[11px] leading-tight block mt-1">${res.gri5 || 'Không phát sinh bao bì chuyên dụng đặc biệt theo hồ sơ mô tả (nếu có bao bì thông thường đi kèm, phân loại cùng hàng hóa theo GRI 5(b)).'}</span>
                             </div>
                         </div>
                     </div>
@@ -9615,8 +9744,8 @@ Trường hợp đủ thông tin:
                                 <span class="text-[10px] font-bold uppercase tracking-wider text-teal-700 dark:text-teal-400 block font-mono">
                                     <i class="fa-solid fa-sitemap mr-1"></i>Chuỗi phả hệ phân tầng Biểu thuế XNK 2026 (Lineage):
                                 </span>
-                                <div class="font-mono text-slate-800 dark:text-slate-200 text-xs">
-                                    ${res.item_description ? `Nhóm ${cleanCode.substring(0,4)} &gt; ... &gt; <strong class="text-teal-600 dark:text-amber-300">${res.item_description}</strong>` : `Mã số 8 số ${codeFmt}`}
+                                <div class="font-mono text-slate-800 dark:text-slate-200 text-xs leading-relaxed">
+                                    ${buildTariffLineageHtml(cleanCode, res.item_description, codeFmt)}
                                 </div>
                             </div>
                         </div>
@@ -9670,9 +9799,9 @@ Trường hợp đủ thông tin:
                             Kết luận & Khuyến nghị Thủ tục Hải quan
                         </span>
                         <p class="leading-relaxed text-slate-700 dark:text-slate-200">
-                            Mặt hàng <strong class="text-slate-900 dark:text-white">'${rawInput.name}'</strong> được phân loại chính xác vào mã HS <strong class="text-sky-700 dark:text-amber-300 font-mono">${codeFmt}</strong> (${declName}). 
-                            Mức thuế MFN: <strong class="text-slate-900 dark:text-white">${mfn}</strong>, VAT: <strong class="text-sky-700 dark:text-sky-300">${vat}</strong>. 
-                            ${res.recommendations || 'Doanh nghiệp chuẩn bị đầy đủ hồ sơ kỹ thuật, datasheet và C/O ưu đãi để được áp dụng thuế suất ưu đãi đặc biệt 0%.'}
+                            Mặt hàng <strong class="text-slate-900 dark:text-white">'${rawInput.name}'</strong> được phân loại vào mã HS <strong class="text-sky-700 dark:text-amber-300 font-mono">${codeFmt}</strong> (${declName}). 
+                            Mức thuế NK ưu đãi (MFN): <strong class="text-slate-900 dark:text-white">${mfn}</strong>, VAT: <strong class="text-sky-700 dark:text-sky-300">${vat}</strong>. 
+                            ${res.recommendations || 'Chuẩn bị đầy đủ hồ sơ kỹ thuật, catalogue/datasheet và C/O hợp lệ để xem xét áp dụng thuế suất ưu đãi đặc biệt theo Hiệp định FTA tương ứng.'}
                         </p>
                     </div>
 
@@ -9683,18 +9812,18 @@ Trường hợp đủ thông tin:
                             Chính Sách Quản Lý Chuyên Ngành &amp; Thủ Tục Thông Quan:
                         </span>
                         <p class="leading-relaxed text-slate-700 dark:text-slate-300">
-                            ${res.specialized_policy || (cleanCode.startsWith('9026') ? 'Theo Thông tư 23/2013/TT-BKHCN và Thông tư 07/2019/TT-BKHCN của Bộ Khoa học và Công nghệ quy định về Danh mục phương tiện đo nhóm 2: Thiết bị đo tốc độ gió công nghiệp/kỹ thuật chuyên dụng dùng nội bộ trong nhà xưởng (đo quạt máy sấy keo, bảo dưỡng hệ thống điều hòa HVAC) không thuộc danh mục phương tiện đo bắt buộc phải phê duyệt mẫu và kiểm định chất lượng trước khi thông quan (chỉ áp dụng đối với phương tiện đo tốc độ phương tiện giao thông 9031.80 hoặc thiết bị khí tượng thủy văn phục vụ dự báo quốc gia). Doanh nghiệp nhập khẩu bình thường với mức thuế suất NK ưu đãi MFN là 0% và thuế VAT 8%.' : 'Mặt hàng không thuộc Danh mục hàng hóa cấm xuất khẩu, cấm nhập khẩu hoặc tạm ngừng xuất nhập khẩu theo Nghị định 69/2018/NĐ-CP. Doanh nghiệp thực hiện thủ tục thông quan thông thường theo quy định của Luật Hải quan.')}
+                            ${res.specialized_policy || (cleanCode.startsWith('9026') || cleanCode.startsWith('9030') || cleanCode.startsWith('9031') ? 'Đối chiếu Thông tư 23/2013/TT-BKHCN và Thông tư 07/2019/TT-BKHCN của Bộ Khoa học &amp; Công nghệ về phương tiện đo nhóm 2 (nếu sử dụng nội bộ không thuộc danh mục đo bắt buộc kiểm định thì thực hiện thông quan theo quy định hiện hành).' : (parseInt(cleanCode.substring(0,2), 10) >= 28 && parseInt(cleanCode.substring(0,2), 10) <= 38 ? 'Đối chiếu Luật Hóa chất 69/2025/QH15 và Nghị định 26/2026/NĐ-CP (cùng cổng Tra cứu Hóa chất) để kiểm tra nghĩa vụ khai báo/giấy phép hóa chất nếu có.' : 'Đối chiếu Nghị định 69/2018/NĐ-CP và Danh mục Kiểm tra Chuyên ngành 2026 theo mã HS 8 số để xác nhận điều kiện nhập khẩu trước khi mở tờ khai hải quan.'))}
                         </p>
                     </div>
 
-                    <!-- Lưu ý Pháp lý & Quy định Lưu hành Nội bộ -->
+                    <!-- Lưu ý Pháp lý & Phạm vi Tham khảo -->
                     <div class="p-4 rounded-2xl bg-amber-500/5 dark:bg-amber-400/5 border border-amber-500/20 dark:border-amber-400/20 text-xs text-slate-600 dark:text-slate-400 space-y-1.5 shadow-sm">
                         <div class="flex items-center gap-2 font-bold text-amber-700 dark:text-amber-400 text-xs uppercase tracking-wider">
                             <i class="fa-solid fa-shield-halved text-sm"></i>
-                            <span>Lưu ý Pháp lý &amp; Quy định Lưu hành Nội bộ:</span>
+                            <span>Lưu ý Pháp lý &amp; Giá trị Tham khảo:</span>
                         </div>
                         <p class="leading-relaxed">
-                            <strong>• Phạm vi sử dụng:</strong> Nền tảng và toàn bộ tài liệu, dữ liệu phân tích đính kèm được bảo mật và chỉ lưu hành phục vụ công tác nghiệp vụ nội bộ công ty.
+                            <strong>• Phạm vi sử dụng:</strong> Nền tảng hỗ trợ tra cứu và đối chiếu mã HS theo Biểu thuế XNK &amp; Chú giải WCO 2022 phục vụ công tác nghiệp vụ xuất nhập khẩu.
                         </p>
                         <p class="leading-relaxed">
                             <strong>• Giá trị tham khảo:</strong> Mã số HS, thuế suất và lập luận pháp lý được đề xuất chỉ mang tính chất tham khảo chuyên môn hỗ trợ ra quyết định. Kết quả phân loại chính thức cuối cùng căn cứ theo thực tế hàng hóa thông quan và phán quyết của Cơ quan Hải quan có thẩm quyền.
@@ -10020,10 +10149,12 @@ Trường hợp đủ thông tin:
             }
 
             const gri1 = `Quy tắc 1 (Pháp lý Tên Nhóm & Chú giải Phần/Chương): Căn cứ Quy tắc 1 (GRI 1) của 6 Quy tắc Tổng quát Giải thích HS, việc phân loại được xác định căn cứ vào nội dung của các nhóm và các Chú giải Phần, Chú giải Chương liên quan. Sản phẩm '${name}' sau khi đối chiếu tuần tự từ Chương 01 đến Chương 97 được xác định thuộc phạm vi pháp lý Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)} (${headingDesc}) thuộc ${chapterTitle}.${statutoryCitation}`;
-            const gri2 = `Quy tắc 2 (Thành phẩm hoàn chỉnh, Chưa lắp ráp & Hỗn hợp): Căn cứ Quy tắc 2(a), sản phẩm ở dạng thành phẩm hoàn chỉnh nguyên chiếc, đã tích hợp đầy đủ cơ cấu vận hành mang đặc tính cơ bản của thành phẩm (hoặc linh kiện đồng bộ tháo rời chưa lắp ráp), đủ điều kiện phân loại như thành phẩm hoàn chỉnh.`;
-            const gri3 = `Quy tắc 3 (Phân loại theo Thứ tự Ưu tiên 3(a) > 3(b) > 3(c)): Căn cứ Quy tắc 3(a), Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)} (${headingDesc}) mô tả đặc trưng định danh chi tiết đúng bản chất công năng và vật liệu của sản phẩm, có giá trị pháp lý ưu tiên tuyệt đối so với các nhóm mang tính chất phụ tùng chung hoặc mô tả khái quát. (Quy tắc 3(b) và 3(c) không cần áp dụng do 3(a) đã xác định rõ ràng).`;
-            const gri4 = `Quy tắc 4 (Hàng hóa giống nhất): Không cần áp dụng (do sản phẩm đã được xác định mã HS chính xác theo thứ tự ưu tiên của Quy tắc 1, 2 và 3).`;
-            const gri5 = `Quy tắc 5 (Bao bì, Hộp chứa chuyên dụng & Vật liệu đóng gói): Bao bì, vỏ hộp đóng gói thông thường đi kèm dùng để chứa đựng bảo quản sản phẩm được phân loại cùng với sản phẩm chính theo Quy tắc 5(b).`;
+            const gri2 = `Không cần áp dụng (hoặc áp dụng GRI 2(a) nếu hàng nhập khẩu ở dạng tháo rời / chưa lắp ráp nhưng đã có đặc tính cơ bản của thành phẩm).`;
+            const gri3 = `Không áp dụng (hàng hóa đã được phân loại trực tiếp theo Quy tắc 1 (GRI 1) và Chú giải Phần/Chương đối với Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)}).`;
+            const gri4 = `Không áp dụng (chỉ dùng khi không thể phân loại theo GRI 1–3).`;
+            const gri5 = /\b(?:hop\s+dung|vali|bao\s+bi|dong\s+goi|vo\s+hop|box|case|packing)\b/i.test(`${name} ${desc} ${specs}`)
+                ? `Bao bì, hộp chứa đi kèm được phân loại cùng sản phẩm chính theo Quy tắc 5(a)/5(b).`
+                : `Không phát sinh bao bì chuyên dụng đặc biệt theo hồ sơ mô tả (nếu có bao bì thông thường đi kèm, phân loại cùng hàng hóa theo GRI 5(b)).`;
             
             const lineageStr = bestItem.lin || `Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)}: ${headingDesc} > ${subheadingDesc} > ${bestItem.vn}`;
             const gri6 = `Quy tắc 6 (Xác định Phân nhóm 6 số & Mã chi tiết 8 số): Căn cứ Quy tắc 6 (GRI 6), việc phân loại ở cấp độ phân nhóm 6 số và mã hàng 8 số được xác định bằng cách so sánh ở CÙNG CẤP ĐỘ GẠCH NỐI (- hoặc --), các Chú giải phân nhóm liên quan và thông số kỹ thuật định lượng (${specs || 'tiêu chuẩn'}). Tuân thủ nghiêm ngặt tiến trình phân tầng phả hệ: ${lineageStr}. Sản phẩm được xếp chuẩn xác vào mã HS 8 số ${codeFmt} (${bestItem.vn}) của Biểu thuế Xuất nhập khẩu Việt Nam 2026.`;
@@ -10131,7 +10262,7 @@ Trường hợp đủ thông tin:
             });
 
             const step1TechReview = {
-                trade_name: `${name} (Model: ${model_en || 'Tiêu chuẩn'})`,
+                trade_name: formatTradeNameWithModel(name, model_en),
                 material: desc || specs || 'Vật liệu chế tạo theo Datasheet / Hồ sơ kỹ thuật của nhà sản xuất',
                 dimensions_specs: specs || desc || 'Thông số kích thước & quy cách kỹ thuật tiêu chuẩn',
                 function_transmission: use || 'Vận hành theo chức năng công năng chuyên dụng'
@@ -10229,10 +10360,12 @@ Trường hợp đủ thông tin:
             }
 
             const gri1 = `Quy tắc 1 (Pháp lý Tên Nhóm & Chú giải Phần/Chương): Căn cứ Quy tắc 1 (GRI 1) của 6 Quy tắc Tổng quát Giải thích HS, việc phân loại được xác định căn cứ vào nội dung của các nhóm và các Chú giải Phần, Chú giải Chương liên quan. Sản phẩm '${name}' sau khi đối chiếu tuần tự từ Chương 01 đến Chương 97 được xác định thuộc phạm vi pháp lý Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)} (${headingDesc}) thuộc ${chapterTitle}.${statutoryCitation}`;
-            const gri2 = `Quy tắc 2 (Thành phẩm hoàn chỉnh, Chưa lắp ráp & Hỗn hợp): Căn cứ Quy tắc 2(a), sản phẩm ở dạng thành phẩm hoàn chỉnh nguyên chiếc, đã tích hợp đầy đủ cơ cấu vận hành mang đặc tính cơ bản của thành phẩm (hoặc linh kiện đồng bộ tháo rời chưa lắp ráp), đủ điều kiện phân loại như thành phẩm hoàn chỉnh.`;
-            const gri3 = `Quy tắc 3 (Phân loại theo Thứ tự Ưu tiên 3(a) > 3(b) > 3(c)): Căn cứ Quy tắc 3(a), Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)} (${headingDesc}) mô tả đặc trưng định danh chi tiết đúng bản chất công năng và vật liệu của sản phẩm, có giá trị pháp lý ưu tiên tuyệt đối so với các nhóm mang tính chất phụ tùng chung hoặc mô tả khái quát. (Quy tắc 3(b) và 3(c) không cần áp dụng do 3(a) đã xác định rõ ràng).`;
-            const gri4 = `Quy tắc 4 (Hàng hóa giống nhất): Không cần áp dụng (do sản phẩm đã được xác định mã HS chính xác theo thứ tự ưu tiên của Quy tắc 1, 2 và 3).`;
-            const gri5 = `Quy tắc 5 (Bao bì, Hộp chứa chuyên dụng & Vật liệu đóng gói): Bao bì, vỏ hộp đóng gói thông thường đi kèm dùng để chứa đựng bảo quản sản phẩm được phân loại cùng với sản phẩm chính theo Quy tắc 5(b).`;
+            const gri2 = `Không cần áp dụng (hoặc áp dụng GRI 2(a) nếu hàng nhập khẩu ở dạng tháo rời / chưa lắp ráp nhưng đã có đặc tính cơ bản của thành phẩm).`;
+            const gri3 = `Không áp dụng (hàng hóa đã được phân loại trực tiếp theo Quy tắc 1 (GRI 1) và Chú giải Phần/Chương đối với Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)}).`;
+            const gri4 = `Không áp dụng (chỉ dùng khi không thể phân loại theo GRI 1–3).`;
+            const gri5 = /\b(?:hop\s+dung|vali|bao\s+bi|dong\s+goi|vo\s+hop|box|case|packing)\b/i.test(`${name} ${desc} ${specs}`)
+                ? `Bao bì, hộp chứa đi kèm được phân loại cùng sản phẩm chính theo Quy tắc 5(a)/5(b).`
+                : `Không phát sinh bao bì chuyên dụng đặc biệt theo hồ sơ mô tả (nếu có bao bì thông thường đi kèm, phân loại cùng hàng hóa theo GRI 5(b)).`;
             
             const lineageStr = targetItem.lin || `Nhóm ${heading.substring(0,2)}.${heading.substring(2,4)}: ${headingDesc} > ${targetItem.vn}`;
             const gri6 = `Quy tắc 6 (Xác định Phân nhóm 6 số & Mã chi tiết 8 số): Căn cứ Quy tắc 6 (GRI 6), việc phân loại ở cấp độ phân nhóm 6 số và mã hàng 8 số được xác định bằng cách so sánh ở CÙNG CẤP ĐỘ GẠCH NỐI (- hoặc --), các Chú giải phân nhóm liên quan và thông số kỹ thuật định lượng (${specs || 'tiêu chuẩn'}). Tuân thủ nghiêm ngặt tiến trình phân tầng phả hệ: ${lineageStr}. Sản phẩm được xếp chuẩn xác vào mã HS 8 số ${codeFmt} (${targetItem.vn}) của Biểu thuế Xuất nhập khẩu Việt Nam 2026.`;
@@ -10257,7 +10390,7 @@ Trường hợp đủ thông tin:
             ];
 
             const step1Explicit = {
-                trade_name: `${name} (Model: ${model_en || 'Tiêu chuẩn'})`,
+                trade_name: formatTradeNameWithModel(name, model_en),
                 material: desc || specs || 'Theo hồ sơ kỹ thuật',
                 dimensions_specs: specs || desc || 'Thông số kỹ thuật tiêu chuẩn',
                 function_transmission: use || 'Sử dụng công nghiệp / thương mại'
@@ -10357,9 +10490,10 @@ Trường hợp đủ thông tin:
                             const res = await response.json();
                             if (res.status === 'success' && res.result) {
                                 const r = res.result;
-                                const html = renderGeminiAIReportHtml({
-                                    hs_code: r.hs_code || r.proposed_hs || '8208.90.00',
-                                    clean_code: (r.clean_code || r.proposed_hs || '82089000').replace(/\./g, ''),
+                                const rawCode = (r.clean_code || r.proposed_hs || '').replace(/\./g, '');
+                                const srvObj = auditAndSanitizeProposedHS({
+                                    hs_code: r.hs_code || r.proposed_hs || '',
+                                    clean_code: rawCode,
                                     decl_name: r.decl_name || r.product_name || name,
                                     item_description: r.item_description || r.description || desc,
                                     mfn: r.mfn || r.duties?.mfn || '0%',
@@ -10376,8 +10510,15 @@ Trường hợp đủ thông tin:
                                     exclusions: r.exclusions || '',
                                     recommendations: r.recommendations || '',
                                     candidates: r.candidates || [],
-                                    step1_tech_review: r.step1_tech_review || null
+                                    step1_tech_review: r.step1_tech_review || null,
+                                    is_insufficient_info: Boolean(r.is_insufficient_info),
+                                    is_six_digit_proposed: Boolean(r.is_six_digit_proposed || rawCode.length === 4 || rawCode.length === 6),
+                                    missing_criteria: r.missing_criteria || [],
+                                    disambiguation_question: r.disambiguation_question || '',
+                                    warning_title: r.warning_title || '',
+                                    warning_message: r.warning_message || ''
                                 }, inputData);
+                                const html = renderGeminiAIReportHtml(srvObj, inputData);
                                 if (container) container.innerHTML = html;
                                 return;
                             }
@@ -10550,28 +10691,50 @@ Trường hợp đủ thông tin:
         }
 
         function renderClientSidePrecedents(query, container) {
-            const q = query.toLowerCase();
-            let precedentHs = "8208.90.00";
-            let rulingDoc = "Thông báo kết quả phân loại TCHQ & Tiền lệ nhóm 82.08";
-            let rationale = `Mặt hàng '${query}' được đối chiếu kết quả phân loại của Tổng cục Hải quan kết hợp 6 Quy tắc Tổng quát GRI và Bộ Chú giải HS 2022 (Công văn 1810/TCHQ-TXNK & HQKV8).`;
+            const qNorm = (typeof removeAccents === 'function' ? removeAccents(query || '') : (query || '')).toLowerCase().trim();
+            const qTokens = qNorm.split(/\s+/).filter(t => t.length >= 2);
+            const dbRulings = (window.CUSTOMS_RULINGS_DATABASE && Array.isArray(window.CUSTOMS_RULINGS_DATABASE))
+                ? window.CUSTOMS_RULINGS_DATABASE : [];
 
-            container.innerHTML = `
-                <div class="space-y-4">
-                    <div class="p-5 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/40 border border-sky-500/30 space-y-3">
-                        <div class="flex items-center justify-between">
+            const scored = dbRulings.map(r => {
+                let s = 0;
+                const rText = (typeof removeAccents === 'function' ? removeAccents(`${r.name || ''} ${r.summary || ''} ${r.hs || ''}`) : `${r.name || ''} ${r.summary || ''} ${r.hs || ''}`).toLowerCase();
+                for (const kw of (r.keywords || [])) {
+                    if (kw.length >= 3 && qNorm.includes(kw.toLowerCase())) s += 3;
+                }
+                for (const tk of qTokens) {
+                    if (rText.includes(tk)) s += 1;
+                }
+                return { r, s };
+            }).filter(x => x.s > 0).sort((a, b) => b.s - a.s).slice(0, 3);
+
+            if (scored.length === 0) {
+                container.innerHTML = `
+                    <div class="p-5 rounded-2xl bg-slate-900 border border-slate-700 text-xs text-slate-300 space-y-2">
+                        <div class="font-bold text-amber-400 flex items-center gap-2"><i class="fa-solid fa-magnifying-glass"></i>Chưa tìm thấy phán quyết TCHQ trùng khớp trực tiếp cho "${query}"</div>
+                        <p>Hệ thống đã đối chiếu kho tiền lệ TCHQ nội bộ. Vui lòng dùng nút tra cứu trực tiếp trên Cổng Tổng cục Hải quan hoặc chuyển sang tab Phân tích AI để kiểm tra theo GRI 1–6 &amp; Chú giải WCO 2022.</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = `<div class="space-y-3">` + scored.map(({ r }) => {
+                const hsFmt = (r.hs && r.hs.length === 8) ? `${r.hs.slice(0,4)}.${r.hs.slice(4,6)}.${r.hs.slice(6,8)}` : (r.hs || '');
+                return `
+                    <div class="p-5 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/40 border border-sky-500/30 space-y-2.5">
+                        <div class="flex items-center justify-between gap-2 flex-wrap">
                             <span class="px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/30 text-xs font-mono font-bold">
-                                <i class="fa-solid fa-gavel mr-1.5"></i>${rulingDoc}
+                                <i class="fa-solid fa-gavel mr-1.5"></i>${r.doc || 'Thông báo KQPL TCHQ'}
                             </span>
-                            <span class="font-mono text-xs text-amber-400 font-bold">Mã HS Tiêu chuẩn</span>
+                            <span class="font-mono text-xs text-amber-400 font-bold">Mã HS: ${hsFmt}</span>
                         </div>
-                        <p class="text-xs text-slate-200 leading-relaxed font-sans">${rationale}</p>
+                        <div class="text-xs font-bold text-white">${r.name || ''}</div>
+                        <p class="text-xs text-slate-300 leading-relaxed">${r.summary || ''}</p>
                         <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
-                            <span>Từ khóa truy vấn: <strong class="text-sky-300 font-mono">${query}</strong></span>
-                            <span class="text-emerald-400"><i class="fa-solid fa-check-double mr-1"></i>Đã chuẩn hóa theo Bộ Chú giải HS 2022 (CV 1810)</span>
+                            <span>Căn cứ: <strong class="text-sky-300">${r.basis || 'GRI 1–6 & WCO 2022'}</strong></span>
+                            <span class="text-emerald-400"><i class="fa-solid fa-check-double mr-1"></i>Kho Tiền lệ TCHQ</span>
                         </div>
-                    </div>
-                </div>
-            `;
+                    </div>`;
+            }).join('') + `</div>`;
         }
 
         function openExternalCustomsSearch(type) {
@@ -12000,7 +12163,16 @@ Trường hợp đủ thông tin:
                     }
                 }
 
-                if (gemRes && (gemRes.hs_code || gemRes.clean_code) && !gemRes.is_insufficient_info) {
+                if (gemRes && gemRes.is_insufficient_info) {
+                    priCode = "CHƯA ĐỦ THÔNG TIN";
+                    altCode = "N/A";
+                    const missingStr = (gemRes.missing_criteria || []).join(', ');
+                    revisedName = `${combinedName} [Cần bổ sung: ${missingStr || gemRes.disambiguation_question || 'thông số kỹ thuật'}]`;
+                    wcoCitation = gemRes.warning_message || 'Chưa đủ dữ kiện để chốt mã HS theo nguyên tắc Zero-Guessing.';
+                    mfnRate = 'N/A';
+                    vatRate = 'N/A';
+                    itemVnDesc = gemRes.item_description || '';
+                } else if (gemRes && (gemRes.hs_code || gemRes.clean_code)) {
                     const cCode = (gemRes.clean_code || gemRes.hs_code || '').replace(/\./g, '');
                     priCode = formatHSCode(cCode);
                     if (gemRes.candidates && gemRes.candidates.length > 0) {
