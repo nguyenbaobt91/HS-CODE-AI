@@ -7,22 +7,35 @@
 (function () {
     'use strict';
 
-    // ---------- 1. DANH MỤC VĂN BẢN HỆ THỐNG (4 VĂN BẢN WORD GỌN NHẸ) ----------
+    // ---------- 1. DANH MỤC VĂN BẢN HỆ THỐNG (14 VĂN BẢN PHÁP QUY TRONG THƯ MỤC TT CAC BO) ----------
     const SYSTEM_DOCS = [
-        { id: 'tt33',  so: '33/2026/TT-BCT',  loai: 'Thông tư', bo: 'BCT',   title: 'Danh mục hàng hóa kiểm tra chuyên ngành thuộc Bộ Công Thương', file: '33_2026_TT-BCT_710258.doc', size: 371896 },
-        { id: 'tt36',  so: '36/2026/TT-BKHCN', loai: 'Thông tư', bo: 'BKHCN', title: 'Danh mục hàng hóa kiểm tra chuyên ngành thuộc Bộ Khoa học và Công nghệ', file: '36_2026_TT-BKHCN_710259.doc', size: 891225 },
-        { id: 'tt41',  so: '41/2026/TT-BXD',  loai: 'Thông tư', bo: 'BXD',   title: 'Danh mục hàng hóa kiểm tra chuyên ngành thuộc Bộ Xây dựng', file: '41_2026_TT-BXD_697288.doc', size: 228123 },
-        { id: 'tt16',  so: '16/2026/TT-BNV',  loai: 'Thông tư', bo: 'BNV',   title: 'Danh mục máy, thiết bị, vật tư có yêu cầu nghiêm ngặt về ATVSLĐ (Bộ Nội vụ)', file: '16_2026_TT-BNV_716907.doc', size: 70502 }
+        { id: 'tt33',     so: '33/2026/TT-BCT',   loai: 'Thông tư',         bo: 'BCT',   title: 'Danh mục hàng hóa kiểm tra chuyên ngành thuộc Bộ Công Thương', file: 'TT CAC BO/33_2026_TT-BCT_710258.doc', size: 371896 },
+        { id: 'vbhn49',   so: '49/VBHN-BCT',      loai: 'Văn bản hợp nhất', bo: 'BCT',   title: 'Quy định dán nhãn năng lượng cho phương tiện, thiết bị sử dụng năng lượng (Bộ Công Thương)', file: 'TT CAC BO/49_VBHN-BCT_678911 (dan nhan nang luong).doc', size: 704000 },
+        { id: 'qd1428',   so: '1428/QĐ-BCT',      loai: 'Quyết định',       bo: 'BCT',   title: 'Danh mục phương tiện, thiết bị phải dán nhãn năng lượng và áp dụng hiệu suất tối thiểu (MEPS)', file: 'TT CAC BO/Quyet_Dinh_1428_Qd_ DAN NHAN NANG LUONG.pdf', size: 189610 },
+        { id: 'tt36',     so: '36/2026/TT-BKHCN', loai: 'Thông tư',         bo: 'BKHCN', title: 'Danh mục hàng hóa kiểm tra chuyên ngành thuộc Bộ Khoa học và Công nghệ', file: 'TT CAC BO/36_2026_TT-BKHCN_710259.doc', size: 891225 },
+        { id: 'tt56',     so: '56/2026/TT-BKHCN', loai: 'Thông tư',         bo: 'BKHCN', title: 'Quy định nhập khẩu máy móc, thiết bị, dây chuyền công nghệ đã qua sử dụng (tuổi máy ≤ 10 năm)', file: 'TT CAC BO/56_2026_TT-BKHCN_724099.doc', size: 297472 },
+        { id: 'tt63',     so: '63/2026/TT-BKHCN', loai: 'Thông tư',         bo: 'BKHCN', title: 'Danh mục sản phẩm công nghệ thông tin đã qua sử dụng cấm nhập khẩu', file: 'TT CAC BO/63_2026_TT-BKHCN DANH MỤC  HÀNG CỦ CẤM NHẬP KHẨU.pdf', size: 642354 },
+        { id: 'tt41',     so: '41/2026/TT-BXD',   loai: 'Thông tư',         bo: 'BXD',   title: 'Danh mục hàng hóa kiểm tra chuyên ngành thuộc Bộ Xây dựng (vật liệu xây dựng)', file: 'TT CAC BO/41_2026_TT-BXD_697288.doc', size: 228123 },
+        { id: 'tt49bxd',  so: '49/2026/TT-BXD',   loai: 'Thông tư',         bo: 'BXD',   title: 'Danh mục sản phẩm, hàng hóa có khả năng gây mất an toàn thuộc Bộ Xây dựng (GTVT & XD)', file: 'TT CAC BO/49-2026_TT - BXD.pdf', size: 1919044 },
+        { id: 'tt16',     so: '16/2026/TT-BNV',   loai: 'Thông tư',         bo: 'BNV',   title: 'Danh mục máy, thiết bị, vật tư có yêu cầu nghiêm ngặt về ATVSLĐ (Bộ Nội vụ)', file: 'TT CAC BO/16_2026_TT-BNV_716907.doc', size: 70502 },
+        { id: 'tt27byt',  so: '27/2026/TT-BYT',   loai: 'Thông tư',         bo: 'BYT',   title: 'Danh mục thực phẩm, dụng cụ chứa đựng, bao gói tiếp xúc thực phẩm rủi ro trung bình (Bộ Y tế)', file: 'TT CAC BO/27_2026_TT-BYT_713076.doc', size: 29236 },
+        { id: 'tt28byt',  so: '28/2026/TT-BYT',   loai: 'Thông tư',         bo: 'BYT',   title: 'Danh mục thuốc, vắc xin, sinh phẩm, nguyên liệu làm thuốc rủi ro cao & trung bình (Bộ Y tế)', file: 'TT CAC BO/28_2026_TT-BYT_713077.doc', size: 52193 },
+        { id: 'tt27bnn',  so: '27/2026/TT-BNNMT', loai: 'Thông tư',         bo: 'BNNMT', title: 'Danh mục sản phẩm, hàng hóa rủi ro trung bình & rủi ro cao thuộc Bộ Nông nghiệp và Môi trường', file: 'TT CAC BO/27_2026_TT-BNNMT_713419.doc', size: 889456 },
+        { id: 'tt44bnn',  so: '44/2026/TT-BNNMT', loai: 'Thông tư',         bo: 'BNNMT', title: 'Sửa đổi, bổ sung một số điều của Thông tư 27/2026/TT-BNNMT (Bộ NN&MT)', file: 'TT CAC BO/44_2026_TT-BNNMT_728749.doc', size: 27411 },
+        { id: 'tt125bca', so: '125/2026/TT-BCA',  loai: 'Thông tư',         bo: 'BCA',   title: 'Danh mục sản phẩm, hàng hóa rủi ro trung bình & rủi ro cao thuộc Bộ Công an', file: 'TT CAC BO/125_2026_TT-BCA_713293.doc', size: 58288 }
     ];
 
     const BO = {
         ALL:   { label: 'Tất cả' },
-        CP:    { label: 'Chính phủ',  pill: 'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-300 dark:bg-rose-950/40 dark:border-rose-900/60' },
         BCT:   { label: 'Bộ Công Thương', pill: 'text-emerald-700 bg-emerald-50 border-emerald-200 dark:text-emerald-300 dark:bg-emerald-950/40 dark:border-emerald-900/60' },
-        BKHCN: { label: 'Bộ KH&CN',   pill: 'text-blue-700 bg-blue-50 border-blue-200 dark:text-blue-300 dark:bg-blue-950/40 dark:border-blue-900/60' },
-        BXD:   { label: 'Bộ Xây dựng', pill: 'text-orange-700 bg-orange-50 border-orange-200 dark:text-orange-300 dark:bg-orange-950/40 dark:border-orange-900/60' },
-        BNV:   { label: 'Bộ Nội vụ',  pill: 'text-purple-700 bg-purple-50 border-purple-200 dark:text-purple-300 dark:bg-purple-950/40 dark:border-purple-900/60' },
-        KHAC:  { label: 'Khác',       pill: 'text-slate-700 bg-slate-50 border-slate-200 dark:text-slate-300 dark:bg-slate-800/60 dark:border-slate-700' }
+        BKHCN: { label: 'Bộ KH&CN',       pill: 'text-blue-700 bg-blue-50 border-blue-200 dark:text-blue-300 dark:bg-blue-950/40 dark:border-blue-900/60' },
+        BXD:   { label: 'Bộ Xây dựng',    pill: 'text-orange-700 bg-orange-50 border-orange-200 dark:text-orange-300 dark:bg-orange-950/40 dark:border-orange-900/60' },
+        BNV:   { label: 'Bộ Nội vụ',      pill: 'text-purple-700 bg-purple-50 border-purple-200 dark:text-purple-300 dark:bg-purple-950/40 dark:border-purple-900/60' },
+        BYT:   { label: 'Bộ Y tế',        pill: 'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-300 dark:bg-rose-950/40 dark:border-rose-900/60' },
+        BNNMT: { label: 'Bộ NN&MT',       pill: 'text-lime-700 bg-lime-50 border-lime-200 dark:text-lime-300 dark:bg-lime-950/40 dark:border-lime-900/60' },
+        BCA:   { label: 'Bộ Công an',     pill: 'text-amber-700 bg-amber-50 border-amber-200 dark:text-amber-300 dark:bg-amber-950/40 dark:border-amber-900/60' },
+        CP:    { label: 'Chính phủ',      pill: 'text-indigo-700 bg-indigo-50 border-indigo-200 dark:text-indigo-300 dark:bg-indigo-950/40 dark:border-indigo-900/60' },
+        KHAC:  { label: 'Khác',           pill: 'text-slate-700 bg-slate-50 border-slate-200 dark:text-slate-300 dark:bg-slate-800/60 dark:border-slate-700' }
     };
 
     // ---------- 2. TIỆN ÍCH ----------
@@ -45,9 +58,12 @@
     function guessBo(name) {
         const n = noTone(name).toUpperCase();
         if (/BKHCN/.test(n)) return 'BKHCN';
+        if (/BNNMT|BNNPTNT/.test(n)) return 'BNNMT';
         if (/BCT/.test(n)) return 'BCT';
         if (/BXD/.test(n)) return 'BXD';
         if (/BNV/.test(n)) return 'BNV';
+        if (/BYT/.test(n)) return 'BYT';
+        if (/BCA/.test(n)) return 'BCA';
         if (/ND-CP|ND CP|NGHI DINH|\bND\b/.test(n)) return 'CP';
         return 'KHAC';
     }
@@ -92,7 +108,7 @@
     let query = '';
     let boFilter = 'ALL';
     const availability = {}; // id -> true/false (văn bản hệ thống có trên server hay không)
-    const sysUrl = d => './' + encodeURIComponent(d.file);
+    const sysUrl = d => './' + d.file.split('/').map(encodeURIComponent).join('/');
 
     // ---------- 5. CSS & KHUNG GIAO DIỆN ----------
     const style = document.createElement('style');
