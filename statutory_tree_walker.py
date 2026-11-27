@@ -438,6 +438,29 @@ class StatutoryTreeWalker:
             }
 
         if re.search(r'\b(?:bom\s+nuoc|bom\s+ly\s+tam|centrifugal\s+pump|may\s+bom)\b', hn):
+            is_non_centrifugal = bool(re.search(r'\b(?:khong\s+(?:phai\s+)?(?:la\s+)?bom\s+ly\s+tam|kieu\s+bom\s+chan\s+khong|bom\s+piston|bom\s+banh\s+rang|bom\s+mang|bom\s+dinh\s+luong)\b', norm))
+            if is_non_centrifugal:
+                m_flow = re.search(r'(\d+(?:[.,]\d+)?)\s*m3/h\b', norm)
+                flow_val = float(m_flow.group(1).replace(',', '.')) if m_flow else None
+                if flow_val is not None and flow_val <= 8000:
+                    return {
+                        "code": "8413.81.11",
+                        "level": 8,
+                        "status": "EXACT_8_DIGIT",
+                        "reasoning": f"Áp dụng GRI 1 -> Nhóm 84.13 (Bơm chất lỏng). Áp dụng GRI 6: Loại trừ bơm ly tâm (8413.70) theo mô tả; bơm nước lưu lượng {flow_val:g} m3/h (≤ 8.000 m3/h) thuộc Phân nhóm 8413.81 -> Mã 8413.81.11.",
+                        "missing_attributes": [],
+                        "assumptions": "",
+                        "reserve_code": "8413.81.19"
+                    }
+                return {
+                    "code": "8413.81",
+                    "level": 6,
+                    "status": "STOP_6_DIGIT",
+                    "reasoning": "Áp dụng GRI 1 & GRI 6: Bơm chất lỏng không phải bơm ly tâm thuộc Phân nhóm 8413.81. Cần xác định lưu lượng (≤ 8.000 m3/h hay > 8.000 m3/h) để chốt 8 số.",
+                    "missing_attributes": ["Lưu lượng bơm (m3/h)"],
+                    "assumptions": "",
+                    "reserve_code": "8413.81.11"
+                }
             return {
                 "code": "8413.70",
                 "level": 6,
@@ -577,16 +600,82 @@ class StatutoryTreeWalker:
                 "reserve_code": "3926.90.99"
             }
 
-        # 10. ĐẦU COS / TERMINAL (Nhóm 8536.90)
-        if re.search(r'\b(?:dau\s+cot|dau\s+cos|terminal)\b', hn):
+        # 10. ĐẦU COS / ĐẦU NỐI DÂY & CÁP ĐIỆN (Nhóm 8536.90)
+        if re.search(r'\b(?:dau\s+cot|dau\s+cos|dau\s+noi(?:\s+day(?:\s+va\s+cap)?(?:\s+dien)?)?|terminal|connector)\b', hn):
+            amp = attrs.get("amp_a")
+            if amp is not None and amp > 16:
+                return {
+                    "code": "8536.90.19", "level": 8, "status": "EXACT_8_DIGIT",
+                    "reasoning": f"Áp dụng GRI 1 -> Nhóm 85.36: Đầu nối dây và cáp điện (không phải dây điện 8544). Áp dụng GRI 6: Dòng định mức {amp:g}A (> 16A) -> Mã 8536.90.19.",
+                    "missing_attributes": [], "assumptions": "", "reserve_code": "8536.90.12"
+                }
             return {
                 "code": "8536.90.12",
                 "level": 8,
                 "status": "EXACT_8_DIGIT",
-                "reasoning": "Áp dụng GRI 1 -> Nhóm 85.36: Thiết bị ghép nối đầu nối dây điện (không phải dây điện 8544). Áp dụng GRI 6: Phân nhóm 8536.90 -> Mã 8536.90.12.",
+                "reasoning": "Áp dụng GRI 1 -> Nhóm 85.36: Thiết bị ghép nối đầu nối dây điện (không phải dây điện 8544). Áp dụng GRI 6: Phân nhóm 8536.90, dòng danh định không quá 16A -> Mã 8536.90.12.",
                 "missing_attributes": [],
-                "assumptions": "Đầu cos bấm bằng đồng",
+                "assumptions": "Đầu nối / đầu cos điện áp <= 1000V, dòng <= 16A",
                 "reserve_code": "8536.90.19"
+            }
+
+        # 10b. BẢNG ĐIỀU KHIỂN / TỦ ĐIỆN ĐÓNG CẮT (Nhóm 8537 - kiểm tra trước Nhóm 8504)
+        if re.search(r'\b(?:bang\s+dieu\s+khien|tu\s+dieu\s+khien|tu\s+dong\s+cat|tu\s+phan\s+phoi|control\s+panel|switchboard)\b', hn):
+            vv = attrs.get("voltage_v")
+            is_gt_1000 = (vv is not None and vv > 1000) or bool(re.search(r'\b(?:tren|vuot\s+qua|hon)\s+1\.?000\s*v\b', norm))
+            if is_gt_1000:
+                return {
+                    "code": "8537.20.21",
+                    "level": 8,
+                    "status": "EXACT_8_DIGIT",
+                    "reasoning": f"Áp dụng GRI 1 -> Nhóm 85.37 (Bảng, tủ điều khiển/đóng cắt). Áp dụng GRI 6: Điện áp trên 1.000V thuộc Phân nhóm 8537.20 -> Mã 8537.20.21.",
+                    "missing_attributes": [],
+                    "assumptions": "",
+                    "reserve_code": "8537.20.29"
+                }
+            if vv is not None and vv <= 1000:
+                return {
+                    "code": "8537.10",
+                    "level": 6,
+                    "status": "STOP_6_DIGIT",
+                    "reasoning": f"Áp dụng GRI 1 -> Nhóm 85.37. Áp dụng GRI 6: Điện áp {vv:g}V (≤ 1.000V) thuộc Phân nhóm 8537.10. Cần xác định loại (có lập trình PLC hay bảng phân phối) để chốt 8 số.",
+                    "missing_attributes": ["Loại bảng điều khiển (PLC / tủ phân phối)"],
+                    "assumptions": "",
+                    "reserve_code": "8537.10.99"
+                }
+            return {
+                "code": "8537",
+                "level": 4,
+                "status": "STOP_4_DIGIT",
+                "reasoning": "Áp dụng GRI 1 -> Nhóm 85.37 (Bảng điều khiển, tủ điện). Thiếu thông số điện áp (≤ 1.000V hay > 1.000V) để phân nhánh 6 số.",
+                "missing_attributes": ["voltage"],
+                "assumptions": "",
+                "reserve_code": "8537.10"
+            }
+
+        # 10c. BỂ/THÙNG CHỨA THÉP > 300 LÍT (Định nghĩa Nhóm 73.09)
+        if re.search(r'\b(?:be|bon|thung\s+chua)\b', hn) and re.search(r'\b(?:thep|sat)\b', norm) and re.search(r'\btren\s+300\s*lit\b', norm):
+            return {
+                "code": "7309.00.99",
+                "level": 8,
+                "status": "EXACT_8_DIGIT",
+                "reasoning": "Áp dụng GRI 1 -> Nhóm 73.09 (Bể, thùng chứa bằng sắt/thép dung tích trên 300 lít, không gắn thiết bị cơ khí hay nhiệt). Áp dụng GRI 6 -> Mã 7309.00.99.",
+                "missing_attributes": [],
+                "assumptions": "",
+                "reserve_code": "7309.00.91"
+            }
+
+        # 10d. DUNG DỊCH NHỰA TRONG DUNG MÔI > 50% (Chú giải 4 Chương 32 -> Nhóm 3208)
+        if re.search(r'\bdung\s+dich\s+nhua\b', hn) and re.search(r'\bdung\s+moi\b', norm) and re.search(r'\btren\s+50\s*%', norm):
+            code_3208 = "3208.20.90" if re.search(r'\b(?:acrylic|vinyl)\b', norm) else "3208.90.90"
+            return {
+                "code": code_3208,
+                "level": 8,
+                "status": "EXACT_8_DIGIT",
+                "reasoning": f"Áp dụng GRI 1 & Chú giải 4 Chương 32: Dung dịch nhựa polyme trong dung môi hữu cơ dễ bay hơi với tỷ lệ dung môi > 50% trọng lượng thuộc Nhóm 32.08 -> Mã {code_3208}.",
+                "missing_attributes": [],
+                "assumptions": "",
+                "reserve_code": "3208.90.90"
             }
 
         # 11. VÒNG ĐỆM PHẲNG / ĐAI ỐC (Nhóm 7318 - Chú giải 2 Phần XV)
@@ -601,7 +690,7 @@ class StatutoryTreeWalker:
                 "reserve_code": "7318.21.00"
             }
 
-        if re.search(r'\b(?:dai\s+oc|e-cu|nut|tan)\b', hn):
+        if re.search(r'\b(?:dai\s+oc|e-cu|ecu|con\s+tan|hex\s+nut|lock\s+nut|flange\s+nut)\b', hn):
             dmm = attrs.get("diameter_mm")
             if dmm is None:
                 return {
@@ -785,7 +874,7 @@ class StatutoryTreeWalker:
                 }
 
         # 16. DÂY DẪN ĐIỆN & CÁP ĐIỆN (Nhóm 8544)
-        if re.search(r'\b(?:day\s+(?:dan\s+)?(?:truyen\s+tin\s+hieu|dien|tin\s+hieu)|day\s+dan\b|day\s+dien\b|cap\s+dien\b|day\s+cap\b|wire|cable|harness)\b', hn):
+        if re.search(r'\b(?:day\s+(?:dan\s+)?(?:truyen\s+tin\s+hieu|dien|tin\s+hieu)|day\s+dan\b|day\s+dien\b|cap\s+(?:dan\s+)?dien\b|cap\s+mang\b|cap\s+vien\s+thong\b|day\s+cap\b|wire|cable|harness)\b', hn):
             if attrs["voltage_v"] is None:
                 return {
                     "code": "8544",
@@ -809,13 +898,31 @@ class StatutoryTreeWalker:
                         "reserve_code": "8544.42.94"
                     }
                 elif attrs["no_connector"]:
+                    is_shielded = bool(re.search(r'\b(?:co\s+vo\s+boc\s+chong\s+nhieu|boc\s+chong\s+nhieu|shielded)\b', norm)) and not bool(re.search(r'\bkhong\s+(?:co\s+)?(?:vo\s+boc\s+)?chong\s+nhieu\b', norm))
+                    is_plastic_wire = bool(re.search(r'\b(?:pvc|plastic|nhua)\b', norm))
+                    is_telecom = bool(re.search(r'\b(?:vien\s+thong|telecom\w*|mang\s+lan|cat5\w*|cat6\w*|utp|ftp|sftp|ethernet|cap\s+mang)\b', norm)) and not bool(re.search(r'\bkhong\s+(?:dung\s+(?:cho\s+)?|phai\s+|su\s+dung\s+(?:cho\s+)?)vien\s+thong\b', norm))
+                    if is_telecom and is_plastic_wire and attrs["voltage_v"] <= 80.0:
+                        wire_code = "8544.49.13"
+                        wire_note = "Cáp viễn thông cách điện plastic (<= 80V, không đầu nối)"
+                    elif is_shielded and re.search(r'\b(?:o\s+to|xe\s+co\s+dong\s+co|automotive)\b', norm):
+                        wire_code = "8544.49.21"
+                        wire_note = "Dây ô tô có vỏ bọc chống nhiễu không đầu nối"
+                    elif is_plastic_wire and attrs["voltage_v"] <= 80.0:
+                        wire_code = "8544.49.22"
+                        wire_note = "Cáp/dây điện cách điện plastic (<= 80V, không viễn thông, không đầu nối)"
+                    elif re.search(r'\b(?:o\s+to|xe\s+co\s+dong\s+co|automotive)\b', norm):
+                        wire_code = "8544.49.21"
+                        wire_note = "Dây dẫn điện không gắn đầu nối dùng cho ô tô"
+                    else:
+                        wire_code = "8544.49.41"
+                        wire_note = "Dây dẫn điện <= 1000V không gắn đầu nối"
                     return {
-                        "code": "8544.49.21" if re.search(r'\b(?:o\s+to|xe\s+co\s+dong\s+co|automotive)\b', norm) else "8544.49.41",
+                        "code": wire_code,
                         "level": 8,
                         "status": "EXACT_8_DIGIT",
-                        "reasoning": "Áp dụng GRI 1 & Nhóm 85.44. Áp dụng GRI 6: Điện áp <= 1000V -> Không gắn đầu nối (Phân nhóm 8544.49) -> Dây ô tô không đầu nối mã 8544.49.21.",
+                        "reasoning": f"Áp dụng GRI 1 & Nhóm 85.44. Áp dụng GRI 6: Điện áp <= 1000V -> Không gắn đầu nối (Phân nhóm 8544.49) -> {wire_note} mã {wire_code}.",
                         "missing_attributes": [],
-                        "assumptions": "Dây dẫn điện không gắn đầu nối dùng cho ô tô",
+                        "assumptions": wire_note,
                         "reserve_code": "8544.49.29"
                     }
                 else:
@@ -828,6 +935,36 @@ class StatutoryTreeWalker:
                         "assumptions": "Thiếu thông tin đầu nối",
                         "reserve_code": "8544.42.99"
                     }
+            else:
+                if attrs["voltage_v"] <= 36000.0:
+                    if re.search(r'\b(?:plastic|pvc|nhua)\b', norm) and not re.search(r'\bboc\s+cach\s+dien\s+bang\s+cao\s+su\b', norm):
+                        return {
+                            "code": "8544.60.11",
+                            "level": 8,
+                            "status": "EXACT_8_DIGIT",
+                            "reasoning": f"Áp dụng GRI 1 -> Nhóm 85.44. Áp dụng GRI 6: Dây/cáp điện áp {attrs['voltage_v']:g}V (> 1.000V đến <= 36 kV), cách điện bằng plastic (8544.60) -> Mã 8544.60.11.",
+                            "missing_attributes": [],
+                            "assumptions": "",
+                            "reserve_code": "8544.60.12"
+                        }
+                    return {
+                        "code": "8544.60.12",
+                        "level": 8,
+                        "status": "EXACT_8_DIGIT",
+                        "reasoning": f"Áp dụng GRI 1 -> Nhóm 85.44. Áp dụng GRI 6: Dây/cáp điện áp {attrs['voltage_v']:g}V (> 1.000V đến <= 36 kV), cách điện bằng cao su/plastic/giấy -> Mã 8544.60.12.",
+                        "missing_attributes": [],
+                        "assumptions": "",
+                        "reserve_code": "8544.60.11"
+                    }
+                return {
+                    "code": "8544.60",
+                    "level": 6,
+                    "status": "STOP_6_DIGIT",
+                    "reasoning": f"Áp dụng GRI 1 -> Nhóm 85.44. Áp dụng GRI 6: Dây/cáp điện áp > 1.000V thuộc Phân nhóm 8544.60 -> dừng ở 6 số.",
+                    "missing_attributes": ["Dải điện áp (> 36kV hay <= 36kV)"],
+                    "assumptions": "",
+                    "reserve_code": "8544.60.29"
+                }
 
         # 17. ĐỘNG CƠ ĐIỆN / MÔ TƠ (Nhóm 8501) - phân nhánh theo công suất, một chiều/xoay chiều, số pha, công dụng
         if re.search(r'\b(?:dong\s+co\s+dien|dong\s+co\s+giam\s+toc|mo\s+to\s+dien|mo\s+to\s+buoc|motor|ac\s+motor|dc\s+motor)\b', hn):

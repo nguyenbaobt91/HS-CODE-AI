@@ -88,6 +88,50 @@ if os.path.exists(WCO_NOTES_PATH):
                 raw_txt = f"{item.get('title', '')} {item.get('official_vn', '')} {item.get('summary', '')} {item.get('official_note', '')}"
                 WCO_SEARCH_TEXTS[h_k] = remove_accents(raw_txt).lower()
         print(f"Precomputed Universal Dual-Index Search for {len(WCO_SEARCH_TEXTS)} WCO headings with full Section/Chapter context.")
+
+        # Build Automatic Section & Chapter WCO Legal Notes Rules (Exclusions & Direct Heading Citations)
+        WCO_LEGAL_RULES = []
+        _LN_STOP = {'nhom', 'chuong', 'phan', 'nay', 'khong', 'bao', 'gom', 'loai', 'tru', 'cac', 'nhung', 'cua', 'cho', 'hoac', 'va', 'bang', 'duoc', 'thuoc', 'vao', 'xep', 'theo', 'quy', 'dinh', 'tai', 'nhu', 'tren', 'duoi', 'tuong', 'tu', 'khac', 'dung', 'de', 'co', 'hay', 'voi', 'trong', 'ngoai', 'hoac', 'nhung'}
+        def _extract_legal_clauses(note_txt, scope_chaps):
+            if not note_txt:
+                return
+            norm_note = remove_accents(note_txt).lower()
+            # Split into sub-clauses by (a), (b), ... or numbered notes
+            parts = re.split(r'(?=\([a-z]\)\s|\bchu\s+giai\s+\d+|\b\d+\.\s)', norm_note)
+            in_excl_block = False
+            for part in parts:
+                if 'khong bao gom' in part or 'khong ap dung' in part:
+                    in_excl_block = True
+                elif re.match(r'^(?:chu\s+giai\s+\d+|\d+\.)', part.strip()):
+                    in_excl_block = ('khong bao gom' in part or 'khong ap dung' in part)
+                # Find cited headings like (nhom 40.16) or thuoc nhom 32.08
+                cited = re.findall(r'(?:nhom|heading)\s+(\d{2})\.(\d{2})', part)
+                if not cited:
+                    continue
+                is_excl = in_excl_block or ('loai tru' in part) or ('khong bao gom' in part)
+                clean_p = re.sub(r'\b(?:nhom|chuong|phan)\s+\d+(?:\.\d+)?', ' ', part)
+                toks = [w for w in re.findall(r'[a-z0-9]+', clean_p) if len(w) >= 3 and w not in _LN_STOP]
+                if len(toks) < 3:
+                    continue
+                bgs = {f"{toks[i]} {toks[i+1]}" for i in range(len(toks)-1)}
+                tok_set = set(toks)
+                for c1, c2 in cited:
+                    th = f"{c1}{c2}"
+                    if th in HEAD_MAP and not th.startswith('98'):
+                        WCO_LEGAL_RULES.append({
+                            'target_head': th,
+                            'scope_chaps': scope_chaps,
+                            'is_excl': is_excl,
+                            'tokens': tok_set,
+                            'bigrams': bgs,
+                        })
+        for _sk, _sv in WCO_SECTIONS.items():
+            _sch = {str(c).zfill(2) for c in (_sv.get('chapters') or [])}
+            _extract_legal_clauses(_sv.get('legal_notes', ''), _sch)
+        for _ck, _cv in WCO_CHAPTERS.items():
+            _cid = str(_cv.get('chapter_id') or _ck.replace('CH_', '')).zfill(2)
+            _extract_legal_clauses(_cv.get('legal_notes', ''), {_cid})
+        print(f"Parsed {len(WCO_LEGAL_RULES)} WCO Section/Chapter Legal Note rules automatically.")
     except Exception as e:
         print("Error loading WCO official notes:", e)
 
@@ -1190,10 +1234,12 @@ def decompose_query(query_text, desc="", use="", specs="", model_en=""):
     materials = []
     text_no_diam = re.sub(r'đường\s+kính|duong\s+kinh', '', full_text_norm)
     text_no_copper_coll = re.sub(r'\b(?:dong\s+bo|dong\s+ho|dong\s+truc|dong\s+tam|dong\s+muc|dong\s+quy|dong\s+dang|hop\s+dong|cong\s+dong|tu\s+dong|chuyen\s+dong|truyen\s+dong|hoat\s+dong|phat\s+dong|khoi\s+dong|bien\s+dong|luu\s+dong|rung\s+dong|lao\s+dong)\b', '', full_text_norm)
-    plastic_coll_regex = r'\b(?:may\s+ep\s+nhua|khuon\s+ep\s+nhua|khuon\s+nhua|nganh\s+nhua|san\s+pham\s+nhua|hat\s+nhua|gia\s+cong\s+nhua|may\s+thoi\s+nhua|may\s+dun\s+nhua|nganh\s+duc\s+nhua|may\s+tao\s+hat\s+nhua)\b'
+    plastic_coll_regex = r'\b(?:may\s+ep\s+nhua|khuon\s+(?:ep|duc)\s+nhua|khuon\s+nhua|nganh\s+nhua|san\s+pham\s+nhua|hat\s+nhua|gia\s+cong\s+nhua|may\s+thoi\s+nhua|may\s+dun\s+nhua|nganh\s+duc\s+nhua|may\s+tao\s+hat\s+nhua)\b'
     text_no_plastic_coll = re.sub(plastic_coll_regex, '', full_text_norm, flags=re.I)
     rubber_coll_regex = r'\b(?:che\s+bien\s+cao\s+su|nganh\s+cao\s+su|may\s+cao\s+su)\b'
     text_no_rubber_coll = re.sub(rubber_coll_regex, '', full_text_norm, flags=re.I)
+    alum_coll_regex = r'\b(?:gia\s+cong\s+(?:cua\s+)?nhom|cat\s+(?:thanh\s+)?nhom|cua\s+nhom|duc\s+nhom|ep\s+nhom|han\s+nhom|thanh\s+nhom|boc\s+nhom|phu\s+nhom|ma\s+nhom)\b'
+    text_no_alum_coll = re.sub(alum_coll_regex, '', full_text_norm, flags=re.I)
 
     for mat_name, pattern, boost_chaps, penalty_chaps in MATERIAL_RULES:
         if mat_name == 'glass':
@@ -1208,6 +1254,9 @@ def decompose_query(query_text, desc="", use="", specs="", model_en=""):
         elif mat_name == 'rubber':
             target_norm = text_no_rubber_coll
             target_full = re.sub(rubber_coll_regex, '', full_text, flags=re.I)
+        elif mat_name == 'aluminum':
+            target_norm = text_no_alum_coll
+            target_full = re.sub(r'\b(?:gia\s+công\s+(?:cua\s+|cửa\s+)?nhôm|cắt\s+(?:thanh\s+)?nhôm|cửa\s+nhôm|đúc\s+nhôm|ép\s+nhôm|hàn\s+nhôm|thanh\s+nhôm)\b', '', full_text, flags=re.I)
         else:
             target_norm = full_text_norm
             target_full = full_text
@@ -1224,7 +1273,7 @@ def decompose_query(query_text, desc="", use="", specs="", model_en=""):
     subj_has_rubber = bool(re.search(r'\b(?:cao\s+su|rubber)\b', subj_norm, re.I))
 
     if subj_has_steel:
-        materials = [m for m in materials if m[0] not in ('plastic', 'rubber')]
+        materials = [m for m in materials if m[0] not in ('plastic', 'rubber', 'aluminum')]
     elif subj_has_copper:
         materials = [m for m in materials if m[0] not in ('plastic', 'rubber', 'steel_iron')]
     elif subj_has_aluminum:
@@ -1232,7 +1281,7 @@ def decompose_query(query_text, desc="", use="", specs="", model_en=""):
     elif subj_has_plastic:
         materials = [m for m in materials if m[0] not in ('steel_iron', 'copper', 'aluminum')]
     elif subj_has_rubber:
-        materials = [m for m in materials if m[0] not in ('steel_iron', 'copper', 'aluminum')]
+        materials = [m for m in materials if m[0] not in ('steel_iron', 'copper', 'aluminum', 'plastic')]
             
     # 4. Check Statutory Categories with Dynamic Material Adaptation
     has_negative_bearing = bool(re.search(r'\b(?:khong|không|chua|chưa|without|no|not)\s+(?:lap\s+|lắp\s+|co\s+|có\s+)?(?:o\s+bi|bi\b|vong\s+bi|ball\s+bearings?|bearings?)', full_text_norm))
@@ -1364,8 +1413,9 @@ def decompose_query(query_text, desc="", use="", specs="", model_en=""):
         matched_in_full = bool(re.search(cat['pattern'], full_text_norm, re.I) or re.search(cat['pattern'], full_text, re.I))
         matched_in_host = bool(re.search(cat['pattern'], host_norm, re.I))
 
-        # Categories that describe standalone devices shouldn't be triggered purely from host machine context
-        if cat['name'] in ['insulated_cables', 'electric_motors', 'valves_fluid_controllers', 'pumps_for_liquids']:
+        # Categories that describe standalone devices or host-sensitive types shouldn't be hijacked purely from host_norm
+        if cat['name'] in ['insulated_cables', 'electric_motors', 'valves_fluid_controllers', 'pumps_for_liquids',
+                           'electrical_switches_relays', 'transformers_power', 'aluminum_plates_articles']:
             if matched_in_subj or (matched_in_full and not matched_in_host):
                 active_categories.append(cat)
         else:
@@ -1536,18 +1586,60 @@ def classify_product_python(name, desc="", use="", specs="", model_en=""):
     host_norm = remove_accents(decomp['host_part'])
     
     subject_tokens = [w for w in re.findall(r'\w+', subj_norm) if len(w) > 1 and w not in STOP_WORDS]
+    desc_only_norm = remove_accents(desc or '')
+    desc_tokens = [w for w in re.findall(r'\w+', desc_only_norm) if len(w) > 1 and w not in STOP_WORDS and w not in set(subject_tokens)]
     host_tokens = [w for w in re.findall(r'\w+', host_norm) if len(w) > 1 and w not in STOP_WORDS]
     
     raw_subj_tokens = re.findall(r'\w+', subj_norm)
     bigrams = [f"{raw_subj_tokens[i]} {raw_subj_tokens[i+1]}" for i in range(len(raw_subj_tokens)-1)] if len(raw_subj_tokens) >= 2 else []
     
     # -------------------------------------------------------------
-    # STAGE 1: Heading Scoring using EXACT TOKEN SET MATCHING
+    # STAGE 1: Heading Scoring using IDF-Weighted Token & Co-Occurrence Matching
     # -------------------------------------------------------------
+    if not globals().get('_HEAD_IDF_CACHE'):
+        import math
+        df_map = {}
+        n_heads = max(1, len(HEAD_MAP))
+        for _h, _hd in HEAD_MAP.items():
+            _toks = set(re.findall(r'\w+', remove_accents(_hd)))
+            for _t in _toks:
+                df_map[_t] = df_map.get(_t, 0) + 1
+        _idf = {t: min(5.5, max(0.8, math.log(1.0 + n_heads / (1.0 + df)))) for t, df in df_map.items()}
+        globals()['_HEAD_IDF_CACHE'] = _idf
+    idf_map = globals()['_HEAD_IDF_CACHE']
+
+    # Extract negated terms to penalize excluded headings
+    neg_terms = set()
+    for nm in re.finditer(r'\bkhong\s+(?:phai\s+|dung\s+(?:cho\s+)?|co\s+)?([a-z0-9\s]{3,30})', full_text_norm):
+        for nt in re.findall(r'\w+', nm.group(1)):
+            if len(nt) >= 3 and nt not in STOP_WORDS:
+                neg_terms.add(nt)
+
     heading_scores = {}
-    
+
+    # Evaluate automatic WCO Section/Chapter Legal Notes (inclusions & exclusions)
+    wco_legal_head_boost = {}
+    wco_legal_chap_penalty = {}
+    _q_sd_tokens = set(subject_tokens) | set(desc_tokens)
+    _q_sd_bgs = set(bigrams)
+    if len(_q_sd_tokens) >= 2 and globals().get('WCO_LEGAL_RULES'):
+        for _lr in WCO_LEGAL_RULES:
+            _bg_hits = len(_q_sd_bgs & _lr['bigrams'])
+            _tk_hits = sum(1 for t in _q_sd_tokens if t in _lr['tokens'])
+            if _bg_hits >= 2 or (_bg_hits >= 1 and _tk_hits >= 3) or _tk_hits >= 4:
+                _th = _lr['target_head']
+                _boost = 180 + _bg_hits * 70 + _tk_hits * 25
+                if _boost > wco_legal_head_boost.get(_th, 0):
+                    wco_legal_head_boost[_th] = min(_boost, 420)
+                if _lr['is_excl']:
+                    for _sc in _lr['scope_chaps']:
+                        if _sc != _th[:2]:
+                            wco_legal_chap_penalty[_sc] = min(wco_legal_chap_penalty.get(_sc, 0) + 120, 260)
+
     for head, h_desc_raw in HEAD_MAP.items():
         ch = head[:2]
+        if ch == '98' and 'chuong 98' not in full_text_norm:
+            continue
         ch_title_raw = CHAPTER_MAP.get(ch, '')
         h_desc_norm = remove_accents(h_desc_raw)
         ch_title_norm = remove_accents(ch_title_raw)
@@ -1559,27 +1651,60 @@ def classify_product_python(name, desc="", use="", specs="", model_en=""):
         
         for bg in bigrams:
             if re.search(r'\b' + re.escape(bg) + r'\b', h_desc_norm):
-                score += 180
+                score += 220
             elif re.search(r'\b' + re.escape(bg) + r'\b', ch_title_norm):
                 score += 90
 
-        # Dual-Index Search: Scan WCO 2022 Explanatory Notes (1,059 Headings)
+        # Dual-Index Search: Scan WCO 2022 Explanatory Notes (word-boundary, IDF-weighted, capped)
         wco_text = WCO_SEARCH_TEXTS.get(head, '')
+        wco_score = 0
         if wco_text:
+            wco_tokens = set(wco_text.split())
             for bg in bigrams:
-                if bg in wco_text:
-                    score += 260  # Explicitly named in WCO Explanatory Notes
+                if re.search(r'\b' + re.escape(bg) + r'\b', wco_text):
+                    wco_score += 180
             for sw in subject_tokens:
-                if len(sw) >= 3 and sw in wco_text:
-                    score += 45
+                if len(sw) >= 3 and sw in wco_tokens:
+                    wco_score += int(15 * idf_map.get(sw, 2.0))
+        score += min(wco_score, 320)
                 
+        h_hits = 0
         for sw in subject_tokens:
             if sw == 'quang' and 'ho quang' in h_desc_norm and 'ho quang' not in full_text_norm:
                 continue
+            w = int(28 * idf_map.get(sw, 2.2))
             if sw in h_tokens:
-                score += 50
+                score += w
+                h_hits += 1
             elif sw in ch_tokens:
-                score += 25
+                score += int(w * 0.45)
+
+        for dw in desc_tokens:
+            if dw == 'quang' and 'ho quang' in h_desc_norm and 'ho quang' not in full_text_norm:
+                continue
+            wd = int(14 * idf_map.get(dw, 2.0))
+            if dw in h_tokens:
+                score += wd
+                h_hits += 1
+            elif dw in ch_tokens:
+                score += int(wd * 0.4)
+
+        # Co-occurrence bonus when multiple distinct subject tokens match the statutory Heading title
+        if h_hits >= 3:
+            score += 180
+        elif h_hits == 2:
+            score += 70
+
+        # Generic negation penalty
+        for nt in neg_terms:
+            if nt in h_tokens and nt not in set(subject_tokens):
+                score -= 250
+
+        # Apply WCO Section/Chapter Legal Notes boost & exclusion penalty
+        if head in wco_legal_head_boost:
+            score += wco_legal_head_boost[head]
+        elif ch in wco_legal_chap_penalty:
+            score -= wco_legal_chap_penalty[ch]
                 
         for mat_name, boost_chaps, penalty_chaps in decomp['materials']:
             if ch in boost_chaps:
@@ -1660,6 +1785,8 @@ def classify_product_python(name, desc="", use="", specs="", model_en=""):
     if _ue is not None:
         try:
             for _lh, _lb in _ue.leaf_phrase_headings(full_text_norm).items():
+                if _lh.startswith('98') and 'chuong 98' not in full_text_norm:
+                    continue
                 heading_scores[_lh] = heading_scores.get(_lh, 0) + _lb
         except Exception as _el:
             print("leaf_phrase_headings error:", _el)
@@ -1690,7 +1817,8 @@ def classify_product_python(name, desc="", use="", specs="", model_en=""):
         item_score += audit_penalty
         
         i_tokens = set(re.findall(r'\w+', item_desc_norm))
-        s_tokens = set(re.findall(r'\w+', sub_desc_norm))
+        head_title_tokens = set(re.findall(r'\w+', remove_accents(HEAD_MAP.get(head, ''))))
+        s_tokens = set(re.findall(r'\w+', sub_desc_norm)) - head_title_tokens
         
         for bg in bigrams:
             if re.search(r'\b' + re.escape(bg) + r'\b', item_desc_norm): item_score += 120
@@ -1701,6 +1829,28 @@ def classify_product_python(name, desc="", use="", specs="", model_en=""):
                 continue
             if sw in i_tokens: item_score += 40
             elif sw in s_tokens: item_score += 20
+
+        # Generic GRI 6 Part-Subheading Priority ("Bộ phận" vs Finished Machine) & Residual ("Loại khác") Scoring
+        is_part_query = bool(re.search(r'\b(?:bo\s+phan|phu\s+tung|linh\s+kien)\b', full_text_norm))
+        is_part_leaf = bool(re.search(r'\b(?:bo\s+phan|phu\s+tung)\b', f"{item_desc_norm} {sub_desc_norm}"))
+        if is_part_query:
+            if is_part_leaf:
+                item_score += 350
+            else:
+                item_score -= 400
+
+        all_q_tokens = set(re.findall(r'\w+', full_text_norm))
+        _GENERIC_SKIP = {'cua', 'cho', 'bang', 'hoac', 'khong', 'tren', 'duoi', 'nhung', 'tuong', 'loai', 'khac', 'nhom', 'chua', 'duoc', 'chi', 'tiet', 'noi', 'cac', 'hay'}
+        is_residual_leaf = bool(re.search(r'\bloai\s+khac\b', item_desc_norm))
+        if not is_residual_leaf:
+            unmatched_leaf = [t for t in i_tokens if len(t) >= 3 and t not in STOP_WORDS and t not in all_q_tokens and t not in _GENERIC_SKIP]
+            item_score -= min(len(unmatched_leaf) * 40, 320)
+        else:
+            item_score += 30
+        # Also penalize unmatched distinctive nouns in parent subheading (e.g., 7308.20 "Tháp và cột lưới" -> "- - Loại khác")
+        if sub_desc_norm and not re.search(r'\bloai\s+khac\b', sub_desc_norm):
+            unmatched_sub = [t for t in s_tokens if len(t) >= 3 and t not in STOP_WORDS and t not in all_q_tokens and t not in _GENERIC_SKIP]
+            item_score -= min(len(unmatched_sub) * 35, 240)
             
         # Precise technical & statutory subhead branch bonuses
         is_mat_plastic = any(m[0] == 'plastic' for m in decomp.get('materials', []))

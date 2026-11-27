@@ -6439,6 +6439,31 @@ Trường hợp đủ thông tin:
             }
 
             if (/\b(?:bom\s+nuoc|bom\s+ly\s+tam|centrifugal\s+pump|may\s+bom)\b/.test(hn)) {
+                const isNonCentrifugal = /\b(?:khong\s+(?:phai\s+)?(?:la\s+)?bom\s+ly\s+tam|kieu\s+bom\s+chan\s+khong|bom\s+piston|bom\s+banh\s+rang|bom\s+mang|bom\s+dinh\s+luong)\b/.test(norm);
+                if (isNonCentrifugal) {
+                    const mFlow = norm.match(/(\d+(?:[.,]\d+)?)\s*m3\/h\b/);
+                    const flowVal = mFlow ? parseFloat(mFlow[1].replace(',', '.')) : null;
+                    if (flowVal !== null && flowVal <= 8000) {
+                        return {
+                            code: "8413.81.11",
+                            level: 8,
+                            status: "EXACT_8_DIGIT",
+                            reasoning: `Áp dụng GRI 1 -> Nhóm 84.13 (Bơm chất lỏng). Áp dụng GRI 6: Loại trừ bơm ly tâm (8413.70) theo mô tả; bơm nước lưu lượng ${flowVal} m3/h (≤ 8.000 m3/h) thuộc Phân nhóm 8413.81 -> Mã 8413.81.11.`,
+                            missing_attributes: [],
+                            assumptions: "",
+                            reserve_code: "8413.81.19"
+                        };
+                    }
+                    return {
+                        code: "8413.81",
+                        level: 6,
+                        status: "STOP_6_DIGIT",
+                        reasoning: "Áp dụng GRI 1 & GRI 6: Bơm chất lỏng không phải bơm ly tâm thuộc Phân nhóm 8413.81. Cần xác định lưu lượng (≤ 8.000 m3/h hay > 8.000 m3/h) để chốt 8 số.",
+                        missing_attributes: ["Lưu lượng bơm (m3/h)"],
+                        assumptions: "",
+                        reserve_code: "8413.81.11"
+                    };
+                }
                 return {
                     code: "8413.70",
                     level: 6,
@@ -6590,16 +6615,68 @@ Trường hợp đủ thông tin:
                 };
             }
 
-            // 10. ĐẦU COS / TERMINAL (Nhóm 8536.90)
-            if (/\b(?:dau\s+cot|dau\s+cos|terminal)\b/.test(hn)) {
+            // 10. ĐẦU COS / ĐẦU NỐI DÂY & CÁP ĐIỆN (Nhóm 8536.90)
+            if (/\b(?:dau\s+cot|dau\s+cos|dau\s+noi(?:\s+day(?:\s+va\s+cap)?(?:\s+dien)?)?|terminal|connector)\b/.test(hn)) {
+                const amp = attrs.amp_a;
+                if (amp !== null && amp > 16) {
+                    return {
+                        code: "8536.90.19", level: 8, status: "EXACT_8_DIGIT",
+                        reasoning: `Áp dụng GRI 1 -> Nhóm 85.36: Đầu nối dây và cáp điện (không phải dây điện 8544). Áp dụng GRI 6: Dòng định mức ${amp}A (> 16A) -> Mã 8536.90.19.`,
+                        missing_attributes: [], assumptions: "", reserve_code: "8536.90.12"
+                    };
+                }
                 return {
                     code: "8536.90.12",
                     level: 8,
                     status: "EXACT_8_DIGIT",
-                    reasoning: "Áp dụng GRI 1 -> Nhóm 85.36: Thiết bị ghép nối đầu nối dây điện (không phải dây điện 8544). Áp dụng GRI 6: Phân nhóm 8536.90 -> Mã 8536.90.12.",
+                    reasoning: "Áp dụng GRI 1 -> Nhóm 85.36: Thiết bị ghép nối đầu nối dây điện (không phải dây điện 8544). Áp dụng GRI 6: Phân nhóm 8536.90, dòng danh định không quá 16A -> Mã 8536.90.12.",
                     missing_attributes: [],
-                    assumptions: "Đầu cos bấm bằng đồng",
+                    assumptions: "Đầu nối / đầu cos điện áp <= 1000V, dòng <= 16A",
                     reserve_code: "8536.90.19"
+                };
+            }
+
+            // 10b. BẢNG ĐIỀU KHIỂN / TỦ ĐIỆN ĐÓNG CẮT (Nhóm 8537 - kiểm tra trước Nhóm 8504)
+            if (/\b(?:bang\s+dieu\s+khien|tu\s+dieu\s+khien|tu\s+dong\s+cat|tu\s+phan\s+phoi|control\s+panel|switchboard)\b/.test(hn)) {
+                const vv = attrs.voltage_v;
+                const isGt1000 = (vv !== null && vv > 1000) || /\b(?:tren|vuot\s+qua|hon)\s+1\.?000\s*v\b/.test(norm);
+                if (isGt1000) {
+                    return {
+                        code: "8537.20.21", level: 8, status: "EXACT_8_DIGIT",
+                        reasoning: "Áp dụng GRI 1 -> Nhóm 85.37 (Bảng, tủ điều khiển/đóng cắt). Áp dụng GRI 6: Điện áp trên 1.000V thuộc Phân nhóm 8537.20 -> Mã 8537.20.21.",
+                        missing_attributes: [], assumptions: "", reserve_code: "8537.20.29"
+                    };
+                }
+                if (vv !== null && vv <= 1000) {
+                    return {
+                        code: "8537.10", level: 6, status: "STOP_6_DIGIT",
+                        reasoning: `Áp dụng GRI 1 -> Nhóm 85.37. Áp dụng GRI 6: Điện áp ${vv}V (≤ 1.000V) thuộc Phân nhóm 8537.10. Cần xác định loại để chốt 8 số.`,
+                        missing_attributes: ["Loại bảng điều khiển (PLC / tủ phân phối)"], assumptions: "", reserve_code: "8537.10.99"
+                    };
+                }
+                return {
+                    code: "8537", level: 4, status: "STOP_4_DIGIT",
+                    reasoning: "Áp dụng GRI 1 -> Nhóm 85.37 (Bảng điều khiển, tủ điện). Thiếu thông số điện áp (≤ 1.000V hay > 1.000V) để phân nhánh 6 số.",
+                    missing_attributes: ["voltage"], assumptions: "", reserve_code: "8537.10"
+                };
+            }
+
+            // 10c. BỂ/THÙNG CHỨA THÉP > 300 LÍT (Định nghĩa Nhóm 73.09)
+            if (/\b(?:be|bon|thung\s+chua)\b/.test(hn) && /\b(?:thep|sat)\b/.test(norm) && /\btren\s+300\s*lit\b/.test(norm)) {
+                return {
+                    code: "7309.00.99", level: 8, status: "EXACT_8_DIGIT",
+                    reasoning: "Áp dụng GRI 1 -> Nhóm 73.09 (Bể, thùng chứa bằng sắt/thép dung tích trên 300 lít, không gắn thiết bị cơ khí hay nhiệt). Áp dụng GRI 6 -> Mã 7309.00.99.",
+                    missing_attributes: [], assumptions: "", reserve_code: "7309.00.91"
+                };
+            }
+
+            // 10d. DUNG DỊCH NHỰA TRONG DUNG MÔI > 50% (Chú giải 4 Chương 32 -> Nhóm 3208)
+            if (/\bdung\s+dich\s+nhua\b/.test(hn) && /\bdung\s+moi\b/.test(norm) && /\btren\s+50\s*%/.test(norm)) {
+                const code3208 = /\b(?:acrylic|vinyl)\b/.test(norm) ? "3208.20.90" : "3208.90.90";
+                return {
+                    code: code3208, level: 8, status: "EXACT_8_DIGIT",
+                    reasoning: `Áp dụng GRI 1 & Chú giải 4 Chương 32: Dung dịch nhựa polyme trong dung môi hữu cơ dễ bay hơi với tỷ lệ dung môi > 50% trọng lượng thuộc Nhóm 32.08 -> Mã ${code3208}.`,
+                    missing_attributes: [], assumptions: "", reserve_code: "3208.90.90"
                 };
             }
 
@@ -6616,7 +6693,7 @@ Trường hợp đủ thông tin:
                 };
             }
 
-            if (/\b(?:dai\s+oc|e-cu|nut|tan)\b/.test(hn)) {
+            if (/\b(?:dai\s+oc|e-cu|ecu|con\s+tan|hex\s+nut|lock\s+nut|flange\s+nut)\b/.test(hn)) {
                 const dmm = attrs.diameter_mm;
                 if (dmm === null || dmm === undefined) {
                     return {
@@ -6817,7 +6894,7 @@ Trường hợp đủ thông tin:
             }
 
             // 16. DÂY DẪN ĐIỆN & CÁP ĐIỆN (Nhóm 8544)
-            if (/\b(?:day\s+(?:dan\s+)?(?:truyen\s+tin\s+hieu|dien|tin\s+hieu)|day\s+dan\b|day\s+dien\b|cap\s+dien\b|day\s+cap\b|wire|cable|harness)\b/.test(hn)) {
+            if (/\b(?:day\s+(?:dan\s+)?(?:truyen\s+tin\s+hieu|dien|tin\s+hieu)|day\s+dan\b|day\s+dien\b|cap\s+(?:dan\s+)?dien\b|cap\s+mang\b|cap\s+vien\s+thong\b|day\s+cap\b|wire|cable|harness)\b/.test(hn)) {
                 if (attrs.voltage_v === null) {
                     return {
                         code: "8544",
@@ -6843,14 +6920,22 @@ Trường hợp đủ thông tin:
                         };
                     } else if (attrs.no_connector) {
                         const isCar = /\b(?:o\s+to|xe\s+co\s+dong\s+co|automotive)\b/.test(norm);
+                        const isShielded = /\b(?:co\s+vo\s+boc\s+chong\s+nhieu|boc\s+chong\s+nhieu|shielded)\b/.test(norm) && !/\bkhong\s+(?:co\s+)?(?:vo\s+boc\s+)?chong\s+nhieu\b/.test(norm);
+                        const isPlasticWire = /\b(?:pvc|plastic|nhua)\b/.test(norm);
+                        const isTelecom = /\b(?:vien\s+thong|telecom\w*|mang\s+lan|cat5\w*|cat6\w*|utp|ftp|sftp|ethernet|cap\s+mang)\b/.test(norm) && !/\bkhong\s+(?:dung\s+(?:cho\s+)?|phai\s+|su\s+dung\s+(?:cho\s+)?)vien\s+thong\b/.test(norm);
+                        let wireCode = "8544.49.41", wireNote = "Dây điện khác không gắn đầu nối";
+                        if (isTelecom && isPlasticWire && attrs.voltage_v <= 80) { wireCode = "8544.49.13"; wireNote = "Cáp viễn thông cách điện plastic (<= 80V, không đầu nối)"; }
+                        else if (isShielded && isCar) { wireCode = "8544.49.21"; wireNote = "Dây ô tô có vỏ bọc chống nhiễu không đầu nối"; }
+                        else if (isPlasticWire && attrs.voltage_v <= 80) { wireCode = "8544.49.22"; wireNote = "Cáp/dây điện cách điện plastic (<= 80V, không viễn thông, không đầu nối)"; }
+                        else if (isCar) { wireCode = "8544.49.21"; wireNote = "Dây ô tô không đầu nối"; }
                         return {
-                            code: isCar ? "8544.49.21" : "8544.49.41",
+                            code: wireCode,
                             level: 8,
                             status: "EXACT_8_DIGIT",
-                            reasoning: `Áp dụng GRI 1 & Nhóm 85.44. Áp dụng GRI 6: Điện áp <= 1000V -> Không gắn đầu nối (Phân nhóm 8544.49) -> ${isCar ? 'Dây ô tô không đầu nối mã 8544.49.21' : 'Dây điện khác không gắn đầu nối mã 8544.49.41'}.`,
+                            reasoning: `Áp dụng GRI 1 & Nhóm 85.44. Áp dụng GRI 6: Điện áp <= 1000V -> Không gắn đầu nối (Phân nhóm 8544.49) -> ${wireNote} mã ${wireCode}.`,
                             missing_attributes: [],
-                            assumptions: "Dây dẫn điện không gắn đầu nối",
-                            reserve_code: isCar ? "8544.49.29" : "8544.49.49"
+                            assumptions: wireNote,
+                            reserve_code: "8544.49.29"
                         };
                     } else {
                         return {
@@ -6863,6 +6948,26 @@ Trường hợp đủ thông tin:
                             reserve_code: "8544.42.99"
                         };
                     }
+                } else {
+                    if (attrs.voltage_v <= 36000) {
+                        if (/\b(?:plastic|pvc|nhua)\b/.test(norm) && !/\bboc\s+cach\s+dien\s+bang\s+cao\s+su\b/.test(norm)) {
+                            return {
+                                code: "8544.60.11", level: 8, status: "EXACT_8_DIGIT",
+                                reasoning: `Áp dụng GRI 1 -> Nhóm 85.44. Áp dụng GRI 6: Dây/cáp điện áp ${attrs.voltage_v}V (> 1.000V đến <= 36 kV), cách điện bằng plastic (8544.60) -> Mã 8544.60.11.`,
+                                missing_attributes: [], assumptions: "", reserve_code: "8544.60.12"
+                            };
+                        }
+                        return {
+                            code: "8544.60.12", level: 8, status: "EXACT_8_DIGIT",
+                            reasoning: `Áp dụng GRI 1 -> Nhóm 85.44. Áp dụng GRI 6: Dây/cáp điện áp ${attrs.voltage_v}V (> 1.000V đến <= 36 kV), cách điện bằng cao su/plastic/giấy -> Mã 8544.60.12.`,
+                            missing_attributes: [], assumptions: "", reserve_code: "8544.60.11"
+                        };
+                    }
+                    return {
+                        code: "8544.60", level: 6, status: "STOP_6_DIGIT",
+                        reasoning: "Áp dụng GRI 1 -> Nhóm 85.44. Áp dụng GRI 6: Dây/cáp điện áp > 1.000V thuộc Phân nhóm 8544.60 -> dừng ở 6 số.",
+                        missing_attributes: ["Dải điện áp (> 36kV hay <= 36kV)"], assumptions: "", reserve_code: "8544.60.29"
+                    };
                 }
             }
 
@@ -7345,9 +7450,97 @@ Trường hợp đủ thông tin:
             const headingScores = {};
             const wcoMap = window.WCO_NOTES_DATA || {};
 
+            if (!window._HEAD_IDF_CACHE) {
+                const dfMap = {};
+                const headKeys = Object.keys(headMap);
+                const nHeads = Math.max(1, headKeys.length);
+                for (const hk of headKeys) {
+                    const toks = getTokens(removeAccents(headMap[hk] || ''));
+                    for (const t of toks) dfMap[t] = (dfMap[t] || 0) + 1;
+                }
+                const idf = {};
+                for (const [t, df] of Object.entries(dfMap)) {
+                    idf[t] = Math.min(5.5, Math.max(0.8, Math.log(1.0 + nHeads / (1.0 + df))));
+                }
+                window._HEAD_IDF_CACHE = idf;
+            }
+            const idfMap = window._HEAD_IDF_CACHE;
+            const subjectWordSet = new Set(subjectWords);
+            const descWords = extractWordTokens(removeAccents(desc || '')).filter(w => !subjectWordSet.has(w));
+            const negTerms = new Set();
+            const negRx = /\bkhong\s+(?:phai\s+|dung\s+(?:cho\s+)?|co\s+)?([a-z0-9\s]{3,30})/g;
+            let nm;
+            while ((nm = negRx.exec(fullTextNorm)) !== null) {
+                for (const nt of (nm[1].match(/[\w]+/g) || [])) {
+                    if (nt.length >= 3 && !STOP.has(nt)) negTerms.add(nt);
+                }
+            }
+
+            if (!window._WCO_LEGAL_RULES_CACHE && wcoMap) {
+                const LN_STOP = new Set(['nhom', 'chuong', 'phan', 'nay', 'khong', 'bao', 'gom', 'loai', 'tru', 'cac', 'nhung', 'cua', 'cho', 'hoac', 'va', 'bang', 'duoc', 'thuoc', 'vao', 'xep', 'theo', 'quy', 'dinh', 'tai', 'nhu', 'tren', 'duoi', 'tuong', 'tu', 'khac', 'dung', 'de', 'co', 'hay', 'voi', 'trong', 'ngoai']);
+                const rules = [];
+                const parseNotes = (noteTxt, scopeChaps) => {
+                    if (!noteTxt) return;
+                    const normNote = removeAccents(noteTxt).toLowerCase();
+                    const parts = normNote.split(/(?=\([a-z]\)\s|\bchu\s+giai\s+\d+|\b\d+\.\s)/);
+                    let inExcl = false;
+                    for (const part of parts) {
+                        if (part.includes('khong bao gom') || part.includes('khong ap dung')) inExcl = true;
+                        else if (/^(?:chu\s+giai\s+\d+|\d+\.)/.test(part.trim())) inExcl = part.includes('khong bao gom') || part.includes('khong ap dung');
+                        const cited = [...part.matchAll(/(?:nhom|heading)\s+(\d{2})\.(\d{2})/g)];
+                        if (!cited.length) continue;
+                        const isExcl = inExcl || part.includes('loai tru') || part.includes('khong bao gom');
+                        const cleanP = part.replace(/\b(?:nhom|chuong|phan)\s+\d+(?:\.\d+)?/g, ' ');
+                        const toks = (cleanP.match(/[a-z0-9]+/g) || []).filter(w => w.length >= 3 && !LN_STOP.has(w));
+                        if (toks.length < 3) continue;
+                        const bgs = new Set();
+                        for (let i = 0; i < toks.length - 1; i++) bgs.add(`${toks[i]} ${toks[i+1]}`);
+                        const tokSet = new Set(toks);
+                        for (const m of cited) {
+                            const th = `${m[1]}${m[2]}`;
+                            if (headMap[th] && !th.startsWith('98')) {
+                                rules.push({ targetHead: th, scopeChaps, isExcl, tokens: tokSet, bigrams: bgs });
+                            }
+                        }
+                    }
+                };
+                for (const [k, v] of Object.entries(wcoMap)) {
+                    if (k.startsWith('SEC_') && v && v.legal_notes) {
+                        parseNotes(v.legal_notes, new Set((v.chapters || []).map(c => String(c).padStart(2, '0'))));
+                    } else if (k.startsWith('CH_') && v && v.legal_notes) {
+                        const cid = String(v.chapter_id || k.replace('CH_', '')).padStart(2, '0');
+                        parseNotes(v.legal_notes, new Set([cid]));
+                    }
+                }
+                window._WCO_LEGAL_RULES_CACHE = rules;
+            }
+            const wcoLegalHeadBoost = {};
+            const wcoLegalChapPenalty = {};
+            const qSdTokens = new Set([...subjectWords, ...descWords]);
+            if (qSdTokens.size >= 2 && window._WCO_LEGAL_RULES_CACHE) {
+                for (const lr of window._WCO_LEGAL_RULES_CACHE) {
+                    let bgHits = 0;
+                    for (const bg of bigrams) { if (lr.bigrams.has(bg)) bgHits++; }
+                    let tkHits = 0;
+                    for (const t of qSdTokens) { if (lr.tokens.has(t)) tkHits++; }
+                    if (bgHits >= 2 || (bgHits >= 1 && tkHits >= 3) || tkHits >= 4) {
+                        const boost = Math.min(180 + bgHits * 70 + tkHits * 25, 420);
+                        if (boost > (wcoLegalHeadBoost[lr.targetHead] || 0)) wcoLegalHeadBoost[lr.targetHead] = boost;
+                        if (lr.isExcl) {
+                            for (const sc of lr.scopeChaps) {
+                                if (sc !== lr.targetHead.substring(0, 2)) {
+                                    wcoLegalChapPenalty[sc] = Math.min((wcoLegalChapPenalty[sc] || 0) + 120, 260);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             for (let head in headMap) {
                 const hDescNorm = removeAccents(headMap[head] || '');
                 const ch = head.substring(0, 2);
+                if (ch === '98' && !fullTextNorm.includes('chuong 98')) continue;
                 const chTitleNorm = removeAccents(chapTitles[ch] || '');
                 const hTokens = getTokens(hDescNorm);
                 const chTokens = getTokens(chTitleNorm);
@@ -7357,39 +7550,54 @@ Trường hợp đủ thông tin:
                 // 1. Match subject bigrams (high precision)
                 for (let bg of bigrams) {
                     const bgRegex = new RegExp('\\b' + bg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
-                    if (bgRegex.test(hDescNorm)) score += 180;
+                    if (bgRegex.test(hDescNorm)) score += 220;
                     else if (bgRegex.test(chTitleNorm)) score += 90;
                 }
 
-                // 1b. Dual-Index: Scan WCO 2022 Explanatory Notes (1,228 headings + Section & Chapter notes)
+                // 1b. Dual-Index: Scan WCO 2022 Explanatory Notes (IDF-weighted, word-boundary, capped)
                 const wcoItem = wcoMap[head];
+                let wcoScore = 0;
                 if (wcoItem) {
                     if (!wcoItem._search_norm) {
-                        // Clean WCO Heading Note ONLY (Strict isolation: Exclude Section & Chapter notes to prevent false positive contamination)
                         wcoItem._search_norm = removeAccents(`${wcoItem.title || ''} ${wcoItem.official_vn || ''} ${wcoItem.summary || ''} ${wcoItem.official_note || ''}`).toLowerCase();
+                        wcoItem._search_tokens = new Set(wcoItem._search_norm.match(/[\w]+/g) || []);
                     }
                     const wcoText = wcoItem._search_norm;
+                    const wcoTokens = wcoItem._search_tokens;
                     for (let bg of bigrams) {
-                        if (wcoText.includes(bg)) {
-                            score += 260; // Technical trade name in WCO Explanatory Notes
-                        }
+                        const bgRegex = new RegExp('\\b' + bg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+                        if (bgRegex.test(wcoText)) wcoScore += 180;
                     }
                     for (let sw of subjectWords) {
-                        if (sw.length >= 3) {
-                            const swRegex = new RegExp('\\b' + sw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
-                            if (swRegex.test(wcoText)) score += 45;
+                        if (sw.length >= 3 && wcoTokens.has(sw)) {
+                            wcoScore += Math.round(15 * (idfMap[sw] || 2.0));
                         }
                     }
                 }
+                score += Math.min(wcoScore, 320);
 
-                // 2. Match subject individual words with exact token set
+                // 2. Match subject & description words weighted by IDF
+                let hHits = 0;
                 for (let sw of subjectWords) {
-                    if (sw === 'quang' && hDescNorm.includes('ho quang') && !fullTextNorm.includes('ho quang')) {
-                        continue;
-                    }
-                    if (hTokens.has(sw)) score += 50;
-                    else if (chTokens.has(sw)) score += 25;
+                    if (sw === 'quang' && hDescNorm.includes('ho quang') && !fullTextNorm.includes('ho quang')) continue;
+                    const w = Math.round(28 * (idfMap[sw] || 2.2));
+                    if (hTokens.has(sw)) { score += w; hHits++; }
+                    else if (chTokens.has(sw)) score += Math.round(w * 0.45);
                 }
+                for (let dw of descWords) {
+                    if (dw === 'quang' && hDescNorm.includes('ho quang') && !fullTextNorm.includes('ho quang')) continue;
+                    const wd = Math.round(14 * (idfMap[dw] || 2.0));
+                    if (hTokens.has(dw)) { score += wd; hHits++; }
+                    else if (chTokens.has(dw)) score += Math.round(wd * 0.4);
+                }
+                if (hHits >= 3) score += 180;
+                else if (hHits === 2) score += 70;
+
+                for (let nt of negTerms) {
+                    if (hTokens.has(nt) && !subjectWordSet.has(nt)) score -= 250;
+                }
+                if (wcoLegalHeadBoost[head]) score += wcoLegalHeadBoost[head];
+                else if (wcoLegalChapPenalty[ch]) score -= wcoLegalChapPenalty[ch];
 
                 // 3. Material alignment
                 for (let mat of decomp.materials) {
@@ -7553,6 +7761,7 @@ Trường hợp đủ thông tin:
                 try {
                     const lph = UniversalEngine.leafPhraseHeadings(fullTextNorm);
                     for (const [lh, lb] of Object.entries(lph)) {
+                        if (lh.startsWith('98') && !fullTextNorm.includes('chuong 98')) continue;
                         headingScores[lh] = (headingScores[lh] || 0) + lb;
                     }
                 } catch (eLph) { console.warn('leafPhraseHeadings error', eLph); }
@@ -7601,7 +7810,8 @@ Trường hợp đủ thông tin:
                 }
 
                 const iTokens = getTokens(itemDescNorm);
-                const sTokens = getTokens(subDescNorm);
+                const headTitleTokens = getTokens(removeAccents(headMap[head] || ''));
+                const sTokens = new Set([...getTokens(subDescNorm)].filter(t => !headTitleTokens.has(t)));
 
                 for (let bg of bigrams) {
                     const bgRegex = new RegExp('\\b' + bg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
@@ -7617,6 +7827,31 @@ Trường hợp đủ thông tin:
                     if (iTokens.has(sw)) itemScore += 40;
                     else if (sTokens.has(sw)) itemScore += 20;
                     else if (lTokens && lTokens.has(sw)) itemScore += 15;
+                }
+
+                // Generic GRI 6 Part-Subheading Priority & Residual ("Loại khác") Scoring
+                const isPartQuery = /\b(?:bo\s+phan|phu\s+tung|linh\s+kien)\b/.test(fullTextNorm);
+                const isPartLeaf = /\b(?:bo\s+phan|phu\s+tung)\b/.test(`${itemDescNorm} ${subDescNorm}`);
+                if (isPartQuery) {
+                    itemScore += isPartLeaf ? 350 : -400;
+                }
+                const allQTokens = getTokens(fullTextNorm);
+                const GENERIC_SKIP = new Set(['cua', 'cho', 'bang', 'hoac', 'khong', 'tren', 'duoi', 'nhung', 'tuong', 'loai', 'khac', 'nhom', 'chua', 'duoc', 'chi', 'tiet', 'noi', 'cac', 'hay']);
+                if (!/\bloai\s+khac\b/.test(itemDescNorm)) {
+                    let um = 0;
+                    for (const t of iTokens) {
+                        if (t.length >= 3 && !STOP.has(t) && !allQTokens.has(t) && !GENERIC_SKIP.has(t)) um++;
+                    }
+                    itemScore -= Math.min(um * 40, 320);
+                } else {
+                    itemScore += 30;
+                }
+                if (subDescNorm && !/\bloai\s+khac\b/.test(subDescNorm)) {
+                    let ums = 0;
+                    for (const t of sTokens) {
+                        if (t.length >= 3 && !STOP.has(t) && !allQTokens.has(t) && !GENERIC_SKIP.has(t)) ums++;
+                    }
+                    itemScore -= Math.min(ums * 35, 240);
                 }
 
                 // Universal Quantitative Spec Threshold Engine (Auto-applies across Biểu thuế)

@@ -27,7 +27,9 @@
     ];
     const ALIASES = {
         'vien thong': ['vien thong', 'telecom', 'telecommunication', 'mang lan', 'lan', 'cat5', 'cat5e', 'cat6', 'cat6a', 'cat7', 'cat 5', 'cat 6', 'ethernet', 'utp', 'ftp', 'sftp', 'dien thoai', 'tin hieu mang', 'cap mang'],
-        'hoat dong bang dien': ['hoat dong bang dien', 'chay bang dien', 'chay dien', 'dung dien', 'dong co dien', 'motor dien', 'electrically operated', 'electric motor']
+        'hoat dong bang dien': ['hoat dong bang dien', 'chay bang dien', 'chay dien', 'dung dien', 'dong co dien', 'motor dien', 'electrically operated', 'electric motor'],
+        'lap voi dau noi': ['lap voi dau noi', 'gan voi dau noi', 'gan dau noi', 'lap dau noi', 'dau noi'],
+        'gan voi dau noi': ['gan voi dau noi', 'lap voi dau noi', 'gan dau noi', 'lap dau noi', 'dau noi']
     };
     function escRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
@@ -92,7 +94,7 @@
         let has = false, nothas = false;
         for (const p of cands) {
             const pe = escRe(p);
-            if (new RegExp('\\b(?:khong|chua)\\s+(?:co\\s+|duoc\\s+|dung\\s+|lap\\s+|gan\\s+|su\\s+dung\\s+|hoat\\s+dong\\s+bang\\s+)?' + pe).test(qn) ||
+            if (new RegExp('\\b(?:khong|chua)\\s+(?:co\\s+|duoc\\s+|phai\\s+|dung\\s+(?:cho\\s+)?|lap\\s+|gan\\s+|su\\s+dung\\s+(?:cho\\s+)?|hoat\\s+dong\\s+bang\\s+)?' + pe).test(qn) ||
                 new RegExp('\\bnon[- ]' + pe).test(qn) || new RegExp('\\bwithout\\s+' + pe).test(qn)) {
                 nothas = true;
             } else if (new RegExp('\\b' + pe + '(?![a-z0-9])').test(qn)) {
@@ -147,6 +149,24 @@
         return failed;
     }
 
+    const PHRASE_STOP = new Set('loai khac cua tu hoac va dung cho khong chua co bang la nhung duoc de cac theo'.split(' '));
+    function leafPhrases(vnTxt) {
+        let t = norm(String(vnTxt || '').replace(/^[\s\-]+/, ''));
+        t = t.replace(/\(sen\)|:/g, ' ').trim();
+        if (!t || /^(?:loai\s+)?khac$/.test(t)) return [[], true];
+        const out = [];
+        for (const part of t.split(/\bhoac\b|[,;()]/)) {
+            const p = part.trim().replace(/\s+/g, ' ');
+            if (!p || /^(?:loai\s+)?khac$/.test(p)) continue;
+            const meaningful = (p.match(/[a-z0-9]+/g) || []).filter(w => !PHRASE_STOP.has(w) && w.length > 1);
+            if (meaningful.length >= 2) out.push(p);
+        }
+        return [out, false];
+    }
+    function phraseInQn(p, qn) {
+        return new RegExp('(?<![a-z0-9])' + escRe(p) + '(?![a-z0-9])').test(qn);
+    }
+
     // Tra ve [disqualified, reason, bonus]
     function evaluate(code, qinfo) {
         const data = root.TARIFF_ENGINE;
@@ -170,6 +190,28 @@
             for (const p of ps) {
                 const [has, nothas] = queryAssertions(qn, p);
                 if ((m.n && nothas) || (m.pp && has)) bonus += 300;
+            }
+        }
+        if (c.length === 8 && qn && root.HS_DATABASE) {
+            const cur = root.HS_DATABASE.find(it => (it.c || '').replace(/\./g, '') === c);
+            if (cur) {
+                const [phsCur, isRes] = leafPhrases(cur.vn);
+                if (isRes) {
+                    const sub6 = c.substring(0, 6);
+                    for (const sib of root.HS_DATABASE) {
+                        const sc = (sib.c || '').replace(/\./g, '');
+                        if (sc.length !== 8 || sc === c || sc.indexOf(sub6) !== 0) continue;
+                        const [phs, sibRes] = leafPhrases(sib.vn);
+                        if (sibRes || !phs.length) continue;
+                        if (phs.some(p => phraseInQn(p, qn))) {
+                            const [sibDq] = evaluate(sc, qinfo);
+                            if (!sibDq) return [true, 'Vi pham GRI 6: Da co nhanh dinh danh cu the khop mo ta (' + fmt(sc) + ')', 0];
+                        }
+                    }
+                } else if (phsCur.length) {
+                    const phHits = phsCur.filter(p => phraseInQn(p, qn)).length;
+                    if (phHits) bonus += 600 * phHits;
+                }
             }
         }
         return [false, '', bonus];
@@ -202,8 +244,11 @@
         for (let n = clean.length; n >= 2; n--) {
             const phrase = clean.slice(0, n).join(' ');
             const re = new RegExp('(?<![a-z])' + escRe(phrase) + '(?![a-z])');
-            const cands = data.filter(x => re.test(x[1]));
+            const cands = data.filter(x => !x[0].startsWith('98') && re.test(x[1]));
             if (!cands.length) continue;
+            if (cands.length <= 2 && cands.every(x => x[0].startsWith('30') || x[0].startsWith('93'))) {
+                if (!/\b(?:thuoc|duoc\s+pham|y\s+te|tranh\s+thai|hormon|khau\s+trang|bang\s+gac|vu\s+khi|sung|dan)\b/.test(qi.qn)) continue;
+            }
             const surv = [], dropped = [];
             for (const [c] of cands) {
                 const [dq, why] = evaluate(c, qi);
@@ -243,8 +288,10 @@
             const toks = new Set((txt.match(/[a-z0-9]+/g) || []).filter(t => !TOK_STOP.has(t)));
             let sc = 0;
             toks.forEach(t => { if (qtoks.has(t)) sc++; });
+            const [phs, isRes] = leafPhrases(it.vn);
+            const phHits = phs.filter(p => phraseInQn(p, qi.qn)).length;
             const mm = materialsOf(txt).filter(x => qi.mt.indexOf(x) >= 0).length;
-            return [sc + 2 * mm + 3 * Math.floor(bn / 300), c];
+            return [sc + 10 * phHits + 2 * mm + 3 * Math.floor(bn / 300) - (isRes ? 5 : 0), c];
         }).sort((a, b) => b[0] - a[0]);
         if (scored[0][0] > 0 && (scored.length === 1 || scored[0][0] > scored[1][0])) {
             return { code: fmt(scored[0][1]), level: 8, status: 'EXACT_8_DIGIT', phrase: c0.substring(0, 4), survivors: scored.map(x => x[1]), dropped: why0 };
@@ -257,6 +304,48 @@
         return null;
     }
 
+    const GENERIC_LEAF_PHRASES = new Set([
+        'bo phan', 'phu tung', 'linh kien', 'hoat dong bang dien', 'khong hoat dong bang dien',
+        'bang tay', 'cong nghiep', 'chua duoc chi tiet', 'loai dung', 'trong y te', 'dung cho',
+        'khong dung', 'loai khac', 'cac loai', 'cac bo phan', 'thiet bi', 'dung cu', 'may moc'
+    ]);
+
+    function leafPhraseHeadings(fullText) {
+        const qi = extractQuery(fullText);
+        const qn = qi.qn;
+        const out = {};
+        if (!qn || !root.HS_DATABASE) return out;
+        const phraseHeads = {};
+        for (const it of root.HS_DATABASE) {
+            const c = (it.c || '').replace(/\./g, '');
+            if (c.length !== 8 || !String(it.vn || '').trimStart().startsWith('-')) continue;
+            const [phs, isRes] = leafPhrases(it.vn);
+            if (isRes || !phs.length) continue;
+            const matched = phs.filter(p => !GENERIC_LEAF_PHRASES.has(p) && p.split(' ').length >= 2 && phraseInQn(p, qn));
+            if (!matched.length) continue;
+            const [dq] = evaluate(c, qi);
+            if (dq) continue;
+            const h = c.substring(0, 4);
+            for (const p of matched) {
+                if (!phraseHeads[p]) phraseHeads[p] = new Set();
+                phraseHeads[p].add(h);
+            }
+            const sc = 450 * matched.length;
+            if (sc > (out[h] || 0)) out[h] = sc;
+        }
+        const commonP = new Set(Object.keys(phraseHeads).filter(p => phraseHeads[p].size > 8));
+        if (commonP.size) {
+            const filtered = {};
+            for (const [h, sc] of Object.entries(out)) {
+                if (Object.entries(phraseHeads).some(([p, hs]) => !commonP.has(p) && hs.has(h))) {
+                    filtered[h] = sc;
+                }
+            }
+            return filtered;
+        }
+        return out;
+    }
+
     function reroute(code, fullText) {
         const c0 = String(code).replace(/\./g, '');
         const scopes = c0.length >= 6 ? [c0.substring(0, 6), c0.substring(0, 4)] : [c0.substring(0, 4)];
@@ -267,5 +356,5 @@
         return null;
     }
 
-    root.UniversalEngine = { norm, extractQuery, evaluate, genericResolve, reroute, condOk, queryAssertions };
+    root.UniversalEngine = { norm, extractQuery, evaluate, genericResolve, reroute, leafPhraseHeadings, condOk, queryAssertions };
 })(typeof window !== 'undefined' ? window : globalThis);

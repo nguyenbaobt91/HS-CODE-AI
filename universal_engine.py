@@ -132,6 +132,8 @@ ALIASES = {
                    'cat 5', 'cat 6', 'ethernet', 'utp', 'ftp', 'sftp', 'dien thoai', 'tin hieu mang', 'cap mang'],
     'hoat dong bang dien': ['hoat dong bang dien', 'chay bang dien', 'chay dien', 'dung dien', 'dong co dien',
                             'motor dien', 'electrically operated', 'electric motor'],
+    'lap voi dau noi': ['lap voi dau noi', 'gan voi dau noi', 'gan dau noi', 'lap dau noi', 'dau noi'],
+    'gan voi dau noi': ['gan voi dau noi', 'lap voi dau noi', 'gan dau noi', 'lap dau noi', 'dau noi'],
 }
 
 
@@ -177,7 +179,7 @@ def query_assertions(qn, phrase):
     nothas = False
     for p in cands:
         pe = re.escape(p)
-        if re.search(r'\b(?:khong|chua)\s+(?:co\s+|duoc\s+|dung\s+|lap\s+|gan\s+|su\s+dung\s+|hoat\s+dong\s+bang\s+)?' + pe, qn) \
+        if re.search(r'\b(?:khong|chua)\s+(?:co\s+|duoc\s+|phai\s+|dung\s+(?:cho\s+)?|lap\s+|gan\s+|su\s+dung\s+(?:cho\s+)?|hoat\s+dong\s+bang\s+)?' + pe, qn) \
                 or re.search(r'\bnon[- ]' + pe, qn) or re.search(r'\bwithout\s+' + pe, qn):
             nothas = True
         elif re.search(r'\b' + pe + r'(?![a-z0-9])', qn):
@@ -388,6 +390,30 @@ def _group_failed(members, qn, q, qinfo_mt=None):
     return failed
 
 
+_PHRASE_STOP = set('loai khac cua tu hoac va dung cho khong chua co bang la nhung duoc de cac theo'.split())
+
+
+def _leaf_phrases(vn_txt):
+    """Tach cac cum tu (>= 2 tu co nghia) trong mo ta cua 1 dong thue 8 so."""
+    t = norm(re.sub(r'^[\s\-]+', '', vn_txt or ''))
+    t = re.sub(r'\(sen\)|:', ' ', t).strip()
+    if not t or re.fullmatch(r'(?:loai\s+)?khac', t):
+        return [], True
+    out = []
+    for part in re.split(r'\bhoac\b|[,;()]', t):
+        p = ' '.join(part.split())
+        if not p or re.fullmatch(r'(?:loai\s+)?khac', p):
+            continue
+        meaningful = [w for w in re.findall(r'[a-z0-9]+', p) if w not in _PHRASE_STOP and len(w) > 1]
+        if len(meaningful) >= 2:
+            out.append(p)
+    return out, False
+
+
+def _phrase_in_qn(p, qn):
+    return bool(re.search(r'(?<![a-z0-9])' + re.escape(p) + r'(?![a-z0-9])', qn))
+
+
 def evaluate(code, qinfo):
     """Tra ve (disqualified: bool, reason: str, bonus: int)."""
     data = load_data()
@@ -414,6 +440,28 @@ def evaluate(code, qinfo):
                 has, nothas = query_assertions(qn, p)
                 if (m.get('n') and nothas) or (m.get('pp') and has):
                     bonus += 300
+    # Quy tac chung GRI 3(a) / GRI 6: dong "Loai khac" (residual) bi loai neu cung phan nhom 6 so da co nhanh dinh danh cu the khop cum tu mo ta
+    if len(c) == 8 and qn:
+        tmap = {tc: it for tc, _, it in _tariff()}
+        cur_it = tmap.get(c)
+        if cur_it:
+            phs_cur, is_res = _leaf_phrases(cur_it.get('vn', ''))
+            if is_res:
+                sub6 = c[:6]
+                for sib_c, _, sib_it in _tariff():
+                    if sib_c == c or not sib_c.startswith(sub6):
+                        continue
+                    phs, sib_res = _leaf_phrases(sib_it.get('vn', ''))
+                    if sib_res or not phs:
+                        continue
+                    if any(_phrase_in_qn(p, qn) for p in phs):
+                        sib_dq, _, _ = evaluate(sib_c, qinfo)
+                        if not sib_dq:
+                            return True, f'Vi pham GRI 6: Da co nhanh dinh danh cu the khop mo ta ({sib_c[:4]}.{sib_c[4:6]}.{sib_c[6:]})', 0
+            elif phs_cur:
+                ph_hits = sum(1 for p in phs_cur if _phrase_in_qn(p, qn))
+                if ph_hits:
+                    bonus += 600 * ph_hits
     return False, '', bonus
 
 
@@ -451,9 +499,13 @@ def generic_resolve(head_noun_norm, full_text):
     for n in range(len(clean), 1, -1):
         phrase = ' '.join(clean[:n])
         pat = re.compile(r'(?<![a-z])' + re.escape(phrase) + r'(?![a-z])')
-        cands = [(c, it) for c, ln, it in data if pat.search(ln)]
+        cands = [(c, it) for c, ln, it in data if not c.startswith('98') and pat.search(ln)]
         if not cands:
             continue
+        # Guard: avoid false-positive match into specialized medical/arms chapters when query has no domain term
+        if len(cands) <= 2 and all(c[:2] in ('30', '93') for c, _ in cands):
+            if not re.search(r'\b(?:thuoc|duoc\s+pham|y\s+te|tranh\s+thai|hormon|khau\s+trang|bang\s+gac|vu\s+khi|sung|dan)\b', qi['qn']):
+                continue
         surv, dropped = [], []
         for c, it in cands:
             dq, why, _ = evaluate(c, qi)
@@ -498,7 +550,9 @@ def _reroute_scope(code, full_text, prefix):
     for c, it, _, bn in surv:
         txt = norm(re.sub(r'^[\s\-]+', '', it.get('vn', '')))
         toks = set(re.findall(r'[a-z0-9]+', txt)) - TOK_STOP
-        sc = len(toks & qtoks) + 2 * len(set(materials_of(txt)) & set(qi['mt'])) + 3 * (bn // 300)
+        phs, is_res = _leaf_phrases(it.get('vn', ''))
+        ph_hits = sum(1 for p in phs if _phrase_in_qn(p, qi['qn']))
+        sc = len(toks & qtoks) + 10 * ph_hits + 2 * len(set(materials_of(txt)) & set(qi['mt'])) + 3 * (bn // 300) - (5 if is_res else 0)
         scored.append((sc, c))
     scored.sort(reverse=True)
     if scored[0][0] > 0 and (len(scored) == 1 or scored[0][0] > scored[1][0]):
@@ -509,6 +563,53 @@ def _reroute_scope(code, full_text, prefix):
         sub = next(iter(subs))
         return {'code': f"{sub[:4]}.{sub[4:6]}", 'level': 6, 'status': 'STOP_6_DIGIT', 'phrase': c0[:4], 'survivors': [x[1] for x in scored], 'dropped': why0}
     return None
+
+
+def leaf_phrase_headings(full_text):
+    """Tra ve dict {heading4: max_bonus} cho cac nhom co dong 8 so khop cum tu chinh xac."""
+    qi = extract_query(full_text)
+    qn = qi['qn']
+_GENERIC_LEAF_PHRASES = {
+    'bo phan', 'phu tung', 'linh kien', 'hoat dong bang dien', 'khong hoat dong bang dien',
+    'bang tay', 'cong nghiep', 'chua duoc chi tiet', 'loai dung', 'trong y te', 'dung cho',
+    'khong dung', 'loai khac', 'cac loai', 'cac bo phan', 'thiet bi', 'dung cu', 'may moc',
+}
+
+def leaf_phrase_headings(full_text):
+    """Cong diem cac nhom 4 so co mo ta nhanh 8 so khop cum tu dac thu (loai bo cum tu chung chung)."""
+    qi = extract_query(full_text)
+    qn = qi['qn']
+    if not qn:
+        return {}
+    out = {}
+    phrase_heads = {}
+    for c, _, it in _tariff():
+        if len(c) != 8 or not (it.get('vn') or '').lstrip().startswith('-'):
+            continue
+        phs, is_res = _leaf_phrases(it.get('vn', ''))
+        if is_res or not phs:
+            continue
+        matched = [p for p in phs if p not in _GENERIC_LEAF_PHRASES and len(p.split()) >= 2 and _phrase_in_qn(p, qn)]
+        if not matched:
+            continue
+        dq, _, _ = evaluate(c, qi)
+        if dq:
+            continue
+        h = c[:4]
+        for p in matched:
+            phrase_heads.setdefault(p, set()).add(h)
+        sc = 450 * len(matched)
+        if sc > out.get(h, 0):
+            out[h] = sc
+    # Remove headings that only matched ultra-common phrases appearing in > 8 headings
+    common_p = {p for p, hs in phrase_heads.items() if len(hs) > 8}
+    if common_p:
+        filtered = {}
+        for h, sc in out.items():
+            if any(p not in common_p and h in hs for p, hs in phrase_heads.items()):
+                filtered[h] = sc
+        return filtered
+    return out
 
 
 def reroute(code, full_text):
