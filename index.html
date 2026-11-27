@@ -4199,10 +4199,60 @@
                 console.warn("Lỗi trích xuất tiền lệ Hải quan:", err);
             }
 
-            // Extract dynamic WCO Explanatory Notes across all chapters
+            // Pass 1 (2-Pass Gemini + WCO RAG): When local StatutoryTreeWalker hasn't locked a statutory code,
+            // let Gemini independently discover the top 3 4-digit Headings across all 97 Chapters so WCO & Tariff RAG never gets poisoned by Stage-1 keywords.
+            let aiDiscoveredHeads = [];
+            try {
+                const isLockedByWalker = Boolean(quickCand && (quickCand._statutory || quickCand._insufficient_info));
+                if (!isLockedByWalker && apiKey && apiKey.length > 15) {
+                    const p1Prompt = `Bạn là Chuyên gia phân loại mã HS Hải quan (WCO HS 2022). Hãy xác định 3 Nhóm 4 số khả dĩ nhất (dạng "xxxx", không dấu chấm) theo GRI 1 và Chú giải Phần/Chương WCO 2022 cho hàng hóa sau:\n- Tên hàng: ${name} (Model: ${model_en || 'N/A'})\n- Bản chất / Thành phần / Chất liệu: ${desc || 'N/A'}\n- Công dụng: ${use || 'N/A'}\n- Thông số: ${specs || 'N/A'}\nLưu ý: Ruột/lốp cao su -> Chương 40 (4011-4013); phụ tùng ô tô -> 8708; smartwatch/module BLE/WiFi/LoRa -> 8517; dung dịch polyme trong dung môi >50% -> 3208; chế phẩm hóa chất -> 3824; thuốc bán lẻ -> 3004.\nTrả về JSON: {"headings": ["xxxx", "yyyy", "zzzz"]}`;
+                    const p1Ctrl = new AbortController();
+                    const p1Timer = setTimeout(() => p1Ctrl.abort(), 8000);
+                    const p1Url = `https://generativelanguage.googleapis.com/v1beta/models/${candidateModels[0]}:generateContent?key=${apiKey}`;
+                    const p1Resp = await fetch(p1Url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        signal: p1Ctrl.signal,
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: p1Prompt }] }],
+                            generationConfig: { temperature: 0.0, responseMimeType: "application/json" }
+                        })
+                    });
+                    clearTimeout(p1Timer);
+                    if (p1Resp.ok) {
+                        const p1Data = await p1Resp.json();
+                        const p1Txt = p1Data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                        const p1M = p1Txt.match(/\{[\s\S]*\}/);
+                        if (p1M) {
+                            const p1Obj = JSON.parse(p1M[0]);
+                            const hMap = window.HEADING_TITLES || {};
+                            aiDiscoveredHeads = (p1Obj.headings || [])
+                                .map(h => String(h).replace(/\D/g, '').substring(0, 4))
+                                .filter(h => h.length === 4 && !h.startsWith('98') && (Object.keys(hMap).length === 0 || hMap[h]));
+                        }
+                    }
+                }
+            } catch (errP1) {
+                console.warn("Pass 1 Heading Discovery fallback:", errP1);
+            }
+
+            // Extract dynamic WCO Explanatory Notes across all chapters (grounded on AI-discovered + local headings)
             let wcoContext = "";
             try {
                 wcoContext = extractRelevantWCOKnowledge(name, desc, use, specs, model_en);
+                if (aiDiscoveredHeads.length > 0 && window.WCO_NOTES_DATA) {
+                    const aiWcoBlocks = [];
+                    for (const ah of aiDiscoveredHeads.slice(0, 3)) {
+                        const wn = window.WCO_NOTES_DATA[ah];
+                        if (wn && !wcoContext.includes(`NHÓM ${ah.substring(0,2)}.${ah.substring(2,4)}`)) {
+                            const noteTxt = (wn.official_note || wn.summary || wn.official_vn || '').substring(0, 1400);
+                            if (noteTxt) aiWcoBlocks.push(`NHÓM ${ah.substring(0,2)}.${ah.substring(2,4)} (${wn.title || ''}):\n${noteTxt}`);
+                        }
+                    }
+                    if (aiWcoBlocks.length > 0) {
+                        wcoContext = aiWcoBlocks.join('\n\n') + '\n\n' + wcoContext;
+                    }
+                }
             } catch (errWco) {
                 console.warn("Lỗi trích xuất Chú giải WCO:", errWco);
             }
@@ -4211,6 +4261,7 @@
             let tariffContext = "";
             try {
                 const candHeads = new Set();
+                for (const ah of aiDiscoveredHeads.slice(0, 3)) candHeads.add(ah);
                 if (quickCand && quickCand.c) {
                     candHeads.add(quickCand.c.replace(/\./g, '').substring(0, 4));
                 }
@@ -4402,7 +4453,8 @@ Trường hợp đủ thông tin:
 }`;
 
             const payload = {
-                contents: [{ parts: [{ text: prompt }] }]
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.0, responseMimeType: "application/json" }
             };
 
             for (let model of candidateModels) {
@@ -4715,7 +4767,7 @@ Trường hợp đủ thông tin:
             },
             {
                 name: 'knitted_apparel',
-                pattern: /\b(?:det\s+kim|knitted|crocheted|ao\s+thun|t-shirt|ao\s+len)\b/i,
+                pattern: /\b(?:ao\s+thun|t-shirt|ao\s+len|(?:ao|quan|vay|do)\s+det\s+kim|(?:knitted|crocheted)\s+(?:shirt|sweater|garment|apparel))\b/i,
                 target_headings: ['6109', '6105', '6110', '6103', '6104'],
                 forbidden_chapters: ['62'],
                 bonus: 1100
@@ -6476,7 +6528,7 @@ Trường hợp đủ thông tin:
             }
 
             // 5. THIẾT BỊ ĐO LƯỜNG & KIỂM TRA (Chương 90)
-            if (/\b(?:dong\s+ho\s+do|dong\s+ho|thiet\s+bi\s+do|may\s+do|bo\s+phan\s+cua\s+thuoc\s+do|gauge|measuring)\b/.test(hn)) {
+            if (/\b(?:dong\s+ho\s+do|dong\s+ho|thiet\s+bi\s+do|may\s+do|cam\s+bien\s+(?:ap\s+suat|luu\s+luong|muc|nhiet\s+do)|bo\s+phan\s+cua\s+thuoc\s+do|gauge|measuring)\b/.test(hn)) {
                 if (/\b(?:ap\s+suat|pressure)\b/.test(norm)) {
                     return {
                         code: "9026.20",
@@ -6670,15 +6722,16 @@ Trường hợp đủ thông tin:
                 };
             }
 
-            // 10d. DUNG DỊCH NHỰA TRONG DUNG MÔI > 50% (Chú giải 4 Chương 32 -> Nhóm 3208)
-            if (/\bdung\s+dich\s+nhua\b/.test(hn) && /\bdung\s+moi\b/.test(norm) && /\btren\s+50\s*%/.test(norm)) {
-                const code3208 = /\b(?:acrylic|vinyl)\b/.test(norm) ? "3208.20.90" : "3208.90.90";
-                return {
-                    code: code3208, level: 8, status: "EXACT_8_DIGIT",
-                    reasoning: `Áp dụng GRI 1 & Chú giải 4 Chương 32: Dung dịch nhựa polyme trong dung môi hữu cơ dễ bay hơi với tỷ lệ dung môi > 50% trọng lượng thuộc Nhóm 32.08 -> Mã ${code3208}.`,
-                    missing_attributes: [], assumptions: "", reserve_code: "3208.90.90"
-                };
-            }
+                // 10d. DUNG DỊCH NHỰA TRONG DUNG MÔI > 50% (Chú giải 4 Chương 32 -> Nhóm 3208)
+                const hasSolventNote4 = /\bdung\s+moi\b/.test(norm) && /\b(?:dung\s+dich\s+nhua|polyme|copolymer|resin|nhua)\b/.test(norm);
+                if (hasSolventNote4 && (/\btren\s+50\s*%/.test(norm) || /\b(?:4\d|5\d|6\d|7\d|8\d|9\d)\s*%/.test(norm))) {
+                    const code3208 = /\b(?:acrylic|vinyl)\b/.test(norm) ? "3208.20.90" : "3208.90.90";
+                    return {
+                        code: code3208, level: 8, status: "EXACT_8_DIGIT",
+                        reasoning: `Áp dụng GRI 1 & Chú giải 4 Chương 32: Dung dịch nhựa polyme trong dung môi hữu cơ dễ bay hơi với tỷ lệ dung môi > 50% trọng lượng thuộc Nhóm 32.08 -> Mã ${code3208}.`,
+                        missing_attributes: [], assumptions: "", reserve_code: "3208.90.90"
+                    };
+                }
 
             // 11. VÒNG ĐỆM PHẲNG / ĐAI ỐC (Nhóm 7318 - Chú giải 2 Phần XV)
             if (/\b(?:vong\s+dem|long\s+den|washer)\b/.test(hn)) {
@@ -7069,7 +7122,7 @@ Trường hợp đủ thông tin:
                 };
             }
 
-            if (/\b(?:bien\s+ap|bien\s+the|transformer)\b/.test(hn)) {
+            if (/(?<!cam\s)\b(?:bien\s+ap|bien\s+the|transformer)\b/.test(hn)) {
                 const pw = attrs.power_w;
                 if (pw === null || pw === undefined) {
                     return {

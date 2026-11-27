@@ -567,7 +567,7 @@ STATUTORY_CATEGORIES = [
     },
     {
         'name': 'knitted_apparel',
-        'pattern': r'\b(?:det\s+kim|knitted|crocheted|ao\s+thun|t-shirt|ao\s+len)\b',
+        'pattern': r'\b(?:ao\s+thun|t-shirt|ao\s+len|(?:ao|quan|vay|do)\s+det\s+kim|(?:knitted|crocheted)\s+(?:shirt|sweater|garment|apparel))\b',
         'target_headings': ['6109', '6105', '6110', '6103', '6104'],
         'forbidden_chapters': ['62'],
         'bonus': 1100
@@ -830,7 +830,7 @@ STATUTORY_CATEGORIES = [
     # 41. Giày dép (Chương 64)
     {
         'name': 'footwear_shoes',
-        'pattern': r'\b(?:giay|dep|ung|sandal|shoes|boots|footwear)\b',
+        'pattern': r'\b(?:giay\s+(?:dep|the\s+thao|da|vai|bao\s+ho)|doi\s+giay|dep\b|ung\s+(?:cao\s+su|nhua|da)|sandal|shoes|boots|footwear)\b',
         'target_headings': ['6401', '6402', '6403', '6404', '6405'],
         'forbidden_chapters': ['3926', '4016', '61', '62', '63'],
         'bonus': 1450
@@ -1273,7 +1273,7 @@ def decompose_query(query_text, desc="", use="", specs="", model_en=""):
     subj_has_rubber = bool(re.search(r'\b(?:cao\s+su|rubber)\b', subj_norm, re.I))
 
     if subj_has_steel:
-        materials = [m for m in materials if m[0] not in ('plastic', 'rubber', 'aluminum')]
+        materials = [m for m in materials if m[0] not in ('plastic', 'rubber', 'aluminum', 'copper')]
     elif subj_has_copper:
         materials = [m for m in materials if m[0] not in ('plastic', 'rubber', 'steel_iron')]
     elif subj_has_aluminum:
@@ -1415,7 +1415,7 @@ def decompose_query(query_text, desc="", use="", specs="", model_en=""):
 
         # Categories that describe standalone devices or host-sensitive types shouldn't be hijacked purely from host_norm
         if cat['name'] in ['insulated_cables', 'electric_motors', 'valves_fluid_controllers', 'pumps_for_liquids',
-                           'electrical_switches_relays', 'transformers_power', 'aluminum_plates_articles']:
+                           'electrical_switches_relays', 'transformers_power', 'aluminum_plates_articles', 'seats_chairs']:
             if matched_in_subj or (matched_in_full and not matched_in_host):
                 active_categories.append(cat)
         else:
@@ -2611,6 +2611,81 @@ def get_system_gemini_api_key(explicit_key=None):
                 pass
     return None
 
+def discover_headings_gemini_python(api_key, name, desc="", use="", specs="", model_en=""):
+    """Pass 1 (Semantic Heading Discovery): Let Gemini identify the top 3 4-digit HS headings
+    across all 97 Chapters independently of keyword Stage 1, so WCO RAG never gets poisoned."""
+    import urllib.request
+    resolved_key = get_system_gemini_api_key(api_key)
+    if not resolved_key:
+        return []
+    prompt = f"""Bạn là Chuyên gia phân loại mã HS Hải quan (WCO HS 2022).
+Hãy xác định 3 Nhóm 4 số khả dĩ nhất (dạng "xxxx", không dấu chấm) theo GRI 1 và Chú giải Phần/Chương WCO 2022 cho hàng hóa sau:
+- Tên hàng: {name} (Model: {model_en or 'N/A'})
+- Bản chất / Thành phần / Chất liệu: {desc or 'N/A'}
+- Công dụng: {use or 'N/A'}
+- Thông số kỹ thuật: {specs or 'N/A'}
+
+Lưu ý pháp lý bắt buộc:
+- Ruột/săm/lốp cao su -> Chương 40 (4011/4012/4013), KHÔNG xếp vào xe/máy bay (Ch. 87/88).
+- Bộ phận/phụ tùng ô tô (cản, cầu, đuôi gió, HUD gắn xe) -> 8708 (trừ chi tiết định danh riêng).
+- Bộ phận chuyên dùng máy móc/viễn thông/điện tử (Chú giải 2(b) Phần XVI) -> nhóm máy mẹ (vd 8517.79, 8473.30).
+- Thiết bị đeo tay thông minh / module thu phát BLE/WiFi/LoRa -> 8517.
+- Dung dịch polyme trong dung môi hữu cơ >50% -> 3208 (Chú giải 4 Chương 32).
+- Chế phẩm hóa chất công nghiệp / phụ gia xi măng / trợ nghiền -> 3824; thuốc diệt nấm/bảo quản -> 3808; sáp nhân tạo -> 3404.
+- Tân dược/thuốc thú y đóng gói bán lẻ -> 3004.
+
+Trả về JSON: {{"headings": ["xxxx", "yyyy", "zzzz"]}}"""
+    payload = json.dumps({
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"temperature": 0.0, "responseMimeType": "application/json"}
+    }).encode('utf-8')
+    for m in ['gemini-3.5-flash-lite', 'gemini-flash-lite-latest', 'gemini-3.5-flash']:
+        try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent?key={resolved_key}"
+            req = urllib.request.Request(url, data=payload, headers={'Content-Type': 'application/json'})
+            with urllib.request.urlopen(req, timeout=10) as response:
+                if response.status == 200:
+                    resp_json = json.loads(response.read().decode('utf-8'))
+                    text = resp_json.get('candidates', [{}])[0].get('content', {}).get('parts', [{}])[0].get('text', '')
+                    m_json = re.search(r'\{[\s\S]*\}', text)
+                    if m_json:
+                        parsed = json.loads(m_json.group(0), strict=False)
+                        hs = [re.sub(r'\D', '', str(h))[:4] for h in (parsed.get('headings') or [])]
+                        hs = [h for h in hs if len(h) == 4 and h in HEAD_MAP and not h.startswith('98')]
+                        if hs:
+                            return hs[:3]
+        except Exception:
+            pass
+    return []
+
+
+def build_grounded_rag_context(ai_headings, stage1_headings, stage1_cands):
+    """Merge AI-discovered headings with Stage-1 headings and pull real Tariff 2026 8-digit lines."""
+    merged_heads = []
+    for h in (ai_headings or []) + (stage1_headings or []):
+        if h and h not in merged_heads and not h.startswith('98'):
+            merged_heads.append(h)
+    merged_cands = []
+    seen_codes = set()
+    # Pull ALL real 8-digit lines for the top 2 AI-discovered headings (or merged headings)
+    for h in merged_heads[:2]:
+        for item in HS_DATABASE:
+            c = item.get('c', '').replace('.', '')
+            if c.startswith(h) and c not in seen_codes:
+                seen_codes.add(c)
+                merged_cands.append(item)
+                if len(merged_cands) >= 35:
+                    break
+        if len(merged_cands) >= 35:
+            break
+    for item in (stage1_cands or []):
+        c = item.get('c', '').replace('.', '')
+        if c and c not in seen_codes and not c.startswith('98'):
+            seen_codes.add(c)
+            merged_cands.append(item)
+    return merged_heads[:4], merged_cands[:40]
+
+
 def call_gemini_api_python(api_key, name, desc, use, specs="", model_en="", candidates=None, top_headings=None):
     import urllib.request
     import urllib.error
@@ -2625,7 +2700,7 @@ def call_gemini_api_python(api_key, name, desc, use, specs="", model_en="", cand
     
     cand_str = ""
     if candidates and len(candidates) > 0:
-        cand_lines = [f"- Mã {c.get('c', '')}: {c.get('vn', '')} (MFN: {c.get('mfn', '0%')})" for c in candidates[:10]]
+        cand_lines = [f"- Mã {c.get('c', '')}: {c.get('vn', '')} (MFN: {c.get('mfn', '0%')})" for c in candidates[:40]]
         cand_str = "\nCác mã phân nhóm ứng viên trong Biểu thuế XNK Việt Nam 2026:\n" + "\n".join(cand_lines)
 
     notes_str = ""
@@ -2713,18 +2788,21 @@ YÊU CẦU TRẢ VỀ DUY NHẤT MỘT CHUỖI JSON CHUẨN (không viết gì n
   "recommendations": "Khuyến nghị thủ tục hải quan..."
 }}
 """
-    payload = json.dumps({"contents": [{"parts": [{"text": prompt}]}]}).encode('utf-8')
+    payload = json.dumps({
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"temperature": 0.0, "responseMimeType": "application/json"}
+    }).encode('utf-8')
     for m in models:
         try:
             url = f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent?key={resolved_key}"
             req = urllib.request.Request(url, data=payload, headers={'Content-Type': 'application/json'})
-            with urllib.request.urlopen(req, timeout=12) as response:
+            with urllib.request.urlopen(req, timeout=14) as response:
                 if response.status == 200:
                     resp_json = json.loads(response.read().decode('utf-8'))
                     text = resp_json.get('candidates', [{}])[0].get('content', {}).get('parts', [{}])[0].get('text', '')
                     m_json = re.search(r'\{[\s\S]*\}', text)
                     if m_json:
-                        parsed = json.loads(m_json.group(0))
+                        parsed = json.loads(m_json.group(0), strict=False)
                         if parsed.get('clean_code') or parsed.get('hs_code'):
                             return parsed
         except Exception as e:
@@ -2963,7 +3041,12 @@ def run_automation_workflow(name, desc, use, specs="", model_en="", image_b64=No
     if gemini_api_key:
         try:
             all_cands = [best_item] + competing_items
-            gemini_res = call_gemini_api_python(gemini_api_key, name, desc, use, specs, model_en, candidates=all_cands, top_headings=top_headings)
+            merged_heads, merged_cands = top_headings, all_cands
+            if _walker_item is None:
+                ai_heads = discover_headings_gemini_python(gemini_api_key, name, desc, use, specs, model_en)
+                if ai_heads:
+                    merged_heads, merged_cands = build_grounded_rag_context(ai_heads, top_headings, all_cands)
+            gemini_res = call_gemini_api_python(gemini_api_key, name, desc, use, specs, model_en, candidates=merged_cands, top_headings=merged_heads)
             if gemini_res:
                 g_code = (gemini_res.get('clean_code') or gemini_res.get('hs_code', '')).replace('.', '').strip()
                 matched = next((item for item in HS_DATABASE if item.get('c', '').replace('.', '') == g_code), None) if len(g_code) == 8 else None

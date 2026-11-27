@@ -472,7 +472,7 @@ class StatutoryTreeWalker:
             }
 
         # 5. THIẾT BỊ ĐO LƯỜNG & KIỂM TRA (Chương 90)
-        if re.search(r'\b(?:dong\s+ho\s+do|dong\s+ho|thiet\s+bi\s+do|may\s+do|bo\s+phan\s+cua\s+thuoc\s+do|gauge|measuring)\b', hn):
+        if re.search(r'\b(?:dong\s+ho\s+do|dong\s+ho|thiet\s+bi\s+do|may\s+do|cam\s+bien\s+(?:ap\s+suat|luu\s+luong|muc|nhiet\s+do)|bo\s+phan\s+cua\s+thuoc\s+do|gauge|measuring)\b', hn):
             if re.search(r'\b(?:ap\s+suat|pressure)\b', norm):
                 return {
                     "code": "9026.20",
@@ -666,7 +666,7 @@ class StatutoryTreeWalker:
             }
 
         # 10d. DUNG DỊCH NHỰA TRONG DUNG MÔI > 50% (Chú giải 4 Chương 32 -> Nhóm 3208)
-        if re.search(r'\bdung\s+dich\s+nhua\b', hn) and re.search(r'\bdung\s+moi\b', norm) and re.search(r'\btren\s+50\s*%', norm):
+        if re.search(r'\bdung\s+moi\b', norm) and re.search(r'\b(?:dung\s+dich\s+nhua|polyme|copolymer|resin|nhua)\b', norm) and (re.search(r'\btren\s+50\s*%', norm) or re.search(r'\b(?:4\d|5\d|6\d|7\d|8\d|9\d)\s*%', norm)):
             code_3208 = "3208.20.90" if re.search(r'\b(?:acrylic|vinyl)\b', norm) else "3208.90.90"
             return {
                 "code": code_3208,
@@ -874,7 +874,7 @@ class StatutoryTreeWalker:
                 }
 
         # 16. DÂY DẪN ĐIỆN & CÁP ĐIỆN (Nhóm 8544)
-        if re.search(r'\b(?:day\s+(?:dan\s+)?(?:truyen\s+tin\s+hieu|dien|tin\s+hieu)|day\s+dan\b|day\s+dien\b|cap\s+(?:dan\s+)?dien\b|cap\s+mang\b|cap\s+vien\s+thong\b|day\s+cap\b|wire|cable|harness)\b', hn):
+        if re.search(r'\b(?:day\s+(?:dan\s+)?(?:truyen\s+tin\s+hieu|dien|tin\s+hieu)|day\s+dan\b|day\s+dien\b|cap\s+(?:dan\s+)?dien\b|cap\s+mang\b|cap\s+vien\s+thong\b|cap\s+tin\s+hieu\b|day\s+cap\b|wire|cable|harness)\b', hn):
             if attrs["voltage_v"] is None:
                 return {
                     "code": "8544",
@@ -1058,7 +1058,7 @@ class StatutoryTreeWalker:
                 "reserve_code": "8504.40.11"
             }
 
-        if re.search(r'\b(?:bien\s+ap|bien\s+the|transformer)\b', hn):
+        if re.search(r'(?<!cam\s)\b(?:bien\s+ap|bien\s+the|transformer)\b', hn):
             pw = attrs["power_w"]
             if pw is None:
                 return {
