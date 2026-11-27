@@ -8591,7 +8591,7 @@ Trường hợp đủ thông tin:
                 if (cleanCode.startsWith('9026')) {
                     specializedPolicyText = 'Theo Thông tư 23/2013/TT-BKHCN và Thông tư 07/2019/TT-BKHCN của Bộ Khoa học và Công nghệ quy định về Danh mục phương tiện đo nhóm 2: Thiết bị đo tốc độ gió công nghiệp/kỹ thuật chuyên dụng dùng nội bộ trong nhà xưởng (đo quạt máy sấy keo, bảo dưỡng hệ thống điều hòa HVAC) không thuộc danh mục phương tiện đo bắt buộc phải phê duyệt mẫu và kiểm định chất lượng trước khi thông quan (chỉ áp dụng đối với phương tiện đo tốc độ phương tiện giao thông 9031.80 hoặc thiết bị khí tượng thủy văn phục vụ dự báo quốc gia). Doanh nghiệp nhập khẩu bình thường với mức thuế suất NK ưu đãi MFN là 0% và thuế VAT 8%.';
                 } else {
-                    specializedPolicyText = 'Mặt hàng không thuộc Danh mục hàng hóa cấm xuất khẩu, cấm nhập khẩu hoặc tạm ngừng xuất nhập khẩu theo Nghị định 69/2018/NĐ-CP. Doanh nghiệp thực hiện thủ tục thông quan hàng hóa thông thường theo quy định của Luật Hải quan.';
+                    specializedPolicyText = 'Mặt hàng không thuộc Danh mục hàng hóa cấm xuất khẩu, cấm nhập khẩu hoặc tạm ngừng xuất nhập khẩu theo Nghị định 292/2026/NĐ-CP. Doanh nghiệp thực hiện thủ tục thông quan hàng hóa thông thường theo quy định của Luật Hải quan.';
                 }
             }
 
@@ -10100,7 +10100,7 @@ Trường hợp đủ thông tin:
                             Chính Sách Quản Lý Chuyên Ngành &amp; Thủ Tục Thông Quan:
                         </span>
                         <p class="leading-relaxed text-slate-700 dark:text-slate-300">
-                            ${res.specialized_policy || (cleanCode.startsWith('9026') || cleanCode.startsWith('9030') || cleanCode.startsWith('9031') ? 'Đối chiếu Thông tư 23/2013/TT-BKHCN và Thông tư 07/2019/TT-BKHCN của Bộ Khoa học &amp; Công nghệ về phương tiện đo nhóm 2 (nếu sử dụng nội bộ không thuộc danh mục đo bắt buộc kiểm định thì thực hiện thông quan theo quy định hiện hành).' : (parseInt(cleanCode.substring(0,2), 10) >= 28 && parseInt(cleanCode.substring(0,2), 10) <= 38 ? 'Đối chiếu Luật Hóa chất 69/2025/QH15 và Nghị định 26/2026/NĐ-CP (cùng cổng Tra cứu Hóa chất) để kiểm tra nghĩa vụ khai báo/giấy phép hóa chất nếu có.' : 'Đối chiếu Nghị định 69/2018/NĐ-CP và Danh mục Kiểm tra Chuyên ngành 2026 theo mã HS 8 số để xác nhận điều kiện nhập khẩu trước khi mở tờ khai hải quan.'))}
+                            ${res.specialized_policy || (cleanCode.startsWith('9026') || cleanCode.startsWith('9030') || cleanCode.startsWith('9031') ? 'Đối chiếu Thông tư 23/2013/TT-BKHCN và Thông tư 07/2019/TT-BKHCN của Bộ Khoa học &amp; Công nghệ về phương tiện đo nhóm 2 (nếu sử dụng nội bộ không thuộc danh mục đo bắt buộc kiểm định thì thực hiện thông quan theo quy định hiện hành).' : (parseInt(cleanCode.substring(0,2), 10) >= 28 && parseInt(cleanCode.substring(0,2), 10) <= 38 ? 'Đối chiếu Luật Hóa chất 69/2025/QH15 và Nghị định 26/2026/NĐ-CP (cùng cổng Tra cứu Hóa chất) để kiểm tra nghĩa vụ khai báo/giấy phép hóa chất nếu có.' : 'Đối chiếu Nghị định 292/2026/NĐ-CP và Danh mục Kiểm tra Chuyên ngành 2026 theo mã HS 8 số để xác nhận điều kiện nhập khẩu trước khi mở tờ khai hải quan.'))}
                         </p>
                     </div>
 

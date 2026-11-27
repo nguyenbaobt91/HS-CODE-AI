@@ -1472,7 +1472,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (15111000)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (15111000)",
     "name": "DẦU CỌ THÔ, CHƯA QUA XỬ LÝ HÓA HỌC (CRUDE PALM OIL), HÀNG MỚI 100%",
     "hs": "15111000",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng Quy tắc 1: Căn cứ để phân loại được xác định theo nội dung của các tiêu đề nhóm (Nhóm 15.11) và các Chú giải phần hoặc chương có liên quan. Dầu cọ và các phân đoạn của dầu cọ được định danh cụ thể tại Chương 15 (Chất béo và dầu nguồn gốc động vật hoặc thực vật).",
@@ -1496,7 +1496,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (39012000)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (39012000)",
     "name": "POLYME TỪ ETYLEN DẠNG HẠT NGUYÊN SINH (POLYETHYLENE CAO CẤP HDPE), TRỌNG LƯỢNG RIÊNG TỪ 0.94 TRỞ LÊN, HÀNG MỚI 100%",
     "hs": "39012000",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Căn cứ GRI 1 để phân loại hàng hóa dựa theo thuật ngữ của các tiêu đề nhóm (Nhóm 39.01) và các Chú giải Chương 39.",
@@ -1520,7 +1520,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (39172923)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (39172923)",
     "name": "ỐNG CỨNG BẰNG NHỰA PVC DÙNG ĐỂ DẪN HÓA CHẤT (CHƯA LẮP PHỤ KIỆN, PHI 25MM), HÀNG MỚI 100%",
     "hs": "39172923",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng Quy tắc 1 (GRI 1): Để đảm bảo tính pháp lý, việc phân loại hàng hóa được xác định theo nội dung của các tiêu đề nhóm và bất kỳ Chú giải Phần hoặc Chương nào có liên quan. Theo Chú giải 8 Chương 39, nhóm 39.17 bao gồm các loại ống, ống dẫn và ống vòi bằng plastic. Hàng hóa là ống cứng làm bằng nhựa PVC có mặt cắt ngang hình tròn, chuyên dùng để dẫn hóa chất, do đó thuộc Nhóm 39.17.",
@@ -1544,7 +1544,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (39269099)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (39269099)",
     "name": "TẤM NHỰA DÙNG ĐỂ BẢO VỆ PHỤ TÙNG MÁY CẮT DẬP DÂY ĐIỆN (HÀNG MỚI 100%)",
     "hs": "39269099",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng Quy tắc 1 (GRI 1): Để đảm bảo tính pháp lý, việc phân loại hàng hóa được xác định theo nội dung của các tiêu đề nhóm và các Chú giải phần hoặc Chương. Mặt hàng là sản phẩm bằng plastic (nhựa) dùng làm tấm che, tấm bảo vệ phụ tùng máy, không được chi tiết hay ghi ở nơi khác trong Danh mục, do đó thuộc Nhóm 39.26.",
@@ -1568,7 +1568,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (40151290)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (40151290)",
     "name": "PHỚT CHẶN DẦU (GIOĂNG CAO SU LÀM KÍN TRỤC) BẰNG CAO SU LƯU HÓA (CHẤT LIỆU NBR), ĐƯỜNG KÍNH PHI 25MM, DÙNG CHO MÁY BƠM, HÀNG MỚI 100%",
     "hs": "40151290",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1: Phân loại hàng hóa dựa theo nội dung của các tiêu đề nhóm (Nhóm 40.16) và các Chú giải Phần/Chương liên quan. Theo Chú giải 1(g) Phần XVI và Chú giải 2 Phần XV (áp dụng tương tự cho vật liệu phi kim loại), các vòng đệm, gioăng, đệm lót (gasket, washers, oil seals) bằng cao su lưu hóa được loại trừ khỏi Phần XVI (máy móc, thiết bị) và được phân loại đặc thù vào Chương 40 (Cục bộ tại Nhóm 40.16 bao gồm các sản phẩm bằng cao su lưu hóa khác chưa được chi tiết ở đâu).",
@@ -1592,7 +1592,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (44079100)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (44079100)",
     "name": "GỖ SỒI (OAK) TỰ NHIÊN, ĐÃ XẺ DỌC, LẠNG HOẶC BÓC TÁCH, ĐÃ HOẶC CHƯA BÀO, CHÀ NHÁM HOẶC GHÉP NỐI ĐẦU, CÓ ĐỘ DÀY TRÊN 6 MM (QUY CÁCH: DÀY 25MM, RỘNG 150MM, DÀI 2000MM), HÀNG MỚI 100%",
     "hs": "44079100",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Theo Quy tắc 1 (GRI 1), việc phân loại hàng hóa được xác định theo nội dung của các tiêu đề nhóm và bất kỳ Chú giải phần hoặc Chú giải chương nào có liên quan. Mặt hàng gỗ sồi xẻ sấy quy cách được mô tả và định danh tại nhóm 44.07 bao gồm gỗ đã xẻ dọc, lạng hoặc bóc tách, đã hoặc chưa bào, chà nhám hoặc ghép nối đầu, có độ dày trên 6 mm.",
@@ -1616,7 +1616,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (44079190)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (44079190)",
     "name": "GỖ SỒI (QUERCUS SPP.) XẺ, ĐÃ BÀO/CHÀ NHÁM HOẶC CHƯA, DÀY TRÊN 6MM, CHƯA GIA CÔNG KHÁC (MỚI 100%)",
     "hs": "44079190",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại hàng hóa dựa trên nội dung các tiêu đề chương, nhóm và Chú giải pháp lý của Chương 44. Hàng hóa là gỗ sồi đã xẻ sấy, có chiều dày 25mm (lớn hơn 6mm), không thuộc các dạng gỗ quy định đặc thù ở các nhóm khác (như gỗ mỏng làm mặt 44.08, gỗ đai thùng 44.04), được định danh trực tiếp tại nhóm 44.07.",
@@ -1640,7 +1640,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (44081030)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (44081030)",
     "name": "VÁN BÓC (LỚP MẶT) BẰNG GỖ BẠCH DƯƠNG, ĐÃ XẺ DỌC/LẠNG/BÓC TÁCH, DÀY 2MM, CHUYÊN DÙNG LÀM VÁN DÁN, MỚI 100%",
     "hs": "44081030",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1: Phân loại hàng hóa căn cứ theo nội dung chú giải của các Chương, nhóm và các Chú giải Phần/Chương. Mặt hàng là tấm gỗ bóc bằng gỗ bạch dương dùng làm ván dán, phù hợp với mô tả của Chương 44 và cụ thể tại nhóm 44.08.",
@@ -1664,7 +1664,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (73021000)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (73021000)",
     "name": "THÂN TRƯỢT DẪN HƯỚNG DÙNG CHO MÁY, BẰNG KIM LOẠI, KHÔNG LẮP Ổ BI (MODEL: SLIDE BODY WITHOUT BALL BEARINGS), HÀNG MỚI 100%",
     "hs": "73021000",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng Quy tắc 1 (GRI 1): Phân loại dựa theo nội dung của các nhóm và Chú giải Phần hoặc Chương. Theo đó, mặt hàng là thân trượt dẫn hướng không lắp ổ bi, được xem xét phân loại vào nhóm 84.83.",
@@ -1688,7 +1688,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (73045910)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (73045910)",
     "name": "ỐNG THÉP ĐÚC KHÔNG HÀN, BẰNG THÉP HỢP KIM KHÁC, CÓ MẶT CẮT NGANG HÌNH TRÒN, DẠNG ỐNG DẪN CHỊU ÁP LỰC CAO (DÙNG CHO NỒI HƠI), ĐƯỜNG KÍNH 60MM, MỚI 100%",
     "hs": "73045910",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại hàng hóa dựa theo nội dung các tiêu đề Chương, Nhóm và Chú giải Chương/Phần. Mặt hàng là ống thép đúc không hàn, thuộc Chương 73, Nhóm 73.04.",
@@ -1712,7 +1712,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (73072210)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (73072210)",
     "name": "KHỚP NỐI ỐNG REN BẰNG THÉP KHÔNG GỈ (THÉP HỢP KIM/KHÔNG GỈ KHÁC), ĐƯỜNG KÍNH TRONG DƯỚI 15CM, DÙNG CHO ĐƯỜNG ỐNG THỦY LỰC, HÀNG MỚI 100%",
     "hs": "73072210",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng Quy tắc 1 (GRI 1): Để đảm bảo tính pháp lý, việc phân loại hàng hóa được xác định theo nội dung của các tiêu đề nhóm và bất kỳ Chú giải phần hoặc Chương nào có liên quan. Theo đó, mặt hàng là phụ kiện ghép nối ống bằng thép được xem xét trực tiếp tại Nhóm 73.07.",
@@ -1736,7 +1736,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (73072290)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (73072290)",
     "name": "KHỚP NỐI ỐNG REN BẰNG THÉP (DÙNG CHO ĐƯỜNG ỐNG THỦY LỰC), ĐƯỜNG KÍNH NGOÀI REN TƯƠNG ỨNG DƯỚI 15CM (LOẠI KHÁC), HÀNG MỚI 100%",
     "hs": "73072290",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại hàng hóa dựa theo nội dung các tiêu đề nhóm 73.07 và Chú giải Phần XV, kết hợp Chú giải Chi tiết HS nhóm 73.07 về phụ kiện ghép nối ống bằng sắt hoặc thép.",
@@ -1760,7 +1760,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (73181410)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (73181410)",
     "name": "VÍT TỰ REN BẰNG THÉP KHÔNG GỈ, ĐƯỜNG KÍNH NGOÀI THÂN KHÔNG QUÁ 16MM, HÀNG MỚI 100%",
     "hs": "73181410",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại hàng hóa dựa theo nội dung các tiêu đề nhóm (Nhóm 73.18) và Chú giải pháp lý có liên quan (Chú giải 2 Phần XV về các sản phẩm bằng kim loại cơ bản).",
@@ -1784,7 +1784,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (73181510)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (73181510)",
     "name": "BU LÔNG LỤC GIÁC BẰNG THÉP, CÓ REN, ĐƯỜNG KÍNH REN M12, DÀI 50MM, CẤP BỀN 8.8, MẠ KẼM ĐIỆN PHÂN, DÙNG CHO MÁY CÔNG NGHIỆP (MỚI 100%)",
     "hs": "73181510",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Căn cứ Quy tắc 1 (GRI 1) của Quy tắc chung giải thích thi hành Danh mục hàng hóa xuất khẩu, nhập khẩu Việt Nam dựa trên Hệ thống hài hoà mô tả và mã hoá hàng hóa (HS) của Tổ chức Hải quan Thế giới: Tên hàng được định danh rõ tại nhóm 73.18 (Vít, bu lông, đai ốc, ... bằng sắt hoặc thép). Do đó, việc phân loại được xác định theo chương và nhóm phù hợp nhất.",
@@ -1808,7 +1808,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (73182100)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (73182100)",
     "name": "VÚ BƠM MỠ BÒ (NÚM MỠ) BẰNG THÉP, CÓ REN M6, KÍCH THƯỚC 10X10MM, DÙNG CHO MÁY MÓC, HÀNG MỚI 100%",
     "hs": "73182100",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại hàng hóa dựa trên nội dung các tiêu đề chương, nhóm và Chú giải pháp lý. Mặt hàng là vú bơm mỡ bò (núm mỡ) bằng kim loại (thép) dùng để lắp vào các điểm bôi trơn của máy móc, thuộc Chương 73 (Sản phẩm bằng sắt hoặc thép). Cụ thể, xét theo bản chất là phụ kiện đường ống hoặc chi tiết kết nối ren, tuy nhiên xét về công năng và phân nhóm chi tiết, vú bơm mỡ thường được phân loại vào nhóm các mặt hàng bu lông, ốc vít, đai ốc, ren... hoặc phụ kiện đường ống tùy theo cấu trúc. Đối với vú bơm mỡ (grease nipple), đây là một loại phụ kiện đường ống/vòi phun hoặc chi tiết ren có tích hợp van bi lò xo nhỏ bên trong để giữ mỡ, thuộc nhóm 73.18 (vít, bu lông, đai ốc...) hoặc nhóm 73.07 / phụ kiện tương tự. Theo thực tế phân loại hải quan Việt Nam, núm bơm mỡ bằng thép có ren được định danh chuẩn xác nhất là một dạng phụ kiện ren hoặc chi tiết cố định/kết nối thuộc nhóm 73.18 hoặc 73.07.",
@@ -1832,7 +1832,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (73182400)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (73182400)",
     "name": "TRỤ GIÁ ĐỠ ĐỊNH VỊ BẰNG SẮT (DÙNG ĐỂ ĐỊNH VỊ/GÁ LẮP, CHIỀU DÀI 45MM), HÀNG MỚI 100%",
     "hs": "73182400",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Căn cứ GRI 1, việc phân loại hàng hóa được xác định theo nội dung của các tiêu đề nhóm và bất kỳ Chú giải Phần hoặc Chương nào có liên quan. Theo bản chất mặt hàng là trụ giá đỡ định vị bằng sắt dùng để định vị, sản phẩm thuộc phạm vi nhóm 73.18.",
@@ -1856,7 +1856,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (73182900)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (73182900)",
     "name": "VÚ BƠM MỠ BÒ BẰNG THÉP (PHỤ KIỆN ĐƯỜNG ỐNG / CHI TIẾT REN BẰNG SẮT THÉP DÙNG CHO MÁY MÓC), KÍCH THƯỚC 10X10MM, REN M6, HÀNG MỚI 100%",
     "hs": "73182900",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại hàng hóa dựa theo nội dung của các tiêu đề nhóm và Chú giải Phần/Chương. Mặt hàng là vú bơm mỡ bò (núm bơm mỡ) bằng thép có ren M6, dùng để lắp vào các điểm chờ bôi trơn của máy móc nhằm bơm mỡ bò. Theo Chú giải 2(a) Phần XV và Chú giải 1(g) Phần XVI, các bộ phận công dụng chung (như bu lông, ốc vít, đai ốc, vòng đệm, phụ kiện đường ống...) bằng kim loại cơ bản không được phân loại là bộ phận của máy móc (Chương 84) mà thuộc Chương 73. Xét cấu tạo, vú bơm mỡ có phần ren M6 để vặn cố định vào chi tiết máy và có đầu côn giữ khớp nối súng bơm mỡ, bản chất kỹ thuật tương tự như các sản phẩm ốc vít ren hoặc phụ kiện đầu nối ren của ống dẫn, thuộc nhóm 73.18 hoặc 73.07. Tuy nhiên, sản phẩm có chức năng nhận đầu bơm mỡ và giữ áp lực mỡ, phân loại chính xác vào nhóm 73.18 (dạng ốc vít ren/chi tiết có ren) hoặc các nhóm phụ kiện tương đương.",
@@ -1880,7 +1880,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (73182990)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (73182990)",
     "name": "VÚ BƠM MỠ BÒ (VÚ MỠ) BẰNG THÉP, REN M6, KÍCH THƯỚC 10X10MM, DÙNG ĐỂ BƠM MỠ BÔI TRƠN MÁY MÓC, HÀNG MỚI 100%",
     "hs": "73182990",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Việc phân loại được xác định theo nội dung của các tiêu đề và Chú giải Phần, Chương (Quy tắc 1). Mặt hàng là vú bơm mỡ bò (đầu vú mỡ) dùng để dẫn truyền mỡ bôi trơn vào các chi tiết máy. Theo Chú giải 2 Phần XV, các chi tiết bằng sắt hoặc thép có ren hoặc không có ren (như ốc vít, bu lông, đai ốc, đinh tán, chốt, vòng đệm và các sản phẩm tương tự) được phân loại vào nhóm 73.18.",
@@ -1904,7 +1904,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (73202090)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (73202090)",
     "name": "LÒ XO XOẮN ỐC BẰNG THÉP, PHI 5MM, DÙNG CHO MÁY DỆT SỢI, HÀNG MỚI 100%",
     "hs": "73202090",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Căn cứ GRI 1, hàng hóa được phân loại theo tiêu đề của Chương 73 (Sản phẩm bằng sắt hoặc thép) và Nhóm 73.20 (Lò xo và lá lò xo, bằng sắt hoặc thép).",
@@ -1928,7 +1928,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (73269099)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (73269099)",
     "name": "MIẾNG THÉP GẮN CỐ ĐỊNH CẢM BIẾN, KÍCH THƯỚC 45X75X5MM, BẰNG THÉP CARBON GIA CÔNG CƠ KHÍ, HÀNG MỚI 100%",
     "hs": "73269099",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Theo Quy tắc GRI 1, việc phân loại hàng hóa được xác định theo nội dung của các tiêu đề và bất kỳ Chú giải Phần hoặc Chương nào có liên quan. Mặt hàng là sản phẩm bằng sắt hoặc thép (Phần XV), được gia công cơ khí (khoan lỗ, cắt theo kích thước) từ thép tấm carbon dùng để gá đặt, gắn cố định cảm biến. Sản phẩm này không được chi tiết hay định danh cụ thể ở bất kỳ nhóm nào khác trong Danh mục HS (ví dụ: không phải là phụ tùng chung theo Chú giải 2 Phần XV, không thuộc Chương 84/85 hay Chương 73 các nhóm từ 73.01 đến 73.25). Do đó, dựa vào bản chất và tên gọi, sản phẩm thuộc Chương 73 và nhóm 73.26 ('Các sản phẩm khác bằng sắt hoặc thép').",
@@ -1952,7 +1952,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (82034000)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (82034000)",
     "name": "BU LÔNG BẰNG THÉP CARBON CƯỜNG ĐỘ CAO (CẤP BỀN 8.8), M12X50MM, TIỆN REN SUỐT, MẠ KẼM ĐIỆN PHÂN, DÙNG CHO KẾT CẤU CƠ KHÍ (MỚI 100%)",
     "hs": "82034000",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Căn cứ GRI 1 để phân loại hàng hóa theo nội dung tên nhóm 73.18 và Chú giải Chương 73, kết hợp Chú giải 2 Phần XV quy định về các sản phẩm bộ phận công dụng chung bằng sắt hoặc thép.",
@@ -1976,7 +1976,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (82077000)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (82077000)",
     "name": "DAO PHAY NGÓN (END MILL) BẰNG HỢP KIM CARBIDE, DÙNG CHO MÁY PHAY CNC ĐỂ GIA CÔNG KIM LOẠI, ĐƯỜNG KÍNH CẮT 10MM, CHIỀU DÀI CẮT 25MM, 4 ME CẮT, HÀNG MỚI 100%",
     "hs": "82077000",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng Quy tắc 1 (GRI 1): Để đảm bảo tính pháp lý, việc phân loại hàng hóa được xác định theo nội dung của các tiêu đề nhóm và bất kỳ Chú giải Phần hoặc Chương nào có liên quan. Theo Chú giải Chương 82 và nội dung nhóm 82.07, các dụng cụ có thể thay đổi được dùng cho máy công cụ (dùng để phay) thuộc nhóm này.",
@@ -2000,7 +2000,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (82081000)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (82081000)",
     "name": "LƯỠI DAO DÙNG CHO MÁY GIA CÔNG KIM LOẠI (LẮP TRÊN MÁY CẮT THÉP CÔNG NGHIỆP), BẰNG THÉP HỢP KIM, HÀNG MỚI 100%",
     "hs": "82081000",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng Quy tắc 1 của 6 Quy tắc tổng quát giải thích phân loại hàng hóa theo Danh mục hàng hóa xuất nhập khẩu Việt Nam dựa trên nội dung chú giải các Chương, Phần và tên nhóm 82.08.",
@@ -2024,7 +2024,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (84146091)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (84146091)",
     "name": "QUẠT LY TÂM HÚT KHÓI CÔNG NGHIỆP BẰNG THÉP, CÔNG SUẤT 3KW, CÁNH THÉP, HÀNG MỚI 100%",
     "hs": "84146091",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng Quy tắc 1 (GRI 1): Tên hàng được định danh tại nhóm 84.14 (Quạt). Căn cứ vào nội dung chú giải nhóm 84.14 bao gồm các loại quạt dùng để lưu thông không khí.",
@@ -2048,7 +2048,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (84669400)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (84669400)",
     "name": "TẤM CHẾ BẢO VỆ BẰNG NHỰA (BỘ PHẬN DÙNG CHO MÁY CẮT DẬP DÂY ĐIỆN), HÀNG MỚI 100%",
     "hs": "84669400",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Căn cứ vào Chú giải 2(b) Phần XVI, các bộ phận nếu chỉ dùng hoặc chủ yếu dùng với một loại máy riêng biệt (thuộc các nhóm từ 84.01 đến 84.79) thì được phân loại vào cùng nhóm với máy đó. Mặt hàng là tấm che bảo vệ thiết kế chuyên dụng cho máy cắt dập dây điện (thuộc nhóm 84.62), do đó thuộc nhóm 84.66 theo GRI 1.",
@@ -2072,7 +2072,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (84811011)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (84811011)",
     "name": "VAN ĐIỀU KHIỂN DÒNG CHẢY/ÁP SUẤT BẰNG TAY BẰNG KIM LOẠI (ĐƯỜNG KÍNH >5CM ĐẾN 40CM), HÀNG MỚI 100%",
     "hs": "84811011",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại hàng hóa dựa theo nội dung các tiêu đề của Phần XVI, Chương 84 và Nhóm 84.81: 'Vòi, van và các thiết bị tương tự dùng cho đường ống, thân nồi hơi, bể chứa hoặc các loại tương tự, kể cả van giảm áp và van điều chỉnh bằng nhiệt'.",
@@ -2096,7 +2096,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (84812011)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (84812011)",
     "name": "VAN BI ĐIỀU KHIỂN KHÍ NÉN, BẰNG THÉP KHÔNG GỈ (INOX), KÍCH THƯỚC DN20, DÙNG CHO ĐƯỜNG ỐNG CÔNG NGHIỆP, HÀNG MỚI 100%",
     "hs": "84812011",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại hàng hóa dựa theo nội dung các tiêu đề của Chương và Chú giải pháp lý có liên quan. Theo đó, mặt hàng van công nghiệp dùng cho đường ống được định danh cụ thể tại nhóm 84.81.",
@@ -2120,7 +2120,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (84812019)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (84812019)",
     "name": "VAN ĐIỆN TỪ ĐIỀU KHIỂN KHÍ NÉN, THÂN NHỰA (PVC/PA), ĐƯỜNG KÍNH DANH ĐỊNH 25MM, ĐIỆN ÁP 24V DC, DÙNG CHO HỆ THỐNG KHÍ NÉN (MODEL: SOLENOID-VALVE-P25), HÀNG MỚI 100%",
     "hs": "84812019",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại hàng hóa dựa trên nội dung các tiêu đề chương, nhóm và Chú giải Phần/Chương. Mặt hàng là van dùng cho đường ống dẫn khí nén, được định danh cụ thể tại Nhóm 84.81.",
@@ -2144,7 +2144,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (84812020)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (84812020)",
     "name": "VAN ĐIỀU KHIỂN BẰNG KHÍ NÉN, BẰNG PLASTIC, ĐƯỜNG KÍNH TRONG 20MM (DN20), DÙNG CHO ĐƯỜNG ỐNG, HÀNG MỚI 100%",
     "hs": "84812020",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để định danh mặt hàng tại cấp độ nhóm 84.81 dựa theo tên gọi và công dụng chính là thiết bị dùng cho đường ống (vòi, van và các thiết bị tương tự).",
@@ -2168,7 +2168,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (84812090)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (84812090)",
     "name": "VAN NHỰA ĐIỀU KHIỂN KHÍ NÉN (DÙNG CHO ĐƯỜNG ỐNG, THÂN BẰNG NHỰA PVC/PA, ĐƯỜNG KÍNH DANH ĐỊNH 25MM, ĐIỆN ÁP 24V DC, ÁP SUẤT 0.8 MPA), HÀNG MỚI 100%",
     "hs": "84812090",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại hàng hóa dựa trên nội dung các tiêu đề Chương, Nhóm và Chú giải Phần/Chương. Mặt hàng là vòi, van và các thiết bị tương tự dùng cho đường ống, thuộc Nhóm 84.81.",
@@ -2192,7 +2192,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (84818030)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (84818030)",
     "name": "VAN ĐIỆN TỪ SOLENOID (THÂN BẰNG ĐỒNG THAU, PHI 25MM, DÙNG CHO HỆ THỐNG CẤP NƯỚC), MỚI 100%",
     "hs": "84818030",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Căn cứ GRI 1: Tờ khai và phân loại hàng hóa được xác định theo nội dung của các tiêu đề nhóm (Nhóm 84.81) và các chú giải phần hoặc chương có liên quan.",
@@ -2216,7 +2216,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (84818061)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (84818061)",
     "name": "VAN BI ĐIỀU KHIỂN BẰNG TAY BẰNG ĐỒNG, ĐƯỜNG KÍNH ĐỊNH MỨC DN20 (KÍCH THƯỚC TRONG TRÊN 5 CM NHƯNG KHÔNG QUÁ 40 CM), MỚI 100%",
     "hs": "84818061",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại hàng hóa dựa trên nội dung các tiêu đề chương, nhóm và Chú giải pháp lý có liên quan. Mặt hàng là van dùng cho đường ống, do đó thuộc Chương 84 và nhóm 84.81.",
@@ -2240,7 +2240,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (84818071)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (84818071)",
     "name": "VAN NHỰA ĐIỀU KHIỂN BẰNG KHÍ NÉN (DÙNG CHO ĐƯỜNG ỐNG, THÂN BẰNG NHỰA PVC/PA, ĐƯỜNG KÍNH DANH ĐỊNH 25MM, ÁP SUẤT 0.8 MPA, ĐIỆN ÁP 24V DC, MODEL: SOLENOID-VALVE-P25), HÀNG MỚI 100%",
     "hs": "84818071",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại hàng hóa dựa trên nội dung các tiêu đề chương, nhóm và Chú giải Phần/Chương. Mặt hàng là van dùng cho đường ống, thuộc Chương 84 và cụ thể tại Nhóm 84.81.",
@@ -2264,7 +2264,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (84818081)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (84818081)",
     "name": "VAN ĐIỀU KHIỂN BẰNG KHÍ NÉN BẰNG NHỰA, ĐƯỜNG KÍNH TRONG 20MM, HÀNG MỚI 100%",
     "hs": "84818081",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại hàng hóa dựa trên nội dung các tiêu đề nhóm (Nhóm 84.81) và Chú giải Phần/Chương có liên quan. Mặt hàng là van dùng cho đường ống, được định danh cụ thể tại Nhóm 84.81.",
@@ -2288,7 +2288,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (84818099)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (84818099)",
     "name": "VAN NHỰA ĐIỀU KHIỂN KHÍ NÉN (DÙNG CHO ĐƯỜNG ỐNG, THÂN BẰNG NHỰA PVC/PA, KÍCH THƯỚC DN25, ÁP SUẤT 0.8MPA, KÈM CUỘN HÚT ĐIỆN TỪ 24V DC), HÀNG MỚI 100%",
     "hs": "84818099",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1: Phân loại hàng hóa dựa theo nội dung của các tiêu đề nhóm (Nhóm 84.81) và các Chú giải Phần hoặc Chương liên quan (Chú giải 2(a) Phần XVI).",
@@ -2312,7 +2312,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (84821000)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (84821000)",
     "name": "Ổ BI ĐỠ MỘT DÃY BẰNG THÉP, MỚI 100%",
     "hs": "84821000",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Căn cứ vào nội dung của Nhóm 84.82 ('Ổ bi hoặc ổ đũa') và các Chú giải phần/chương có liên quan. Theo Quy tắc 1, việc phân loại được xác định theo các điều khoản của nhóm và chú giải phần hay chương.",
@@ -2330,7 +2330,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (84832020)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (84832020)",
     "name": "THÂN TRƯỢT DẪN HƯỚNG DÙNG CHO MÁY CÔNG CỤ (KHÔNG LẮP Ổ BI), HÀNG MỚI 100%",
     "hs": "84832020",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng Quy tắc 1 (GRI 1): Việc phân loại hàng hóa được xác định theo pháp lý của các tiêu đề nhóm và Chú giải Phần hoặc Chương. Mặt hàng là phụ tùng của máy công cụ thuộc chương 84, được định danh tại nhóm 84.66.",
@@ -2354,7 +2354,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (84833090)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (84833090)",
     "name": "THÂN TRƯỢT DẪN HƯỚNG BẰNG GANG ĐÚC (KHÔNG LẮP Ổ BI), DÙNG CHO CÔNG CỤ, MODEL: SLIDE-HOUSING-NB, HÀNG MỚI 100%",
     "hs": "84833090",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại hàng hóa dựa trên nội dung tiêu đề của Nhóm 84.83 và các chú giải phần/chương có liên quan. Hàng hóa là thân trượt dùng ổ trượt (không dùng ổ bi/đũa) cho máy công cụ.",
@@ -2378,7 +2378,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (84879000)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (84879000)",
     "name": "VÚ BƠM MỠ BÒ BẰNG THÉP (MODEL: M6-GREASE-NIPPLE), REN M6, KÍCH THƯỚC 10X10MM, DÙNG CHO MÁY MÓC, HÀNG MỚI 100%",
     "hs": "84879000",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng Quy tắc 1 (GRI 1): Để đảm bảo tính pháp lý, việc phân loại hàng hóa được căn cứ theo nội dung của các tiêu đề nhóm, Chú giải Phần, Chú giải Chương. Theo Chú giải chi tiết WCO Nhóm 84.87, vú tra mỡ (greasing nipple) là bộ phận cơ khí máy móc không được ghi hoặc chi tiết ở nơi khác trong Chương 84 hoặc các chương khác của Danh mục.",
@@ -2402,7 +2402,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (85044090)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (85044090)",
     "name": "BỘ CHUYỂN ĐỔI NGUỒN ĐIỆN TĨNH (AC SANG DC), ĐIỆN ÁP 220V, DÒNG ĐIỆN 15A, HÀNG MỚI 100%",
     "hs": "85044090",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại hàng hóa dựa trên nội dung các tiêu đề phần, chương, phân chương. Theo Chú giải Chương 85 và cấu trúc biểu thuế, thiết bị có chức năng biến đổi điện năng tĩnh (chuyển đổi nguồn điện xoay chiều AC thành nguồn điện một chiều DC) thuộc Nhóm 85.04.",
@@ -2426,7 +2426,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (85352110)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (85352110)",
     "name": "MÁY CẮT CHÂN KHÔNG DÙNG CHO ĐIỆN ÁP TRÊN 1.000 V (VCB 24KV 630A), LOẠI HỘP ĐÚC, MỚI 100%",
     "hs": "85352110",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại hàng hóa dựa theo nội dung các tiêu đề của Phần XVI và Chương 85. Theo Chú giải Chương và Chú giải Nhóm 85.35, mặt hàng là thiết bị điện dùng để đóng ngắt mạch điện với điện áp trên 1.000 V (24kV), do đó thuộc nhóm 85.35.",
@@ -2450,7 +2450,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (85362019)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (85362019)",
     "name": "MÁY CẮT KHÔNG KHÍ (AIR CIRCUIT BREAKER - ACB), 3 PHA, ĐIỆN ÁP 400V, DÒNG ĐIỆN ĐỊNH MỨC 1600A, DÙNG CHO ĐIỆN ÁP KHÔNG QUÁ 1000V, HÀNG MỚI 100%",
     "hs": "85362019",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại hàng hóa dựa trên nội dung các tiêu đề chương, nhóm và chú giải phần/chương. Mặt hàng là thiết bị đóng ngắt mạch điện hạ thế (dưới 1000V), thuộc Chương 85 và nhóm 85.36.",
@@ -2474,7 +2474,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (85365095)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (85365095)",
     "name": "MÁY CẮT KHÔNG KHÍ HẠ THẾ (AIR CIRCUIT BREAKER - ACB), 3 PHA, 400V, 1600A, DÙNG CHO ĐIỆN ÁP KHÔNG QUÁ 1000V, HÀNG MỚI 100%",
     "hs": "85365095",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng Quy tắc 1 để phân loại hàng hóa dựa theo nội dung các tiêu đề của Chương, Phần (Chương 85) và chú giải pháp lý có liên quan (Chú giải 2(a) Phần XVI). Mặt hàng là thiết bị điện dùng để đóng ngắt mạch điện với điện áp không quá 1.000V.",
@@ -2498,7 +2498,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (85365096)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (85365096)",
     "name": "CÔNG TẮC ĐIỆN DÙNG TRONG DÂN DỤNG VÀ CÔNG NGHIỆP, ĐIỆN ÁP 220V, DÒNG ĐIỆN 10A, VỎ NHỰA PC/ABS, LOẠI 1 PHÍM (MODEL: SWITCH-220V-10A), HÀNG MỚI 100%",
     "hs": "85365096",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Căn cứ GRI 1, tên hàng là công tắc điện dùng để đóng ngắt mạch điện hạ thế, thuộc Chương 85. Theo Chú giải 2(a) Phần XVI, thiết bị có chức năng độc lập (công tắc) được phân loại vào nhóm định danh của nó là Nhóm 85.36.",
@@ -2522,7 +2522,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (85365099)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (85365099)",
     "name": "CÔNG TẮC ĐIỆN DÙNG CHO MẠCH ĐIỆN ÁP KHÔNG QUÁ 1.000V (LOẠI DÙNG TRONG CÔNG NGHIỆP, 380V, 25A), HÀNG MỚI 100%",
     "hs": "85365099",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại hàng hóa dựa trên nội dung các tiêu đề chương, nhóm và Chú giải pháp lý. Hàng hóa là công tắc điện dùng để đóng ngắt mạch điện với điện áp không quá 1.000V, thuộc nhóm 85.36.",
@@ -2546,7 +2546,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (85371012)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (85371012)",
     "name": "HÀNG HÓA NHẬP KHẨU",
     "hs": "85371012",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng theo nội dung của nhóm và Chú giải Chương liên quan của Biểu thuế XNK 2026.",
@@ -2566,7 +2566,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (85444294)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (85444294)",
     "name": "DÂY CÁP ĐIỆN BẰNG ĐỒNG, CÓ CÁCH ĐIỆN BẰNG PVC, 3 LÕI, ĐÃ GẮN ĐẦU NỐI PHÍCH CẮM, DÙNG CHO ĐIỆN ÁP 220V, HÀNG MỚI 100%",
     "hs": "85444294",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Căn cứ Quy tắc 1 của GRI (Các Quy tắc tổng quát giải thích việc phân loại Danh mục hàng hóa xuất nhập khẩu theo Hệ thống hài hòa mô tả và mã hóa hàng hóa), tên nhóm 85.44 bao gồm: 'Dây điện, cáp điện (kể cả cáp đồng trục) có cách điện... và các vật dẫn có cách điện khác, đã hoặc chưa gắn với đầu nối'. Do mặt hàng là dây cáp điện bằng đồng bọc PVC đã được gắn đầu nối phích cắm, việc phân loại được xác định trực tiếp tại cấp độ nhóm 85.44.",
@@ -2590,7 +2590,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (87141090)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (87141090)",
     "name": "BỘ PHẬN VÀ PHỤ TÙNG CỦA XE MÔ TÔ (KỂ CẢ XE GẮN MÁY): PHỤ TÙNG BẰNG NHỰA PVC (ỐP BẢO VỆ), KÍCH THƯỚC 70X50MM, MỚI 100%",
     "hs": "87141090",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng Quy tắc 1 (GRI 1): Để đảm bảo tính pháp lý, việc phân loại được xác định theo nội dung của các tiêu đề nhóm và bất kỳ Chú giải Phần hoặc Chương nào liên quan. Hàng hóa là phụ tùng của xe máy (xe mô tô, xe gắn máy) được xem xét tại Chương 87, nhóm 87.14.",
@@ -2614,7 +2614,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (88062100)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (88062100)",
     "name": "MÁY BAY KHÔNG NGƯỜI LÁI (DRONE) TÍCH HỢP CAMERA, TRỌNG LƯỢNG CẤT CÁNH 249G, MỚI 100%",
     "hs": "88062100",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại mặt hàng dựa trên nội dung các tiêu đề nhóm (Nhóm 88.06 bao gồm các phương tiện bay không người lái) và các Chú giải Phần/Chương liên quan.",
@@ -2638,7 +2638,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (90041000)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (90041000)",
     "name": "TẤM NHỰA BẢO VỆ AN TOÀN BẰNG NHỰA PLASTIC (DÙNG CHO MÁY CẮT DẬP DÂY ĐIỆN), HÀNG MỚI 100%",
     "hs": "90041000",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng GRI 1 để phân loại hàng hóa dựa trên nội dung các tiêu đề nhóm (Nhóm 39.26) và Chú giải pháp lý của Phần hoặc Chương.",
@@ -2662,7 +2662,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (90321000)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (90321000)",
     "name": "BỘ ĐIỀU NHIỆT THERMOSTAT TỰ ĐỘNG (RƠ LE NHIỆT LƯỠNG KIM 220V, DÙNG ĐỂ TỰ ĐỘNG ỔN NHIỆT), HÀNG MỚI 100%",
     "hs": "90321000",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng Quy tắc 1 (GRI 1): Để đảm bảo tính pháp lý, việc phân loại hàng hóa được xác định theo nội dung của các tiêu đề nhóm và bất kỳ Chú giải Phần hoặc Chương nào có liên quan. Mặt hàng là bộ điều nhiệt thermostat tự động hoạt động dựa trên nguyên lý lưỡng kim để tự động ổn nhiệt, phù hợp trực tiếp với mô tả của nhóm 90.32.",
@@ -2686,7 +2686,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (94013900)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (94013900)",
     "name": "GHẾ XOAY VĂN PHÒNG CÓ ĐIỀU CHỈNH ĐỘ CAO, KHUNG CHÂN BẰNG THÉP, ĐÃ NHỒI ĐỆM MÚT, CHIỀU CAO 90-110CM, HÀNG MỚI 100%",
     "hs": "94013900",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Căn cứ GRI 1 và Chú giải 1(k) Chương 73, Chú giải Chương 94, mặt hàng ghế ngồi dùng cho văn phòng được định danh cụ thể tại nhóm 94.01.",
@@ -2710,7 +2710,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (94017100)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (94017100)",
     "name": "GHẾ XOAY VĂN PHÒNG CÓ KHUNG BẰNG THÉP, ĐÃ NHỒI ĐỆM, BỌC NỈ, DÙNG ĐỂ NGỒI LÀM VIỆC, HÀNG MỚI 100%",
     "hs": "94017100",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Căn cứ GRI 1: Tên hàng được định danh tại nhóm 94.01 ('Ghế ngồi (trừ các loại thuộc nhóm 94.02), có hoặc không chuyển được thành giường, và bộ phận của chúng'). Việc phân loại được xác định theo nội dung của các nhóm và chú giải phần, chương.",
@@ -2734,7 +2734,7 @@ window.CUSTOMS_RULINGS_DATABASE = [
     ]
   },
   {
-    "doc": "Hồ sơ Thẩm định Antigravity (94031000)",
+    "doc": "Hồ sơ Thẩm định Nghiệp vụ (94031000)",
     "name": "GHẾ XOAY VĂN PHÒNG CÓ ĐỆM MÚT CHÂN THÉP, CHIỀU CAO 90-110CM, DÙNG TRONG VĂN PHÒNG, HÀNG MỚI 100%",
     "hs": "94031000",
     "basis": "· GRI 1 (Tên Nhóm & Chú giải): Áp dụng Quy tắc 1 (GRI 1): Để đảm bảo tính pháp lý, việc phân loại hàng hóa được xác định theo nội dung của các tiêu đề và Chú giải phần hoặc chương. Theo Chú giải 4 của Chương 94, các mặt hàng là ghế ngồi thuộc nhóm 94.01; tuy nhiên, đối với mặt hàng ghế xoay văn phòng có cấu trúc đồ nội thất chuyên dụng (nếu xét theo cấu trúc tổng thể kết hợp bàn làm việc/nội thất văn phòng hoặc phân loại theo cấu trúc đồ nội thất bằng kim loại dùng trong văn phòng tại nhóm 9403), cần xem xét đối chiếu giữa Nhóm 94.01 và Nhóm 94.03. Theo biểu thuế XNK 2026 và danh mục ứng viên được chỉ định trong yêu cầu (mã 94031000), mặt hàng được định danh là đồ nội thất bằng kim loại sử dụng trong văn phòng.",

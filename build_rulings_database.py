@@ -97,7 +97,7 @@ for f in docx_files:
         if name:
             combined_text = f"{name} {desc} {use}"
             rulings.append({
-                'doc': f'Hồ sơ Thẩm định Antigravity ({proposed_hs})',
+                'doc': f'Hồ sơ Thẩm định Nghiệp vụ ({proposed_hs})',
                 'name': name,
                 'hs': proposed_hs,
                 'basis': basis or 'Áp dụng 6 Quy tắc GRI và Chú giải WCO 2022',
