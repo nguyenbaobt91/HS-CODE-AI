@@ -165,7 +165,35 @@ docs.forEach(d=>{
   d._st=status(d);
   const dt=pd(d.ngay_hl)||pd(d.ngay),dn=pd(d.ngay);
   d._ts=dt?dt.getTime():0;d._dn=dn?dn.getTime():0;d._fut=dt&&dt>today?1:0;
-  d._fso=fold(d.so||'');d._fnh=fold(d.nhan||'');
+  d._fso=fold(d.so||'');d._fnh=fold(d.nhan||'');d._ften=fold(d.ten||'');
+  const m=d._fso.match(/^0*(\d+\/\d{4})/);d._ny=m?m[1]:'';
+  d._tp=d._fnh.includes('nghi dinh')?'nd':d._fnh.includes('thong tu')?'tt':d._fnh.includes('luat')?'luat':d._fnh.includes('quyet dinh')?'qd':d._fso.includes('vbhn')?'vbhn':'';
+  d._isAmender=(d.vaitro==='Văn bản sửa đổi, bổ sung'||/bãi bỏ một phần/i.test(d.hieu_luc||''));
+});
+// Liên kết một chiều: văn bản gốc/cũ -> các văn bản mới hơn sửa đổi, bổ sung, bãi bỏ hoặc hợp nhất
+const amendedBy=new Map();
+docs.forEach((d,i)=>{
+  if(d.vaitro.startsWith('Phụ')||!d._ny)return;
+  const set=new Set();
+  const dHl=fold(d.hieu_luc||'');
+  docs.forEach((o,j)=>{
+    if(j===i||o.vaitro.startsWith('Phụ'))return;
+    // Chỉ liên kết sang văn bản mới hơn hoặc văn bản hợp nhất
+    if(o.vaitro!=='Văn bản hợp nhất'&&o._dn&&d._dn&&o._dn<d._dn)return;
+    const oRef=fold((o.sua_doi||'')+' '+(/(?:bãi bỏ|thay thế)/i.test(o.hieu_luc||'')&&!/bãi bỏ bởi|đã sửa bởi/i.test(o.hieu_luc||'')?o.hieu_luc:''));
+    const reD=new RegExp('(^|[^0-9])0*'+d._ny.replace('/','\\/')+'(?![0-9])');
+    const oMentionsD=oRef&&reD.test(oRef)&&(o._tp===d._tp||oRef.includes(d._fso));
+    const reO=o._ny?new RegExp('(^|[^0-9])0*'+o._ny.replace('/','\\/')+'(?![0-9])'):null;
+    const dMentionsO=reO&&dHl&&/(sua boi|bai bo boi|thay the boi)/.test(dHl)&&reO.test(dHl)&&(o._tp===d._tp||dHl.includes(o._fso));
+    if(oMentionsD||dMentionsO)set.add(j);
+  });
+  // Liên kết thêm VBHN cùng tên luật (vd: Luật 107/2016/QH13 -> 96/VBHN-VPQH)
+  if(d._tp==='luat'&&d.vaitro==='Văn bản gốc'){
+    docs.forEach((o,j)=>{
+      if(j!==i&&o.vaitro==='Văn bản hợp nhất'&&d._ften.slice(0,22)&&o._ften.includes(d._ften.slice(0,22)))set.add(j);
+    });
+  }
+  if(set.size)amendedBy.set(i,set);
 });
 // Unpack compact array format lazily without duplicating text strings in RAM
 const chunks=[];
@@ -200,21 +228,65 @@ const KEEP1=new Set(['diem','mau','form','khoan','phu']);
 function expandWord(w){const k=fold(w).replace(/[^a-z0-9\/]/g,'');return ABBR[k]||w}
 function expandStr(s){return s.split(/\s+/).map(expandWord).join(' ')}
 function matchDocRef(q){
-  const re=/(?:^|\s)(nđ|nd|nghị định|nghi dinh|tt|thông tư|thong tu|luật|luat|qđ|qd|quyết định|quyet dinh|vbhn)\s*(\d+(?:\/\d{4})?)/gi;
+  const re=/(?:^|\s)(nđ|nd|nghị định|nghi dinh|tt|thông tư|thong tu|luật|luat|qđ|qd|quyết định|quyet dinh|vbhn)\s*(?:(?:số|so)\s*)?(\d+(?:\/\d{4})?)(?:\/[a-z0-9đĐ-]+)?/gi;
   const targets=new Set();
-  const qClean=q.replace(re,(all,tp,num)=>{
-    const t=fold(tp),n=num.toLowerCase();
+  const addByNum=(tpCode,num)=>{
+    const n=num.toLowerCase(),n0=n.replace(/^0+/,'');
     let matched=false;
     docs.forEach((d,idx)=>{
       if(d.vaitro.startsWith('Phụ'))return;
-      const soMatch=d._fso.startsWith(n+'/')||d._fso===n||d._fnh.includes(' '+n+'/')||d._fnh.endsWith(' '+n);
-      if(!soMatch)return;
-      const tpOk=(t.startsWith('n')&&d._fnh.includes('nghi dinh'))||(t.startsWith('t')&&d._fnh.includes('thong tu'))||(t.startsWith('l')&&d._fnh.includes('luat'))||(t.startsWith('q')&&d._fnh.includes('quyet dinh'))||(t==='vbhn'&&d._fso.includes('vbhn'));
-      if(tpOk){targets.add(idx);matched=true}
+      if(tpCode&&d._tp!==tpCode)return;
+      const so0=d._fso.replace(/^0+/,'');
+      const soMatch=so0.startsWith(n0+'/')||so0===n0||d._fso.startsWith(n+'/')||d._fso===n||d._fnh.includes(' '+n+'/')||d._fnh.endsWith(' '+n);
+      if(soMatch){targets.add(idx);matched=true}
     });
-    return matched?' ':all;
+    return matched;
+  };
+  let qClean=q.replace(re,(all,tp,num)=>{
+    const t=fold(tp);
+    const tpCode=t.startsWith('n')?'nd':t.startsWith('t')?'tt':t.startsWith('l')?'luat':t.startsWith('q')?'qd':t==='vbhn'?'vbhn':'';
+    return addByNum(tpCode,num)?' ':all;
   });
+  // Hỗ trợ nhập trực tiếp số hiệu đầy đủ không kèm chữ "Thông tư/Nghị định" (vd: 38/2015/TT-BTC)
+  qClean=qClean.replace(/(?:^|\s)(\d+\/\d{4})\/(tt|nđ|nd|qh|qđ|qd|vbhn)[a-z0-9đĐ-]*/gi,(all,num,suf)=>{
+    const s=fold(suf);
+    const tpCode=s.startsWith('n')?'nd':s.startsWith('t')?'tt':s.startsWith('qh')?'luat':s.startsWith('q')?'qd':'vbhn';
+    return addByNum(tpCode,num)?' ':all;
+  });
+  // Hỗ trợ nhập tên Luật quen thuộc (vd: "Luật Hải quan", "Luật Thuế XNK", "Luật Quản lý thuế"...)
+  const NAMED_LAWS=[
+    [/(?:^|\s)(?:luật|luat)\s+(?:hải quan|hai quan)(?=$|\s|[,.;:])/gi,'54/2014'],
+    [/(?:^|\s)(?:luật|luat)\s+(?:thuế|thue)\s+(?:xuất khẩu,?\s*thuế\s*nhập khẩu|xuat khau,?\s*thue\s*nhap khau|xuất nhập khẩu|xuat nhap khau|xnk)(?=$|\s|[,.;:])/gi,'107/2016'],
+    [/(?:^|\s)(?:luật|luat)\s+(?:quản lý thuế|quan ly thue)(?=$|\s|[,.;:])/gi,'108/2025'],
+    [/(?:^|\s)(?:luật|luat)\s+(?:xử lý vi phạm hành chính|xu ly vi pham hanh chinh|xlvphc)(?=$|\s|[,.;:])/gi,'15/2012'],
+    [/(?:^|\s)(?:luật|luat)\s+(?:quản lý ngoại thương|quan ly ngoai thuong)(?=$|\s|[,.;:])/gi,'05/2017'],
+    [/(?:^|\s)(?:luật|luat)\s+(?:thuế giá trị gia tăng|thue gia tri gia tang|thuế gtgt|thue gtgt)(?=$|\s|[,.;:])/gi,'48/2024']
+  ];
+  for(const [lre,lnum] of NAMED_LAWS){
+    qClean=qClean.replace(lre,all=>addByNum('luat',lnum)?' ':all);
+  }
   return{targets,qClean};
+}
+function chunkBelongsOtherDoc(c,targetNys){
+  if(!targetNys||!targetNys.length)return false;
+  const intro=(c.t||'').split(/như sau\s*:|[“"]/i)[0].slice(0,260);
+  const hf=fold((c.td||'')+'\n'+intro);
+  const mentioned=hf.match(/\b\d{1,3}\/\d{4}\b/g);
+  if(!mentioned||!mentioned.length)return false;
+  return !mentioned.some(m=>targetNys.includes(m.replace(/^0+/,'')));
+}
+function isAmendMatch(c,nmVal,nmFold,targetNys){
+  const intro=(c.t||'').split(/như sau\s*:|[“"]/i)[0].slice(0,260);
+  const head=(c.td||'')+'\n'+intro;
+  const headLow=head.toLowerCase().normalize('NFC');
+  const headFold=fold(head);
+  if(!/(sua doi|bo sung|bai bo|thay the)/.test(headFold))return false;
+  const reDieu=nmVal.includes('đ')
+    ?new RegExp('(?:^|[^\\p{L}\\p{N}])điều\\s+'+nmVal+'(?![\\p{L}\\p{N}])','iu')
+    :new RegExp('(?:^|[^a-z0-9])dieu\\s+'+nmFold+'(?![a-z0-9])','i');
+  if(!reDieu.test(nmVal.includes('đ')?headLow:headFold))return false;
+  if(chunkBelongsOtherDoc(c,targetNys))return false;
+  return true;
 }
 function search(rawQ){
   const phrases=[];
@@ -254,6 +326,15 @@ function search(rawQ){
   const hasAccent=/[^\x00-\x7f]/.test(q);
   const bia=[];for(let i=0;i<qa.length-1;i++)bia.push(qa[i]+' '+qa[i+1]);
   const fD=filterDoc;
+  const amendTargets=new Set();
+  const targetNys=[];
+  if(docTargets.size){
+    docTargets.forEach(ti=>{
+      if(docs[ti]&&docs[ti]._ny)targetNys.push(docs[ti]._ny);
+      const ab=amendedBy.get(ti);
+      if(ab)ab.forEach(ai=>{if(!docTargets.has(ai))amendTargets.add(ai)});
+    });
+  }
   const sw=qt.reduce((a,t)=>a+idf(t),0)||1;
   // Chọn tập ứng viên từ Inverted Index thay vì quét toàn bộ 5.461 đoạn
   let candIdx;
@@ -278,8 +359,19 @@ function search(rawQ){
     const cDieu=(c.dieu||'').toLowerCase();
     const dieuHit=nmVal?((nmVal.includes('đ')?cDieu===nmVal:(cDieu===nmVal||fold(cDieu)===nmFold))?1:0):0;
     const docHit=docTargets.size?(docTargets.has(c.d)?1:0):0;
-    if(docTargets.size&&!docHit)continue;
-    if(nmVal&&!qt.length&&!dieuHit)continue;
+    const inAmendDoc=amendTargets.size&&amendTargets.has(c.d);
+    let amendHit=0, amendDocHit=0;
+    if(nmVal){
+      if(docTargets.size){
+        if(inAmendDoc&&isAmendMatch(c,nmVal,nmFold,targetNys))amendHit=1;
+      }else if(d._isAmender&&isAmendMatch(c,nmVal,nmFold,null)){
+        amendHit=1;
+      }
+    }else if(inAmendDoc&&!chunkBelongsOtherDoc(c,targetNys)){
+      amendDocHit=1;
+    }
+    if(docTargets.size&&!docHit&&!amendHit&&!amendDocHit)continue;
+    if(nmVal&&!qt.length&&!dieuHit&&!amendHit)continue;
     const cf=fold(c.t), cfn=' '+cf.replace(/[^a-z0-9\/]+/g,' ')+' ', cft=fold(c.td), clt=c.t.toLowerCase();
     if(phrases.length&&!phrases.every(alts=>alts.some(p=>cfn.includes(' '+p+' '))))continue;
     let sc=0,hit=0,hw=0;
@@ -306,7 +398,8 @@ function search(rawQ){
     }
     for(const t of qt){if(cft.includes(t))sc+=idf(t)*1.5}
     if(dieuHit)sc*=(d.vaitro==='Văn bản gốc'||d.vaitro==='Văn bản hợp nhất')?3.2:1.2;
-    if(kmVal&&c.kh===kmVal)sc*=1.5;
+    if(amendHit)sc*=3.0;
+    if(kmVal&&(c.kh===kmVal||(amendHit&&new RegExp('khoan\\s+'+kmVal+'(?![0-9])').test(cft+' '+cf.slice(0,220)))))sc*=1.5;
     const penHit=pen&&d.nhom.includes('Xử phạt vi phạm hành chính')?1:0;
     if(penHit)sc*=2.0;
     if(d._st[0]==='bad')sc*=0.6;
@@ -314,9 +407,11 @@ function search(rawQ){
     const phraseHit=(whole&&cfn.includes(' '+whole+' '))?2:(seqs.length&&seqs.every(s=>cfn.includes(' '+s+' ')))?1:0;
     const accentHit=hasAccent?(bia.length&&bia.every(b=>clt.includes(b))?2:accCnt>0?1:0):0;
     const stRank=d._st[0]==='bad'?2:d._fut?1:0;
-    out.push({c,sc,cov,tier,phraseHit,accentHit,penHit,stRank,dieuHit,docHit,ts:d._ts,dn:d._dn});
+    const structHit=(dieuHit||amendHit)?1:0;
+    const docPref=(!qt.length&&!nmVal)?docHit:0;
+    out.push({c,sc,cov,tier,phraseHit,accentHit,penHit,stRank,dieuHit,amendHit,amendDocHit,structHit,docHit,docPref,ts:d._ts,dn:d._dn,nmVal});
   }
-  out.sort((a,b)=>b.dieuHit-a.dieuHit||b.docHit-a.docHit||a.stRank-b.stRank||b.penHit-a.penHit||b.tier-a.tier||b.phraseHit-a.phraseHit||b.accentHit-a.accentHit||b.ts-a.ts||b.dn-a.dn||b.sc-a.sc);
+  out.sort((a,b)=>b.structHit-a.structHit||a.stRank-b.stRank||b.docPref-a.docPref||b.amendHit-a.amendHit||b.dieuHit-a.dieuHit||b.penHit-a.penHit||b.tier-a.tier||b.phraseHit-a.phraseHit||b.accentHit-a.accentHit||b.ts-a.ts||b.dn-a.dn||b.sc-a.sc);
   const docCnt=new Map();
   out.forEach(x=>docCnt.set(x.c.d,(docCnt.get(x.c.d)||0)+1));
   if(fD===''){
@@ -370,7 +465,7 @@ function cardHtml(x,k,docCnt){
   const c=x.c,d=docs[c.d];
   return '<div class="card"><div class="head"><div class="cite"><span class="num">'+(k+1)+'</span>'+esc(label(c))+'</div><span class="score">độ khớp '+Math.round(x.cov*100)+'%</span></div>'+
     '<div class="sub">'+esc(d.ten)+' · ban hành '+esc(d.ngay)+(c.ch?' · '+esc(c.ch):'')+(c.dieu&&c.td?' · <b>'+esc(c.td)+'</b>':'')+'</div>'+
-    '<div>'+chips(d)+'</div>'+
+    '<div>'+chips(d)+(x.amendHit?'<span class="chip sd">🔄 Sửa đổi/bổ sung Điều '+esc(x.nmVal)+'</span>':x.amendDocHit?'<span class="chip sd">🔄 Văn bản sửa đổi/hợp nhất liên quan</span>':'')+'</div>'+
     (d.vaitro!=='Văn bản gốc'&&d.sua_doi?'<div class="sub">Sửa đổi, bổ sung: '+esc(d.sua_doi)+'</div>':'')+
     '<div class="txt" id="t'+k+'">'+hl(c.t,qtG,700)+'</div>'+
     '<div class="acts">'+(c.t.length>700?'<button class="a" onclick="LAW.full('+k+')">Xem đầy đủ</button>':'')+
