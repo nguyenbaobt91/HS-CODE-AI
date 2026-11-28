@@ -4170,8 +4170,6 @@
                         const rClean = r.hs.replace(/\./g, '');
                         const rHead = rClean.substring(0, 4);
                         const rChap = rClean.substring(0, 2);
-                        // Strict chapter guard: NEVER cross chapters for precedents!
-                        if (expectedChap && rChap !== expectedChap) continue;
 
                         let matchCount = 0;
                         for (let kw of (r.keywords || [])) {
@@ -4179,6 +4177,7 @@
                         }
                         if (rClean === (quickCand?.c || '').replace(/\./g, '')) matchCount += 5;
                         else if (rHead === expectedHead) matchCount += 3;
+                        else if (expectedChap && rChap === expectedChap) matchCount += 1;
 
                         if (matchCount >= 2 || (rClean === (quickCand?.c || '').replace(/\./g, '') && matchCount >= 1)) {
                             matchedRulings.push({ ruling: r, score: matchCount });
@@ -4199,12 +4198,11 @@
                 console.warn("Lỗi trích xuất tiền lệ Hải quan:", err);
             }
 
-            // Pass 1 (2-Pass Gemini + WCO RAG): When local StatutoryTreeWalker hasn't locked a statutory code,
-            // let Gemini independently discover the top 3 4-digit Headings across all 97 Chapters so WCO & Tariff RAG never gets poisoned by Stage-1 keywords.
+            // Pass 1 (2-Pass Gemini + WCO RAG): Luôn cho Gemini đọc hiểu ngữ cảnh độc lập để đề xuất Top 3 Nhóm 4 số
+            // trên toàn bộ 97 Chương (không bị khóa cứng bởi Stage-1 keyword/regex).
             let aiDiscoveredHeads = [];
             try {
-                const isLockedByWalker = Boolean(quickCand && (quickCand._statutory || quickCand._insufficient_info));
-                if (!isLockedByWalker && apiKey && apiKey.length > 15) {
+                if (apiKey && apiKey.length > 15) {
                     const p1Prompt = `Bạn là Chuyên gia phân loại mã HS Hải quan (WCO HS 2022). Hãy xác định 3 Nhóm 4 số khả dĩ nhất (dạng "xxxx", không dấu chấm) theo GRI 1 và Chú giải Phần/Chương WCO 2022 cho hàng hóa sau:\n- Tên hàng: ${name} (Model: ${model_en || 'N/A'})\n- Bản chất / Thành phần / Chất liệu: ${desc || 'N/A'}\n- Công dụng: ${use || 'N/A'}\n- Thông số: ${specs || 'N/A'}\nLưu ý: Ruột/lốp cao su -> Chương 40 (4011-4013); phụ tùng ô tô -> 8708; smartwatch/module BLE/WiFi/LoRa -> 8517; dung dịch polyme trong dung môi >50% -> 3208; chế phẩm hóa chất -> 3824; thuốc bán lẻ -> 3004.\nTrả về JSON: {"headings": ["xxxx", "yyyy", "zzzz"]}`;
                     const p1Ctrl = new AbortController();
                     const p1Timer = setTimeout(() => p1Ctrl.abort(), 8000);
@@ -6668,7 +6666,12 @@ Trường hợp đủ thông tin:
             }
 
             // 10. ĐẦU COS / ĐẦU NỐI DÂY & CÁP ĐIỆN (Nhóm 8536.90)
-            if (/\b(?:dau\s+cot|dau\s+cos|dau\s+noi(?:\s+day(?:\s+va\s+cap)?(?:\s+dien)?)?|terminal|connector)\b/.test(hn)) {
+            // Chỉ áp dụng khi bản thân hàng hóa LÀ đầu nối/đầu cos, KHÔNG bắt nhầm "dây điện có gắn đầu nối" (Nhóm 8544.42)
+            if (
+                /\b(?:dau\s+cot|dau\s+cos|dau\s+noi(?:\s+day(?:\s+va\s+cap)?(?:\s+dien)?)?|terminal|connector)\b/.test(hn)
+                && !/^(?:day|cap|wire|cable|harness)\b/.test(hn)
+                && !/\b(?:co\s+gan|da\s+gan|gan\s+san|chua\s+gan|khong\s+gan)\s+dau\s+noi\b/.test(hn)
+            ) {
                 const amp = attrs.amp_a;
                 if (amp !== null && amp > 16) {
                     return {
@@ -6962,6 +6965,32 @@ Trường hợp đủ thông tin:
 
                 if (attrs.voltage_v <= 1000.0) {
                     if (attrs.has_connector) {
+                        const isPlasticWire = /\b(?:pvc|plastic|nhua)\b/.test(norm);
+                        const coreMatch = norm.match(/(?:duong\s+kinh\s+(?:loi|day)|loi)\s*(?:duoi|nho\s+hon|khong\s+qua|<=|<)?\s*(\d+(?:[.,]\d+)?)\s*mm\b/);
+                        const coreD = coreMatch ? parseFloat(coreMatch[1].replace(",", ".")) : null;
+                        const isUnder5mm = (coreD !== null && (coreD < 5.0 || (coreD === 5.0 && !/\btren\s+5/.test(norm))));
+                        if (isPlasticWire && isUnder5mm) {
+                            return {
+                                code: "8544.42.94",
+                                level: 8,
+                                status: "EXACT_8_DIGIT",
+                                reasoning: "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 85.44. Áp dụng GRI 6: Điện áp <= 1000V -> Đã lắp với đầu nối điện (Phân nhóm 8544.42) -> Loại khác, cáp điện cách điện bằng plastic, mỗi lõi đường kính không quá 5mm -> Mã 8544.42.94.",
+                                missing_attributes: [],
+                                assumptions: "Dây/cáp điện <= 1000V, cách điện plastic, lõi <= 5mm, đã lắp đầu nối",
+                                reserve_code: "8544.42.99"
+                            };
+                        }
+                        if (isPlasticWire && coreD !== null && coreD > 5.0 && coreD <= 19.5) {
+                            return {
+                                code: "8544.42.95",
+                                level: 8,
+                                status: "EXACT_8_DIGIT",
+                                reasoning: "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 85.44. Áp dụng GRI 6: Điện áp <= 1000V -> Đã lắp với đầu nối điện (Phân nhóm 8544.42) -> Cáp điện cách điện bằng plastic, mỗi lõi đường kính trên 5mm nhưng không quá 19,5mm -> Mã 8544.42.95.",
+                                missing_attributes: [],
+                                assumptions: "Dây/cáp điện <= 1000V, cách điện plastic, lõi > 5mm đến 19.5mm, đã lắp đầu nối",
+                                reserve_code: "8544.42.94"
+                            };
+                        }
                         return {
                             code: "8544.42.99",
                             level: 8,
@@ -9444,14 +9473,23 @@ Trường hợp đủ thông tin:
             const fullNorm = (typeof removeAccents === 'function') ? removeAccents(fullText) : fullText.toLowerCase();
             let cCode = (res.clean_code || res.hs_code || '').replace(/\./g, '');
 
-            // Quy tắc pháp lý có căn cứ Chú giải (StatutoryTreeWalker) được ưu tiên hơn mã do AI đề xuất
+            // Quy tắc định lượng StatutoryTreeWalker:
+            // - Nếu Gemini chưa ra mã hợp lệ trong HS_DATABASE (mã bịa/rỗng): dùng StatutoryTreeWalker làm lưới an toàn.
+            // - Nếu Gemini ĐÃ ra mã hợp lệ trong HS_DATABASE: CHỈ cho StatutoryTreeWalker tinh chỉnh khi CÙNG NHÓM 4 SỐ
+            //   (để chốt chính xác ngưỡng định lượng V/A/kW/mm theo Biểu thuế), TUYỆT ĐỐI KHÔNG lấy regex khác nhóm đè lên kết quả hiểu ngữ cảnh của Gemini!
             try {
                 if (typeof classifyStatutoryTreeClientSide === 'function') {
                     let sw = classifyStatutoryTreeClientSide({ name: rawInput.name || '', desc: rawInput.desc || '', use: rawInput.use || '', specs: rawInput.specs || '', model_en: rawInput.model_en || '' });
                     if (sw && typeof engineValidateWalkerClient === 'function' && sw.status && sw.status !== 'INSUFFICIENT_INFO') {
                         sw = engineValidateWalkerClient(sw, { name: rawInput.name || '', desc: rawInput.desc || '', use: rawInput.use || '', specs: rawInput.specs || '', model_en: rawInput.model_en || '' });
                     }
-                    if (sw && sw.status === 'INSUFFICIENT_INFO') {
+                    const swClean = sw && sw.code ? (sw.code || '').replace(/\./g, '') : '';
+                    const aiHead = cCode.length >= 4 ? cCode.substring(0, 4) : '';
+                    const swHead = swClean.length >= 4 ? swClean.substring(0, 4) : '';
+                    const aiValidInDb = cCode.length === 8 && Boolean((window.HS_DATABASE || []).find(it => (it.c || '').replace(/\./g, '') === cCode));
+                    const sameHeadingOrFallback = !aiValidInDb || (aiHead && swHead && aiHead === swHead);
+
+                    if (sw && sw.status === 'INSUFFICIENT_INFO' && sameHeadingOrFallback) {
                         res.is_insufficient_info = true;
                         res.warning_title = 'Cần xác nhận dữ kiện phân định (Không đoán mò)';
                         res.warning_message = sw.reasoning;
@@ -9461,8 +9499,7 @@ Trường hợp đủ thông tin:
                         res.legal_basis = sw.legal_basis || '';
                         return res;
                     }
-                    const swClean = sw && sw.code ? (sw.code || '').replace(/\./g, '') : '';
-                    if (sw && (sw.status === 'STOP_4_DIGIT' || sw.status === 'STOP_6_DIGIT') && (swClean.length === 4 || swClean.length === 6)) {
+                    if (sw && sameHeadingOrFallback && (sw.status === 'STOP_4_DIGIT' || sw.status === 'STOP_6_DIGIT') && (swClean.length === 4 || swClean.length === 6)) {
                         if (swClean !== cCode) {
                             console.warn('[StatutoryWalker] Giữ nguyên mã dừng ' + sw.status + ' (' + sw.code + '), không cho AI đoán ' + cCode);
                             res.exclusions = 'Loại trừ mã ' + (res.hs_code || cCode) + ' do AI đề xuất: thiếu dữ kiện chia tách cấp sâu hơn theo quy tắc pháp lý. ' + (res.exclusions || '');
@@ -9482,11 +9519,11 @@ Trường hợp đủ thông tin:
                         }
                     }
                     const swCode = sw && sw.status === 'EXACT_8_DIGIT' ? swClean : '';
-                    if (swCode.length === 8 && swCode !== cCode) {
+                    if (swCode.length === 8 && swCode !== cCode && sameHeadingOrFallback) {
                         const dbw = (window.HS_DATABASE || []).find(it => (it.c || '').replace(/\./g, '') === swCode);
                         if (dbw) {
-                            console.warn('[StatutoryWalker] Thay mã AI ' + cCode + ' bằng ' + swCode);
-                            res.exclusions = 'Loại trừ mã ' + (res.hs_code || cCode) + ' do AI đề xuất: không phù hợp quy tắc pháp lý. ' + (res.exclusions || '');
+                            console.warn('[StatutoryWalker] Tinh chỉnh ngưỡng cùng nhóm ' + cCode + ' -> ' + swCode);
+                            res.exclusions = 'Điều chỉnh chi tiết 8 số từ ' + (res.hs_code || cCode) + ' sang ' + sw.code + ' theo ngưỡng định lượng biểu thuế. ' + (res.exclusions || '');
                             res.clean_code = swCode;
                             res.hs_code = sw.code;
                             res.is_six_digit_proposed = false;

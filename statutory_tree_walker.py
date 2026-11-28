@@ -601,7 +601,12 @@ class StatutoryTreeWalker:
             }
 
         # 10. ĐẦU COS / ĐẦU NỐI DÂY & CÁP ĐIỆN (Nhóm 8536.90)
-        if re.search(r'\b(?:dau\s+cot|dau\s+cos|dau\s+noi(?:\s+day(?:\s+va\s+cap)?(?:\s+dien)?)?|terminal|connector)\b', hn):
+        # Chỉ áp dụng khi bản thân hàng hóa LÀ đầu nối/đầu cos, KHÔNG bắt nhầm "dây điện có gắn đầu nối" (Nhóm 8544.42)
+        if (
+            re.search(r'\b(?:dau\s+cot|dau\s+cos|dau\s+noi(?:\s+day(?:\s+va\s+cap)?(?:\s+dien)?)?|terminal|connector)\b', hn)
+            and not re.match(r'^(?:day|cap|wire|cable|harness)\b', hn)
+            and not re.search(r'\b(?:co\s+gan|da\s+gan|gan\s+san|chua\s+gan|khong\s+gan)\s+dau\s+noi\b', hn)
+        ):
             amp = attrs.get("amp_a")
             if amp is not None and amp > 16:
                 return {
@@ -888,6 +893,30 @@ class StatutoryTreeWalker:
 
             if attrs["voltage_v"] <= 1000.0:
                 if attrs["has_connector"]:
+                    is_plastic_wire = bool(re.search(r'\b(?:pvc|plastic|nhua)\b', norm))
+                    core_m = re.search(r'(?:duong\s+kinh\s+(?:loi|day)|loi)\s*(?:duoi|nho\s+hon|khong\s+qua|<=|<)?\s*(\d+(?:[.,]\d+)?)\s*mm\b', norm)
+                    core_d = float(core_m.group(1).replace(',', '.')) if core_m else None
+                    is_under_5mm = (core_d is not None and (core_d < 5.0 or (core_d == 5.0 and not re.search(r'\btren\s+5', norm))))
+                    if is_plastic_wire and is_under_5mm:
+                        return {
+                            "code": "8544.42.94",
+                            "level": 8,
+                            "status": "EXACT_8_DIGIT",
+                            "reasoning": "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 85.44. Áp dụng GRI 6: Điện áp <= 1000V -> Đã lắp với đầu nối điện (Phân nhóm 8544.42) -> Loại khác, cáp điện cách điện bằng plastic, mỗi lõi đường kính không quá 5mm -> Mã 8544.42.94.",
+                            "missing_attributes": [],
+                            "assumptions": "Dây/cáp điện <= 1000V, cách điện plastic, lõi <= 5mm, đã lắp đầu nối",
+                            "reserve_code": "8544.42.99"
+                        }
+                    if is_plastic_wire and core_d is not None and 5.0 < core_d <= 19.5:
+                        return {
+                            "code": "8544.42.95",
+                            "level": 8,
+                            "status": "EXACT_8_DIGIT",
+                            "reasoning": "Áp dụng GRI 1 & Chú giải 2(a) Phần XVI -> Nhóm 85.44. Áp dụng GRI 6: Điện áp <= 1000V -> Đã lắp với đầu nối điện (Phân nhóm 8544.42) -> Cáp điện cách điện bằng plastic, mỗi lõi đường kính trên 5mm nhưng không quá 19,5mm -> Mã 8544.42.95.",
+                            "missing_attributes": [],
+                            "assumptions": "Dây/cáp điện <= 1000V, cách điện plastic, lõi > 5mm đến 19.5mm, đã lắp đầu nối",
+                            "reserve_code": "8544.42.94"
+                        }
                     return {
                         "code": "8544.42.99",
                         "level": 8,
